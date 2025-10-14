@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manny Serrano's Social's</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for a clean look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Applying the Inter font to the whole page */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-violet-50 text-gray-800">
+
+    <!-- Main Container -->
+    <div class="container mx-auto px-4 py-8 flex flex-col items-center justify-center min-h-screen">
+        
+        <div class="w-full max-w-md text-center">
+            
+            <!-- 
+            =================================
+            EDIT YOUR PROFILE PICTURE
+            =================================
+            To change your profile picture, replace the `src` value below with the URL of your image.
+            For example: src="https://your-image-url.com/profile.jpg"
+            -->
+            <img 
+                src="https://placehold.co/128x128/E9D5FF/3730A3?text=MS" 
+                alt="Manny Serrano Profile Picture" 
+                class="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-white shadow-lg"
+            >
+            
+            <!-- 
+            =================================
+            EDIT YOUR NAME & BIO
+            =================================
+            You can change the name and bio text below.
+            -->
+            <h1 class="text-3xl font-bold text-violet-800">Manny Serrano's Socials</h1>
+            <p class="text-lg text-gray-600 mt-2 mb-8">Your local Tampa comic slash barber</p>
+
+            <!-- Links Container -->
+            <div class="space-y-4">
+
+                <!-- 
+                =================================
+                EDIT YOUR SOCIAL LINKS
+                =================================
+                Each link is an `<a>` tag.
+                - Change the `href` value to update the URL.
+                - Change the text inside the `<a>` tag to update the button's label.
+                
+                To add a new link, just copy and paste one of the blocks below and edit it.
+                -->
+
+                <!-- Barbering Instagram -->
+                <a href="https://www.instagram.com/mas_barbery?igsh=MXBhOGtzb3B1b214cQ%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" class="block w-full bg-white hover:bg-violet-100 text-violet-700 font-semibold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:-translate-y-1">
+                    Barbering Instagram
+                </a>
+
+                <!-- Comedy Instagram -->
+                <a href="https://www.instagram.com/monotonebaritone?igsh=aXZjcXdoYjYydjFx&utm_source=qr" target="_blank" rel="noopener noreferrer" class="block w-full bg-white hover:bg-violet-100 text-violet-700 font-semibold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:-translate-y-1">
+                    Comedy Instagram
+                </a>
+
+                <!-- Snapchat -->
+                <a href="https://snapchat.com/t/3G3anaHJ" target="_blank" rel="noopener noreferrer" class="block w-full bg-white hover:bg-violet-100 text-violet-700 font-semibold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:-translate-y-1">
+                    Snapchat
+                </a>
+
+                <!-- Facebook -->
+                <a href="https://www.facebook.com/share/1ChXo1WokK/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" class="block w-full bg-white hover:bg-violet-100 text-violet-700 font-semibold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:-translate-y-1">
+                    Facebook
+                </a>
+
+                <!-- 
+                =================================
+                ADD YOUR YOUTUBE PAGES HERE
+                =================================
+                To add your YouTube links, remove the `<!--` and `-->` markers from around each link block.
+                Then, replace the `#` in `href="#"` with your actual YouTube URL.
+                -->
+
+                <!-- Main YouTube (Currently Hidden) -->
+                <!--
+                <a href="#" target="_blank" rel="noopener noreferrer" class="block w-full bg-white hover:bg-violet-100 text-violet-700 font-semibold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:-translate-y-1">
+                    Main YouTube Channel
+                </a>
+                -->
+
+                <!-- Comedy Duo YouTube (Currently Hidden) -->
+                <!--
+                <a href="#" target="_blank" rel="noopener noreferrer" class="block w-full bg-white hover:bg-violet-100 text-violet-700 font-semibold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:-translate-y-1">
+                    Comedy Duo YouTube
+                </a>
+                -->
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>
