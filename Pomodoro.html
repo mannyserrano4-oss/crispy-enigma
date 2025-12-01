@@ -21,7 +21,10 @@
             /* --- NIGHT THEME (Cyberpunk) --- */
             /* Upload an image named 'bg-night.gif' to GitHub */
             --bg-image: url('bg-night.gif'); 
-            --text-color: #00ffcc; /* Cyan */
+            
+            /* CHANGED: Default text is now Neon Cyan for readability */
+            --text-color: #00ffff; 
+            
             --glass-bg: rgba(0, 0, 0, 0.8); 
             --font-family: 'Courier New', monospace;
         }
@@ -159,7 +162,9 @@
        STEP 2: COLOR FADING CONFIGURATION
        ========================================= */
     const colorsDay = { start: [0, 100, 0], end: [210, 180, 140] }; 
-    const colorsNight = { start: [75, 0, 130], end: [255, 20, 147] };
+    
+    // CHANGED: Night starts with Neon Cyan (0, 255, 255) to be readable on dark bg
+    const colorsNight = { start: [0, 255, 255], end: [255, 20, 147] };
 
     /* =========================================
        STEP 3: SOUND FILES
@@ -229,10 +234,9 @@
         document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
         if (mode === 'work') document.getElementById('mode-pomodoro').classList.add('active');
         if (mode === 'break') document.getElementById('mode-short').classList.add('active');
-        // Custom modes keep current selection or clear
     }
 
-    /* --- THE FIX: SMART SWITCHING LOGIC --- */
+    /* --- SMART SWITCHING LOGIC --- */
     function timerComplete() {
         clearInterval(timerId);
         isRunning = false;
@@ -243,28 +247,21 @@
 
         const autoBreak = document.getElementById('auto-break').checked;
 
-        // 1. Determine NEXT Step
         if (currentMode === 'work') {
-            // Finished Work -> Load Short Break
             setupTimer(5 * 60, 'break');
             highlightMode('break');
             if(autoBreak) setTimeout(() => startTimer(), 1000);
 
         } else if (currentMode === 'break') {
-            // Finished Break -> Load Work
             setupTimer(25 * 60, 'work');
             highlightMode('work');
-            // Usually don't auto-start work, but if you want to, uncomment next line:
-            // if(autoBreak) setTimeout(() => startTimer(), 1000);
 
         } else if (currentMode === 'custom-work') {
-            // Finished Custom Work -> Load Custom Break
             const breakT = document.getElementById('custom-break-input').value;
             setupTimer(breakT * 60, 'custom-break');
             if(autoBreak) setTimeout(() => startTimer(), 1000);
 
         } else if (currentMode === 'custom-break') {
-            // Finished Custom Break -> Load Custom Work
             const workT = document.getElementById('custom-work-input').value;
             setupTimer(workT * 60, 'custom-work');
         }
@@ -318,7 +315,6 @@
         btn.addEventListener('click', () => {
             playSound('click');
             highlightMode(btn.dataset.mode === 'work' ? 'work' : 'break');
-            // Specific override for Long Break button
             if(btn.id === 'mode-long') {
                  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
                  btn.classList.add('active');
@@ -331,7 +327,7 @@
         playSound('click');
         const min = document.getElementById('custom-work-input').value;
         document.getElementById('settings-panel').style.display = 'none';
-        highlightMode(''); // clear selection
+        highlightMode(''); 
         setupTimer(min * 60, 'custom-work');
     });
 
