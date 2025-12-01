@@ -10,16 +10,10 @@
            ========================================= */
         :root {
             /* --- DAY THEME (Nature) --- */
-            /* Upload an image named 'bg-day.jpg' to GitHub, or paste a URL here */
+            /* Upload an image named 'bg-day.jpg' to GitHub */
             --bg-image: url('bg-day.jpg'); 
-            
-            /* The color of the text and the ring */
             --text-color: #2e4a33; /* Dark Sage Green */
-            
-            /* Glass effect background color */
             --glass-bg: rgba(255, 253, 240, 0.7); 
-            
-            /* Font style */
             --font-family: 'Verdana', sans-serif;
         }
 
@@ -27,18 +21,12 @@
             /* --- NIGHT THEME (Cyberpunk) --- */
             /* Upload an image named 'bg-night.gif' to GitHub */
             --bg-image: url('bg-night.gif'); 
-            
-            /* Neon Text Color */
             --text-color: #00ffcc; /* Cyan */
-            
-            /* Dark Glass effect */
             --glass-bg: rgba(0, 0, 0, 0.8); 
-            
-            /* Matrix/Code font */
             --font-family: 'Courier New', monospace;
         }
 
-        /* --- GLOBAL LAYOUT (Do not change unless you know CSS) --- */
+        /* --- GLOBAL LAYOUT --- */
         body {
             margin: 0; height: 100vh; display: flex;
             justify-content: center; align-items: center;
@@ -72,7 +60,7 @@
         svg { transform: rotate(-90deg); width: 100%; height: 100%; }
         circle { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke 1s linear; }
         .track { stroke: rgba(128, 128, 128, 0.3); }
-        .progress { stroke: var(--text-color); } /* Color handled by JS */
+        .progress { stroke: var(--text-color); } 
         
         .time-display {
             position: absolute; top: 50%; left: 50%;
@@ -121,9 +109,9 @@
     </div>
 
     <div class="modes">
-        <button class="mode-btn active" data-time="25" data-mode="work">Pomodoro</button>
-        <button class="mode-btn" data-time="5" data-mode="break">Short Break</button>
-        <button class="mode-btn" data-time="15" data-mode="break">Long Break</button>
+        <button class="mode-btn active" id="mode-pomodoro" data-time="25" data-mode="work">Pomodoro</button>
+        <button class="mode-btn" id="mode-short" data-time="5" data-mode="break">Short Break</button>
+        <button class="mode-btn" id="mode-long" data-time="15" data-mode="break">Long Break</button>
     </div>
 
     <div class="timer-wrapper">
@@ -170,23 +158,19 @@
     /* =========================================
        STEP 2: COLOR FADING CONFIGURATION
        ========================================= */
-    // DAY COLORS (RGB format): Dark Green -> Tan/Beige
     const colorsDay = { start: [0, 100, 0], end: [210, 180, 140] }; 
-    
-    // NIGHT COLORS (RGB format): Dark Purple -> Hot Pink
     const colorsNight = { start: [75, 0, 130], end: [255, 20, 147] };
 
     /* =========================================
        STEP 3: SOUND FILES
        ========================================= */
-    // Ensure these files exist in your GitHub repo!
     const sounds = {
         click: new Audio('click.mp3'),
         alarmDay: new Audio('alarm-day.mp3'),
         alarmNight: new Audio('alarm-night.mp3')
     };
 
-    /* --- LOGIC (Do not edit below unless comfortable) --- */
+    /* --- LOGIC --- */
     const circle = document.querySelector('.progress');
     const radius = circle.r.baseVal.value;
     const circumference = 2 * Math.PI * radius;
@@ -203,7 +187,6 @@
     const startBtn = document.getElementById('start-btn');
     const html = document.documentElement;
 
-    // Helper: Mix two colors based on % of time left
     function interpolateColor(color1, color2, factor) {
         let result = color1.slice();
         for (let i = 0; i < 3; i++) {
@@ -213,22 +196,18 @@
     }
 
     function updateVisuals(seconds) {
-        // Time Text
         const m = Math.floor(seconds / 60);
         const s = seconds % 60;
         timeDisplay.textContent = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
         
-        // Ring Progress
         const percent = seconds / totalTime;
         const offset = circumference - (percent * circumference);
         circle.style.strokeDashoffset = offset;
 
-        // Color Fading
         const isCyber = html.getAttribute('data-theme') === 'cyber';
         const palette = isCyber ? colorsNight : colorsDay;
         const currentColor = interpolateColor(palette.start, palette.end, 1 - percent);
         
-        // Apply colors
         circle.style.stroke = currentColor;
         timeDisplay.style.color = currentColor;
         document.querySelector('.container').style.color = currentColor;
@@ -236,17 +215,24 @@
     }
 
     function playSound(type) {
-        // Reset sound to start to allow rapid clicks
         if(type === 'click') {
             sounds.click.currentTime = 0;
-            sounds.click.play().catch(e => console.log("Audio prevented"));
+            sounds.click.play().catch(e => {});
         } else if (type === 'alarm') {
             const isCyber = html.getAttribute('data-theme') === 'cyber';
             const alarm = isCyber ? sounds.alarmNight : sounds.alarmDay;
-            alarm.play().catch(e => console.log("Audio prevented"));
+            alarm.play().catch(e => {});
         }
     }
 
+    function highlightMode(mode) {
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        if (mode === 'work') document.getElementById('mode-pomodoro').classList.add('active');
+        if (mode === 'break') document.getElementById('mode-short').classList.add('active');
+        // Custom modes keep current selection or clear
+    }
+
+    /* --- THE FIX: SMART SWITCHING LOGIC --- */
     function timerComplete() {
         clearInterval(timerId);
         isRunning = false;
@@ -256,19 +242,31 @@
         playSound('alarm');
 
         const autoBreak = document.getElementById('auto-break').checked;
-        
-        // AUTO-START LOGIC
-        if (autoBreak) {
-            if (currentMode === 'work' || currentMode === 'custom-work') {
-                // Determine if we need Standard Break or Custom Break
-                if (currentMode === 'custom-work') {
-                    const customBreakTime = document.getElementById('custom-break-input').value;
-                    setupTimer(customBreakTime * 60, 'custom-break');
-                } else {
-                    setupTimer(5 * 60, 'break');
-                }
-                setTimeout(() => startTimer(), 1000); // Small delay before auto-start
-            }
+
+        // 1. Determine NEXT Step
+        if (currentMode === 'work') {
+            // Finished Work -> Load Short Break
+            setupTimer(5 * 60, 'break');
+            highlightMode('break');
+            if(autoBreak) setTimeout(() => startTimer(), 1000);
+
+        } else if (currentMode === 'break') {
+            // Finished Break -> Load Work
+            setupTimer(25 * 60, 'work');
+            highlightMode('work');
+            // Usually don't auto-start work, but if you want to, uncomment next line:
+            // if(autoBreak) setTimeout(() => startTimer(), 1000);
+
+        } else if (currentMode === 'custom-work') {
+            // Finished Custom Work -> Load Custom Break
+            const breakT = document.getElementById('custom-break-input').value;
+            setupTimer(breakT * 60, 'custom-break');
+            if(autoBreak) setTimeout(() => startTimer(), 1000);
+
+        } else if (currentMode === 'custom-break') {
+            // Finished Custom Break -> Load Custom Work
+            const workT = document.getElementById('custom-work-input').value;
+            setupTimer(workT * 60, 'custom-work');
         }
     }
 
@@ -312,37 +310,39 @@
         updateVisuals(seconds);
     }
 
-    /* --- EVENT LISTENERS --- */
+    /* --- LISTENERS --- */
     document.getElementById('start-btn').addEventListener('click', () => { playSound('click'); startTimer(); });
     document.getElementById('reset-btn').addEventListener('click', () => { playSound('click'); setupTimer(totalTime, currentMode); });
 
-    // Standard Modes
     document.querySelectorAll('.mode-btn[data-time]').forEach(btn => {
         btn.addEventListener('click', () => {
             playSound('click');
-            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+            highlightMode(btn.dataset.mode === 'work' ? 'work' : 'break');
+            // Specific override for Long Break button
+            if(btn.id === 'mode-long') {
+                 document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                 btn.classList.add('active');
+            }
             setupTimer(btn.dataset.time * 60, btn.dataset.mode);
         });
     });
 
-    // Custom Work Button
     document.getElementById('start-custom-work').addEventListener('click', () => {
         playSound('click');
         const min = document.getElementById('custom-work-input').value;
-        document.getElementById('settings-panel').style.display = 'none'; // Close settings
+        document.getElementById('settings-panel').style.display = 'none';
+        highlightMode(''); // clear selection
         setupTimer(min * 60, 'custom-work');
     });
 
-    // Custom Break Button
     document.getElementById('start-custom-break').addEventListener('click', () => {
         playSound('click');
         const min = document.getElementById('custom-break-input').value;
-        document.getElementById('settings-panel').style.display = 'none'; // Close settings
+        document.getElementById('settings-panel').style.display = 'none';
+        highlightMode('');
         setupTimer(min * 60, 'custom-break');
     });
 
-    // Theme Toggle
     document.getElementById('theme-btn').addEventListener('click', (e) => {
         playSound('click');
         if (html.getAttribute('data-theme') === 'cyber') {
@@ -355,14 +355,12 @@
         updateVisuals(timeLeft);
     });
 
-    // Settings Toggle
     document.getElementById('settings-btn').addEventListener('click', () => {
         playSound('click');
         const panel = document.getElementById('settings-panel');
         panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
     });
 
-    // Music Toggle
     const musicBtn = document.getElementById('music-btn');
     const bgMusic = document.getElementById('bg-music');
     let isMusicPlaying = false;
@@ -373,7 +371,6 @@
         isMusicPlaying = !isMusicPlaying;
     });
 
-    // iOS Background Resume
     const savedTarget = localStorage.getItem('targetTime');
     if (savedTarget) {
         const now = Date.now();
@@ -384,7 +381,6 @@
         }
     }
     
-    // Initial Paint
     updateVisuals(timeLeft);
 </script>
 </body>
