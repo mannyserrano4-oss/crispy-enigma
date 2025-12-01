@@ -6,10 +6,10 @@
     <title>Focus Timer</title>
     <style>
         /* =========================================
-           STEP 1: VISUALS (Using Public Links)
+           STYLE CONFIGURATION
            ========================================= */
         :root {
-            /* --- DAY THEME (Nature) --- */
+            /* DAY THEME */
             --bg-color: #f4f1ea; 
             --bg-image: url('https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=2674&auto=format&fit=crop'); 
             --text-color: #2e4a33; 
@@ -18,16 +18,15 @@
         }
 
         [data-theme="cyber"] {
-            /* --- NIGHT THEME (Cyberpunk) --- */
+            /* NIGHT THEME */
             --bg-color: #050505; 
-            /* High quality looped rain city GIF */
             --bg-image: url('https://media.giphy.com/media/u0u3Cenj5V76E/giphy.gif'); 
             --text-color: #00ffff; 
-            --glass-bg: rgba(0, 0, 0, 0.5); 
+            --glass-bg: rgba(0, 0, 0, 0.6); 
             --font-family: 'Courier New', monospace;
         }
 
-        /* --- GLOBAL LAYOUT --- */
+        /* --- LAYOUT --- */
         body {
             margin: 0; height: 100vh; display: flex;
             justify-content: center; align-items: center;
@@ -38,20 +37,25 @@
             transition: all 0.5s ease; overflow: hidden;
         }
         
+        /* The Blur Layer */
         body::before {
             content: ""; position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: inherit; filter: blur(5px); z-index: -2;
+            background: inherit; filter: blur(5px); 
+            z-index: 0; /* Sits at the bottom */
         }
 
         .container {
+            position: relative; 
+            z-index: 10; /* FIX: Ensures buttons are always clickable */
+            
             background: var(--glass-bg);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255,255,255,0.2);
             border-radius: 25px; padding: 40px;
             text-align: center; width: 90%; max-width: 400px;
             color: var(--text-color);
-            box-shadow: 0 8px 32px 0 rgba(0,0,0,0.2);
+            box-shadow: 0 8px 32px 0 rgba(0,0,0,0.3);
             transition: color 1s ease, background 0.5s ease;
         }
         
@@ -103,12 +107,10 @@
             width: 60px; padding: 5px; border-radius: 5px; border: 1px solid currentColor;
             background: rgba(255,255,255,0.2); color: inherit;
         }
-        
         select {
             padding: 5px; border-radius: 5px; border: 1px solid currentColor;
             background: rgba(255,255,255,0.2); color: inherit; width: 120px;
         }
-        
         .custom-controls { display: flex; gap: 10px; margin-top: 10px; }
         .btn-custom {
             flex: 1; padding: 8px; background: rgba(128,128,128,0.2);
@@ -191,26 +193,57 @@
 
 <script>
     /* =========================================
-       STEP 2: CONFIGURATION
+       CONFIG & AUDIO ENGINE
        ========================================= */
     const colorsDay = { start: [0, 100, 0], end: [210, 180, 140] }; 
     const colorsNight = { start: [0, 255, 255], end: [255, 20, 147] };
 
-    // AUDIO FILES (Public URLs)
+    // PUBLIC MUSIC LINKS (No uploads needed)
     const musicFiles = {
-        day: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3',   // Mellow Nature
-        night: 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_c8c8a73467.mp3?filename=cyberpunk-city-110202.mp3' // Synthwave/Cyber
+        day: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3',
+        night: 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_c8c8a73467.mp3?filename=cyberpunk-city-110202.mp3' 
     };
     
-    /* Using Audio Context for short beeps to avoid lag */
+    // SYNTHESIZER (Generates beeps without files)
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     const audioCtx = new AudioContext();
+
+    function playSound(type) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        const isCyber = html.getAttribute('data-theme') === 'cyber';
+        const now = audioCtx.currentTime;
+
+        if (type === 'click') {
+            osc.type = isCyber ? 'square' : 'triangle';
+            osc.frequency.setValueAtTime(isCyber ? 600 : 300, now);
+            gainNode.gain.setValueAtTime(0.05, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+            osc.start(now); osc.stop(now + 0.1);
+        } else if (type === 'alarm') {
+            osc.type = isCyber ? 'sawtooth' : 'sine';
+            if(isCyber) {
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(600, now + 0.3);
+                gainNode.gain.setValueAtTime(0.3, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 2);
+            } else {
+                osc.frequency.setValueAtTime(440, now);
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
+            }
+            osc.start(now); osc.stop(now + 3);
+        }
+    }
 
     /* --- ICONS --- */
     const iconLeaf = `<svg viewBox="0 0 24 24"><path d="M17,8C8,10,5.9,16.17,3.82,21.34L5.71,22l1-2.3A4.49,4.49,0,0,0,8,20C19,20,22,3,22,3,21,5,14,5.25,9,6.25S2,11.5,2,13.5a6.22,6.22,0,0,0,1.75,3.75C7,8,17,8,17,8Z"/></svg>`;
     const iconCyber = `<svg viewBox="0 0 24 24"><path d="M4.5,10.5V12.5H6.5V14.5H8.5V12.5H6.5V10.5H4.5M17.5,10.5V12.5H15.5V14.5H17.5V12.5H19.5V10.5H17.5M6,4V6H18V4H6M4,6V8H20V6H4M2,8V16H22V8H2M6,10H8V12H6V10M16,10H18V12H16V10M11,10H13V12H11V10Z"/></svg>`;
 
-    /* --- LOGIC --- */
+    /* --- TIMER LOGIC --- */
     const circle = document.querySelector('.progress');
     const radius = circle.r.baseVal.value;
     const circumference = 2 * Math.PI * radius;
@@ -254,45 +287,13 @@
         document.documentElement.style.setProperty('--text-color', currentColor);
     }
 
-    /* SYNTHESIZED SOUNDS (No files needed for clicks/alarms) */
-    function playSound(type) {
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
-        osc.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-        const isCyber = html.getAttribute('data-theme') === 'cyber';
-        const now = audioCtx.currentTime;
-
-        if (type === 'click') {
-            osc.type = isCyber ? 'square' : 'triangle';
-            osc.frequency.setValueAtTime(isCyber ? 600 : 300, now);
-            gainNode.gain.setValueAtTime(0.05, now);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
-            osc.start(now); osc.stop(now + 0.1);
-        } else if (type === 'alarm') {
-            osc.type = isCyber ? 'sawtooth' : 'sine';
-            if(isCyber) {
-                osc.frequency.setValueAtTime(150, now);
-                osc.frequency.linearRampToValueAtTime(600, now + 0.3);
-                gainNode.gain.setValueAtTime(0.3, now);
-                gainNode.gain.linearRampToValueAtTime(0, now + 2);
-            } else {
-                osc.frequency.setValueAtTime(440, now);
-                gainNode.gain.setValueAtTime(0.2, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
-            }
-            osc.start(now); osc.stop(now + 3);
-        }
-    }
-
     function highlightMode(mode) {
         document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
         if (mode === 'work') document.getElementById('mode-pomodoro').classList.add('active');
         if (mode === 'break') document.getElementById('mode-short').classList.add('active');
     }
 
-    /* --- AUDIO ENGINE --- */
+    /* --- MUSIC & AMBIENCE --- */
     const bgMusic = document.getElementById('bg-music');
     const musicBtn = document.getElementById('music-btn');
     const ambiencePlayer = document.getElementById('ambience-player');
@@ -354,7 +355,7 @@
         updateMusicSource(); 
     });
 
-    /* --- STANDARD TIMER LOGIC --- */
+    /* --- TIMER & CONTROLS --- */
     function timerComplete() {
         clearInterval(timerId); isRunning = false;
         startBtn.textContent = 'Start'; targetTime = null;
@@ -363,4 +364,76 @@
         const autoBreak = document.getElementById('auto-break').checked;
 
         if (currentMode === 'work') {
-            setup
+            setupTimer(5 * 60, 'break'); highlightMode('break');
+            if(autoBreak) setTimeout(() => startTimer(), 1000);
+        } else if (currentMode === 'break') {
+            setupTimer(25 * 60, 'work'); highlightMode('work');
+        } else if (currentMode === 'custom-work') {
+            const breakT = document.getElementById('custom-break-input').value;
+            setupTimer(breakT * 60, 'custom-break');
+            if(autoBreak) setTimeout(() => startTimer(), 1000);
+        } else if (currentMode === 'custom-break') {
+            const workT = document.getElementById('custom-work-input').value;
+            setupTimer(workT * 60, 'custom-work');
+        }
+    }
+
+    function startTimer() {
+        if (isRunning) {
+            clearInterval(timerId); isRunning = false;
+            startBtn.textContent = 'Start'; targetTime = null;
+            localStorage.removeItem('targetTime');
+        } else {
+            isRunning = true; startBtn.textContent = 'Pause';
+            targetTime = Date.now() + (timeLeft * 1000);
+            localStorage.setItem('targetTime', targetTime);
+            timerId = setInterval(() => {
+                const now = Date.now();
+                const distance = targetTime - now;
+                if (distance < 0) { timeLeft = 0; updateVisuals(0); timerComplete(); } 
+                else { timeLeft = Math.ceil(distance / 1000); updateVisuals(timeLeft); }
+            }, 1000);
+        }
+    }
+
+    function setupTimer(seconds, mode) {
+        clearInterval(timerId); isRunning = false;
+        startBtn.textContent = 'Start'; timeLeft = seconds; totalTime = seconds;
+        currentMode = mode; targetTime = null;
+        localStorage.removeItem('targetTime'); updateVisuals(seconds);
+    }
+
+    document.getElementById('start-btn').addEventListener('click', () => { playSound('click'); startTimer(); });
+    document.getElementById('reset-btn').addEventListener('click', () => { playSound('click'); setupTimer(totalTime, currentMode); });
+    document.querySelectorAll('.mode-btn[data-time]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            playSound('click'); highlightMode(btn.dataset.mode === 'work' ? 'work' : 'break');
+            if(btn.id === 'mode-long') { document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
+            setupTimer(btn.dataset.time * 60, btn.dataset.mode);
+        });
+    });
+    document.getElementById('start-custom-work').addEventListener('click', () => {
+        playSound('click'); const min = document.getElementById('custom-work-input').value;
+        document.getElementById('settings-panel').style.display = 'none'; highlightMode(''); setupTimer(min * 60, 'custom-work');
+    });
+    document.getElementById('start-custom-break').addEventListener('click', () => {
+        playSound('click'); const min = document.getElementById('custom-break-input').value;
+        document.getElementById('settings-panel').style.display = 'none'; highlightMode(''); setupTimer(min * 60, 'custom-break');
+    });
+    document.getElementById('settings-btn').addEventListener('click', () => {
+        playSound('click');
+        const panel = document.getElementById('settings-panel');
+        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    });
+
+    const savedTarget = localStorage.getItem('targetTime');
+    if (savedTarget) {
+        const now = Date.now();
+        if (savedTarget > now) {
+            targetTime = parseInt(savedTarget); timeLeft = Math.ceil((targetTime - now) / 1000); startTimer();
+        }
+    }
+    updateVisuals(timeLeft);
+</script>
+</body>
+</html>
