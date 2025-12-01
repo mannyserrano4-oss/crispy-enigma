@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Focus Timer</title>
+    <style>
+        /* --- CSS VARIABLES & THEMES --- */
+        :root {
+            /* NATURE THEME (Default) */
+            --bg-image: url('https://images.unsplash.com/photo-1617336336365-502661334057?q=80&w=2574&auto=format&fit=crop'); /* Soft watercolor landscape */
+            --glass-bg: rgba(255, 253, 240, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --text-color: #4a5d4e; /* Sage Green */
+            --accent-color: #8fbc8f; /* Light Green */
+            --ring-start: #556b2f; /* Dark Olive */
+            --ring-end: #d2b48c; /* Tan/Beige */
+            --font-family: 'Verdana', sans-serif;
+            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        [data-theme="cyber"] {
+            /* CYBERPUNK THEME */
+            /* Using a rainy city GIF placeholder */
+            --bg-image: url('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExODF4OXV5bDV5anh6eW94eGc4eHl5eHp5eHl5eHl5eHl5eHl5eCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/u0u3Cenj5V76E/giphy.gif');
+            --glass-bg: rgba(0, 0, 0, 0.7);
+            --glass-border: rgba(0, 255, 255, 0.2);
+            --text-color: #00ffcc; /* Neon Cyan */
+            --accent-color: #ff00ff; /* Neon Pink */
+            --ring-start: #00ffff; /* Cyan */
+            --ring-end: #ff0099; /* Pink */
+            --font-family: 'Courier New', monospace;
+            --shadow: 0 8px 32px 0 rgba(0, 255, 255, 0.2);
+        }
+
+        /* --- GLOBAL STYLES --- */
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: var(--font-family);
+            background-image: var(--bg-image);
+            background-size: cover;
+            background-position: center;
+            transition: all 0.5s ease;
+            overflow: hidden;
+        }
+
+        /* Overlay to darken/lighten bg images slightly */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: inherit;
+            filter: blur(5px);
+            z-index: -2;
+        }
+
+        .container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 25px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            width: 90%;
+            max-width: 400px;
+            color: var(--text-color);
+            transition: all 0.5s ease;
+            position: relative;
+        }
+
+        /* --- HEADER & CONTROLS --- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .theme-toggle, .settings-toggle {
+            cursor: pointer;
+            font-size: 1.5rem;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            opacity: 0.8;
+            transition: 0.2s;
+        }
+        .theme-toggle:hover, .settings-toggle:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        /* --- TIMER CIRCLE --- */
+        .timer-wrapper {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            margin: 0 auto;
+        }
+        
+        svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+
+        circle {
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s linear, stroke 1s ease;
+        }
+
+        .track {
+            stroke: rgba(128, 128, 128, 0.2);
+        }
+
+        .progress {
+            stroke: var(--ring-start); /* Initial color, JS updates this */
+            stroke-dasharray: 691; /* 2 * PI * r (r=110) */
+            stroke-dashoffset: 0;
+        }
+
+        .time-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: bold;
+        }
+
+        /* --- BUTTONS --- */
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        button.btn-main {
+            padding: 12px 25px;
+            border: 2px solid var(--text-color);
+            background: transparent;
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        button.btn-main:hover {
+            background: var(--text-color);
+            color: var(--glass-bg);
+            box-shadow: 0 0 10px var(--text-color);
+        }
+
+        /* --- MODES --- */
+        .modes {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .mode-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 10px;
+            opacity: 0.6;
+        }
+        .mode-btn.active {
+            opacity: 1;
+            background: rgba(128,128,128,0.1);
+            font-weight: bold;
+        }
+
+        /* --- SETTINGS PANEL --- */
+        #settings-panel {
+            display: none;
+            margin-top: 20px;
+            border-top: 1px solid var(--glass-border);
+            padding-top: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            align-items: center;
+        }
+
+        input[type="number"] {
+            width: 50px;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid var(--text-color);
+            background: rgba(255,255,255,0.2);
+            color: var(--text-color);
+        }
+
+        /* --- MUSIC PLAYER --- */
+        .music-player {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            opacity: 0.8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <button id="theme-btn" class="theme-toggle" title="Switch Theme">🌿</button>
+        <button id="settings-btn" class="settings-toggle" title="Settings">⚙️</button>
+    </div>
+
+    <div class="modes">
+        <button class="mode-btn active" data-time="25">Pomodoro</button>
+        <button class="mode-btn" data-time="5">Short Break</button>
+        <button class="mode-btn" data-time="15">Long Break</button>
+    </div>
+
+    <div class="timer-wrapper">
+        <svg>
+            <circle class="track" cx="125" cy="125" r="110"></circle>
+            <circle class="progress" cx="125" cy="125" r="110"></circle>
+        </svg>
+        <div class="time-display" id="time-display">25:00</div>
+    </div>
+
+    <div class="controls">
+        <button class="btn-main" id="start-btn">Start</button>
+        <button class="btn-main" id="reset-btn">Reset</button>
+    </div>
+
+    <div id="settings-panel">
+        <div class="setting-row">
+            <label>Auto-start Break?</label>
+            <input type="checkbox" id="auto-break">
+        </div>
+        <div class="setting-row">
+            <label>Custom Work (min):</label>
+            <input type="number" id="custom-work" value="25">
+        </div>
+        <div class="setting-row">
+            <label>Custom Break (min):</label>
+            <input type="number" id="custom-break" value="5">
+        </div>
+    </div>
+
+    <div class="music-player">
+        <span>♫ Lo-Fi Music</span>
+        <button id="music-btn" class="mode-btn">▶ Play</button>
+        <audio id="bg-music" loop>
+            <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+</div>
+
+<script>
+    /* --- CONFIGURATION --- */
+    const circle = document.querySelector('.progress');
+    const radius = circle.r.baseVal.value;
+    const circumference = 2 * Math.PI * radius;
+    
+    circle.style.strokeDasharray = `${circumference} ${circumference}`;
+    circle.style.strokeDashoffset = circumference;
+
+    let timeLeft = 25 * 60;
+    let totalTime = 25 * 60;
+    let timerId = null;
+    let isRunning = false;
+    let currentMode = 'work'; // 'work' or 'break'
+    let targetTime = null; // For iOS background tracking
+
+    /* --- ELEMENTS --- */
+    const timeDisplay = document.getElementById('time-display');
+    const startBtn = document.getElementById('start-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const themeBtn = document.getElementById('theme-btn');
+    const settingsBtn = document.getElementById('settings-btn');
+    const settingsPanel = document.getElementById('settings-panel');
+    const modeBtns = document.querySelectorAll('.mode-btn[data-time]');
+    const musicBtn = document.getElementById('music-btn');
+    const bgMusic = document.getElementById('bg-music');
+    
+    /* --- AUDIO SYNTHESIZER (No files needed!) --- */
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const audioCtx = new AudioContext();
+
+    function playSound(type) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        const isCyber = document.documentElement.getAttribute('data-theme') === 'cyber';
+        const now = audioCtx.currentTime;
+
+        if (type === 'hover') {
+            // Quiet blip
+            osc.type = isCyber ? 'sawtooth' : 'sine';
+            osc.frequency.setValueAtTime(isCyber ? 800 : 400, now);
+            gainNode.gain.setValueAtTime(0.02, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+            osc.start(now);
+            osc.stop(now + 0.1);
+        } else if (type === 'click') {
+            // Confirmation sound
+            osc.type = isCyber ? 'square' : 'triangle';
+            osc.frequency.setValueAtTime(isCyber ? 600 : 300, now);
+            osc.frequency.exponentialRampToValueAtTime(isCyber ? 1000 : 500, now + 0.1);
+            gainNode.gain.setValueAtTime(0.1, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+            osc.start(now);
+            osc.stop(now + 0.2);
+        } else if (type === 'alarm') {
+            // Timer End
+            osc.type = isCyber ? 'sawtooth' : 'sine';
+            // Tesla/Sci-fi pulse vs Soft Chime
+            if(isCyber) {
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.linearRampToValueAtTime(800, now + 0.2);
+                osc.frequency.linearRampToValueAtTime(200, now + 0.4);
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 1.5);
+            } else {
+                // Nature chime
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 2);
+            }
+            osc.start(now);
+            osc.stop(now + 2);
+        }
+    }
+
+    // Add hover sounds to buttons
+    document.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('mouseenter', () => playSound('hover'));
+        btn.addEventListener('click', () => playSound('click'));
+    });
+
+    /* --- TIMER LOGIC --- */
+    function setProgress(percent) {
+        const offset = circumference - (percent / 100) * circumference;
+        circle.style.strokeDashoffset = offset;
+        
+        // Color Interpolation Logic (Fade from Start Color to End Color)
+        const root = getComputedStyle(document.documentElement);
+        const startColor = root.getPropertyValue('--ring-start').trim();
+        const endColor = root.getPropertyValue('--ring-end').trim();
+        // Note: Real CSS variable interpolation in JS is complex, 
+        // effectively handled here by CSS transitions on the stroke property if we swapped classes,
+        // but simple version: we just let the circle shrink. 
+        // For advanced color blending, we would need a hex-interpolator function here.
+        // For now, we stick to the main color which looks clean.
+    }
+
+    function updateDisplay(seconds) {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        timeDisplay.textContent = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+        const percent = (seconds / totalTime) * 100;
+        setProgress(percent);
+    }
+
+    function timerComplete() {
+        clearInterval(timerId);
+        isRunning = false;
+        startBtn.textContent = 'Start';
+        targetTime = null;
+        localStorage.removeItem('targetTime');
+        playSound('alarm');
+
+        // Auto-start logic
+        const autoBreak = document.getElementById('auto-break').checked;
+        if (autoBreak && currentMode === 'work') {
+            currentMode = 'break';
+            const breakTime = document.getElementById('custom-break').value;
+            setTimer(breakTime * 60);
+            startTimer();
+        }
+    }
+
+    function startTimer() {
+        if (isRunning) {
+            // Pause
+            clearInterval(timerId);
+            isRunning = false;
+            startBtn.textContent = 'Start';
+            targetTime = null;
+            localStorage.removeItem('targetTime');
+        } else {
+            // Start
+            isRunning = true;
+            startBtn.textContent = 'Pause';
+            
+            // Set Target Time (iOS Fix)
+            const now = Date.now();
+            targetTime = now + (timeLeft * 1000);
+            localStorage.setItem('targetTime', targetTime);
+
+            timerId = setInterval(() => {
+                const now = Date.now();
+                const distance = targetTime - now;
+                
+                if (distance < 0) {
+                    timeLeft = 0;
+                    updateDisplay(0);
+                    timerComplete();
+                } else {
+                    timeLeft = Math.ceil(distance / 1000);
+                    updateDisplay(timeLeft);
+                }
+            }, 1000);
+        }
+    }
+
+    function setTimer(seconds) {
+        clearInterval(timerId);
+        isRunning = false;
+        startBtn.textContent = 'Start';
+        timeLeft = seconds;
+        totalTime = seconds;
+        targetTime = null;
+        localStorage.removeItem('targetTime');
+        updateDisplay(seconds);
+    }
+
+    /* --- EVENT LISTENERS --- */
+    startBtn.addEventListener('click', startTimer);
+    
+    resetBtn.addEventListener('click', () => {
+        setTimer(totalTime);
+    });
+
+    modeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            modeBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // Check if Custom
+            // (Simplified logic: taking data-time, if you want custom logic use settings inputs)
+            setTimer(btn.dataset.time * 60);
+            currentMode = btn.textContent.includes('Break') ? 'break' : 'work';
+        });
+    });
+
+    // Theme Toggle
+    themeBtn.addEventListener('click', () => {
+        const html = document.documentElement;
+        if (html.getAttribute('data-theme') === 'cyber') {
+            html.removeAttribute('data-theme');
+            themeBtn.textContent = '🌿';
+        } else {
+            html.setAttribute('data-theme', 'cyber');
+            themeBtn.textContent = '👾';
+        }
+        // Force redraw of colors
+        updateDisplay(timeLeft);
+    });
+
+    // Settings Toggle
+    settingsBtn.addEventListener('click', () => {
+        settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Music Toggle
+    let isPlaying = false;
+    musicBtn.addEventListener('click', () => {
+        if(isPlaying) {
+            bgMusic.pause();
+            musicBtn.textContent = '▶ Play';
+        } else {
+            bgMusic.play();
+            musicBtn.textContent = '⏸ Pause';
+        }
+        isPlaying = !isPlaying;
+    });
+
+    /* --- IOS RESUME CHECK --- */
+    // Checks if we closed the app and came back
+    const savedTarget = localStorage.getItem('targetTime');
+    if (savedTarget) {
+        const now = Date.now();
+        if (savedTarget > now) {
+            targetTime = parseInt(savedTarget);
+            timeLeft = Math.ceil((targetTime - now) / 1000);
+            startTimer(); // Auto-resume
+        } else {
+            localStorage.removeItem('targetTime');
+        }
+    } else {
+        updateDisplay(timeLeft);
+    }
+
+</script>
+</body>
+</html>
