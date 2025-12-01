@@ -10,7 +10,6 @@
            ========================================= */
         :root {
             /* --- DAY THEME (Nature) --- */
-            /* Upload an image named 'bg-day.jpg' to GitHub */
             --bg-image: url('bg-day.jpg'); 
             --text-color: #2e4a33; /* Dark Sage Green */
             --glass-bg: rgba(255, 253, 240, 0.7); 
@@ -19,12 +18,8 @@
 
         [data-theme="cyber"] {
             /* --- NIGHT THEME (Cyberpunk) --- */
-            /* Upload an image named 'bg-night.gif' to GitHub */
             --bg-image: url('bg-night.gif'); 
-            
-            /* CHANGED: Default text is now Neon Cyan for readability */
-            --text-color: #00ffff; 
-            
+            --text-color: #00ffff; /* Neon Cyan */
             --glass-bg: rgba(0, 0, 0, 0.8); 
             --font-family: 'Courier New', monospace;
         }
@@ -55,12 +50,23 @@
         }
         .header { display: flex; justify-content: space-between; margin-bottom: 20px; }
         button { cursor: pointer; border: none; background: none; color: inherit; font-family: inherit; transition: 0.2s; }
-        .theme-toggle, .settings-toggle { font-size: 1.5rem; opacity: 0.8; }
+        
+        /* NEW: SVG Icon Styling to match colors */
+        .theme-toggle, .settings-toggle { 
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0.8; 
+            width: 40px; height: 40px;
+        }
+        .theme-toggle svg, .settings-toggle svg {
+            width: 28px; height: 28px;
+            fill: currentColor; /* THIS makes it match the timer color! */
+            transition: fill 1s linear;
+        }
         .theme-toggle:hover, .settings-toggle:hover { transform: scale(1.1); opacity: 1; }
         
         /* TIMER VISUALS */
         .timer-wrapper { position: relative; width: 250px; height: 250px; margin: 0 auto; }
-        svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+        svg.timer-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
         circle { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke 1s linear; }
         .track { stroke: rgba(128, 128, 128, 0.3); }
         .progress { stroke: var(--text-color); } 
@@ -107,8 +113,12 @@
 
 <div class="container">
     <div class="header">
-        <button id="theme-btn" class="theme-toggle">🌿</button>
-        <button id="settings-btn" class="settings-toggle">⚙️</button>
+        <button id="theme-btn" class="theme-toggle" title="Switch Theme">
+            <svg viewBox="0 0 24 24"><path d="M17,8C8,10,5.9,16.17,3.82,21.34L5.71,22l1-2.3A4.49,4.49,0,0,0,8,20C19,20,22,3,22,3,21,5,14,5.25,9,6.25S2,11.5,2,13.5a6.22,6.22,0,0,0,1.75,3.75C7,8,17,8,17,8Z"/></svg>
+        </button>
+        <button id="settings-btn" class="settings-toggle" title="Settings">
+            <svg viewBox="0 0 24 24"><path d="M12,15.5A3.5,3.5,0,0,1,8.5,12A3.5,3.5,0,0,1,12,8.5A3.5,3.5,0,0,1,15.5,12A3.5,3.5,0,0,1,12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.35 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.35 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.04 4.95,18.95L7.44,17.95C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.95L19.05,18.95C19.27,19.04 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/></svg>
+        </button>
     </div>
 
     <div class="modes">
@@ -118,7 +128,7 @@
     </div>
 
     <div class="timer-wrapper">
-        <svg>
+        <svg class="timer-svg">
             <circle class="track" cx="125" cy="125" r="110"></circle>
             <circle class="progress" cx="125" cy="125" r="110"></circle>
         </svg>
@@ -162,8 +172,6 @@
        STEP 2: COLOR FADING CONFIGURATION
        ========================================= */
     const colorsDay = { start: [0, 100, 0], end: [210, 180, 140] }; 
-    
-    // CHANGED: Night starts with Neon Cyan (0, 255, 255) to be readable on dark bg
     const colorsNight = { start: [0, 255, 255], end: [255, 20, 147] };
 
     /* =========================================
@@ -174,6 +182,10 @@
         alarmDay: new Audio('alarm-day.mp3'),
         alarmNight: new Audio('alarm-night.mp3')
     };
+
+    /* --- ICONS (SVG Strings) --- */
+    const iconLeaf = `<svg viewBox="0 0 24 24"><path d="M17,8C8,10,5.9,16.17,3.82,21.34L5.71,22l1-2.3A4.49,4.49,0,0,0,8,20C19,20,22,3,22,3,21,5,14,5.25,9,6.25S2,11.5,2,13.5a6.22,6.22,0,0,0,1.75,3.75C7,8,17,8,17,8Z"/></svg>`;
+    const iconCyber = `<svg viewBox="0 0 24 24"><path d="M4.5,10.5V12.5H6.5V14.5H8.5V12.5H6.5V10.5H4.5M17.5,10.5V12.5H15.5V14.5H17.5V12.5H19.5V10.5H17.5M6,4V6H18V4H6M4,6V8H20V6H4M2,8V16H22V8H2M6,10H8V12H6V10M16,10H18V12H16V10M11,10H13V12H11V10Z"/></svg>`;
 
     /* --- LOGIC --- */
     const circle = document.querySelector('.progress');
@@ -339,14 +351,16 @@
         setupTimer(min * 60, 'custom-break');
     });
 
-    document.getElementById('theme-btn').addEventListener('click', (e) => {
+    // THEME TOGGLE (Swaps SVGs)
+    const themeBtn = document.getElementById('theme-btn');
+    themeBtn.addEventListener('click', (e) => {
         playSound('click');
         if (html.getAttribute('data-theme') === 'cyber') {
             html.removeAttribute('data-theme');
-            e.target.textContent = '🌿';
+            themeBtn.innerHTML = iconLeaf; // Switch back to Leaf
         } else {
             html.setAttribute('data-theme', 'cyber');
-            e.target.textContent = '👾';
+            themeBtn.innerHTML = iconCyber; // Switch to Pixel Invader
         }
         updateVisuals(timeLeft);
     });
