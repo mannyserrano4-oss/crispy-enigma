@@ -6,22 +6,25 @@
     <title>Focus Timer</title>
     <style>
         /* =========================================
-           STEP 1: STYLE CONFIGURATION
+           AREA 1: BACKGROUND IMAGES
            ========================================= */
         :root {
-            /* DAY THEME */
+            /* DAY THEME BACKGROUND */
             --bg-color: #f4f1ea; 
-            /* To change background: Replace the link inside url('') */
-            --bg-image: url('https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=2674&auto=format&fit=crop'); 
+            /* Replace the URL below with your own image link */
+            --bg-image: url('https://images.unsplash.com/photo-1493934558415-9d19f0b2b4d2?q=80&w=2554&auto=format&fit=crop'); 
+            
             --text-color: #2e4a33; 
             --glass-bg: rgba(255, 253, 240, 0.25); 
             --font-family: 'Verdana', sans-serif;
         }
 
         [data-theme="cyber"] {
-            /* NIGHT THEME */
+            /* NIGHT THEME BACKGROUND */
             --bg-color: #050505; 
-            --bg-image: url('https://media.giphy.com/media/u0u3Cenj5V76E/giphy.gif'); 
+            /* Replace the URL below with your own image link */
+            --bg-image: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2670&auto=format&fit=crop'); 
+            
             --text-color: #00ffff; 
             --glass-bg: rgba(0, 0, 0, 0.6); 
             --font-family: 'Courier New', monospace;
@@ -41,15 +44,16 @@
         body::before {
             content: ""; position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: inherit; filter: blur(5px); z-index: 0;
+            background: inherit; filter: blur(8px); /* Blur the background image */
+            z-index: 0;
         }
 
         .container {
-            position: relative; z-index: 10; 
+            position: relative; z-index: 10;
             background: var(--glass-bg);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 25px; padding: 30px; /* Reduced padding slightly to fit new controls */
+            border-radius: 25px; padding: 30px;
             text-align: center; width: 90%; max-width: 400px;
             color: var(--text-color);
             box-shadow: 0 8px 32px 0 rgba(0,0,0,0.3);
@@ -89,7 +93,7 @@
         }
         button.btn-main:hover { background: currentColor; color: var(--glass-bg); }
 
-        .modes { display: flex; justify-content: center; gap: 5px; margin-bottom: 20px; }
+        .modes { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
         .mode-btn { font-size: 0.85rem; padding: 5px 10px; border-radius: 10px; opacity: 0.6; }
         .mode-btn.active { opacity: 1; font-weight: bold; background: rgba(128,128,128,0.2); }
 
@@ -110,37 +114,24 @@
             border-radius: 8px; font-weight: bold; font-size: 0.8rem;
         }
 
-        /* SOUND CONTROLS (Footer) */
-        .sound-footer {
+        /* SOUNDBOARD (New Section) */
+        .soundboard {
             margin-top: 25px;
             padding-top: 15px;
-            border-top: 1px solid rgba(128,128,128,0.3);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+            border-top: 1px solid rgba(255,255,255,0.3);
         }
-
+        
         .sound-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 0.85rem;
-            opacity: 0.9;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px; font-size: 0.9rem;
         }
-
-        .sound-btn {
-            background: none; border: 1px solid currentColor;
-            border-radius: 5px; padding: 4px 10px;
-            font-size: 0.8rem; cursor: pointer; min-width: 60px;
-        }
-        .sound-btn:hover { background: rgba(128,128,128,0.2); }
-
+        
         select {
-            padding: 4px; border-radius: 5px; border: 1px solid currentColor;
-            background: rgba(255,255,255,0.1); color: inherit; width: 100px; font-size: 0.8rem;
+            padding: 5px; border-radius: 5px; border: 1px solid currentColor;
+            background: rgba(255,255,255,0.1); color: inherit; width: 140px; cursor: pointer;
         }
-        /* Fix for dark mode dropdown options */
-        option { background-color: #333; color: white; }
+        
+        .btn-icon { font-size: 1.2rem; line-height: 1; }
     </style>
 </head>
 <body>
@@ -163,8 +154,8 @@
 
     <div class="timer-wrapper">
         <svg class="timer-svg">
-            <circle class="track" cx="125" cy="125" r="110"></circle>
-            <circle class="progress" cx="125" cy="125" r="110"></circle>
+            <circle class="track" cx="110" cy="110" r="95"></circle>
+            <circle class="progress" cx="110" cy="110" r="95"></circle>
         </svg>
         <div class="time-display" id="time-display">25:00</div>
     </div>
@@ -174,6 +165,291 @@
         <button class="btn-main" id="reset-btn">Reset</button>
     </div>
 
+    <div class="soundboard">
+        <div class="sound-row">
+            <select id="ambience-select">
+                <option value="none">-- No Noise --</option>
+                <option value="https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3">Rain</option>
+                <option value="https://cdn.pixabay.com/download/audio/2021/08/09/audio_65191b6470.mp3">Storm</option>
+                <option value="https://cdn.pixabay.com/download/audio/2021/08/04/audio_38289551c9.mp3">Forest</option>
+                <option value="https://cdn.pixabay.com/download/audio/2021/08/09/audio_8ed5925a66.mp3">Waves</option>
+            </select>
+            <button id="ambience-btn" class="btn-icon">▶</button>
+        </div>
+
+        <div class="sound-row">
+            <span>Focus Music</span>
+            <button id="music-btn" class="btn-icon">▶</button>
+        </div>
+    </div>
+
     <div id="settings-panel">
         <div class="setting-row">
             <label>Auto-start Breaks?</label>
+            <input type="checkbox" id="auto-break">
+        </div>
+        <div class="setting-row">
+            <label>Custom Work (min):</label>
+            <input type="number" id="custom-work-input" value="45">
+        </div>
+        <div class="setting-row">
+            <label>Custom Break (min):</label>
+            <input type="number" id="custom-break-input" value="10">
+        </div>
+        <div class="custom-controls">
+            <button class="btn-custom" id="start-custom-work">Start Work</button>
+            <button class="btn-custom" id="start-custom-break">Start Break</button>
+        </div>
+    </div>
+
+    <audio id="bg-music" loop></audio>
+    <audio id="ambience-player" loop></audio>
+</div>
+
+<script>
+    /* =========================================
+       AREA 2: MUSIC LINKS
+       ========================================= */
+    const musicFiles = {
+        // PASTE YOUR DAY MUSIC LINK INSIDE THE QUOTES BELOW:
+        day: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3',
+        
+        // PASTE YOUR NIGHT MUSIC LINK INSIDE THE QUOTES BELOW:
+        night: 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_c8c8a73467.mp3?filename=cyberpunk-city-110202.mp3' 
+    };
+    
+    // Config
+    const colorsDay = { start: [0, 100, 0], end: [210, 180, 140] }; 
+    const colorsNight = { start: [0, 255, 255], end: [255, 20, 147] };
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const audioCtx = new AudioContext();
+
+    /* --- ICONS --- */
+    const iconLeaf = `<svg viewBox="0 0 24 24"><path d="M17,8C8,10,5.9,16.17,3.82,21.34L5.71,22l1-2.3A4.49,4.49,0,0,0,8,20C19,20,22,3,22,3,21,5,14,5.25,9,6.25S2,11.5,2,13.5a6.22,6.22,0,0,0,1.75,3.75C7,8,17,8,17,8Z"/></svg>`;
+    const iconCyber = `<svg viewBox="0 0 24 24"><path d="M4.5,10.5V12.5H6.5V14.5H8.5V12.5H6.5V10.5H4.5M17.5,10.5V12.5H15.5V14.5H17.5V12.5H19.5V10.5H17.5M6,4V6H18V4H6M4,6V8H20V6H4M2,8V16H22V8H2M6,10H8V12H6V10M16,10H18V12H16V10M11,10H13V12H11V10Z"/></svg>`;
+
+    /* --- LOGIC --- */
+    const circle = document.querySelector('.progress');
+    const radius = circle.r.baseVal.value;
+    const circumference = 2 * Math.PI * radius;
+    circle.style.strokeDasharray = `${circumference} ${circumference}`;
+
+    let timeLeft = 25 * 60;
+    let totalTime = 25 * 60;
+    let timerId = null;
+    let isRunning = false;
+    let currentMode = 'work'; 
+    let targetTime = null;
+
+    const timeDisplay = document.getElementById('time-display');
+    const startBtn = document.getElementById('start-btn');
+    const html = document.documentElement;
+
+    function interpolateColor(color1, color2, factor) {
+        let result = color1.slice();
+        for (let i = 0; i < 3; i++) {
+            result[i] = Math.round(result[i] + factor * (color2[i] - color1[i]));
+        }
+        return `rgb(${result[0]}, ${result[1]}, ${result[2]})`;
+    }
+
+    function updateVisuals(seconds) {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        timeDisplay.textContent = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+        
+        const percent = seconds / totalTime;
+        const offset = circumference - (percent * circumference);
+        circle.style.strokeDashoffset = offset;
+
+        const isCyber = html.getAttribute('data-theme') === 'cyber';
+        const palette = isCyber ? colorsNight : colorsDay;
+        const currentColor = interpolateColor(palette.start, palette.end, 1 - percent);
+        
+        circle.style.stroke = currentColor;
+        timeDisplay.style.color = currentColor;
+        document.querySelector('.container').style.color = currentColor;
+        document.documentElement.style.setProperty('--text-color', currentColor);
+    }
+
+    function playSound(type) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        const isCyber = html.getAttribute('data-theme') === 'cyber';
+        const now = audioCtx.currentTime;
+
+        if (type === 'click') {
+            osc.type = isCyber ? 'square' : 'triangle';
+            osc.frequency.setValueAtTime(isCyber ? 600 : 300, now);
+            gainNode.gain.setValueAtTime(0.05, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+            osc.start(now); osc.stop(now + 0.1);
+        } else if (type === 'alarm') {
+            osc.type = isCyber ? 'sawtooth' : 'sine';
+            if(isCyber) {
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(600, now + 0.3);
+                gainNode.gain.setValueAtTime(0.3, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 2);
+            } else {
+                osc.frequency.setValueAtTime(440, now);
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
+            }
+            osc.start(now); osc.stop(now + 3);
+        }
+    }
+
+    function highlightMode(mode) {
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        if (mode === 'work') document.getElementById('mode-pomodoro').classList.add('active');
+        if (mode === 'break') document.getElementById('mode-short').classList.add('active');
+    }
+
+    /* --- AUDIO ENGINE --- */
+    const bgMusic = document.getElementById('bg-music');
+    const musicBtn = document.getElementById('music-btn');
+    const ambiencePlayer = document.getElementById('ambience-player');
+    const ambienceBtn = document.getElementById('ambience-btn');
+    const ambienceSelect = document.getElementById('ambience-select');
+    let isMusicPlaying = false;
+    let isAmbiencePlaying = false;
+
+    function updateMusicSource() {
+        const isCyber = html.getAttribute('data-theme') === 'cyber';
+        const newSrc = isCyber ? musicFiles.night : musicFiles.day;
+        const currentSrc = bgMusic.getAttribute('src');
+        if (currentSrc !== newSrc) {
+            const wasPlaying = isMusicPlaying;
+            bgMusic.src = newSrc;
+            if (wasPlaying) bgMusic.play();
+        }
+    }
+
+    musicBtn.addEventListener('click', () => {
+        playSound('click');
+        if(!bgMusic.getAttribute('src')) updateMusicSource();
+        if(isMusicPlaying) { bgMusic.pause(); musicBtn.textContent = '▶'; } 
+        else { bgMusic.play(); musicBtn.textContent = '⏸'; }
+        isMusicPlaying = !isMusicPlaying;
+    });
+
+    ambienceBtn.addEventListener('click', () => {
+        playSound('click');
+        if (ambienceSelect.value === 'none') return;
+        if (isAmbiencePlaying) {
+            ambiencePlayer.pause(); ambienceBtn.textContent = '▶';
+        } else {
+            ambiencePlayer.src = ambienceSelect.value;
+            ambiencePlayer.play(); ambienceBtn.textContent = '⏸';
+        }
+        isAmbiencePlaying = !isAmbiencePlaying;
+    });
+
+    ambienceSelect.addEventListener('change', () => {
+        if (isAmbiencePlaying) {
+             if(ambienceSelect.value === 'none') {
+                 ambiencePlayer.pause(); isAmbiencePlaying = false; ambienceBtn.textContent = '▶';
+             } else {
+                 ambiencePlayer.src = ambienceSelect.value; ambiencePlayer.play();
+             }
+        }
+    });
+
+    const themeBtn = document.getElementById('theme-btn');
+    themeBtn.addEventListener('click', (e) => {
+        playSound('click');
+        if (html.getAttribute('data-theme') === 'cyber') {
+            html.removeAttribute('data-theme'); themeBtn.innerHTML = iconLeaf; 
+        } else {
+            html.setAttribute('data-theme', 'cyber'); themeBtn.innerHTML = iconCyber; 
+        }
+        updateVisuals(timeLeft);
+        updateMusicSource(); 
+    });
+
+    /* --- TIMER & CONTROLS --- */
+    function timerComplete() {
+        clearInterval(timerId); isRunning = false;
+        startBtn.textContent = 'Start'; targetTime = null;
+        localStorage.removeItem('targetTime');
+        playSound('alarm');
+        const autoBreak = document.getElementById('auto-break').checked;
+
+        if (currentMode === 'work') {
+            setupTimer(5 * 60, 'break'); highlightMode('break');
+            if(autoBreak) setTimeout(() => startTimer(), 1000);
+        } else if (currentMode === 'break') {
+            setupTimer(25 * 60, 'work'); highlightMode('work');
+        } else if (currentMode === 'custom-work') {
+            const breakT = document.getElementById('custom-break-input').value;
+            setupTimer(breakT * 60, 'custom-break');
+            if(autoBreak) setTimeout(() => startTimer(), 1000);
+        } else if (currentMode === 'custom-break') {
+            const workT = document.getElementById('custom-work-input').value;
+            setupTimer(workT * 60, 'custom-work');
+        }
+    }
+
+    function startTimer() {
+        if (isRunning) {
+            clearInterval(timerId); isRunning = false;
+            startBtn.textContent = 'Start'; targetTime = null;
+            localStorage.removeItem('targetTime');
+        } else {
+            isRunning = true; startBtn.textContent = 'Pause';
+            targetTime = Date.now() + (timeLeft * 1000);
+            localStorage.setItem('targetTime', targetTime);
+            timerId = setInterval(() => {
+                const now = Date.now();
+                const distance = targetTime - now;
+                if (distance < 0) { timeLeft = 0; updateVisuals(0); timerComplete(); } 
+                else { timeLeft = Math.ceil(distance / 1000); updateVisuals(timeLeft); }
+            }, 1000);
+        }
+    }
+
+    function setupTimer(seconds, mode) {
+        clearInterval(timerId); isRunning = false;
+        startBtn.textContent = 'Start'; timeLeft = seconds; totalTime = seconds;
+        currentMode = mode; targetTime = null;
+        localStorage.removeItem('targetTime'); updateVisuals(seconds);
+    }
+
+    document.getElementById('start-btn').addEventListener('click', () => { playSound('click'); startTimer(); });
+    document.getElementById('reset-btn').addEventListener('click', () => { playSound('click'); setupTimer(totalTime, currentMode); });
+    document.querySelectorAll('.mode-btn[data-time]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            playSound('click'); highlightMode(btn.dataset.mode === 'work' ? 'work' : 'break');
+            if(btn.id === 'mode-long') { document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
+            setupTimer(btn.dataset.time * 60, btn.dataset.mode);
+        });
+    });
+    document.getElementById('start-custom-work').addEventListener('click', () => {
+        playSound('click'); const min = document.getElementById('custom-work-input').value;
+        document.getElementById('settings-panel').style.display = 'none'; highlightMode(''); setupTimer(min * 60, 'custom-work');
+    });
+    document.getElementById('start-custom-break').addEventListener('click', () => {
+        playSound('click'); const min = document.getElementById('custom-break-input').value;
+        document.getElementById('settings-panel').style.display = 'none'; highlightMode(''); setupTimer(min * 60, 'custom-break');
+    });
+    document.getElementById('settings-btn').addEventListener('click', () => {
+        playSound('click');
+        const panel = document.getElementById('settings-panel');
+        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    });
+
+    const savedTarget = localStorage.getItem('targetTime');
+    if (savedTarget) {
+        const now = Date.now();
+        if (savedTarget > now) {
+            targetTime = parseInt(savedTarget); timeLeft = Math.ceil((targetTime - now) / 1000); startTimer();
+        }
+    }
+    updateVisuals(timeLeft);
+</script>
+</body>
+</html>
