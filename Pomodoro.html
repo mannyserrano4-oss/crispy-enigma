@@ -264,36 +264,44 @@
         timeDisplay.style.color = currentColor;
         document.querySelector('.container').style.color = currentColor;
         document.documentElement.style.setProperty('--text-color', currentColor);
-    }
+    /* =========================================
+       HYBRID AUDIO ENGINE
+       ========================================= */
+    // 1. Setup the Alarm Files
+    const alarmFiles = {
+        day: new Audio('alarm-day.mp3'),
+        night: new Audio('alarm-night.mp3')
+    };
+
+    // 2. Setup the Synthesizer (for clicks)
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const audioCtx = new AudioContext();
 
     function playSound(type) {
         if (audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
-        osc.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
         const isCyber = html.getAttribute('data-theme') === 'cyber';
         const now = audioCtx.currentTime;
 
         if (type === 'click') {
+            // --- KEEPING YOUR ORIGINAL CLICK LOGIC ---
+            // This generates the beep using code (no file needed)
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
             osc.type = isCyber ? 'square' : 'triangle';
             osc.frequency.setValueAtTime(isCyber ? 600 : 300, now);
             gainNode.gain.setValueAtTime(0.05, now);
             gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
             osc.start(now); osc.stop(now + 0.1);
-        } else if (type === 'alarm') {
-            osc.type = isCyber ? 'sawtooth' : 'sine';
-            if(isCyber) {
-                osc.frequency.setValueAtTime(150, now);
-                osc.frequency.linearRampToValueAtTime(600, now + 0.3);
-                gainNode.gain.setValueAtTime(0.3, now);
-                gainNode.gain.linearRampToValueAtTime(0, now + 2);
-            } else {
-                osc.frequency.setValueAtTime(440, now);
-                gainNode.gain.setValueAtTime(0.2, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
-            }
-            osc.start(now); osc.stop(now + 3);
+        } 
+        else if (type === 'alarm') {
+            // --- NEW ALARM LOGIC (MP3 FILES) ---
+            // This plays the actual file you uploaded
+            const sound = isCyber ? alarmFiles.night : alarmFiles.day;
+            sound.currentTime = 0; // Rewind to start
+            sound.play().catch(e => console.log('Audio wait'));
         }
     }
 
