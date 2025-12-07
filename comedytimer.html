@@ -38,7 +38,7 @@
             overflow: hidden;
             user-select: none;
             -webkit-user-select: none;
-            transition: background-color 0.5s ease;
+            transition: background-color 0.2s ease;
         }
 
         /* --- TABS --- */
@@ -47,7 +47,7 @@
             background: #111;
             padding: 5px;
             gap: 5px;
-            z-index: 50; /* Ensure tabs stay above content */
+            z-index: 50;
         }
 
         .tab-btn {
@@ -75,16 +75,16 @@
             height: 100%;
             width: 100%;
             position: absolute;
-            top: 50px; /* Space for tab bar */
+            top: 50px;
             left: 0;
-            background-color: var(--bg-black); /* Default black for menu screens */
+            background-color: var(--bg-black);
             box-sizing: border-box;
             height: calc(100% - 50px);
         }
 
         .screen.active { display: flex; }
 
-        /* --- QUICK MODE SCREEN --- */
+        /* --- QUICK MODE --- */
         #screen-quick {
             padding: 40px;
             align-items: center;
@@ -106,11 +106,7 @@
             letter-spacing: 1px;
         }
 
-        .quick-input-row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
+        .quick-input-row { display: flex; gap: 10px; align-items: center; }
 
         .quick-input {
             flex-grow: 1;
@@ -124,12 +120,9 @@
             -webkit-appearance: none;
         }
 
-        /* --- BUILDER SCREEN --- */
-        #screen-builder {
-            padding: 20px;
-        }
+        /* --- BUILDER --- */
+        #screen-builder { padding: 20px; }
 
-        /* Bit List */
         #bit-list {
             flex-grow: 1;
             overflow-y: auto;
@@ -137,7 +130,6 @@
             flex-direction: column;
             gap: 10px;
             padding-bottom: 20px;
-            position: relative;
         }
 
         .bit-card {
@@ -160,7 +152,6 @@
         .bit-info { display: flex; flex-direction: column; gap: 2px; flex-grow: 1; }
         .bit-name { font-weight: bold; font-size: 1.1rem; }
         .bit-time { font-size: 0.9rem; color: #888; }
-
         .bit-controls { display: flex; align-items: center; gap: 15px; }
 
         .del-btn {
@@ -183,9 +174,7 @@
             cursor: grab;
             touch-action: none;
         }
-        .drag-handle:active { color: white; }
 
-        /* Add Bar */
         .add-bar {
             display: flex;
             gap: 10px;
@@ -204,7 +193,7 @@
             font-size: 1rem;
         }
         #new-name { flex-grow: 1; }
-        #new-time { width: 50px; text-align: center; }
+        #new-time { width: 60px; text-align: center; }
 
         .add-btn {
             background: var(--accent);
@@ -214,7 +203,6 @@
             width: 50px;
             font-size: 1.5rem;
             font-weight: bold;
-            cursor: pointer;
         }
 
         /* Footer */
@@ -222,12 +210,34 @@
             border-top: 1px solid #333;
             padding-top: 15px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 15px;
         }
 
-        .total-display { font-size: 0.9rem; color: #aaa; }
-        .total-display span { font-size: 1.4rem; color: white; font-weight: bold; display: block; }
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .stat-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .stat-label { font-size: 0.8rem; color: #aaa; text-transform: uppercase; }
+        .stat-value { font-size: 1.4rem; font-weight: bold; }
+        
+        #builder-light {
+            background: #222;
+            border: 1px solid #444;
+            color: white;
+            width: 60px;
+            font-size: 1.1rem;
+            padding: 5px;
+            border-radius: 4px;
+            text-align: center;
+        }
 
         .start-btn {
             background-color: white;
@@ -237,10 +247,8 @@
             font-size: 1.2rem;
             font-weight: bold;
             border-radius: 8px;
-            cursor: pointer;
             width: 100%;
         }
-        .footer-bar .start-btn { width: auto; } 
 
         /* --- TIMER SCREEN --- */
         #screen-timer {
@@ -248,9 +256,7 @@
             align-items: center;
             justify-content: center;
             z-index: 100;
-            
-            /* THE FIX: Make transparent so Body color shows through */
-            background-color: transparent; 
+            background-color: var(--bg-black);
         }
 
         #timer-display {
@@ -318,13 +324,11 @@
         }
 
         /* --- COLORS --- */
-        body.yellow { background-color: var(--bg-yellow); color: black; }
-        body.yellow .icon-btn { color: black; border-color: rgba(0,0,0,0.3); background: rgba(0,0,0,0.1); }
-        body.red { background-color: var(--bg-red); color: white; }
-        body.flash { animation: flash-red 0.5s infinite; }
-        @keyframes flash-red { 0% { background: var(--bg-red); } 50% { background: black; } 100% { background: var(--bg-red); } }
-        
-        /* Logic to hide numbers */
+        body.yellow #screen-timer { background-color: var(--bg-yellow); color: black; }
+        body.yellow .icon-btn { border-color: rgba(0,0,0,0.3); background: rgba(0,0,0,0.1); color: black; }
+        body.red #screen-timer { background-color: var(--bg-red); color: white; }
+        body.flash #screen-timer { animation: flash-red 0.5s infinite; }
+        @keyframes flash-red { 0% { background-color: var(--bg-red); } 50% { background-color: black; } 100% { background-color: var(--bg-red); } }
         body.hide-numbers #timer-display { opacity: 0; }
 
     </style>
@@ -337,7 +341,6 @@
     </div>
 
     <div id="screen-builder" class="screen active">
-        
         <div id="bit-list">
             <div style="text-align: center; color: #555; margin-top: 50px; font-style: italic;">
                 Add jokes below...
@@ -346,13 +349,22 @@
 
         <div class="add-bar">
             <input type="text" id="new-name" placeholder="Joke Name">
-            <input type="number" id="new-time" placeholder="Min" value="2">
+            <input type="number" id="new-time" placeholder="Min" value="2" step="0.1" inputmode="decimal">
             <button class="add-btn" onclick="addBit()">+</button>
         </div>
 
         <div class="footer-bar">
-            <div class="total-display">TOTAL<span id="total-time-display">0m</span></div>
-            <button class="start-btn" id="start-btn" onclick="startSet()" disabled>START</button>
+            <div class="stats-row">
+                <div class="stat-group">
+                    <span class="stat-label">Total Time</span>
+                    <span class="stat-value" id="total-time-display">0m</span>
+                </div>
+                <div class="stat-group">
+                    <span class="stat-label">Light At (Min)</span>
+                    <input type="number" id="builder-light" value="1" step="0.1" inputmode="decimal">
+                </div>
+            </div>
+            <button class="start-btn" id="start-btn" onclick="startSet()" disabled>START SET</button>
         </div>
     </div>
 
@@ -360,14 +372,14 @@
         <div class="quick-group">
             <label class="quick-label">Total Time (Min)</label>
             <div class="quick-input-row">
-                <input type="number" id="quick-total" class="quick-input" value="5">
+                <input type="number" id="quick-total" class="quick-input" value="5" step="0.1" inputmode="decimal">
             </div>
         </div>
 
         <div class="quick-group">
             <label class="quick-label">Light At (Min Left)</label>
             <div class="quick-input-row">
-                <input type="number" id="quick-light" class="quick-input" value="1">
+                <input type="number" id="quick-light" class="quick-input" value="1" step="0.1" inputmode="decimal">
             </div>
         </div>
 
@@ -405,7 +417,6 @@
 
             document.getElementById('screen-builder').classList.remove('active');
             document.getElementById('screen-quick').classList.remove('active');
-            
             document.getElementById(`screen-${tabName}`).classList.add('active');
         }
 
@@ -414,10 +425,10 @@
             const nameInput = document.getElementById('new-name');
             const timeInput = document.getElementById('new-time');
             const name = nameInput.value.trim();
-            const minutes = parseInt(timeInput.value);
+            // Allow decimals
+            const minutes = parseFloat(timeInput.value);
 
-            if (!name || !minutes || minutes <= 0) return;
-
+            if (!name || isNaN(minutes) || minutes <= 0) return;
             setlist.push({ id: Date.now(), name, minutes });
             nameInput.value = '';
             renderList();
@@ -428,7 +439,7 @@
             renderList();
         }
 
-        // --- TOUCH DRAG ENGINE ---
+        // --- TOUCH LOGIC ---
         let draggingId = null;
         let draggingEl = null;
 
@@ -441,24 +452,19 @@
         function handleTouchMove(e) {
             if (!draggingId) return;
             e.preventDefault(); 
-            
             const touch = e.touches[0];
             const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
             const cardUnder = elementUnder ? elementUnder.closest('.bit-card') : null;
 
             if (cardUnder && cardUnder !== draggingEl) {
-                const fromIndex = setlist.findIndex(item => item.id === draggingId);
                 const toId = parseInt(cardUnder.dataset.id);
-                
                 if (toId && toId !== draggingId) {
+                    const fromIndex = setlist.findIndex(item => item.id === draggingId);
                     const toIndex = setlist.findIndex(item => item.id === toId);
-                    
                     const temp = setlist[fromIndex];
                     setlist[fromIndex] = setlist[toIndex];
                     setlist[toIndex] = temp;
-
                     renderList();
-                    
                     const newCards = document.querySelectorAll('.bit-card');
                     draggingEl = newCards[toIndex]; 
                     draggingEl.classList.add('dragging-active');
@@ -491,7 +497,6 @@
 
             setlist.forEach((bit, index) => {
                 totalMin += bit.minutes;
-                
                 const div = document.createElement('div');
                 div.className = 'bit-card';
                 div.dataset.id = bit.id; 
@@ -512,22 +517,28 @@
                 `;
                 container.appendChild(div);
             });
-
+            
+            // Round to 1 decimal place to avoid 4.000000001 issues
+            totalMin = Math.round(totalMin * 10) / 10;
             totalDisplay.innerText = `${totalMin}m`;
         }
 
         // --- TIMER LOGIC ---
         function startQuickSet() {
-            const total = parseInt(document.getElementById('quick-total').value);
-            const light = parseInt(document.getElementById('quick-light').value);
-            if (!total || total <= 0) return alert("Invalid Time");
+            const total = parseFloat(document.getElementById('quick-total').value);
+            const light = parseFloat(document.getElementById('quick-light').value);
+            
+            if (isNaN(total) || total <= 0) return alert("Invalid Time");
+            
             const csContainer = document.getElementById('cs-content');
             csContainer.innerHTML = `<div class="cs-item">Quick ${total}m Set<span>Light at ${light}m</span></div>`;
+            
             startTimerLogic(total * 60 * 1000, light * 60 * 1000);
         }
 
         function startSet() {
             let totalMin = setlist.reduce((sum, bit) => sum + bit.minutes, 0);
+            
             const csContainer = document.getElementById('cs-content');
             csContainer.innerHTML = '';
             setlist.forEach((bit, i) => {
@@ -537,7 +548,12 @@
                         <span>${bit.minutes} min</span>
                     </div>`;
             });
-            const warningMs = totalMin < 2 ? 30000 : 60000;
+            
+            // Get the light warning time from the new input
+            const lightMin = parseFloat(document.getElementById('builder-light').value);
+            // Default to 1 min if input is invalid
+            const warningMs = (isNaN(lightMin) ? 1 : lightMin) * 60 * 1000;
+            
             startTimerLogic(totalMin * 60 * 1000, warningMs);
         }
 
@@ -608,7 +624,6 @@
 
         function resetColors() {
             document.body.classList.remove('yellow', 'red', 'flash');
-            // We do NOT touch 'hide-numbers' here, so preferences are saved
         }
 
         function toggleNumbers() {
