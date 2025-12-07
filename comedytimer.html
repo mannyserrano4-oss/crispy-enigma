@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <title>The Tight Five</title>
-    <meta name="apple-mobile-web-app-title" content="Tight 5">
-    <meta name="application-name" content="Tight 5">
+    <title>Comedy Timer</title>
+    <meta name="apple-mobile-web-app-title" content="Comedy Timer">
+    <meta name="application-name" content="Comedy Timer">
 
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAbFBMVEUAAAAZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMWy/C9YAAAAI3RSTlMAAAb6y4kQ19O/jBvFpZFHPzUfFvT06eLaxcG8sK2cl42Eengq2V96AAAAqklEQVRYw+3XyQ6CMBAF0EClQBEV1Pn/P2sTEnUhmhD2cW7vTJOZMnQ4hP9R9+04d6alYQzDxtC1E9zStZ0S3NK1nRLc0rWdEtwy39rK/Wuf6yX3r60l96+tJfevrSX3r60l96+tJfevrSX3r60l96+tJfevrSX3r60l96+tJfevrSX3r60l96+tJfevrSX3r60l96+tJfevrSX3r60l96+tJfevrSX3r60l96+tJfevre/eX05cE66+Jm4FAAAAAElFTkSuQmCC">
-    <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAbFBMVEUAAAAZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMwZmMWy/C9YAAAAI3RSTlMAAAb6y4kQ19O/jBvFpZFHPzUfFvT06eLaxcG8sK2cl42Eengq2V96AAAAqklEQVRYw+3XyQ6CMBAF0EClQBEV1Pn/P2sTEnUhmhD2cW7vTJOZMnQ4hP9R9+04d6alYQzDxtC1E9zStZ0S3NK1nRLc0rWdEtwy39rK/Wuf6yX3r60l96+tJfevrSX3r60l96+tJfevrSX3r60l96+tJfevrSX3r60l96+tJfevrSX3r60l96+tJfevrSX3r60l96+tJfevrSX3r60l96+tJfevrSX3r60l96+tJfevrSX3r60l96+tJfevre/eX05cE66+Jm4FAAAAAElFTkSuQmCC">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
 
     <style>
         :root {
@@ -35,6 +35,8 @@
             flex-direction: column;
             overflow: hidden;
             transition: background-color 0.5s ease;
+            -webkit-user-select: none; /* Prevent text selection on tap */
+            user-select: none;
         }
 
         /* --- Screens --- */
@@ -53,7 +55,7 @@
         .screen.active { display: flex; }
 
         /* --- Setup Screen --- */
-        h1 { margin-bottom: 40px; text-transform: uppercase; letter-spacing: 2px; }
+        h1 { margin-bottom: 40px; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; text-align: center; }
 
         .btn-grid {
             display: grid;
@@ -74,7 +76,7 @@
             transition: transform 0.1s;
         }
 
-        button.preset-btn:active { transform: scale(0.95); }
+        button.preset-btn:active { transform: scale(0.95); background-color: #444; }
         
         button.preset-btn span {
             display: block;
@@ -108,6 +110,9 @@
             border: 1px solid #444;
             color: white;
             border-radius: 8px;
+            /* Remove default styling */
+            -webkit-appearance: none;
+            margin: 0;
         }
 
         .action-btn {
@@ -129,6 +134,7 @@
             margin-top: 20px;
             text-decoration: underline;
             cursor: pointer;
+            font-size: 1rem;
         }
 
         /* --- Timer Screen --- */
@@ -137,37 +143,41 @@
             font-weight: bold;
             font-variant-numeric: tabular-nums;
             z-index: 2;
+            transition: opacity 0.3s;
         }
         
         @media (min-width: 600px) { #timer-display { font-size: 8rem; } }
 
-        /* The hidden controls overlay */
+        /* Controls Overlay */
         .timer-controls {
             position: absolute;
-            bottom: 30px;
+            bottom: 40px;
             display: flex;
-            gap: 20px;
+            gap: 30px;
             z-index: 10;
         }
 
         .icon-btn {
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
             color: white;
-            width: 60px;
-            height: 60px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(10px);
         }
+
+        .icon-btn:active { background: rgba(255,255,255,0.3); }
 
         /* --- Color States --- */
         body.yellow { background-color: var(--bg-yellow); color: black; }
-        body.yellow .icon-btn { color: black; border-color: black; background: rgba(0,0,0,0.1); }
+        /* In yellow mode, make buttons dark so they are visible */
+        body.yellow .icon-btn { color: black; border-color: rgba(0,0,0,0.3); background: rgba(0,0,0,0.1); }
         
         body.red { background-color: var(--bg-red); color: white; }
         
@@ -189,7 +199,7 @@
 <body>
 
     <div id="screen-select" class="screen active">
-        <h1>The Tight Five</h1>
+        <h1>COMEDY TIMER</h1>
         <div class="btn-grid">
             <button class="preset-btn" onclick="startTimer(5, 1)">
                 5 Minutes
@@ -204,23 +214,23 @@
                 <span>Light at 5 min</span>
             </button>
             <button class="preset-btn" style="background: #222" onclick="showCustom()">
-                Custom
+                Custom Set
             </button>
         </div>
     </div>
 
     <div id="screen-custom" class="screen">
-        <h1>Custom Set</h1>
+        <h1>Custom</h1>
         <div class="custom-inputs">
             <div class="input-group">
-                <label>Total Time (Minutes)</label>
-                <input type="number" id="custom-total" value="7" inputmode="numeric">
+                <label>Set Length (Minutes)</label>
+                <input type="number" id="custom-total" value="7" inputmode="numeric" pattern="[0-9]*">
             </div>
             <div class="input-group">
                 <label>Light At (Minutes Remaining)</label>
-                <input type="number" id="custom-light" value="2" inputmode="numeric">
+                <input type="number" id="custom-light" value="2" inputmode="numeric" pattern="[0-9]*">
             </div>
-            <button class="action-btn" onclick="startCustom()">START SET</button>
+            <button class="action-btn" onclick="startCustom()">START</button>
         </div>
         <button class="back-btn" onclick="showSelect()">Back</button>
     </div>
@@ -278,7 +288,7 @@
             const now = Date.now();
             const durationMs = totalMinutes * 60 * 1000;
             endTime = now + durationMs;
-            warningTimeMs = lightAtMinutes * 60 * 1000; // e.g., 1 min left
+            warningTimeMs = lightAtMinutes * 60 * 1000; 
 
             showTimer();
             resetColors();
@@ -335,8 +345,10 @@
         function stopTimer() {
             clearInterval(timerInterval);
             document.body.className = ''; // Remove colors
-            // Restore visibility preference logic if needed, but for now just reset
+            
+            // Re-apply hidden preference if set
             if (!isNumbersVisible) document.body.classList.add('hide-numbers');
+            
             showSelect();
         }
 
