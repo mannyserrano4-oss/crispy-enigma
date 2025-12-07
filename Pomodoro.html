@@ -207,13 +207,12 @@
     /* =========================================
        AUDIO CONFIGURATION
        ========================================= */
-    // 1. MUSIC (Filenames from GitHub)
     const musicFiles = {
+        // Ensure these match your GitHub filenames exactly!
         day: 'day.mp3',
-        night: 'night.mp3.mp3'
+        night: 'night.mp3'
     };
 
-    // 2. ALARMS (Filenames from GitHub)
     const alarmFiles = {
         day: new Audio('alarm-day.mp3'),
         night: new Audio('alarm-night.mp3')
@@ -224,14 +223,8 @@
        ========================================= */
     const colorsDay = { start: [0, 100, 0], end: [210, 180, 140] }; 
     const colorsNight = { start: [0, 255, 255], end: [255, 20, 147] };
-
-    // Initialize Audio Context for Clicks
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     const audioCtx = new AudioContext();
-
-    /* --- ICONS --- */
-    const iconLeaf = `<svg viewBox="0 0 24 24"><path d="M17,8C8,10,5.9,16.17,3.82,21.34L5.71,22l1-2.3A4.49,4.49,0,0,0,8,20C19,20,22,3,22,3,21,5,14,5.25,9,6.25S2,11.5,2,13.5a6.22,6.22,0,0,0,1.75,3.75C7,8,17,8,17,8Z"/></svg>`;
-    const iconCyber = `<svg viewBox="0 0 24 24"><path d="M4.5,10.5V12.5H6.5V14.5H8.5V12.5H6.5V10.5H4.5M17.5,10.5V12.5H15.5V14.5H17.5V12.5H19.5V10.5H17.5M6,4V6H18V4H6M4,6V8H20V6H4M2,8V16H22V8H2M6,10H8V12H6V10M16,10H18V12H16V10M11,10H13V12H11V10Z"/></svg>`;
 
     /* --- VARS --- */
     const circle = document.querySelector('.progress');
@@ -246,11 +239,95 @@
     let currentMode = 'work'; 
     let targetTime = null;
 
+    // AUDIO STATE TRACKERS (The "Intent")
+    let musicEnabled = false;
+    let ambienceEnabled = false;
+
     const timeDisplay = document.getElementById('time-display');
     const startBtn = document.getElementById('start-btn');
     const html = document.documentElement;
 
-    /* --- VISUALS --- */
+    /* --- AUDIO ENGINE --- */
+    const bgMusic = document.getElementById('bg-music');
+    const musicBtn = document.getElementById('music-btn');
+    const ambiencePlayer = document.getElementById('ambience-player');
+    const ambienceBtn = document.getElementById('ambience-btn');
+    const ambienceSelect = document.getElementById('ambience-select');
+
+    function updateMusicSource() {
+        const isCyber = html.getAttribute('data-theme') === 'cyber';
+        const newSrc = isCyber ? musicFiles.night : musicFiles.day;
+        const currentSrc = bgMusic.getAttribute('src');
+        if (currentSrc !== newSrc) {
+            bgMusic.src = newSrc;
+             // If we swap tracks while running, keep playing
+            if (musicEnabled && isRunning) bgMusic.play().catch(e => console.log('Wait'));
+        }
+    }
+
+    // --- NEW: SYNC FUNCTION ---
+    // Decides if audio should play based on Timer State + User Intent
+    function syncAudio() {
+        if (isRunning) {
+            // Timer is running: Respect user choice
+            if (musicEnabled) bgMusic.play().catch(e=>{});
+            if (ambienceEnabled && ambienceSelect.value !== 'none') ambiencePlayer.play().catch(e=>{});
+        } else {
+            // Timer paused/stopped: Silence everything
+            bgMusic.pause();
+            ambiencePlayer.pause();
+        }
+    }
+
+    // --- BUTTONS NOW TOGGLE "INTENT" ---
+    musicBtn.addEventListener('click', () => {
+        playSound('click');
+        musicEnabled = !musicEnabled; // Toggle state
+        
+        if(!bgMusic.getAttribute('src')) updateMusicSource();
+
+        // Update Icon immediately
+        musicBtn.textContent = musicEnabled ? '⏸' : '▶';
+        
+        // If timer is running, play/pause immediately. 
+        // If paused, just arm/disarm it (syncAudio handles logic).
+        if(musicEnabled) {
+            if(isRunning) bgMusic.play();
+        } else {
+            bgMusic.pause();
+        }
+    });
+
+    ambienceBtn.addEventListener('click', () => {
+        playSound('click');
+        if (ambienceSelect.value === 'none') return;
+        
+        ambienceEnabled = !ambienceEnabled; // Toggle state
+        
+        ambienceBtn.textContent = ambienceEnabled ? '⏸' : '▶';
+        
+        if(ambienceEnabled) {
+            ambiencePlayer.src = ambienceSelect.value;
+            if(isRunning) ambiencePlayer.play();
+        } else {
+            ambiencePlayer.pause();
+        }
+    });
+
+    ambienceSelect.addEventListener('change', () => {
+        if (ambienceEnabled) {
+             if(ambienceSelect.value === 'none') {
+                 ambiencePlayer.pause(); 
+                 ambienceEnabled = false; 
+                 ambienceBtn.textContent = '▶';
+             } else {
+                 ambiencePlayer.src = ambienceSelect.value; 
+                 if(isRunning) ambiencePlayer.play();
+             }
+        }
+    });
+
+    /* --- VISUALS & EFFECTS --- */
     function interpolateColor(color1, color2, factor) {
         let result = color1.slice();
         for (let i = 0; i < 3; i++) {
@@ -278,33 +355,49 @@
         document.documentElement.style.setProperty('--text-color', currentColor);
     }
 
-    /* --- HYBRID AUDIO ENGINE --- */
+    function playBeep(isCyber) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+        osc.type = isCyber ? 'sawtooth' : 'sine';
+        if(isCyber) {
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.linearRampToValueAtTime(600, now + 0.3);
+            gainNode.gain.setValueAtTime(0.3, now);
+            gainNode.gain.linearRampToValueAtTime(0, now + 1);
+        } else {
+            osc.frequency.setValueAtTime(440, now);
+            gainNode.gain.setValueAtTime(0.2, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+        }
+        osc.start(now); osc.stop(now + 2);
+    }
+
     function playSound(type) {
-        // Resume AudioCtx if suspended
         if (audioCtx.state === 'suspended') audioCtx.resume();
         const isCyber = html.getAttribute('data-theme') === 'cyber';
         
         if (type === 'click') {
-            // SYNTHESIZED CLICK (Fast & Snappy)
             const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
             osc.connect(gainNode);
             gainNode.connect(audioCtx.destination);
-            
             osc.type = isCyber ? 'square' : 'triangle';
             osc.frequency.setValueAtTime(isCyber ? 600 : 300, audioCtx.currentTime);
-            
             gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-            
-            osc.start(audioCtx.currentTime); 
-            osc.stop(audioCtx.currentTime + 0.1);
+            osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.1);
         } 
         else if (type === 'alarm') {
-            // FILE-BASED ALARM (Your MP3s)
             const sound = isCyber ? alarmFiles.night : alarmFiles.day;
             sound.currentTime = 0;
-            sound.play().catch(e => console.log('Audio file blocked or missing'));
+            const playPromise = sound.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => { playBeep(isCyber); });
+            }
         }
     }
 
@@ -314,83 +407,15 @@
         if (mode === 'break') document.getElementById('mode-short').classList.add('active');
     }
 
-    /* --- MUSIC & AMBIENCE --- */
-    const bgMusic = document.getElementById('bg-music');
-    const musicBtn = document.getElementById('music-btn');
-    const ambiencePlayer = document.getElementById('ambience-player');
-    const ambienceBtn = document.getElementById('ambience-btn');
-    const ambienceSelect = document.getElementById('ambience-select');
-    let isMusicPlaying = false;
-    let isAmbiencePlaying = false;
-
-    function updateMusicSource() {
-        const isCyber = html.getAttribute('data-theme') === 'cyber';
-        const newSrc = isCyber ? musicFiles.night : musicFiles.day;
-        const currentSrc = bgMusic.getAttribute('src');
-        if (currentSrc !== newSrc) {
-            const wasPlaying = isMusicPlaying;
-            bgMusic.src = newSrc;
-            if (wasPlaying) bgMusic.play().catch(e => console.log('Music waiting'));
-        }
-    }
-
-    musicBtn.addEventListener('click', () => {
-        playSound('click');
-        if(!bgMusic.getAttribute('src')) updateMusicSource();
-        
-        if(isMusicPlaying) { 
-            bgMusic.pause(); 
-            musicBtn.textContent = '▶'; 
-        } else { 
-            bgMusic.play().catch(e => console.log('Play blocked')); 
-            musicBtn.textContent = '⏸'; 
-        }
-        isMusicPlaying = !isMusicPlaying;
-    });
-
-    ambienceBtn.addEventListener('click', () => {
-        playSound('click');
-        if (ambienceSelect.value === 'none') return;
-        
-        if (isAmbiencePlaying) {
-            ambiencePlayer.pause(); ambienceBtn.textContent = '▶';
-        } else {
-            ambiencePlayer.src = ambienceSelect.value;
-            ambiencePlayer.play().catch(e => console.log('Play blocked'));
-            ambienceBtn.textContent = '⏸';
-        }
-        isAmbiencePlaying = !isAmbiencePlaying;
-    });
-
-    ambienceSelect.addEventListener('change', () => {
-        if (isAmbiencePlaying) {
-             if(ambienceSelect.value === 'none') {
-                 ambiencePlayer.pause(); isAmbiencePlaying = false; ambienceBtn.textContent = '▶';
-             } else {
-                 ambiencePlayer.src = ambienceSelect.value; 
-                 ambiencePlayer.play().catch(e => console.log('Play blocked'));
-             }
-        }
-    });
-
-    const themeBtn = document.getElementById('theme-btn');
-    themeBtn.addEventListener('click', (e) => {
-        playSound('click');
-        if (html.getAttribute('data-theme') === 'cyber') {
-            html.removeAttribute('data-theme'); themeBtn.innerHTML = iconLeaf; 
-        } else {
-            html.setAttribute('data-theme', 'cyber'); themeBtn.innerHTML = iconCyber; 
-        }
-        updateVisuals(timeLeft);
-        updateMusicSource(); 
-    });
-
     /* --- TIMER --- */
     function timerComplete() {
+        playSound('alarm');
         clearInterval(timerId); isRunning = false;
         startBtn.textContent = 'Start'; targetTime = null;
         localStorage.removeItem('targetTime');
-        playSound('alarm');
+        
+        syncAudio(); // <--- STOPS MUSIC
+
         const autoBreak = document.getElementById('auto-break').checked;
 
         if (currentMode === 'work') {
@@ -410,13 +435,20 @@
 
     function startTimer() {
         if (isRunning) {
+            // PAUSE ACTION
             clearInterval(timerId); isRunning = false;
             startBtn.textContent = 'Start'; targetTime = null;
             localStorage.removeItem('targetTime');
+            
+            syncAudio(); // <--- STOPS MUSIC
         } else {
+            // PLAY ACTION
             isRunning = true; startBtn.textContent = 'Pause';
             targetTime = Date.now() + (timeLeft * 1000);
             localStorage.setItem('targetTime', targetTime);
+            
+            syncAudio(); // <--- STARTS MUSIC (if enabled)
+            
             timerId = setInterval(() => {
                 const now = Date.now();
                 const distance = targetTime - now;
@@ -430,12 +462,18 @@
         clearInterval(timerId); isRunning = false;
         startBtn.textContent = 'Start'; timeLeft = seconds; totalTime = seconds;
         currentMode = mode; targetTime = null;
-        localStorage.removeItem('targetTime'); updateVisuals(seconds);
+        localStorage.removeItem('targetTime'); 
+        
+        syncAudio(); // <--- ENSURES SILENCE ON RESET
+        
+        updateVisuals(seconds);
     }
 
     // Listeners
     document.getElementById('start-btn').addEventListener('click', () => { playSound('click'); startTimer(); });
     document.getElementById('reset-btn').addEventListener('click', () => { playSound('click'); setupTimer(totalTime, currentMode); });
+    
+    // Mode Buttons
     document.querySelectorAll('.mode-btn[data-time]').forEach(btn => {
         btn.addEventListener('click', () => {
             playSound('click'); highlightMode(btn.dataset.mode === 'work' ? 'work' : 'break');
@@ -443,6 +481,8 @@
             setupTimer(btn.dataset.time * 60, btn.dataset.mode);
         });
     });
+    
+    // Custom Buttons
     document.getElementById('start-custom-work').addEventListener('click', () => {
         playSound('click'); const min = document.getElementById('custom-work-input').value;
         document.getElementById('settings-panel').style.display = 'none'; highlightMode(''); setupTimer(min * 60, 'custom-work');
@@ -451,10 +491,22 @@
         playSound('click'); const min = document.getElementById('custom-break-input').value;
         document.getElementById('settings-panel').style.display = 'none'; highlightMode(''); setupTimer(min * 60, 'custom-break');
     });
+    
+    // Settings & Theme
     document.getElementById('settings-btn').addEventListener('click', () => {
         playSound('click');
         const panel = document.getElementById('settings-panel');
         panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    });
+    document.getElementById('theme-btn').addEventListener('click', (e) => {
+        playSound('click');
+        if (html.getAttribute('data-theme') === 'cyber') {
+            html.removeAttribute('data-theme'); themeBtn.innerHTML = iconLeaf; 
+        } else {
+            html.setAttribute('data-theme', 'cyber'); themeBtn.innerHTML = iconCyber; 
+        }
+        updateVisuals(timeLeft);
+        updateMusicSource(); 
     });
 
     const savedTarget = localStorage.getItem('targetTime');
