@@ -10,8 +10,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <link rel="apple-touch-icon" href="icon.png">
-    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="ficon.png">
+    <link rel="icon" type="image/png" href="ficon.png">
 
     <style>
         :root {
@@ -115,7 +115,11 @@
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: contain; 
+            
+            /* THE FIX: 'cover' ensures the image fills the screen edge-to-edge 
+               so no black bars show up to mess up the slider logic. */
+            object-fit: cover; 
+            
             pointer-events: none;
         }
 
@@ -171,7 +175,6 @@
             backdrop-filter: blur(4px);
         }
 
-        /* --- The Input --- */
         #range-input {
             position: absolute;
             top: 0;
@@ -186,13 +189,11 @@
             touch-action: none; 
         }
 
-        /* --- Touch Blocker (Active only during Auto-Slide) --- */
         #touch-blocker {
             display: none;
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 50; /* Above the range input */
-            /* Transparent */
+            z-index: 50;
         }
         body.cinema-mode #touch-blocker { display: block; }
 
@@ -242,9 +243,7 @@
             <img id="img-after" class="img-layer">
             <img id="img-before" class="img-layer">
             <div id="slider-handle"></div>
-            
             <input type="range" id="range-input" min="0" max="100" value="50" oninput="updateVisuals(this.value)">
-            
             <div id="touch-blocker" onclick="stopAutoSlide()"></div>
         </div>
     </div>
@@ -252,8 +251,16 @@
     <script>
         let animationFrame;
         let startTime;
-        const DURATION = 4000; // 4 Seconds to slide
-        const DELAY = 1000; // 1 Second wait before starting
+        
+        // --- ANIMATION SETTINGS ---
+        const DURATION_ONE_WAY = 3000; // 3 seconds per swipe
+        const TOTAL_CYCLES = 3;        // Back and forth 3 times
+        const DELAY = 1000;            // Initial delay
+        
+        let direction = 1; // 1 = Left to Right, -1 = Right to Left
+        let cycleCount = 0;
+        let currentStartVal = 0;
+        let isAnimating = false;
 
         function loadImage(input, type) {
             if (input.files && input.files[0]) {
@@ -267,7 +274,6 @@
             }
         }
 
-        // Standard update function
         function updateVisuals(val) {
             const percentage = 100 - val;
             document.getElementById('img-before').style.clipPath = `inset(0 ${percentage}% 0 0)`;
@@ -275,25 +281,22 @@
             document.getElementById('range-input').value = val;
         }
 
-        // --- AUTO SLIDE LOGIC ---
-
         function startAutoSlide() {
-            // 1. Enter Cinema Mode (Hides UI, enables Touch Blocker)
             document.body.classList.add('cinema-mode');
-            
-            // 2. Show Toast briefly
             const toast = document.getElementById('toast');
             toast.style.opacity = '1';
             setTimeout(() => { toast.style.opacity = '0'; }, 2000);
 
-            // 3. Reset Slider to 0 (All Before)
+            // Reset
             updateVisuals(0);
+            direction = 1; // Go towards 100
+            cycleCount = 0;
+            isAnimating = true;
 
-            // 4. Start Animation Loop after delay
             setTimeout(() => {
-                // Check if still in cinema mode before starting
-                if (document.body.classList.contains('cinema-mode')) {
+                if (isAnimating) {
                     startTime = null;
+                    currentStartVal = 0; // Starting at 0
                     animationFrame = requestAnimationFrame(animateLoop);
                 }
             }, DELAY);
@@ -303,29 +306,45 @@
             if (!startTime) startTime = timestamp;
             const progress = timestamp - startTime;
             
-            // Calculate percentage (0 to 1)
-            let percent = progress / DURATION;
+            // 0 to 1
+            let percent = progress / DURATION_ONE_WAY;
             if (percent > 1) percent = 1;
 
-            // Apply Easing (Smooth Start/End) - Ease In Out Quad
+            // EaseInOutQuad
             const eased = percent < 0.5 ? 2 * percent * percent : 1 - Math.pow(-2 * percent + 2, 2) / 2;
 
-            // Move Slider (0 to 100)
-            updateVisuals(eased * 100);
+            // Calculate Value based on direction
+            let val;
+            if (direction === 1) {
+                // Going 0 to 100
+                val = eased * 100;
+            } else {
+                // Going 100 to 0
+                val = 100 - (eased * 100);
+            }
 
-            if (progress < DURATION) {
-                // Keep going
-                if (document.body.classList.contains('cinema-mode')) {
+            updateVisuals(val);
+
+            if (progress < DURATION_ONE_WAY) {
+                if (isAnimating) animationFrame = requestAnimationFrame(animateLoop);
+            } else {
+                // Move Finished. Check if we flip direction or stop
+                if (cycleCount < (TOTAL_CYCLES * 2) - 1) {
+                    // Flip direction
+                    direction *= -1;
+                    cycleCount++;
+                    startTime = null; // Reset time for next loop
                     animationFrame = requestAnimationFrame(animateLoop);
+                } else {
+                    // All Done
+                    stopAutoSlide();
                 }
             }
         }
 
         function stopAutoSlide() {
-            // Cancel Animation
+            isAnimating = false;
             cancelAnimationFrame(animationFrame);
-            
-            // Exit Cinema Mode
             document.body.classList.remove('cinema-mode');
         }
 
