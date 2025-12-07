@@ -11,28 +11,26 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <link rel="apple-touch-icon" href="bicon.png">
-    <link rel="icon" type="image/png" href="bicon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
 
     <style>
         :root {
             /* Dark Mode (Default) */
-            --bg-color: #1a1a1a;
+            --bg-color: #000000;
             --text-color: #ffffff;
-            --card-bg: #2d2d2d;
             --input-bg: #333;
             --border-color: #444;
             
             /* Status Colors */
             --status-soak: #d32f2f; /* Red */
-            --status-clean: #388e3c; /* Green */
-            --status-danger: #1976d2; /* Blue */
+            --status-clean: #2e7d32; /* Green */
+            --status-danger: #1565c0; /* Blue */
         }
 
         body.light-mode {
-            --bg-color: #f4f4f4;
-            --text-color: #333333;
-            --card-bg: #ffffff;
+            --bg-color: #ffffff;
+            --text-color: #000000;
             --input-bg: #e0e0e0;
             --border-color: #ccc;
         }
@@ -42,163 +40,188 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            height: 100vh; /* Force full height */
+            height: 100dvh; /* Dynamic height for mobile browsers */
             display: flex;
             flex-direction: column;
-            align-items: center;
-            transition: background-color 0.3s, color 0.3s;
-            /* Prevent rubber-banding on iOS */
-            overscroll-behavior-y: none; 
+            overflow: hidden; /* No scrolling */
+            transition: background-color 0.3s;
         }
 
-        /* --- Header & Controls --- */
-        header {
-            width: 100%;
-            max-width: 600px;
+        /* --- Header Area (Fixed Top) --- */
+        .top-bar {
+            padding: 10px 15px;
             display: flex;
-            justify-content: space-between;
+            gap: 10px;
             align-items: center;
-            margin-bottom: 30px;
-            margin-top: 10px; /* Space for status bar */
+            background-color: var(--bg-color);
+            z-index: 10;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0; /* Never shrink this */
         }
 
-        h1 { margin: 0; font-size: 1.5rem; letter-spacing: 1px; }
+        h1 {
+            margin: 0;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            margin-right: auto;
+            text-transform: uppercase;
+        }
 
         .theme-toggle {
             background: none;
             border: 1px solid var(--text-color);
             color: var(--text-color);
             padding: 5px 10px;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
             font-size: 0.8rem;
         }
 
-        .controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-            width: 100%;
-            max-width: 600px;
-        }
-
         select {
-            flex-grow: 1;
-            padding: 15px;
-            font-size: 1.1rem;
-            border-radius: 8px;
+            padding: 8px;
+            font-size: 1rem;
+            border-radius: 6px;
             border: 1px solid var(--border-color);
             background-color: var(--input-bg);
             color: var(--text-color);
-            /* Remove default arrow to look cleaner */
-            -webkit-appearance: none; 
-            text-align: center;
+            width: 120px;
         }
 
         button.add-btn {
-            padding: 15px 25px;
+            padding: 5px 15px;
             background-color: var(--text-color);
             color: var(--bg-color);
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             font-size: 1.5rem;
+            line-height: 1;
             cursor: pointer;
             font-weight: bold;
         }
 
-        button.add-btn:active { transform: scale(0.95); }
-
-        /* --- Timer Grid --- */
+        /* --- Main Grid Container --- */
         #timer-container {
+            flex-grow: 1; /* Fill all remaining space */
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 15px;
-            width: 100%;
-            max-width: 800px;
-            padding-bottom: 50px;
+            gap: 4px;
+            padding: 4px;
+            /* Layouts are handled by data-count attributes below */
+        }
+
+        /* --- Dynamic Grid Layouts --- */
+        
+        /* 1 Timer: Full Screen */
+        #timer-container[data-count="1"] { grid-template-columns: 1fr; grid-template-rows: 1fr; }
+
+        /* 2 Timers */
+        #timer-container[data-count="2"] { 
+            grid-template-columns: 1fr; 
+            grid-template-rows: 1fr 1fr; /* Stack vertically on mobile */
+        }
+        @media (min-width: 600px) { /* Side by side on desktop/landscape */
+            #timer-container[data-count="2"] { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
+        }
+
+        /* 3-4 Timers: 2x2 Grid */
+        #timer-container[data-count="3"],
+        #timer-container[data-count="4"] { 
+            grid-template-columns: 1fr 1fr; 
+            grid-template-rows: 1fr 1fr; 
+        }
+
+        /* 5-6 Timers */
+        #timer-container[data-count="5"],
+        #timer-container[data-count="6"] { 
+            grid-template-columns: 1fr 1fr; 
+            grid-template-rows: 1fr 1fr 1fr; 
+        }
+        @media (min-width: 600px) {
+            #timer-container[data-count="5"],
+            #timer-container[data-count="6"] { 
+                grid-template-columns: 1fr 1fr 1fr; 
+                grid-template-rows: 1fr 1fr; 
+            }
         }
 
         /* --- Timer Cards --- */
         .timer-card {
-            background-color: var(--status-soak); /* Default to Red/Soaking */
+            background-color: var(--status-soak);
             color: white;
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 8px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
-            min-height: 150px;
             position: relative;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
+            width: 100%;
+            height: 100%; /* Force fill grid cell */
+            overflow: hidden;
+            transition: background-color 0.3s;
         }
 
         .timer-card h3 {
-            margin: 0 0 10px 0;
-            font-size: 1.2rem;
+            margin: 0;
+            font-size: 4vw; /* Scales with screen width */
             font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            opacity: 0.9;
         }
+        
+        /* Limit text size on desktop so it's not comic */
+        @media (min-width: 800px) { .timer-card h3 { font-size: 1.5rem; } }
 
         .timer-card .time-display {
-            font-size: 2.5rem;
+            font-size: 15vw; /* Massive scaling text */
             font-weight: 700;
-            font-variant-numeric: tabular-nums; 
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+            margin: 10px 0;
         }
+        @media (min-width: 800px) { .timer-card .time-display { font-size: 5rem; } }
 
         .timer-card .status-text {
-            font-size: 0.8rem;
-            margin-top: 5px;
-            opacity: 0.9;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: bold;
         }
 
         .close-btn {
             position: absolute;
-            top: 5px;
+            top: 10px;
             right: 10px;
-            background: none;
+            background: rgba(0,0,0,0.2);
             border: none;
-            color: rgba(255,255,255,0.7);
-            font-size: 1.2rem;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.5rem;
             cursor: pointer;
-            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         /* --- States --- */
-        .timer-card.clean {
-            background-color: var(--status-clean);
-            transform: scale(1.02);
-        }
-
-        .timer-card.danger {
-            background-color: var(--status-danger);
-            animation: pulse-blue 1.5s infinite;
-        }
-
+        .timer-card.clean { background-color: var(--status-clean); }
+        .timer-card.danger { background-color: var(--status-danger); animation: pulse-blue 1.5s infinite; }
+        
         @keyframes pulse-blue {
             0% { opacity: 1; }
             50% { opacity: 0.7; }
             100% { opacity: 1; }
         }
-
-        /* Mobile Adjustment */
-        @media (max-width: 400px) {
-            #timer-container { grid-template-columns: 1fr 1fr; }
-            .timer-card .time-display { font-size: 1.8rem; }
-        }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>BARBICIDE</h1>
+    <div class="top-bar">
+        <h1>Barbicide</h1>
         <button class="theme-toggle" onclick="toggleTheme()">Mode</button>
-    </header>
-
-    <div class="controls">
         <select id="toolSelect">
             <option value="Shears">Shears</option>
             <option value="Combs">Combs</option>
@@ -209,72 +232,49 @@
         <button class="add-btn" onclick="addTimer()">+</button>
     </div>
 
-    <div id="timer-container">
+    <div id="timer-container" data-count="0">
         </div>
 
     <script>
         // --- Configuration ---
         const SOAK_MINUTES = 10; 
         
-        // --- Audio Variables ---
         let timers = [];
         let audioCtx = null;
         let audioUnlocked = false;
 
-        // --- 1. The Audio Engine ---
+        // --- Audio Logic ---
         function initAudio() {
-            // Only setup once
             if (audioCtx) return; 
-
             const AudioContext = window.AudioContext || window.webkitAudioContext;
             audioCtx = new AudioContext();
-
-            // Handle the "Suspended" state (common on iOS)
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
         }
 
-        // --- 2. The Silent Unlock (The Fix) ---
-        // We play a silent sound instantly on button click to "wake up" the audio engine
         function unlockAudio() {
             if (audioUnlocked || !audioCtx) return;
-
-            // Resume context again just to be safe
             audioCtx.resume().then(() => {
-                // Create a silent buffer
                 const buffer = audioCtx.createBuffer(1, 1, 22050); 
                 const source = audioCtx.createBufferSource();
                 source.buffer = buffer;
                 source.connect(audioCtx.destination);
                 source.start(0);
-                
                 audioUnlocked = true;
-                console.log("Audio System Unlocked");
             });
         }
 
-        // --- 3. The Alarm Sound ---
         function playChime() {
-            // If context died or wasn't made, try to recover (rare)
             if (!audioCtx) return; 
-
             const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
-
             osc.connect(gainNode);
             gainNode.connect(audioCtx.destination);
-
-            // Pleasant "Ding" Sound
             osc.type = 'sine'; 
-            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
             osc.frequency.exponentialRampToValueAtTime(261.63, audioCtx.currentTime + 2);
-
-            // Volume Envelope (Fade In / Fade Out)
             gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
             gainNode.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.1);
             gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3);
-
             osc.start();
             osc.stop(audioCtx.currentTime + 3);
         }
@@ -283,9 +283,13 @@
             document.body.classList.toggle('light-mode');
         }
 
-        // --- 4. Adding a Timer ---
+        // --- Layout Logic ---
+        function updateLayout() {
+            const container = document.getElementById('timer-container');
+            container.setAttribute('data-count', timers.length);
+        }
+
         function addTimer() {
-            // STEP 1: Wake up the Audio Engine immediately
             initAudio();
             unlockAudio();
 
@@ -302,12 +306,14 @@
 
             timers.push(timer);
             renderTimer(timer);
+            updateLayout();
         }
 
         function removeTimer(id) {
             timers = timers.filter(t => t.id !== id);
             const el = document.getElementById(`timer-${id}`);
             if (el) el.remove();
+            updateLayout();
         }
 
         function formatTime(ms) {
@@ -328,22 +334,17 @@
                 const displayEl = el.querySelector('.time-display');
                 const statusEl = el.querySelector('.status-text');
 
-                // Still Soaking
                 if (timeLeft > 0) {
                     displayEl.innerText = formatTime(timeLeft);
                     statusEl.innerText = "SOAKING";
                 } 
-                // Finished (Trigger Sound)
                 else if (timeLeft <= 0 && !timer.finished) {
                     timer.finished = true;
                     el.classList.remove('soaking');
                     el.classList.add('clean');
                     statusEl.innerText = "READY";
-                    
-                    // The magic happens here
                     playChime(); 
                 }
-                // Overtime
                 else if (timer.finished) {
                     displayEl.innerText = "+" + formatTime(timeLeft);
                     statusEl.innerText = "OVER SOAKED";
@@ -374,7 +375,6 @@
         }
 
         setInterval(updateTimers, 200);
-
     </script>
 </body>
 </html>
