@@ -33,6 +33,8 @@
             overflow: hidden;
             user-select: none;
             -webkit-user-select: none;
+            /* Prevent whole-page bouncing */
+            overscroll-behavior: none;
         }
 
         /* --- Header / Controls --- */
@@ -44,7 +46,6 @@
             transition: transform 0.3s ease;
         }
         
-        /* Slide up out of view in Cinema Mode */
         body.cinema-mode #controls-area {
             transform: translateY(-100%);
             position: absolute;
@@ -123,17 +124,13 @@
             pointer-events: none;
         }
 
-        /* BEFORE Image (Top Layer) */
         #img-before {
             z-index: 5;
             clip-path: inset(0 50% 0 0); 
             background-color: transparent; 
         }
 
-        /* AFTER Image (Bottom Layer) */
-        #img-after {
-            z-index: 1;
-        }
+        #img-after { z-index: 1; }
 
         .placeholder {
             position: absolute;
@@ -179,7 +176,7 @@
             backdrop-filter: blur(4px);
         }
 
-        /* --- The Actual Slider (Invisible) --- */
+        /* --- The Actual Slider (Fixed) --- */
         #range-input {
             position: absolute;
             top: 0;
@@ -188,10 +185,12 @@
             height: 100%;
             opacity: 0;
             cursor: ew-resize;
-            /* Z-Index 20 ensures it is ON TOP of everything else so touch works */
             z-index: 20; 
             margin: 0;
             -webkit-appearance: none; 
+            
+            /* THE FIX: Tells iOS "This is a control, don't scroll the page" */
+            touch-action: none; 
         }
 
         #toast {
@@ -233,7 +232,7 @@
     </div>
 
     <div id="stage">
-        <div id="toast">Double tap to exit</div>
+        <div id="toast">Double tap empty space to exit</div>
 
         <div class="compare-container">
             <div class="placeholder">Load images above</div>
@@ -274,18 +273,24 @@
             document.body.classList.remove('cinema-mode');
         }
 
-        // --- DOUBLE TAP LOGIC (Fixed) ---
+        // --- PREVENT SLIDER FROM TRIGGERING DOUBLE TAP ---
+        const rangeInput = document.getElementById('range-input');
+        
+        // If we are touching the slider, stop the event from bubbling up to the document
+        // This ensures moving the slider never accidentally exits Cinema Mode
+        rangeInput.addEventListener('touchend', function(e) {
+            e.stopPropagation();
+        });
+        
+        // --- DOUBLE TAP LOGIC ---
         let lastTap = 0;
         document.addEventListener('touchend', function(e) {
             const currentTime = new Date().getTime();
             const tapLength = currentTime - lastTap;
             
             if (tapLength < 500 && tapLength > 0) {
-                // If we are in cinema mode, exit
                 if (document.body.classList.contains('cinema-mode')) {
                     exitCinema();
-                    // We only prevent default if we actually triggered the exit
-                    // This prevents ghost clicks when exiting
                     e.preventDefault(); 
                 }
             }
