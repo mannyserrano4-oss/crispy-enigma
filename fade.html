@@ -1,1 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <title>Fade Reveal</title>
+    <meta name="apple-mobile-web-app-title" content="Fade Reveal">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
+
+    <style>
+        :root {
+            --bg-color: #121212;
+            --accent: #2196f3;
+            --text-color: #ffffff;
+            --handle-color: #ffffff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Header / Controls --- */
+        #controls-area {
+            padding: 20px;
+            background: #1a1a1a;
+            border-bottom: 1px solid #333;
+            z-index: 20;
+            transition: transform 0.3s ease;
+        }
+        
+        /* Class to hide header for recording */
+        body.cinema-mode #controls-area {
+            transform: translateY(-100%);
+            position: absolute;
+            width: 100%;
+        }
+
+        h1 { margin: 0 0 15px 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; text-align: center;}
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .upload-btn {
+            background: #333;
+            color: white;
+            border: 1px solid #555;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+            max-width: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .upload-btn.active { background: #2e7d32; border-color: #2e7d32; }
+
+        /* Hidden file inputs */
+        input[type="file"] { display: none; }
+
+        /* Cinema Toggle */
+        #cinema-btn {
+            background: var(--accent);
+            border: none;
+            color: white;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        /* --- The Stage --- */
+        #stage {
+            flex-grow: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: #000;
+        }
+
+        /* The Comparison Container */
+        .compare-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        /* Images */
+        .img-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Keeps aspect ratio */
+            user-select: none;
+        }
+
+        #img-after {
+            /* This is the top layer (The Clean Cut) */
+            /* We clip it based on slider */
+            clip-path: inset(0 50% 0 0); 
+            background: #000; /* Fallback */
+        }
+
+        /* Placeholder Text */
+        .placeholder {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: #555;
+            font-size: 1.5rem;
+            pointer-events: none;
+            text-align: center;
+        }
+
+        /* --- The Slider Handle --- */
+        #slider-handle {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 4px;
+            background: var(--handle-color);
+            transform: translateX(-50%);
+            pointer-events: none; /* Let clicks pass through to the input */
+            z-index: 10;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        /* The circle on the handle */
+        #slider-handle::after {
+            content: "↔";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: var(--handle-color);
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        /* The Invisible Interaction Layer */
+        #range-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: ew-resize;
+            z-index: 20;
+            margin: 0;
+        }
+
+        /* Floating Restore Button (For when Cinema Mode is on) */
+        #restore-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 10px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            z-index: 30;
+            display: none; /* Hidden by default */
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        
+        body.cinema-mode #restore-btn { display: flex; }
+
+    </style>
+</head>
+<body>
+
+    <div id="controls-area">
+        <h1>Fade Reveal</h1>
+        <div class="btn-row">
+            <input type="file" id="file-before" accept="image/*" onchange="loadImage(this, 'before')">
+            <input type="file" id="file-after" accept="image/*" onchange="loadImage(this, 'after')">
+
+            <label for="file-before" class="upload-btn" id="btn-before">
+                <span>📷</span> Before
+            </label>
+            <label for="file-after" class="upload-btn" id="btn-after">
+                <span>✨</span> After
+            </label>
+            
+            <button id="cinema-btn" onclick="toggleCinema()">REC</button>
+        </div>
+    </div>
+
+    <div id="stage">
+        <button id="restore-btn" onclick="toggleCinema()">✕</button>
+        
+        <div class="compare-container">
+            <div class="placeholder">Load images above</div>
+            
+            <img id="img-before" class="img-layer">
+            
+            <img id="img-after" class="img-layer">
+
+            <div id="slider-handle"></div>
+
+            <input type="range" id="range-input" min="0" max="100" value="50" oninput="updateSlider(this.value)">
+        </div>
+    </div>
+
+    <script>
+        function loadImage(input, type) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    // Update the image source
+                    document.getElementById(`img-${type}`).src = e.target.result;
+                    
+                    // Mark button as active (green)
+                    document.getElementById(`btn-${type}`).classList.add('active');
+                    
+                    // Hide placeholder text if both are loaded
+                    // (Optional logic, handled by z-index mostly)
+                    document.querySelector('.placeholder').style.opacity = '0';
+                }
+                
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function updateSlider(val) {
+            // 1. Move the Clip Path of the TOP image
+            // We inset from the RIGHT side. 
+            // If val is 50, we inset 50%. If val is 0, we inset 100% (hidden).
+            const percentage = 100 - val;
+            document.getElementById('img-after').style.clipPath = `inset(0 ${percentage}% 0 0)`;
+
+            // 2. Move the Handle
+            document.getElementById('slider-handle').style.left = `${val}%`;
+        }
+
+        function toggleCinema() {
+            document.body.classList.toggle('cinema-mode');
+        }
+    </script>
+</body>
+</html>
