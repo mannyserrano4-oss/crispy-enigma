@@ -18,8 +18,7 @@
             --bg-color: #000000;
             --accent: #2196f3;
             --text-color: #ffffff;
-            /* Semi-transparent white for the slider */
-            --handle-color: rgba(255, 255, 255, 0.4); 
+            --handle-color: rgba(255, 255, 255, 0.5); 
         }
 
         body {
@@ -42,7 +41,7 @@
             background: #111;
             border-bottom: 1px solid #333;
             z-index: 100;
-            transition: transform 0.5s ease;
+            transition: transform 0.3s ease;
         }
         
         /* Slide up out of view in Cinema Mode */
@@ -84,10 +83,8 @@
             color: #fff;
         }
 
-        /* Hidden file inputs */
         input[type="file"] { display: none; }
 
-        /* Cinema Toggle */
         #cinema-btn {
             background: var(--accent);
             border: none;
@@ -110,38 +107,34 @@
             background: #000;
         }
 
-        /* The Comparison Container */
         .compare-container {
             position: relative;
             width: 100%;
             height: 100%;
         }
 
-        /* Images */
         .img-layer {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: contain; /* Keeps aspect ratio */
+            object-fit: contain; 
             pointer-events: none;
         }
 
-        /* BEFORE Image (Top Layer, Left Side) */
+        /* BEFORE Image (Top Layer) */
         #img-before {
-            z-index: 2;
-            /* Default: clipped at 50% */
+            z-index: 5;
             clip-path: inset(0 50% 0 0); 
             background-color: transparent; 
         }
 
-        /* AFTER Image (Bottom Layer, Background) */
+        /* AFTER Image (Bottom Layer) */
         #img-after {
             z-index: 1;
         }
 
-        /* Placeholder Text */
         .placeholder {
             position: absolute;
             top: 50%; left: 50%;
@@ -153,7 +146,7 @@
             z-index: 0;
         }
 
-        /* --- The Transparent Slider Handle --- */
+        /* --- Visual Handle --- */
         #slider-handle {
             position: absolute;
             top: 0;
@@ -164,11 +157,9 @@
             transform: translateX(-50%);
             pointer-events: none; 
             z-index: 10;
-            /* Subtle glow */
             box-shadow: 0 0 15px rgba(255,255,255,0.2);
         }
 
-        /* The circle on the handle */
         #slider-handle::after {
             content: "↔";
             position: absolute;
@@ -177,7 +168,7 @@
             transform: translate(-50%, -50%);
             width: 40px;
             height: 40px;
-            background: rgba(0,0,0,0.3); /* Dark see-through bubble */
+            background: rgba(0,0,0,0.3);
             border: 2px solid var(--handle-color);
             color: var(--handle-color);
             border-radius: 50%;
@@ -188,7 +179,7 @@
             backdrop-filter: blur(4px);
         }
 
-        /* The Invisible Interaction Layer */
+        /* --- The Actual Slider (Invisible) --- */
         #range-input {
             position: absolute;
             top: 0;
@@ -197,12 +188,12 @@
             height: 100%;
             opacity: 0;
             cursor: ew-resize;
-            z-index: 20;
+            /* Z-Index 20 ensures it is ON TOP of everything else so touch works */
+            z-index: 20; 
             margin: 0;
-            -webkit-appearance: none; /* remove iOS default styles */
+            -webkit-appearance: none; 
         }
 
-        /* Notification Toast (Instructions) */
         #toast {
             position: absolute;
             top: 50%;
@@ -246,13 +237,9 @@
 
         <div class="compare-container">
             <div class="placeholder">Load images above</div>
-            
             <img id="img-after" class="img-layer">
-            
             <img id="img-before" class="img-layer">
-
             <div id="slider-handle"></div>
-
             <input type="range" id="range-input" min="0" max="100" value="50" oninput="updateSlider(this.value)">
         </div>
     </div>
@@ -271,54 +258,40 @@
         }
 
         function updateSlider(val) {
-            // Logic: 
-            // 'img-before' is on TOP.
-            // If slider is at 50%, we want to see 'Before' on the LEFT (0-50) and 'After' on the RIGHT (50-100).
-            // So we must clip the RIGHT side of the 'Before' image.
-            
-            // clip-path: inset(top right bottom left);
-            // We want to inset from the RIGHT by (100 - val)%
             const percentage = 100 - val;
             document.getElementById('img-before').style.clipPath = `inset(0 ${percentage}% 0 0)`;
-
-            // Move the Handle
             document.getElementById('slider-handle').style.left = `${val}%`;
         }
 
         function enterCinema() {
             document.body.classList.add('cinema-mode');
-            
-            // Show instruction toast
             const toast = document.getElementById('toast');
             toast.style.opacity = '1';
-            
-            // Hide toast after 3 seconds
-            setTimeout(() => {
-                toast.style.opacity = '0';
-            }, 3000);
+            setTimeout(() => { toast.style.opacity = '0'; }, 3000);
         }
 
         function exitCinema() {
             document.body.classList.remove('cinema-mode');
         }
 
-        // Double Tap Logic
+        // --- DOUBLE TAP LOGIC (Fixed) ---
         let lastTap = 0;
         document.addEventListener('touchend', function(e) {
             const currentTime = new Date().getTime();
             const tapLength = currentTime - lastTap;
+            
             if (tapLength < 500 && tapLength > 0) {
-                exitCinema();
-                e.preventDefault();
+                // If we are in cinema mode, exit
+                if (document.body.classList.contains('cinema-mode')) {
+                    exitCinema();
+                    // We only prevent default if we actually triggered the exit
+                    // This prevents ghost clicks when exiting
+                    e.preventDefault(); 
+                }
             }
             lastTap = currentTime;
         });
         
-        // Double Click for Desktop testing
-        document.addEventListener('dblclick', function() {
-            exitCinema();
-        });
-
     </script>
 </body>
 </html>
