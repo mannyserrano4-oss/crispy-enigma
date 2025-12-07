@@ -18,7 +18,7 @@
             --bg-color: #000000;
             --accent: #2196f3;
             --text-color: #ffffff;
-            --handle-color: rgba(255, 255, 255, 0.5); 
+            --handle-color: rgba(255, 255, 255, 0.6); 
         }
 
         body {
@@ -33,7 +33,6 @@
             overflow: hidden;
             user-select: none;
             -webkit-user-select: none;
-            /* Prevent whole-page bouncing */
             overscroll-behavior: none;
         }
 
@@ -43,7 +42,7 @@
             background: #111;
             border-bottom: 1px solid #333;
             z-index: 100;
-            transition: transform 0.3s ease;
+            transition: transform 0.4s ease;
         }
         
         body.cinema-mode #controls-area {
@@ -78,11 +77,7 @@
             font-weight: 500;
         }
         
-        .upload-btn.active { 
-            background: #111; 
-            border-color: #fff; 
-            color: #fff;
-        }
+        .upload-btn.active { background: #111; border-color: #fff; color: #fff; }
 
         input[type="file"] { display: none; }
 
@@ -176,7 +171,7 @@
             backdrop-filter: blur(4px);
         }
 
-        /* --- The Actual Slider (Fixed) --- */
+        /* --- The Input --- */
         #range-input {
             position: absolute;
             top: 0;
@@ -188,10 +183,18 @@
             z-index: 20; 
             margin: 0;
             -webkit-appearance: none; 
-            
-            /* THE FIX: Tells iOS "This is a control, don't scroll the page" */
             touch-action: none; 
         }
+
+        /* --- Touch Blocker (Active only during Auto-Slide) --- */
+        #touch-blocker {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 50; /* Above the range input */
+            /* Transparent */
+        }
+        body.cinema-mode #touch-blocker { display: block; }
 
         #toast {
             position: absolute;
@@ -206,7 +209,7 @@
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.5s ease;
-            z-index: 50;
+            z-index: 60;
             white-space: nowrap;
         }
 
@@ -227,23 +230,31 @@
                 ✨ After
             </label>
             
-            <button id="cinema-btn" onclick="enterCinema()">REC</button>
+            <button id="cinema-btn" onclick="startAutoSlide()">REC</button>
         </div>
     </div>
 
     <div id="stage">
-        <div id="toast">Double tap empty space to exit</div>
+        <div id="toast">Tap anywhere to stop</div>
 
         <div class="compare-container">
             <div class="placeholder">Load images above</div>
             <img id="img-after" class="img-layer">
             <img id="img-before" class="img-layer">
             <div id="slider-handle"></div>
-            <input type="range" id="range-input" min="0" max="100" value="50" oninput="updateSlider(this.value)">
+            
+            <input type="range" id="range-input" min="0" max="100" value="50" oninput="updateVisuals(this.value)">
+            
+            <div id="touch-blocker" onclick="stopAutoSlide()"></div>
         </div>
     </div>
 
     <script>
+        let animationFrame;
+        let startTime;
+        const DURATION = 4000; // 4 Seconds to slide
+        const DELAY = 1000; // 1 Second wait before starting
+
         function loadImage(input, type) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
@@ -256,47 +267,68 @@
             }
         }
 
-        function updateSlider(val) {
+        // Standard update function
+        function updateVisuals(val) {
             const percentage = 100 - val;
             document.getElementById('img-before').style.clipPath = `inset(0 ${percentage}% 0 0)`;
             document.getElementById('slider-handle').style.left = `${val}%`;
+            document.getElementById('range-input').value = val;
         }
 
-        function enterCinema() {
+        // --- AUTO SLIDE LOGIC ---
+
+        function startAutoSlide() {
+            // 1. Enter Cinema Mode (Hides UI, enables Touch Blocker)
             document.body.classList.add('cinema-mode');
+            
+            // 2. Show Toast briefly
             const toast = document.getElementById('toast');
             toast.style.opacity = '1';
-            setTimeout(() => { toast.style.opacity = '0'; }, 3000);
+            setTimeout(() => { toast.style.opacity = '0'; }, 2000);
+
+            // 3. Reset Slider to 0 (All Before)
+            updateVisuals(0);
+
+            // 4. Start Animation Loop after delay
+            setTimeout(() => {
+                // Check if still in cinema mode before starting
+                if (document.body.classList.contains('cinema-mode')) {
+                    startTime = null;
+                    animationFrame = requestAnimationFrame(animateLoop);
+                }
+            }, DELAY);
         }
 
-        function exitCinema() {
+        function animateLoop(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const progress = timestamp - startTime;
+            
+            // Calculate percentage (0 to 1)
+            let percent = progress / DURATION;
+            if (percent > 1) percent = 1;
+
+            // Apply Easing (Smooth Start/End) - Ease In Out Quad
+            const eased = percent < 0.5 ? 2 * percent * percent : 1 - Math.pow(-2 * percent + 2, 2) / 2;
+
+            // Move Slider (0 to 100)
+            updateVisuals(eased * 100);
+
+            if (progress < DURATION) {
+                // Keep going
+                if (document.body.classList.contains('cinema-mode')) {
+                    animationFrame = requestAnimationFrame(animateLoop);
+                }
+            }
+        }
+
+        function stopAutoSlide() {
+            // Cancel Animation
+            cancelAnimationFrame(animationFrame);
+            
+            // Exit Cinema Mode
             document.body.classList.remove('cinema-mode');
         }
 
-        // --- PREVENT SLIDER FROM TRIGGERING DOUBLE TAP ---
-        const rangeInput = document.getElementById('range-input');
-        
-        // If we are touching the slider, stop the event from bubbling up to the document
-        // This ensures moving the slider never accidentally exits Cinema Mode
-        rangeInput.addEventListener('touchend', function(e) {
-            e.stopPropagation();
-        });
-        
-        // --- DOUBLE TAP LOGIC ---
-        let lastTap = 0;
-        document.addEventListener('touchend', function(e) {
-            const currentTime = new Date().getTime();
-            const tapLength = currentTime - lastTap;
-            
-            if (tapLength < 500 && tapLength > 0) {
-                if (document.body.classList.contains('cinema-mode')) {
-                    exitCinema();
-                    e.preventDefault(); 
-                }
-            }
-            lastTap = currentTime;
-        });
-        
     </script>
 </body>
 </html>
