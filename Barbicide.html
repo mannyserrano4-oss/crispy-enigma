@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <link rel="apple-touch-icon" href="bicon.png">
-    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="icon" type="image/png" href="bicon.png">
 
     <style>
         :root {
@@ -215,24 +215,66 @@
     <script>
         // --- Configuration ---
         const SOAK_MINUTES = 10; 
-        // const SOAK_MINUTES = 0.1; // Uncomment for testing (6 seconds)
         
+        // --- Audio Variables ---
         let timers = [];
         let audioCtx = null;
+        let audioUnlocked = false;
 
-        // --- Sound Logic ---
+        // --- 1. The Audio Engine ---
+        function initAudio() {
+            // Only setup once
+            if (audioCtx) return; 
+
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+
+            // Handle the "Suspended" state (common on iOS)
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // --- 2. The Silent Unlock (The Fix) ---
+        // We play a silent sound instantly on button click to "wake up" the audio engine
+        function unlockAudio() {
+            if (audioUnlocked || !audioCtx) return;
+
+            // Resume context again just to be safe
+            audioCtx.resume().then(() => {
+                // Create a silent buffer
+                const buffer = audioCtx.createBuffer(1, 1, 22050); 
+                const source = audioCtx.createBufferSource();
+                source.buffer = buffer;
+                source.connect(audioCtx.destination);
+                source.start(0);
+                
+                audioUnlocked = true;
+                console.log("Audio System Unlocked");
+            });
+        }
+
+        // --- 3. The Alarm Sound ---
         function playChime() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            // If context died or wasn't made, try to recover (rare)
+            if (!audioCtx) return; 
+
             const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
+
             osc.connect(gainNode);
             gainNode.connect(audioCtx.destination);
+
+            // Pleasant "Ding" Sound
             osc.type = 'sine'; 
-            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
             osc.frequency.exponentialRampToValueAtTime(261.63, audioCtx.currentTime + 2);
+
+            // Volume Envelope (Fade In / Fade Out)
             gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
             gainNode.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.1);
             gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3);
+
             osc.start();
             osc.stop(audioCtx.currentTime + 3);
         }
@@ -241,9 +283,15 @@
             document.body.classList.toggle('light-mode');
         }
 
+        // --- 4. Adding a Timer ---
         function addTimer() {
+            // STEP 1: Wake up the Audio Engine immediately
+            initAudio();
+            unlockAudio();
+
             const toolType = document.getElementById('toolSelect').value;
             const id = Date.now();
+            
             const timer = {
                 id: id,
                 type: toolType,
@@ -251,10 +299,9 @@
                 finished: false,
                 overtime: false
             };
+
             timers.push(timer);
             renderTimer(timer);
-            // Request audio context permission on first interaction
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         }
 
         function removeTimer(id) {
@@ -272,25 +319,35 @@
 
         function updateTimers() {
             const now = Date.now();
+
             timers.forEach(timer => {
                 const el = document.getElementById(`timer-${timer.id}`);
                 if (!el) return;
+
                 const timeLeft = timer.endTime - now;
                 const displayEl = el.querySelector('.time-display');
                 const statusEl = el.querySelector('.status-text');
 
+                // Still Soaking
                 if (timeLeft > 0) {
                     displayEl.innerText = formatTime(timeLeft);
                     statusEl.innerText = "SOAKING";
-                } else if (timeLeft <= 0 && !timer.finished) {
+                } 
+                // Finished (Trigger Sound)
+                else if (timeLeft <= 0 && !timer.finished) {
                     timer.finished = true;
                     el.classList.remove('soaking');
                     el.classList.add('clean');
                     statusEl.innerText = "READY";
-                    playChime();
-                } else if (timer.finished) {
+                    
+                    // The magic happens here
+                    playChime(); 
+                }
+                // Overtime
+                else if (timer.finished) {
                     displayEl.innerText = "+" + formatTime(timeLeft);
                     statusEl.innerText = "OVER SOAKED";
+                    
                     if (Math.abs(timeLeft) > 10000 && !timer.overtime) {
                         timer.overtime = true;
                         el.classList.remove('clean');
@@ -305,16 +362,19 @@
             const card = document.createElement('div');
             card.className = 'timer-card'; 
             card.id = `timer-${timer.id}`;
+            
             card.innerHTML = `
                 <button class="close-btn" onclick="removeTimer(${timer.id})">×</button>
                 <h3>${timer.type}</h3>
                 <div class="time-display">--:--</div>
                 <div class="status-text">STARTING</div>
             `;
+            
             container.appendChild(card);
         }
 
         setInterval(updateTimers, 200);
+
     </script>
 </body>
 </html>
