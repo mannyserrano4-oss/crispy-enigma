@@ -6,6 +6,7 @@
     
     <title>Fade Reveal</title>
     <meta name="apple-mobile-web-app-title" content="Fade Reveal">
+    <meta name="application-name" content="Fade Reveal">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
@@ -14,10 +15,11 @@
 
     <style>
         :root {
-            --bg-color: #121212;
+            --bg-color: #000000;
             --accent: #2196f3;
             --text-color: #ffffff;
-            --handle-color: #ffffff;
+            /* Semi-transparent white for the slider */
+            --handle-color: rgba(255, 255, 255, 0.4); 
         }
 
         body {
@@ -30,18 +32,20 @@
             flex-direction: column;
             height: 100vh;
             overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         /* --- Header / Controls --- */
         #controls-area {
             padding: 20px;
-            background: #1a1a1a;
+            background: #111;
             border-bottom: 1px solid #333;
-            z-index: 20;
-            transition: transform 0.3s ease;
+            z-index: 100;
+            transition: transform 0.5s ease;
         }
         
-        /* Class to hide header for recording */
+        /* Slide up out of view in Cinema Mode */
         body.cinema-mode #controls-area {
             transform: translateY(-100%);
             position: absolute;
@@ -57,11 +61,11 @@
         }
 
         .upload-btn {
-            background: #333;
-            color: white;
-            border: 1px solid #555;
-            padding: 10px 15px;
-            border-radius: 6px;
+            background: #222;
+            color: #aaa;
+            border: 1px solid #444;
+            padding: 12px;
+            border-radius: 8px;
             font-size: 0.9rem;
             cursor: pointer;
             flex: 1;
@@ -71,9 +75,14 @@
             align-items: center;
             justify-content: center;
             gap: 5px;
+            font-weight: 500;
         }
         
-        .upload-btn.active { background: #2e7d32; border-color: #2e7d32; }
+        .upload-btn.active { 
+            background: #111; 
+            border-color: #fff; 
+            color: #fff;
+        }
 
         /* Hidden file inputs */
         input[type="file"] { display: none; }
@@ -83,9 +92,11 @@
             background: var(--accent);
             border: none;
             color: white;
-            padding: 10px;
-            border-radius: 6px;
+            padding: 0 20px;
+            border-radius: 8px;
             font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
         }
 
         /* --- The Stage --- */
@@ -104,8 +115,6 @@
             position: relative;
             width: 100%;
             height: 100%;
-            max-width: 100%;
-            max-height: 100%;
         }
 
         /* Images */
@@ -116,14 +125,20 @@
             width: 100%;
             height: 100%;
             object-fit: contain; /* Keeps aspect ratio */
-            user-select: none;
+            pointer-events: none;
         }
 
-        #img-after {
-            /* This is the top layer (The Clean Cut) */
-            /* We clip it based on slider */
+        /* BEFORE Image (Top Layer, Left Side) */
+        #img-before {
+            z-index: 2;
+            /* Default: clipped at 50% */
             clip-path: inset(0 50% 0 0); 
-            background: #000; /* Fallback */
+            background-color: transparent; 
+        }
+
+        /* AFTER Image (Bottom Layer, Background) */
+        #img-after {
+            z-index: 1;
         }
 
         /* Placeholder Text */
@@ -131,24 +146,26 @@
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            color: #555;
-            font-size: 1.5rem;
+            color: #333;
+            font-size: 1.2rem;
             pointer-events: none;
             text-align: center;
+            z-index: 0;
         }
 
-        /* --- The Slider Handle --- */
+        /* --- The Transparent Slider Handle --- */
         #slider-handle {
             position: absolute;
             top: 0;
             bottom: 0;
             left: 50%;
-            width: 4px;
+            width: 2px;
             background: var(--handle-color);
             transform: translateX(-50%);
-            pointer-events: none; /* Let clicks pass through to the input */
+            pointer-events: none; 
             z-index: 10;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            /* Subtle glow */
+            box-shadow: 0 0 15px rgba(255,255,255,0.2);
         }
 
         /* The circle on the handle */
@@ -160,14 +177,15 @@
             transform: translate(-50%, -50%);
             width: 40px;
             height: 40px;
-            background: var(--handle-color);
-            color: #000;
+            background: rgba(0,0,0,0.3); /* Dark see-through bubble */
+            border: 2px solid var(--handle-color);
+            color: var(--handle-color);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.2rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            backdrop-filter: blur(4px);
         }
 
         /* The Invisible Interaction Layer */
@@ -181,29 +199,26 @@
             cursor: ew-resize;
             z-index: 20;
             margin: 0;
+            -webkit-appearance: none; /* remove iOS default styles */
         }
 
-        /* Floating Restore Button (For when Cinema Mode is on) */
-        #restore-btn {
+        /* Notification Toast (Instructions) */
+        #toast {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(0,0,0,0.5);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
             color: white;
-            border: 1px solid rgba(255,255,255,0.3);
-            padding: 10px;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            z-index: 30;
-            display: none; /* Hidden by default */
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            cursor: pointer;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 50;
+            white-space: nowrap;
         }
-        
-        body.cinema-mode #restore-btn { display: flex; }
 
     </style>
 </head>
@@ -216,25 +231,25 @@
             <input type="file" id="file-after" accept="image/*" onchange="loadImage(this, 'after')">
 
             <label for="file-before" class="upload-btn" id="btn-before">
-                <span>📷</span> Before
+                📷 Before
             </label>
             <label for="file-after" class="upload-btn" id="btn-after">
-                <span>✨</span> After
+                ✨ After
             </label>
             
-            <button id="cinema-btn" onclick="toggleCinema()">REC</button>
+            <button id="cinema-btn" onclick="enterCinema()">REC</button>
         </div>
     </div>
 
     <div id="stage">
-        <button id="restore-btn" onclick="toggleCinema()">✕</button>
-        
+        <div id="toast">Double tap to exit</div>
+
         <div class="compare-container">
             <div class="placeholder">Load images above</div>
             
-            <img id="img-before" class="img-layer">
-            
             <img id="img-after" class="img-layer">
+            
+            <img id="img-before" class="img-layer">
 
             <div id="slider-handle"></div>
 
@@ -246,37 +261,64 @@
         function loadImage(input, type) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
-                
                 reader.onload = function(e) {
-                    // Update the image source
                     document.getElementById(`img-${type}`).src = e.target.result;
-                    
-                    // Mark button as active (green)
                     document.getElementById(`btn-${type}`).classList.add('active');
-                    
-                    // Hide placeholder text if both are loaded
-                    // (Optional logic, handled by z-index mostly)
                     document.querySelector('.placeholder').style.opacity = '0';
                 }
-                
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
         function updateSlider(val) {
-            // 1. Move the Clip Path of the TOP image
-            // We inset from the RIGHT side. 
-            // If val is 50, we inset 50%. If val is 0, we inset 100% (hidden).
+            // Logic: 
+            // 'img-before' is on TOP.
+            // If slider is at 50%, we want to see 'Before' on the LEFT (0-50) and 'After' on the RIGHT (50-100).
+            // So we must clip the RIGHT side of the 'Before' image.
+            
+            // clip-path: inset(top right bottom left);
+            // We want to inset from the RIGHT by (100 - val)%
             const percentage = 100 - val;
-            document.getElementById('img-after').style.clipPath = `inset(0 ${percentage}% 0 0)`;
+            document.getElementById('img-before').style.clipPath = `inset(0 ${percentage}% 0 0)`;
 
-            // 2. Move the Handle
+            // Move the Handle
             document.getElementById('slider-handle').style.left = `${val}%`;
         }
 
-        function toggleCinema() {
-            document.body.classList.toggle('cinema-mode');
+        function enterCinema() {
+            document.body.classList.add('cinema-mode');
+            
+            // Show instruction toast
+            const toast = document.getElementById('toast');
+            toast.style.opacity = '1';
+            
+            // Hide toast after 3 seconds
+            setTimeout(() => {
+                toast.style.opacity = '0';
+            }, 3000);
         }
+
+        function exitCinema() {
+            document.body.classList.remove('cinema-mode');
+        }
+
+        // Double Tap Logic
+        let lastTap = 0;
+        document.addEventListener('touchend', function(e) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            if (tapLength < 500 && tapLength > 0) {
+                exitCinema();
+                e.preventDefault();
+            }
+            lastTap = currentTime;
+        });
+        
+        // Double Click for Desktop testing
+        document.addEventListener('dblclick', function() {
+            exitCinema();
+        });
+
     </script>
 </body>
 </html>
