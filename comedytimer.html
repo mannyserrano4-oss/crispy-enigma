@@ -47,6 +47,7 @@
             background: #111;
             padding: 5px;
             gap: 5px;
+            z-index: 50; /* Ensure tabs stay above content */
         }
 
         .tab-btn {
@@ -76,7 +77,7 @@
             position: absolute;
             top: 50px; /* Space for tab bar */
             left: 0;
-            background-color: var(--bg-black);
+            background-color: var(--bg-black); /* Default black for menu screens */
             box-sizing: border-box;
             height: calc(100% - 50px);
         }
@@ -147,7 +148,6 @@
             justify-content: space-between;
             align-items: center;
             border: 1px solid #333;
-            /* Prevent touch actions interfering with drag */
             touch-action: pan-y; 
         }
 
@@ -176,13 +176,12 @@
             justify-content: center;
         }
 
-        /* The Drag Handle */
         .drag-handle {
             font-size: 1.8rem;
             color: #666;
             padding: 10px;
             cursor: grab;
-            touch-action: none; /* Critical for drag */
+            touch-action: none;
         }
         .drag-handle:active { color: white; }
 
@@ -241,14 +240,17 @@
             cursor: pointer;
             width: 100%;
         }
-        .footer-bar .start-btn { width: auto; } /* Smaller button on Builder page */
+        .footer-bar .start-btn { width: auto; } 
 
         /* --- TIMER SCREEN --- */
         #screen-timer {
-            top: 0; height: 100%; /* Cover tabs */
+            top: 0; height: 100%;
             align-items: center;
             justify-content: center;
             z-index: 100;
+            
+            /* THE FIX: Make transparent so Body color shows through */
+            background-color: transparent; 
         }
 
         #timer-display {
@@ -321,6 +323,8 @@
         body.red { background-color: var(--bg-red); color: white; }
         body.flash { animation: flash-red 0.5s infinite; }
         @keyframes flash-red { 0% { background: var(--bg-red); } 50% { background: black; } 100% { background: var(--bg-red); } }
+        
+        /* Logic to hide numbers */
         body.hide-numbers #timer-display { opacity: 0; }
 
     </style>
@@ -395,12 +399,10 @@
 
         // --- TABS ---
         function switchTab(tabName) {
-            // UI Toggle
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             if(tabName === 'builder') document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
             else document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
 
-            // Screen Toggle
             document.getElementById('screen-builder').classList.remove('active');
             document.getElementById('screen-quick').classList.remove('active');
             
@@ -426,7 +428,7 @@
             renderList();
         }
 
-        // --- TOUCH DRAG ENGINE (Custom) ---
+        // --- TOUCH DRAG ENGINE ---
         let draggingId = null;
         let draggingEl = null;
 
@@ -438,36 +440,25 @@
 
         function handleTouchMove(e) {
             if (!draggingId) return;
-            e.preventDefault(); // Stop scrolling while dragging
+            e.preventDefault(); 
             
-            // Get the element currently under the finger
             const touch = e.touches[0];
             const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
             const cardUnder = elementUnder ? elementUnder.closest('.bit-card') : null;
 
-            // If we are over a DIFFERENT card, swap them in the array
             if (cardUnder && cardUnder !== draggingEl) {
-                // Find indices
                 const fromIndex = setlist.findIndex(item => item.id === draggingId);
-                // We need to find the ID of the card underneath
-                // Let's hack: we need to find which index the cardUnder belongs to.
-                // Re-rendering is expensive, so we do this carefully.
-                // Better approach: We render the ID into the HTML
                 const toId = parseInt(cardUnder.dataset.id);
                 
                 if (toId && toId !== draggingId) {
                     const toIndex = setlist.findIndex(item => item.id === toId);
                     
-                    // Swap in array
                     const temp = setlist[fromIndex];
                     setlist[fromIndex] = setlist[toIndex];
                     setlist[toIndex] = temp;
 
-                    // Re-render immediately (this creates the "snap" effect)
                     renderList();
                     
-                    // Re-acquire the dragging element to keep styling
-                    // (After render, DOM nodes are new)
                     const newCards = document.querySelectorAll('.bit-card');
                     draggingEl = newCards[toIndex]; 
                     draggingEl.classList.add('dragging-active');
@@ -503,7 +494,7 @@
                 
                 const div = document.createElement('div');
                 div.className = 'bit-card';
-                div.dataset.id = bit.id; // Store ID for drag logic
+                div.dataset.id = bit.id; 
                 div.innerHTML = `
                     <div class="bit-info">
                         <div class="bit-name">${index + 1}. ${bit.name}</div>
@@ -525,24 +516,18 @@
             totalDisplay.innerText = `${totalMin}m`;
         }
 
-        // --- TIMER START LOGIC ---
+        // --- TIMER LOGIC ---
         function startQuickSet() {
             const total = parseInt(document.getElementById('quick-total').value);
             const light = parseInt(document.getElementById('quick-light').value);
-            
             if (!total || total <= 0) return alert("Invalid Time");
-
-            // Setup Cheat Sheet for Quick Mode
             const csContainer = document.getElementById('cs-content');
             csContainer.innerHTML = `<div class="cs-item">Quick ${total}m Set<span>Light at ${light}m</span></div>`;
-
             startTimerLogic(total * 60 * 1000, light * 60 * 1000);
         }
 
         function startSet() {
             let totalMin = setlist.reduce((sum, bit) => sum + bit.minutes, 0);
-            
-            // Build Cheat Sheet
             const csContainer = document.getElementById('cs-content');
             csContainer.innerHTML = '';
             setlist.forEach((bit, i) => {
@@ -552,8 +537,6 @@
                         <span>${bit.minutes} min</span>
                     </div>`;
             });
-
-            // Default warning logic (1 min warning, unless short set)
             const warningMs = totalMin < 2 ? 30000 : 60000;
             startTimerLogic(totalMin * 60 * 1000, warningMs);
         }
@@ -563,7 +546,7 @@
 
             document.getElementById('screen-builder').classList.remove('active');
             document.getElementById('screen-quick').classList.remove('active');
-            document.querySelector('.tab-bar').style.display = 'none'; // Hide tabs
+            document.querySelector('.tab-bar').style.display = 'none'; 
             document.getElementById('screen-timer').classList.add('active');
             
             const now = Date.now();
@@ -584,15 +567,18 @@
             updateDisplay(timeLeft);
 
             if (timeLeft <= 0) {
+                // RED
                 if (!document.body.classList.contains('red')) {
-                    document.body.className = 'red';
+                    document.body.classList.add('red');
+                    document.body.classList.remove('yellow');
                     if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
                 }
                 if (timeLeft < -10000) document.body.classList.add('flash');
             } 
             else if (timeLeft <= warningTimeMs) {
+                // YELLOW
                 if (!document.body.classList.contains('yellow')) {
-                    document.body.className = 'yellow';
+                    document.body.classList.add('yellow');
                     if (navigator.vibrate) navigator.vibrate(200);
                 }
             }
@@ -611,9 +597,8 @@
             clearInterval(timerInterval);
             resetColors();
             document.getElementById('screen-timer').classList.remove('active');
-            document.querySelector('.tab-bar').style.display = 'flex'; // Show tabs
+            document.querySelector('.tab-bar').style.display = 'flex'; 
             
-            // Return to active tab
             if (document.querySelector('.tab-btn:nth-child(1)').classList.contains('active')) {
                 document.getElementById('screen-builder').classList.add('active');
             } else {
@@ -622,8 +607,8 @@
         }
 
         function resetColors() {
-            document.body.className = '';
-            if (!isNumbersVisible) document.body.classList.add('hide-numbers');
+            document.body.classList.remove('yellow', 'red', 'flash');
+            // We do NOT touch 'hide-numbers' here, so preferences are saved
         }
 
         function toggleNumbers() {
