@@ -210,7 +210,7 @@
     const musicFiles = {
         // Ensure these match your GitHub filenames exactly!
         day: 'day.mp3',
-        night: 'night.mp3.mp3'
+        night: 'night.mp3'
     };
 
     const alarmFiles = {
@@ -260,39 +260,36 @@
         const currentSrc = bgMusic.getAttribute('src');
         if (currentSrc !== newSrc) {
             bgMusic.src = newSrc;
-             // If we swap tracks while running, keep playing
-            if (musicEnabled && isRunning) bgMusic.play().catch(e => console.log('Wait'));
+             // If we swap tracks while playing, keep playing
+            if (musicEnabled) bgMusic.play().catch(e => console.log('Wait'));
         }
     }
 
-    // --- NEW: SYNC FUNCTION ---
-    // Decides if audio should play based on Timer State + User Intent
+    // --- SYNC FUNCTION (Only called by Timer Events) ---
     function syncAudio() {
         if (isRunning) {
-            // Timer is running: Respect user choice
+            // Timer Started: Resume if enabled
             if (musicEnabled) bgMusic.play().catch(e=>{});
             if (ambienceEnabled && ambienceSelect.value !== 'none') ambiencePlayer.play().catch(e=>{});
         } else {
-            // Timer paused/stopped: Silence everything
+            // Timer Stopped: Pause everything
             bgMusic.pause();
             ambiencePlayer.pause();
         }
     }
 
-    // --- BUTTONS NOW TOGGLE "INTENT" ---
+    // --- BUTTONS (Manual Override) ---
     musicBtn.addEventListener('click', () => {
         playSound('click');
         musicEnabled = !musicEnabled; // Toggle state
         
         if(!bgMusic.getAttribute('src')) updateMusicSource();
 
-        // Update Icon immediately
         musicBtn.textContent = musicEnabled ? '⏸' : '▶';
         
-        // If timer is running, play/pause immediately. 
-        // If paused, just arm/disarm it (syncAudio handles logic).
+        // CHANGED: Play immediately if enabled (Timer doesn't matter)
         if(musicEnabled) {
-            if(isRunning) bgMusic.play();
+            bgMusic.play().catch(e=>{});
         } else {
             bgMusic.pause();
         }
@@ -306,9 +303,10 @@
         
         ambienceBtn.textContent = ambienceEnabled ? '⏸' : '▶';
         
+        // CHANGED: Play immediately if enabled
         if(ambienceEnabled) {
             ambiencePlayer.src = ambienceSelect.value;
-            if(isRunning) ambiencePlayer.play();
+            ambiencePlayer.play().catch(e=>{});
         } else {
             ambiencePlayer.pause();
         }
@@ -322,7 +320,8 @@
                  ambienceBtn.textContent = '▶';
              } else {
                  ambiencePlayer.src = ambienceSelect.value; 
-                 if(isRunning) ambiencePlayer.play();
+                 // Play immediately if enabled
+                 ambiencePlayer.play().catch(e=>{});
              }
         }
     });
@@ -409,12 +408,12 @@
 
     /* --- TIMER --- */
     function timerComplete() {
-        playSound('alarm');
+        // Silent Finish (No Alarm)
         clearInterval(timerId); isRunning = false;
         startBtn.textContent = 'Start'; targetTime = null;
         localStorage.removeItem('targetTime');
         
-        syncAudio(); // <--- STOPS MUSIC
+        syncAudio(); // Stops Music/Ambience
 
         const autoBreak = document.getElementById('auto-break').checked;
 
@@ -440,14 +439,14 @@
             startBtn.textContent = 'Start'; targetTime = null;
             localStorage.removeItem('targetTime');
             
-            syncAudio(); // <--- STOPS MUSIC
+            syncAudio(); // Pauses Music
         } else {
             // PLAY ACTION
             isRunning = true; startBtn.textContent = 'Pause';
             targetTime = Date.now() + (timeLeft * 1000);
             localStorage.setItem('targetTime', targetTime);
             
-            syncAudio(); // <--- STARTS MUSIC (if enabled)
+            syncAudio(); // Resumes Music (if enabled)
             
             timerId = setInterval(() => {
                 const now = Date.now();
@@ -464,7 +463,7 @@
         currentMode = mode; targetTime = null;
         localStorage.removeItem('targetTime'); 
         
-        syncAudio(); // <--- ENSURES SILENCE ON RESET
+        syncAudio(); 
         
         updateVisuals(seconds);
     }
@@ -473,7 +472,6 @@
     document.getElementById('start-btn').addEventListener('click', () => { playSound('click'); startTimer(); });
     document.getElementById('reset-btn').addEventListener('click', () => { playSound('click'); setupTimer(totalTime, currentMode); });
     
-    // Mode Buttons
     document.querySelectorAll('.mode-btn[data-time]').forEach(btn => {
         btn.addEventListener('click', () => {
             playSound('click'); highlightMode(btn.dataset.mode === 'work' ? 'work' : 'break');
@@ -482,7 +480,6 @@
         });
     });
     
-    // Custom Buttons
     document.getElementById('start-custom-work').addEventListener('click', () => {
         playSound('click'); const min = document.getElementById('custom-work-input').value;
         document.getElementById('settings-panel').style.display = 'none'; highlightMode(''); setupTimer(min * 60, 'custom-work');
@@ -492,7 +489,6 @@
         document.getElementById('settings-panel').style.display = 'none'; highlightMode(''); setupTimer(min * 60, 'custom-break');
     });
     
-    // Settings & Theme
     document.getElementById('settings-btn').addEventListener('click', () => {
         playSound('click');
         const panel = document.getElementById('settings-panel');
