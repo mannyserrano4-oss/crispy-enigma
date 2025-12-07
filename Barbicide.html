@@ -41,11 +41,11 @@
             color: var(--text-color);
             margin: 0;
             padding: 0;
-            height: 100vh; /* Force full height */
-            height: 100dvh; /* Dynamic height for mobile browsers */
+            height: 100vh; 
+            height: 100dvh; 
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* No scrolling */
+            overflow: hidden; /* Stops whole page bounce */
             transition: background-color 0.3s;
         }
 
@@ -58,7 +58,7 @@
             background-color: var(--bg-color);
             z-index: 10;
             border-bottom: 1px solid var(--border-color);
-            flex-shrink: 0; /* Never shrink this */
+            flex-shrink: 0; 
         }
 
         h1 {
@@ -103,32 +103,45 @@
 
         /* --- Main Grid Container --- */
         #timer-container {
-            flex-grow: 1; /* Fill all remaining space */
+            flex-grow: 1;
             display: grid;
             gap: 4px;
             padding: 4px;
-            /* Layouts are handled by data-count attributes below */
+            
+            /* THE FIX: Allow internal scrolling */
+            overflow-y: auto; 
+            -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+            
+            /* Default Layout (for 7+ items) */
+            grid-template-columns: 1fr 1fr;
+            grid-auto-rows: 180px; /* Fixed height so they don't squish */
         }
 
-        /* --- Dynamic Grid Layouts --- */
+        /* --- Dynamic Layouts (No Scroll for 1-6 items) --- */
         
-        /* 1 Timer: Full Screen */
-        #timer-container[data-count="1"] { grid-template-columns: 1fr; grid-template-rows: 1fr; }
+        /* 1 Timer */
+        #timer-container[data-count="1"] { 
+            grid-template-columns: 1fr; 
+            grid-template-rows: 1fr; 
+            overflow-y: hidden; /* Lock scroll */
+        }
 
         /* 2 Timers */
         #timer-container[data-count="2"] { 
             grid-template-columns: 1fr; 
-            grid-template-rows: 1fr 1fr; /* Stack vertically on mobile */
+            grid-template-rows: 1fr 1fr; 
+            overflow-y: hidden; 
         }
-        @media (min-width: 600px) { /* Side by side on desktop/landscape */
+        @media (min-width: 600px) {
             #timer-container[data-count="2"] { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
         }
 
-        /* 3-4 Timers: 2x2 Grid */
+        /* 3-4 Timers */
         #timer-container[data-count="3"],
         #timer-container[data-count="4"] { 
             grid-template-columns: 1fr 1fr; 
             grid-template-rows: 1fr 1fr; 
+            overflow-y: hidden;
         }
 
         /* 5-6 Timers */
@@ -136,6 +149,7 @@
         #timer-container[data-count="6"] { 
             grid-template-columns: 1fr 1fr; 
             grid-template-rows: 1fr 1fr 1fr; 
+            overflow-y: hidden;
         }
         @media (min-width: 600px) {
             #timer-container[data-count="5"],
@@ -144,6 +158,8 @@
                 grid-template-rows: 1fr 1fr; 
             }
         }
+        
+        /* 7+ Timers (No special rule needed, defaults to grid-auto-rows defined above) */
 
         /* --- Timer Cards --- */
         .timer-card {
@@ -157,30 +173,34 @@
             text-align: center;
             position: relative;
             width: 100%;
-            height: 100%; /* Force fill grid cell */
+            height: 100%; 
             overflow: hidden;
             transition: background-color 0.3s;
         }
 
         .timer-card h3 {
             margin: 0;
-            font-size: 4vw; /* Scales with screen width */
+            font-size: 1.5rem;
             font-weight: 500;
             text-transform: uppercase;
             opacity: 0.9;
         }
         
-        /* Limit text size on desktop so it's not comic */
-        @media (min-width: 800px) { .timer-card h3 { font-size: 1.5rem; } }
+        /* Massive font only if we have few items */
+        #timer-container[data-count="1"] .timer-card h3,
+        #timer-container[data-count="2"] .timer-card h3 { font-size: 4vw; }
 
         .timer-card .time-display {
-            font-size: 15vw; /* Massive scaling text */
+            font-size: 3.5rem;
             font-weight: 700;
             line-height: 1;
             font-variant-numeric: tabular-nums;
             margin: 10px 0;
         }
-        @media (min-width: 800px) { .timer-card .time-display { font-size: 5rem; } }
+        
+        /* Massive numbers only for few items */
+        #timer-container[data-count="1"] .timer-card .time-display,
+        #timer-container[data-count="2"] .timer-card .time-display { font-size: 15vw; }
 
         .timer-card .status-text {
             font-size: 1rem;
