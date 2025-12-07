@@ -205,7 +205,6 @@
             font-weight: bold;
         }
 
-        /* Footer */
         .footer-bar {
             border-top: 1px solid #333;
             padding-top: 15px;
@@ -214,17 +213,8 @@
             gap: 15px;
         }
 
-        .stats-row {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .stat-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
+        .stats-row { display: flex; justify-content: space-between; }
+        .stat-group { display: flex; flex-direction: column; gap: 5px; }
         .stat-label { font-size: 0.8rem; color: #aaa; text-transform: uppercase; }
         .stat-value { font-size: 1.4rem; font-weight: bold; }
         
@@ -323,13 +313,16 @@
             border-radius: 8px;
         }
 
-        /* --- COLORS --- */
+        /* --- COLORS & STATES --- */
         body.yellow #screen-timer { background-color: var(--bg-yellow); color: black; }
         body.yellow .icon-btn { border-color: rgba(0,0,0,0.3); background: rgba(0,0,0,0.1); color: black; }
         body.red #screen-timer { background-color: var(--bg-red); color: white; }
         body.flash #screen-timer { animation: flash-red 0.5s infinite; }
         @keyframes flash-red { 0% { background-color: var(--bg-red); } 50% { background-color: black; } 100% { background-color: var(--bg-red); } }
         body.hide-numbers #timer-display { opacity: 0; }
+        
+        /* HIDE CHEAT SHEET BUTTON IN QUICK MODE */
+        body.quick-mode #btn-cheat { display: none; }
 
     </style>
 </head>
@@ -390,7 +383,7 @@
         <div id="timer-display">00:00</div>
         
         <div class="timer-controls">
-            <button class="icon-btn" onclick="toggleCheatSheet()">📄</button>
+            <button class="icon-btn" id="btn-cheat" onclick="toggleCheatSheet()">📄</button>
             <button class="icon-btn" onclick="toggleNumbers()">👁️</button>
             <button class="icon-btn" onclick="stopTimer()">⏹</button>
         </div>
@@ -425,7 +418,6 @@
             const nameInput = document.getElementById('new-name');
             const timeInput = document.getElementById('new-time');
             const name = nameInput.value.trim();
-            // Allow decimals
             const minutes = parseFloat(timeInput.value);
 
             if (!name || isNaN(minutes) || minutes <= 0) return;
@@ -518,7 +510,6 @@
                 container.appendChild(div);
             });
             
-            // Round to 1 decimal place to avoid 4.000000001 issues
             totalMin = Math.round(totalMin * 10) / 10;
             totalDisplay.innerText = `${totalMin}m`;
         }
@@ -530,15 +521,18 @@
             
             if (isNaN(total) || total <= 0) return alert("Invalid Time");
             
-            const csContainer = document.getElementById('cs-content');
-            csContainer.innerHTML = `<div class="cs-item">Quick ${total}m Set<span>Light at ${light}m</span></div>`;
-            
+            // Flag body as quick mode to hide button
+            document.body.classList.add('quick-mode');
+
             startTimerLogic(total * 60 * 1000, light * 60 * 1000);
         }
 
         function startSet() {
             let totalMin = setlist.reduce((sum, bit) => sum + bit.minutes, 0);
             
+            // Remove quick mode flag
+            document.body.classList.remove('quick-mode');
+
             const csContainer = document.getElementById('cs-content');
             csContainer.innerHTML = '';
             setlist.forEach((bit, i) => {
@@ -549,9 +543,7 @@
                     </div>`;
             });
             
-            // Get the light warning time from the new input
             const lightMin = parseFloat(document.getElementById('builder-light').value);
-            // Default to 1 min if input is invalid
             const warningMs = (isNaN(lightMin) ? 1 : lightMin) * 60 * 1000;
             
             startTimerLogic(totalMin * 60 * 1000, warningMs);
@@ -612,6 +604,10 @@
         function stopTimer() {
             clearInterval(timerInterval);
             resetColors();
+            
+            // Clean up Quick Mode flag
+            document.body.classList.remove('quick-mode');
+
             document.getElementById('screen-timer').classList.remove('active');
             document.querySelector('.tab-bar').style.display = 'flex'; 
             
