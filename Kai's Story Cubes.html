@@ -14,16 +14,28 @@
 
     <style>
         :root {
-            --bg-color: #1a1a1a;
-            --accent: #FFD700; /* Roblox Gold */
-            --card-bg: #2d2d2d;
-            --text-color: #ffffff;
-            --slot-bg: #444;
+            /* Fun Palette */
+            --bg-gradient: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            --card-bg: #ffffff;
+            --text-color: #333;
+            
+            /* Button Colors */
+            --btn-blue: #54a0ff;
+            --btn-blue-shadow: #2e86de;
+            
+            --btn-green: #00d2d3;
+            --btn-green-shadow: #01a3a4;
+            
+            --btn-yellow: #feca57;
+            --btn-yellow-shadow: #ff9f43;
+            
+            --btn-red: #ff6b6b;
+            --btn-red-shadow: #ee5253;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
+            font-family: "Chalkboard SE", "Comic Sans MS", sans-serif; /* Kid friendly font */
+            background: var(--bg-gradient);
             color: var(--text-color);
             margin: 0;
             padding: 0;
@@ -31,144 +43,204 @@
             overflow: hidden;
             user-select: none;
             -webkit-user-select: none;
+            display: flex;
+            justify-content: center;
         }
 
-        /* --- NAVIGATION / SCREENS --- */
+        /* --- SHARED COMPONENTS --- */
         .screen {
             display: none;
             flex-direction: column;
             width: 100%;
             height: 100%;
-            position: absolute;
-            top: 0; left: 0;
-            background: var(--bg-color);
+            max-width: 600px; /* Tablet constraint */
             padding: 20px;
             box-sizing: border-box;
             align-items: center;
+            animation: fadeIn 0.3s ease;
         }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
         .screen.active { display: flex; }
 
-        /* --- HOME SCREEN (THE HUB) --- */
-        #screen-home {
-            justify-content: center;
-            gap: 20px;
+        h1 {
+            margin: 10px 0 20px 0;
+            font-size: 2.5rem;
+            color: white;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+            text-align: center;
+            font-weight: 900;
         }
 
-        h1 { margin: 0 0 20px 0; font-size: 2rem; text-transform: uppercase; color: var(--accent); text-shadow: 0 2px 0 #000; }
+        /* Bouncy 3D Buttons */
+        .bouncy-btn {
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 900;
+            padding: 15px 30px;
+            border-radius: 20px;
+            cursor: pointer;
+            position: relative;
+            top: 0;
+            transition: all 0.1s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* Color Variants */
+        .btn-home { background: var(--btn-red); box-shadow: 0 6px 0 var(--btn-red-shadow); }
+        .btn-action { background: var(--btn-green); box-shadow: 0 6px 0 var(--btn-green-shadow); font-size: 1.8rem; width: 80%; }
+        .btn-nav { background: var(--btn-blue); box-shadow: 0 6px 0 var(--btn-blue-shadow); padding: 10px 15px; font-size: 1.2rem; }
+
+        /* Click Effect */
+        .bouncy-btn:active {
+            top: 6px;
+            box-shadow: 0 0 0 var(--btn-green-shadow); /* Remove shadow to look pressed */
+        }
+
+        .home-icon-btn {
+            position: absolute;
+            top: 15px; left: 15px;
+            padding: 10px 15px;
+            font-size: 1.5rem;
+            z-index: 100;
+        }
+
+        /* --- HOME SCREEN --- */
+        #screen-home { justify-content: center; gap: 20px; }
 
         .game-card {
-            background: var(--card-bg);
+            background: white;
             width: 100%;
-            max-width: 300px;
             padding: 20px;
-            border-radius: 20px;
+            border-radius: 25px;
             display: flex;
             align-items: center;
             gap: 20px;
             cursor: pointer;
-            border: 4px solid #444;
+            box-shadow: 0 8px 0 rgba(0,0,0,0.1);
             transition: transform 0.1s;
+            border: 4px solid white;
         }
         
-        .game-card:active { transform: scale(0.95); border-color: var(--accent); }
+        .game-card:active { transform: scale(0.95); background: #f0f0f0; }
 
-        .game-icon { font-size: 3rem; }
-        .game-title { font-size: 1.5rem; font-weight: bold; }
-
-        /* --- SHARED UI --- */
-        .back-btn {
-            position: absolute;
-            top: 20px; left: 20px;
-            background: #444;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            z-index: 100;
+        .gc-icon { 
+            font-size: 3.5rem; 
+            background: #eee; 
+            width: 80px; height: 80px; 
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 20px;
         }
+        
+        .gc-info { flex-grow: 1; }
+        .gc-title { font-size: 1.8rem; font-weight: 800; color: #444; margin-bottom: 5px; }
+        .gc-desc { font-size: 0.9rem; color: #888; font-weight: bold; }
 
-        /* --- GAME 1: STORY SLOTS --- */
+        /* --- GAME 1: SLOTS --- */
         #screen-slots { justify-content: center; }
 
         .slots-container {
             display: flex;
-            gap: 5px;
-            background: #333;
-            padding: 10px;
-            border-radius: 15px;
-            margin-bottom: 30px;
+            gap: 8px;
+            background: rgba(255,255,255,0.3);
+            padding: 15px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            width: 100%;
+            justify-content: center;
         }
 
         .slot-col {
             background: white;
-            width: 55px;
-            height: 80px;
-            border-radius: 8px;
+            width: 18%; /* Flexible width */
+            aspect-ratio: 2/3;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 2.5rem;
             overflow: hidden;
-            border: 3px solid #000;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.1);
+            border: 2px solid rgba(0,0,0,0.1);
         }
+        
+        @media (max-width: 350px) { .slot-col { font-size: 2rem; } }
 
-        .slot-col.spinning span {
-            animation: blurScroll 0.2s infinite linear;
-        }
+        .slot-col.spinning span { animation: blurScroll 0.2s infinite linear; }
 
         @keyframes blurScroll {
-            0% { transform: translateY(-10px); filter: blur(2px); }
-            50% { transform: translateY(10px); filter: blur(2px); }
-            100% { transform: translateY(-10px); filter: blur(2px); }
+            0% { transform: translateY(-20px) scale(0.8); filter: blur(4px); opacity: 0.5; }
+            50% { transform: translateY(20px) scale(0.8); filter: blur(4px); opacity: 0.5; }
+            100% { transform: translateY(-20px) scale(0.8); filter: blur(4px); opacity: 0.5; }
         }
-
-        .big-btn {
-            background: var(--accent);
-            color: black;
-            border: none;
-            padding: 20px 60px;
-            font-size: 2rem;
-            font-weight: 900;
-            border-radius: 50px;
-            border-bottom: 8px solid #b8860b;
-            cursor: pointer;
-        }
-        .big-btn:active { transform: translateY(4px); border-bottom-width: 4px; }
 
         /* --- GAME 2: BLOX BUILDER --- */
         #screen-builder { justify-content: center; }
 
+        .builder-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
         .avatar-stage {
-            background: radial-gradient(circle, #444 0%, #111 100%);
-            width: 300px;
-            height: 350px;
-            border-radius: 20px;
+            width: 280px;
+            height: 320px;
+            border-radius: 30px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             position: relative;
-            margin-bottom: 20px;
-            border: 4px solid #555;
+            background-color: #fff; /* Default BG */
+            border: 6px solid white;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            overflow: hidden;
+            transition: background-color 0.3s;
         }
 
-        .part-row {
+        /* The Stack */
+        .avatar-part { font-size: 4.5rem; line-height: 1; transition: transform 0.2s; z-index: 2; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        #disp-head { z-index: 5; margin-bottom: -10px; }
+        #disp-body { z-index: 4; margin-bottom: -15px; }
+        #disp-legs { z-index: 3; }
+        
+        .pet-display {
+            position: absolute;
+            bottom: 20px; right: 20px;
+            font-size: 2.5rem;
+            z-index: 6;
+            animation: float 3s infinite ease-in-out;
+        }
+
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        /* Animation Class */
+        .avatar-stage.alive .avatar-part { animation: dance 0.6s infinite alternate; }
+        @keyframes dance { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
+
+        /* Controls */
+        .controls-row {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
+            gap: 15px;
             width: 100%;
-            padding: 0 10px;
-            margin: 5px 0;
+            background: rgba(255,255,255,0.2);
+            padding: 5px;
+            border-radius: 15px;
         }
-
-        .part-display { font-size: 4rem; width: 80px; text-align: center; }
         
-        .arrow-btn {
-            background: none; border: none; color: white; font-size: 2rem; padding: 10px;
-        }
+        .control-label { font-weight: bold; color: white; width: 60px; text-align: right; text-transform: uppercase; font-size: 0.8rem;}
 
         /* --- GAME 3: THIS OR THAT --- */
         #screen-thisthat { justify-content: center; }
@@ -176,38 +248,55 @@
         .vs-container {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 10px;
             width: 100%;
             align-items: center;
+            margin-bottom: 20px;
         }
 
         .option-card {
             background: white;
-            width: 80%;
-            height: 150px;
-            border-radius: 20px;
+            width: 90%;
+            height: 140px;
+            border-radius: 25px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 5rem;
-            border: 6px solid #ccc;
-            transition: transform 0.2s, background 0.2s;
+            font-size: 6rem;
+            box-shadow: 0 8px 0 #ddd;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 4px solid transparent;
         }
 
+        .option-card:active { transform: scale(0.95); box-shadow: 0 4px 0 #ddd; top: 4px; position: relative; }
+        
         .option-card.winner {
-            background: #4caf50;
-            border-color: #fff;
-            transform: scale(1.1);
+            background: #FFEAA7;
+            border-color: #FDCB6E;
+            animation: bounce 0.5s infinite alternate;
         }
 
-        .vs-text { font-size: 2rem; font-weight: 900; color: #888; margin: 10px 0; }
+        @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.05); } }
 
-        /* Confetti */
+        .vs-badge {
+            background: white;
+            color: #333;
+            font-weight: 900;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            z-index: 2;
+            margin: -25px 0; /* Overlap cards */
+        }
+
+        /* --- CONFETTI --- */
         #confetti-canvas {
             position: absolute;
             top: 0; left: 0;
             pointer-events: none;
             width: 100%; height: 100%;
+            z-index: 200;
         }
 
     </style>
@@ -219,24 +308,34 @@
     <div id="screen-home" class="screen active">
         <h1>Kai's Arcade</h1>
         
-        <div class="game-card" onclick="goGame('slots')">
-            <div class="game-icon">🎰</div>
-            <div class="game-title">Story Slots</div>
+        <div class="game-card" onclick="goGame('slots')" style="border-bottom: 6px solid #00d2d3;">
+            <div class="gc-icon">🎰</div>
+            <div class="gc-info">
+                <div class="gc-title">Story Slots</div>
+                <div class="gc-desc">Spin to tell a story!</div>
+            </div>
         </div>
 
-        <div class="game-card" onclick="goGame('builder')">
-            <div class="game-icon">👷</div>
-            <div class="game-title">Blox Builder</div>
+        <div class="game-card" onclick="goGame('builder')" style="border-bottom: 6px solid #feca57;">
+            <div class="gc-icon">👷</div>
+            <div class="gc-info">
+                <div class="gc-title">Blox Builder</div>
+                <div class="gc-desc">Make a hero!</div>
+            </div>
         </div>
 
-        <div class="game-card" onclick="goGame('thisthat')">
-            <div class="game-icon">⚖️</div>
-            <div class="game-title">This or That</div>
+        <div class="game-card" onclick="goGame('thisthat')" style="border-bottom: 6px solid #ff6b6b;">
+            <div class="gc-icon">⚖️</div>
+            <div class="gc-info">
+                <div class="gc-title">This or That</div>
+                <div class="gc-desc">Vote & Choose!</div>
+            </div>
         </div>
     </div>
 
     <div id="screen-slots" class="screen">
-        <button class="back-btn" onclick="goHome()">🏠</button>
+        <button class="bouncy-btn btn-home home-icon-btn" onclick="goHome()">🏠</button>
+        <h1>Story Slots</h1>
         
         <div class="slots-container">
             <div class="slot-col" id="slot1"><span>🦕</span></div>
@@ -246,151 +345,204 @@
             <div class="slot-col" id="slot5"><span>🏰</span></div>
         </div>
 
-        <button class="big-btn" onclick="spinSlots()">SPIN!</button>
+        <button class="bouncy-btn btn-action" onclick="spinSlots()">SPIN IT!</button>
     </div>
 
     <div id="screen-builder" class="screen">
-        <button class="back-btn" onclick="goHome()">🏠</button>
+        <button class="bouncy-btn btn-home home-icon-btn" onclick="goHome()">🏠</button>
+        <h1>Blox Builder</h1>
         
-        <div class="avatar-stage">
-            <div class="part-row">
-                <button class="arrow-btn" onclick="changePart('head', -1)">◀</button>
-                <div class="part-display" id="disp-head">😎</div>
-                <button class="arrow-btn" onclick="changePart('head', 1)">▶</button>
+        <div class="builder-container">
+            <div class="avatar-stage" id="avatar-stage">
+                <div class="avatar-part" id="disp-head">😎</div>
+                <div class="avatar-part" id="disp-body">👕</div>
+                <div class="avatar-part" id="disp-legs">👖</div>
+                <div class="pet-display" id="disp-pet"></div>
             </div>
-            <div class="part-row">
-                <button class="arrow-btn" onclick="changePart('body', -1)">◀</button>
-                <div class="part-display" id="disp-body">👕</div>
-                <button class="arrow-btn" onclick="changePart('body', 1)">▶</button>
+
+            <div class="controls-row">
+                <span class="control-label">Head</span>
+                <button class="bouncy-btn btn-nav" onclick="changePart('head', -1)">◀</button>
+                <button class="bouncy-btn btn-nav" onclick="changePart('head', 1)">▶</button>
             </div>
-            <div class="part-row">
-                <button class="arrow-btn" onclick="changePart('item', -1)">◀</button>
-                <div class="part-display" id="disp-item">🎸</div>
-                <button class="arrow-btn" onclick="changePart('item', 1)">▶</button>
+            <div class="controls-row">
+                <span class="control-label">Body</span>
+                <button class="bouncy-btn btn-nav" onclick="changePart('body', -1)">◀</button>
+                <button class="bouncy-btn btn-nav" onclick="changePart('body', 1)">▶</button>
+            </div>
+            <div class="controls-row">
+                <span class="control-label">Legs</span>
+                <button class="bouncy-btn btn-nav" onclick="changePart('legs', -1)">◀</button>
+                <button class="bouncy-btn btn-nav" onclick="changePart('legs', 1)">▶</button>
+            </div>
+             <div class="controls-row">
+                <span class="control-label">Pet</span>
+                <button class="bouncy-btn btn-nav" onclick="changePart('pet', -1)">◀</button>
+                <button class="bouncy-btn btn-nav" onclick="changePart('pet', 1)">▶</button>
+            </div>
+             <div class="controls-row">
+                <span class="control-label">World</span>
+                <button class="bouncy-btn btn-nav" onclick="changePart('bg', 1)">🎨</button>
             </div>
         </div>
-        
-        <div style="color: #888; font-size: 1.2rem; font-weight: bold;">CREATE YOUR HERO</div>
+
+        <button class="bouncy-btn btn-action" style="background: var(--btn-yellow); box-shadow: 0 6px 0 var(--btn-yellow-shadow); margin-top: 20px;" onclick="animateCharacter()">BRING TO LIFE!</button>
     </div>
 
     <div id="screen-thisthat" class="screen">
-        <button class="back-btn" onclick="goHome()">🏠</button>
+        <button class="bouncy-btn btn-home home-icon-btn" onclick="goHome()">🏠</button>
+        <h1>This or That</h1>
         
         <div class="vs-container">
             <div class="option-card" id="opt1" onclick="pickOption(1)">🦖</div>
-            <div class="vs-text">VS</div>
+            <div class="vs-badge">VS</div>
             <div class="option-card" id="opt2" onclick="pickOption(2)">👽</div>
         </div>
 
-        <button class="big-btn" style="margin-top: 30px; font-size: 1.2rem; padding: 15px 30px;" onclick="newVsRound()">NEXT PAIR</button>
+        <button class="bouncy-btn btn-action" onclick="newVsRound()">NEXT PAIR</button>
     </div>
 
     <script>
+        // --- DATA SETS ---
+        const allEmojis = [
+            "🦕","🍕","🚀","⛈️","🏰","🦁","🚗","👻","💎","🤠","🤖","🦄","💩","🌵",
+            "🔥","❄️","🍔","🏎️","🦈","🤢","🧟","🍫","🥦","🏝️","🏔️","⚽","🎸","⚔️",
+            "🕷️","🐍","🧜","🧚","🧞","🧙","🧛","🦓","🦒","🐘","🦍","🍟","🍩","🍭"
+        ];
+
+        const builderParts = {
+            head: ["😎","🤠","🤖","🤡","👽","🎃","😈","🐶","🐱","🤴","👵","👮","👩‍🚀"],
+            body: ["👕","🥋","🧥","🦺","👗","👔","🦾","🦴","🕸️","👙"],
+            legs: ["👖","🩳","🦵","🛹","🐎","🏍️","🧜‍♀️"],
+            pet: ["","🐶","🐱","🦜","🐉","👻","💩","🤖"],
+            bg: ["#ffffff", "#ffcccc", "#ccffcc", "#ccccff", "#ffffcc", "#e0e0e0", "#333333"]
+        };
+        
+        let currentBuild = { head: 0, body: 0, legs: 0, pet: 0, bg: 0 };
+
+        const vsPairs = [
+            ["🦖","👽"], ["🦸","🦹"], ["🕷️","🐍"], ["🔥","❄️"], 
+            ["🍕","🍔"], ["🏎️","✈️"], ["🦁","🦈"], ["💩","🤢"],
+            ["👻","🧟"], ["🤠","🤖"], ["🍫","🥦"], ["🏝️","🏔️"],
+            ["Minecraft","Roblox"], ["☀️","🌙"], ["🚲","🛹"]
+        ];
+
+        // --- AUDIO SYNTH (No files needed) ---
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        function playTone(freq, type, duration) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function sfx(type) {
+            if (type === 'click') playTone(400, 'sine', 0.1);
+            if (type === 'spin') playTone(200, 'triangle', 0.1);
+            if (type === 'nav') playTone(600, 'sine', 0.05);
+            if (type === 'win') {
+                // Fanfare
+                setTimeout(() => playTone(400, 'square', 0.2), 0);
+                setTimeout(() => playTone(500, 'square', 0.2), 150);
+                setTimeout(() => playTone(800, 'square', 0.4), 300);
+            }
+        }
+
         // --- NAVIGATION ---
         function goGame(gameId) {
+            sfx('click');
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(`screen-${gameId}`).classList.add('active');
             if(gameId === 'thisthat') newVsRound();
         }
 
         function goHome() {
+            sfx('click');
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('screen-home').classList.add('active');
         }
 
-        // --- AUDIO ENGINE (Simple Blips) ---
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        const audioCtx = new AudioContext();
-
-        function playSound(type) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            if (type === 'spin') {
-                osc.frequency.setValueAtTime(200, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.1);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
-            } else if (type === 'win') {
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-                osc.frequency.setValueAtTime(600, audioCtx.currentTime + 0.1);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
-            } else {
-                // Click
-                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+        // --- GAME 1: SMART SLOTS (Unique Logic) ---
+        function getUniqueSet(count) {
+            // Fisher-Yates Shuffle copy of array
+            let deck = [...allEmojis]; 
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
             }
+            return deck.slice(0, count);
         }
 
-        // --- GAME 1: SLOTS LOGIC ---
-        const emojis = ["🦕","🍕","🚀","⛈️","🏰","🦁","🚗","👻","💎","🤠","🤖","🦄","💩","🌵"];
-        
         function spinSlots() {
-            playSound('spin');
+            sfx('click');
+            const results = getUniqueSet(5); // Get 5 unique emojis
             
-            // Visual Spin
             for(let i=1; i<=5; i++) {
                 const el = document.getElementById(`slot${i}`);
                 el.classList.add('spinning');
                 
                 // Staggered Stop
                 setTimeout(() => {
+                    sfx('spin');
                     el.classList.remove('spinning');
-                    el.innerHTML = `<span>${emojis[Math.floor(Math.random() * emojis.length)]}</span>`;
-                    playSound('click');
-                }, 500 + (i * 200));
+                    el.innerHTML = `<span>${results[i-1]}</span>`;
+                }, 400 + (i * 150));
+            }
+            
+            setTimeout(() => sfx('win'), 1500);
+        }
+
+        // --- GAME 2: ADVANCED BUILDER ---
+        function changePart(type, dir) {
+            sfx('nav');
+            let idx = currentBuild[type] + dir;
+            if(idx < 0) idx = builderParts[type].length - 1;
+            if(idx >= builderParts[type].length) idx = 0;
+            currentBuild[type] = idx;
+            
+            if(type === 'bg') {
+                document.getElementById('avatar-stage').style.backgroundColor = builderParts[type][idx];
+            } else {
+                document.getElementById(`disp-${type}`).innerText = builderParts[type][idx];
             }
         }
 
-        // --- GAME 2: BLOX BUILDER LOGIC ---
-        const parts = {
-            head: ["😎","🤠","🤖","🤡","👽","🎃","😈","🐶","🐱","🤴"],
-            body: ["👕","🥋","🧥","🦺","👗","👔","🦾","🦴","🕸️"],
-            item: ["🎸","⚔️","🛡️","🍕","🏆","🎮","📱","🔦","🧨","🎈"]
-        };
-        
-        let currentParts = { head: 0, body: 0, item: 0 };
-
-        function changePart(type, dir) {
-            playSound('click');
-            let idx = currentParts[type] + dir;
-            if(idx < 0) idx = parts[type].length - 1;
-            if(idx >= parts[type].length) idx = 0;
+        function animateCharacter() {
+            const stage = document.getElementById('avatar-stage');
+            stage.classList.add('alive');
+            sfx('win');
+            fireConfetti();
             
-            currentParts[type] = idx;
-            document.getElementById(`disp-${type}`).innerText = parts[type][idx];
+            setTimeout(() => {
+                stage.classList.remove('alive');
+            }, 3000);
         }
 
-        // --- GAME 3: THIS OR THAT LOGIC ---
-        const vsPairs = [
-            ["🦖","👽"], ["🦸","🦹"], ["🕷️","🐍"], ["🔥","❄️"], 
-            ["🍕","🍔"], ["🏎️","✈️"], ["🦁","🦈"], ["💩","🤢"],
-            ["👻","🧟"], ["🤠","🤖"], ["🍫","🥦"], ["🏝️","🏔️"]
-        ];
-
+        // --- GAME 3: THIS OR THAT ---
         function newVsRound() {
-            // Reset styles
+            sfx('click');
             document.querySelectorAll('.option-card').forEach(el => el.classList.remove('winner'));
-            
-            // Pick random pair
             const pair = vsPairs[Math.floor(Math.random() * vsPairs.length)];
             document.getElementById('opt1').innerText = pair[0];
             document.getElementById('opt2').innerText = pair[1];
         }
 
         function pickOption(num) {
-            playSound('win');
+            sfx('win');
             document.getElementById(`opt${num}`).classList.add('winner');
             fireConfetti();
         }
 
-        // --- CONFETTI ENGINE (Simple Canvas) ---
+        // --- CONFETTI ENGINE ---
         function fireConfetti() {
             const canvas = document.getElementById('confetti-canvas');
             const ctx = canvas.getContext('2d');
@@ -398,14 +550,15 @@
             canvas.height = window.innerHeight;
             
             const particles = [];
-            for(let i=0; i<50; i++) {
+            for(let i=0; i<60; i++) {
                 particles.push({
                     x: window.innerWidth / 2,
                     y: window.innerHeight / 2,
-                    vx: (Math.random() - 0.5) * 20,
-                    vy: (Math.random() - 0.5) * 20,
+                    vx: (Math.random() - 0.5) * 25,
+                    vy: (Math.random() - 0.5) * 25,
                     color: `hsl(${Math.random()*360}, 100%, 50%)`,
-                    life: 100
+                    life: 100,
+                    size: Math.random() * 10 + 5
                 });
             }
 
@@ -416,9 +569,10 @@
                     if(p.life > 0) {
                         p.x += p.vx;
                         p.y += p.vy;
-                        p.life--;
+                        p.vy += 0.5; // Gravity
+                        p.life -= 2;
                         ctx.fillStyle = p.color;
-                        ctx.fillRect(p.x, p.y, 8, 8);
+                        ctx.fillRect(p.x, p.y, p.size, p.size);
                         active = true;
                     }
                 });
@@ -426,7 +580,6 @@
             }
             animate();
         }
-
     </script>
 </body>
 </html>
