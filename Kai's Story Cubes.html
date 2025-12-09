@@ -358,4 +358,244 @@
             <div class="controls-row">
                 <span class="control-label">Body</span>
                 <button class="bouncy-btn btn-nav" onclick="changePart('body', -1)">◀</button>
-                <button class="bouncy-btn btn-nav" onclick="changePart('body
+                <button class="bouncy-btn btn-nav" onclick="changePart('body', 1)">▶</button>
+            </div>
+            <div class="controls-row">
+                <span class="control-label">Legs</span>
+                <button class="bouncy-btn btn-nav" onclick="changePart('legs', -1)">◀</button>
+                <button class="bouncy-btn btn-nav" onclick="changePart('legs', 1)">▶</button>
+            </div>
+             <div class="controls-row">
+                <span class="control-label">Pet</span>
+                <button class="bouncy-btn btn-nav" onclick="changePart('pet', -1)">◀</button>
+                <button class="bouncy-btn btn-nav" onclick="changePart('pet', 1)">▶</button>
+            </div>
+             <div class="controls-row">
+                <span class="control-label">World</span>
+                <button class="bouncy-btn btn-nav" onclick="changePart('bg', 1)">🎨</button>
+            </div>
+        </div>
+
+        <button class="bouncy-btn btn-action" style="background: var(--btn-yellow); box-shadow: 0 6px 0 var(--btn-yellow-shadow); margin-top: 20px;" onclick="animateCharacter()">BRING TO LIFE!</button>
+    </div>
+
+    <div id="screen-thisthat" class="screen">
+        <button class="bouncy-btn btn-home home-icon-btn" onclick="goHome()">🏠</button>
+        <h1>This or That</h1>
+        
+        <div class="vs-container">
+            <div class="option-card" id="opt1" onclick="pickOption(1)">🦖</div>
+            <div class="vs-badge">VS</div>
+            <div class="option-card" id="opt2" onclick="pickOption(2)">👽</div>
+        </div>
+
+        <button class="bouncy-btn btn-action" onclick="newVsRound()">NEXT PAIR</button>
+    </div>
+
+    <script>
+        // --- MEGA DATA SETS ---
+        
+        const allEmojis = [
+            // Animals
+            "🦕","🦖","🦁","🦈","🐳","🐙","🕷️","🐍","🦓","🦒","🐘","🦍","🦅","🦉","🦇","🦄","🐉",
+            "🐕","🐈","🐖","🐄","🐎","🐢","🐊","🐬","🦀","🐠","🐌","🐛","🐝","🐞","🦋","🐜","🦟",
+            // Fantasy/People
+            "🤠","🤡","👽","🤖","🎃","😈","👻","🧞","🧜","🧚","🧙","🧛","🧟","🦸","🦹","🥷","🤴","👸",
+            // Food
+            "🍕","🍔","🍟","🌭","🍿","🥓","🍳","🥞","🧇","🥯","🥨","🥐","🥖","🧀","🌮","🌯","🥗",
+            "🍩","🍪","🎂","🍰","🧁","🥧","🍦","🍨","🍧","🍫","🍬","🍭","🥦","🥑","🍉","🍓","🍌",
+            // Transport
+            "🚗","🚕","🚙","🚌","🏎️","🚓","🚑","🚒","🚜","🚲","🛴","🛵","🏍️","🚂","✈️","🚀","🛸",
+            "⛵","🚤","🛳️","🛶","🚁","🚠","🚇","🚄",
+            // Objects/Weather
+            "⛈️","☀️","❄️","🔥","🌈","🌊","🌋","🏰","🗿","🗽","🗼","⛩️","🎢","🎡","🎠","🎪","🎨",
+            "🎮","🎸","🎻","🥁","⚽","🏀","🏈","⚾","🎾","🎱","🎳","🥊","🥋","⛳","⛸️","🎣","🤿",
+            "💎","💰","🔑","🎁","💣","🧨","🎈","🔮","🔭","🔬","💊","🧬","🦠","🧻","🧼","🧲"
+        ];
+
+        const builderParts = {
+            head: [
+                "😎","🤠","🤖","🤡","👽","🎃","😈","🐶","🐱","🤴","👵","👮","👩‍🚀",
+                "🦁","🐵","🐼","🐷","🐸","🦊","🐻","🐨","🐯","🦄","🐲","🎅","🧛","🧟",
+                "🥷","🦸","🦹","👶","👴","👲","👳","🕵️","👷","💂","💆","💇","🤯","🥶"
+            ],
+            body: [
+                "👕","🥋","🧥","🦺","👗","👔","🦾","🦴","🕸️","👙",
+                "👘","🥻","🩱","👚","🥓","📦","🧊","🛡️","🧱","🦠","🛹","🌲","🌻",
+                "🎒","🧣","🧤","🧡","🖤","💚","💜","💙","💝"
+            ],
+            legs: [
+                "👖","🩳","🦵","🛹","🐎","🏍️","🧜‍♀️","🦶","👟","🩰","👢",
+                "🚙","☁️","🚀","🚲","🛴","🛵","🦽","🦼","🛶","🚽","🛁","🛋️"
+            ],
+            pet: [
+                "","🐶","🐱","🦜","🐉","👻","💩","🤖","🕷️","🐍","🦇","🦄",
+                "🦖","🦕","🐢","🦀","🐙","🐡","🐠","🐌","🐛","🐝","🐞","🦋","🐥"
+            ],
+            bg: [
+                "#ffffff", "#ffcccc", "#ccffcc", "#ccccff", "#ffffcc", "#e0e0e0", "#333333",
+                "#ff7979", "#badc58", "#dff9fb", "#f6e58d", "#686de0", "#e056fd", "#be2edd"
+            ]
+        };
+        
+        let currentBuild = { head: 0, body: 0, legs: 0, pet: 0, bg: 0 };
+
+        const vsPairs = [
+            ["🦖","👽"], ["🦸","🦹"], ["🕷️","🐍"], ["🔥","❄️"], 
+            ["🍕","🍔"], ["🏎️","✈️"], ["🦁","🦈"], ["💩","🤢"],
+            ["👻","🧟"], ["🤠","🤖"], ["🍫","🥦"], ["🏝️","🏔️"],
+            ["Minecraft","Roblox"], ["☀️","🌙"], ["🚲","🛹"],
+            ["🐶","🐱"], ["🥞","🧇"], ["🎮","📱"], ["🏖️","⛺"],
+            ["🎬","📚"], ["🎤","🎨"], ["⚽","🏀"], ["🎢","🎡"],
+            ["🛁","🚿"], ["🍝","🌮"], ["🎸","🎹"], ["🧛","🐺"],
+            ["🚀","🚢"], ["🌈","⛈️"], ["🍬","🍿"]
+        ];
+
+        // --- AUDIO SYNTH ---
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        function playTone(freq, type, duration) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function sfx(type) {
+            if (type === 'click') playTone(400, 'sine', 0.1);
+            if (type === 'spin') playTone(200, 'triangle', 0.1);
+            if (type === 'nav') playTone(600, 'sine', 0.05);
+            if (type === 'win') {
+                setTimeout(() => playTone(400, 'square', 0.2), 0);
+                setTimeout(() => playTone(500, 'square', 0.2), 150);
+                setTimeout(() => playTone(800, 'square', 0.4), 300);
+            }
+        }
+
+        // --- NAVIGATION ---
+        function goGame(gameId) {
+            sfx('click');
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(`screen-${gameId}`).classList.add('active');
+            if(gameId === 'thisthat') newVsRound();
+        }
+
+        function goHome() {
+            sfx('click');
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen-home').classList.add('active');
+        }
+
+        // --- GAME 1: SMART SLOTS ---
+        function getUniqueSet(count) {
+            let deck = [...allEmojis]; 
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+            return deck.slice(0, count);
+        }
+
+        function spinSlots() {
+            sfx('click');
+            const results = getUniqueSet(5); 
+            
+            for(let i=1; i<=5; i++) {
+                const el = document.getElementById(`slot${i}`);
+                el.classList.add('spinning');
+                setTimeout(() => {
+                    sfx('spin');
+                    el.classList.remove('spinning');
+                    el.innerHTML = `<span>${results[i-1]}</span>`;
+                }, 400 + (i * 150));
+            }
+            setTimeout(() => sfx('win'), 1500);
+        }
+
+        // --- GAME 2: ADVANCED BUILDER ---
+        function changePart(type, dir) {
+            sfx('nav');
+            let idx = currentBuild[type] + dir;
+            if(idx < 0) idx = builderParts[type].length - 1;
+            if(idx >= builderParts[type].length) idx = 0;
+            currentBuild[type] = idx;
+            
+            if(type === 'bg') {
+                document.getElementById('avatar-stage').style.backgroundColor = builderParts[type][idx];
+            } else {
+                document.getElementById(`disp-${type}`).innerText = builderParts[type][idx];
+            }
+        }
+
+        function animateCharacter() {
+            const stage = document.getElementById('avatar-stage');
+            stage.classList.add('alive');
+            sfx('win');
+            fireConfetti();
+            setTimeout(() => { stage.classList.remove('alive'); }, 3000);
+        }
+
+        // --- GAME 3: THIS OR THAT ---
+        function newVsRound() {
+            sfx('click');
+            document.querySelectorAll('.option-card').forEach(el => el.classList.remove('winner'));
+            const pair = vsPairs[Math.floor(Math.random() * vsPairs.length)];
+            document.getElementById('opt1').innerText = pair[0];
+            document.getElementById('opt2').innerText = pair[1];
+        }
+
+        function pickOption(num) {
+            sfx('win');
+            document.getElementById(`opt${num}`).classList.add('winner');
+            fireConfetti();
+        }
+
+        // --- CONFETTI ENGINE ---
+        function fireConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const particles = [];
+            for(let i=0; i<60; i++) {
+                particles.push({
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2,
+                    vx: (Math.random() - 0.5) * 25,
+                    vy: (Math.random() - 0.5) * 25,
+                    color: `hsl(${Math.random()*360}, 100%, 50%)`,
+                    life: 100,
+                    size: Math.random() * 10 + 5
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0,0,canvas.width, canvas.height);
+                let active = false;
+                particles.forEach(p => {
+                    if(p.life > 0) {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.vy += 0.5; // Gravity
+                        p.life -= 2;
+                        ctx.fillStyle = p.color;
+                        ctx.fillRect(p.x, p.y, p.size, p.size);
+                        active = true;
+                    }
+                });
+                if(active) requestAnimationFrame(animate);
+            }
+            animate();
+        }
+    </script>
+</body>
+</html>
