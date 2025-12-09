@@ -78,7 +78,7 @@
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(5, 1fr);
-            gap: 8px;
+            gap: 6px;
             padding: 10px;
             max-width: 600px;
             margin: 0 auto;
@@ -94,9 +94,10 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            font-size: 0.75rem;
+            font-size: 0.7rem; /* Slightly smaller for more text */
+            line-height: 1.1;
             font-weight: 700;
-            padding: 2px;
+            padding: 4px;
             cursor: pointer;
             box-shadow: var(--shadow);
             transition: transform 0.1s, background-color 0.2s;
@@ -121,7 +122,7 @@
             background: var(--accent);
             color: white;
             border-color: var(--accent);
-            font-size: 1rem;
+            font-size: 0.9rem;
             text-transform: uppercase;
         }
 
@@ -164,7 +165,7 @@
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%) scale(0);
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             padding: 40px;
             border-radius: 30px;
             text-align: center;
@@ -172,17 +173,18 @@
             z-index: 50;
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             border: 5px solid var(--accent);
+            width: 80%;
+            max-width: 300px;
         }
         
         body.night-mode #win-overlay { background: #2d3436; border-color: var(--mark-color); }
 
         #win-overlay.visible { transform: translate(-50%, -50%) scale(1); }
         
-        .bingo-text { font-size: 4rem; margin: 0; color: var(--accent); font-weight: 900; }
+        .bingo-text { font-size: 3.5rem; margin: 0; color: var(--accent); font-weight: 900; }
 
-        /* Mobile Font Sizing */
         @media (max-height: 700px) {
-            .tile { font-size: 0.65rem; }
+            .tile { font-size: 0.6rem; }
             h1 { font-size: 1.2rem; }
         }
 
@@ -206,78 +208,124 @@
 
     <div id="win-overlay" onclick="hideWin()">
         <h2 class="bingo-text">BINGO!</h2>
-        <p style="font-weight: bold; font-size: 1.2rem;">Tap to continue playing</p>
+        <p style="font-weight: bold; font-size: 1.2rem;">Tap to keep playing</p>
     </div>
 
     <script>
-        // --- DATA ---
+        // --- 150+ ROAD TRIP ITEMS ---
         const roadItems = [
-            "Waffle House", "Cracker Barrel", "Police Car", "Ambulance", "Fire Truck",
-            "Billboard: Lawyer", "Billboard: Jesus", "Billboard: Adult", "Construction Cone",
-            "Speed Limit 70", "Mile Marker 100", "State Line Sign", "Rest Area",
-            "Weigh Station", "Flat Tire on Road", "Shoe on Road", "Dead Animal",
-            "Dog in Car", "Feet on Dash", "Singing Driver", "Texting Driver",
-            "Out of State Plate", "Vanity Plate", "Stick Family", "Baby on Board",
-            "Truck with Logs", "Car Carrier", "Tanker Truck", "Cement Mixer",
-            "Motorcycle Group", "RV towing Car", "Camper Van", "School Bus",
-            "Yellow Car", "Pink Car", "Classic Car", "Convertible (Top Down)",
-            "Broken Headlight", "Bumper Sticker: Politics", "Bumper Sticker: Sports",
-            "Roof Rack / Box", "Bicycles on Back", "Boat on Trailer", "Jet Skis",
-            "Cow", "Horse", "Hawk / Eagle", "Vultures", "Palm Tree",
-            "Wind Turbine", "Solar Panels", "Water Tower", "Silo", "Barn",
-            "Graffiti on Bridge", "Tunnel", "Toll Booth", "Exit 69", "Exit 420",
-            "Triple Trailer", "FedEx Truck", "UPS Truck", "Amazon Truck",
-            "Walmart Truck", "Dollar General", "McDonalds Sign", "Starbucks",
-            "Gas Price < $3", "Gas Price > $4", "Someone Sleeping", "U-Haul",
-            "Car with Rust", "Missing Hubcap", "Spoiler (Wing)", "Muddy Truck"
+            // Vehicles
+            "Police Car", "Ambulance", "Fire Truck", "Motorcycle", "Motorcycle with Sidecar",
+            "Yellow Car", "Pink Car", "Lime Green Car", "Purple Car", "Orange Car",
+            "Classic Car (Vintage)", "Convertible (Top Down)", "Tesla", "Jeep with Ducks",
+            "VW Beetle (Punch Buggy)", "Smart Car", "Hummer", "Minivan with Stick Family",
+            "School Bus", "City Bus", "Party Bus/Limo", "RV / Motorhome", "Camper Van",
+            "Truck towing Boat", "Truck towing Jet Skis", "Truck towing Car",
+            "FedEx Truck", "UPS Truck", "Amazon Prime Van", "Walmart Truck",
+            "Coca-Cola Truck", "Pepsi Truck", "Lays/Chips Truck", "Gas Tanker",
+            "Car Carrier (Full)", "Cement Mixer", "Garbage Truck", "Street Sweeper",
+            "Mail Truck (USPS)", "Military Vehicle", "Tractor on Road", "UTV / ATV on Trailer",
+            "U-Haul Truck", "U-Haul Trailer", "Flatbed Tow Truck", "Hearse",
+            
+            // Driving Behaviors / People
+            "Dog Head out Window", "Dog in Truck Bed", "Cat in Car", "Feet on Dashboard",
+            "Driver Singing", "Driver Eating", "Driver Picking Nose", "Someone Sleeping",
+            "Wearing Sunglasses", "Wearing a Hat", "Talking on Phone", "Arguing Couple",
+            "Kids Fighting in Back", "Baby Crying (Heard/Seen)", "Smoker (Arm out window)",
+            "Person Changing Tire", "Police Pulled Someone Over", "Construction Worker",
+            
+            // Signs & Billboards
+            "Waffle House Sign", "Cracker Barrel Sign", "Buc-ee's Sign", "McDonald's Arches",
+            "Starbucks Sign", "Dollar General", "Walmart", "Home Depot / Lowe's",
+            "Billboard: Lawyer/Injury", "Billboard: Jesus/Religious", "Billboard: Adult Store",
+            "Billboard: Fireworks", "Billboard: Fast Food", "Billboard: Casino",
+            "Speed Limit 70", "Speed Limit 55", "Speed Limit 45", "Mile Marker 100",
+            "State Line Sign", "Welcome Center", "Rest Area 1 Mile", "Weigh Station Open",
+            "Exit 69", "Exit 420", "Detour Sign", "Road Work Ahead", "Merge Left/Right",
+            "Dip in Road", "Deer Crossing", "Falling Rocks", "Bridge Ices Before Road",
+            "Gas Price < $3.00", "Gas Price > $4.00", "Adopt a Highway",
+            
+            // Environment / Infrastructure
+            "Water Tower", "Cell Tower (Fake Tree)", "Wind Turbine", "Solar Farm",
+            "Power Plant / Smoke", "Factory", "Silo / Barn", "Hay Bales",
+            "Cow(s)", "Horse(s)", "Goat/Sheep", "Hawk/Eagle on Wire", "Vultures circling",
+            "Dead Animal (Roadkill)", "Train / Railroad Tracks", "Tunnel", "Toll Booth",
+            "Bridge over Water", "Graffiti on Bridge", "Abandoned Building", "Cemetery",
+            "Airplane in Sky", "Helicopter", "Hot Air Balloon", "Chemtrails / Contrails",
+            "Rain / Storm", "Rainbow", "Sunset / Sunrise", "Full Moon", "Palm Tree",
+            
+            // Car Details
+            "Out of State Plate", "Alaska/Hawaii Plate", "Vanity Plate (Custom)",
+            "Student Driver Sticker", "Baby on Board Sticker", "Political Sticker",
+            "Sports Team Sticker", "Stick Family Sticker", "Honor Student Sticker",
+            "Broken Headlight/Taillight", "Missing Hubcap", "Spare Tire on Car",
+            "Dented Bumper", "Very Muddy Truck", "Very Dirty Car", "Spoiler (Wing)",
+            "Roof Rack / Box", "Bicycles on Rack", "Kayak/Canoe on Roof",
+            "Mattress on Roof", "Furniture in Trunk", "License Plate Hanging Off"
         ];
 
-        let boardState = []; // 25 items (0-24)
+        let boardState = [];
         let markedIndices = []; 
 
-        // --- AUDIO ENGINE ---
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        const audioCtx = new AudioContext();
+        // --- ROBUST AUDIO ENGINE (iOS Fix) ---
+        let audioCtx = null;
 
-        document.body.addEventListener('touchstart', unlockAudio, { once: true });
-        document.body.addEventListener('click', unlockAudio, { once: true });
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
 
-        function unlockAudio() { if (audioCtx.state === 'suspended') audioCtx.resume(); }
-
+        // Play Sound with instant resume check
         function playSound(type) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
+            initAudio(); // Force check every time logic runs
+
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
             gain.connect(audioCtx.destination);
 
+            const now = audioCtx.currentTime;
+
             if (type === 'mark') {
-                // High blip
+                // Happy "Ding"
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+                osc.frequency.setValueAtTime(500, now);
+                osc.frequency.exponentialRampToValueAtTime(1000, now + 0.1);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
             } else if (type === 'unmark') {
-                // Low blip
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+                // Lower "Bloop"
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.linearRampToValueAtTime(200, now + 0.1);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
             } else if (type === 'win') {
-                // Fanfare chord
-                [400, 500, 600, 800].forEach((freq, i) => {
+                // Major Chord Fanfare
+                [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
                     const o = audioCtx.createOscillator();
                     const g = audioCtx.createGain();
                     o.type = 'square';
                     o.connect(g);
                     g.connect(audioCtx.destination);
+                    
                     o.frequency.value = freq;
-                    g.gain.setValueAtTime(0.05, audioCtx.currentTime + (i*0.1));
-                    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + (i*0.1) + 0.5);
-                    o.start(audioCtx.currentTime + (i*0.1));
-                    o.stop(audioCtx.currentTime + (i*0.1) + 0.5);
+                    // Staggered start
+                    const startTime = now + (i * 0.1);
+                    g.gain.setValueAtTime(0.1, startTime);
+                    g.gain.exponentialRampToValueAtTime(0.001, startTime + 0.5);
+                    
+                    o.start(startTime);
+                    o.stop(startTime + 0.5);
                 });
             }
         }
@@ -294,19 +342,20 @@
         }
 
         function newGame() {
+            // Trigger audio unlock on the user interaction
+            initAudio(); 
+
             // Pick 24 items (Center is free)
             const shuffled = shuffle([...roadItems]);
             const selected = shuffled.slice(0, 24);
             
-            // Insert FREE SPACE at index 12 (Center of 25)
+            // Insert FREE SPACE at index 12
             selected.splice(12, 0, "FREE SPACE");
             
             boardState = selected;
             markedIndices = [12]; // Center starts marked
             
             renderBoard();
-            
-            // Reset Win overlay if showing
             document.getElementById('win-overlay').classList.remove('visible');
         }
 
@@ -358,14 +407,13 @@
                 [0,6,12,18,24], [4,8,12,16,20]
             ];
 
-            // Check if any win combination is fully present in markedIndices
             const hasWin = wins.some(combo => combo.every(i => markedIndices.includes(i)));
 
             if (hasWin) {
-                // Prevent spamming win if already won? 
-                // Nah, let them feel good. But maybe check if we just triggered it.
-                // For simple UX, just trigger the celebration.
-                triggerWin();
+                // Small delay so the tile lights up before the overlay covers it
+                setTimeout(() => {
+                    triggerWin();
+                }, 100);
             }
         }
 
@@ -422,8 +470,9 @@
             animate();
         }
 
-        // Init
-        newGame();
+        // Init Logic on Load
+        // We do NOT play sound here to avoid browser errors
+        newGame(); 
 
     </script>
 </body>
