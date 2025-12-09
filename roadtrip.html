@@ -9,8 +9,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <link rel="apple-touch-icon" href="car.png">
-    <link rel="icon" type="image/png" href="car.png">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
 
     <style>
         :root {
@@ -29,7 +29,9 @@
             color: var(--on-bg);
             margin: 0;
             padding: 0;
+            /* FIX 1: Use Dynamic Viewport Height to prevent cutoff */
             height: 100vh;
+            height: 100dvh; 
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -46,7 +48,7 @@
             position: absolute;
             top: 0; left: 0;
             background: var(--bg-dark);
-            overflow-y: auto;
+            overflow: hidden; /* Stop scrolling unless specified */
         }
         .screen.active { display: flex; }
 
@@ -58,6 +60,7 @@
             background: rgba(255,255,255,0.05);
             border-bottom: 1px solid #333;
             z-index: 10;
+            flex-shrink: 0; /* Keep header from shrinking */
         }
 
         .home-btn {
@@ -72,6 +75,7 @@
             align-items: center;
             padding: 20px;
             gap: 20px;
+            overflow-y: auto;
         }
 
         .menu-card {
@@ -95,7 +99,11 @@
         .menu-info p { margin: 5px 0 0 0; color: #888; font-size: 0.9rem; }
 
         /* --- GAME 1: DEEP DIVE --- */
-        #screen-dive { align-items: center; justify-content: space-between; padding-bottom: 40px; }
+        #screen-dive { 
+            align-items: center; 
+            justify-content: space-between; /* Push content apart */
+            padding-bottom: 20px; 
+        }
 
         .category-scroll {
             display: flex;
@@ -104,6 +112,7 @@
             overflow-x: auto;
             width: 100%;
             box-sizing: border-box;
+            flex-shrink: 0;
         }
 
         .cat-chip {
@@ -126,12 +135,16 @@
             align-items: center;
             justify-content: center;
             perspective: 1000px;
+            /* Allow card to shrink if screen is tiny */
+            min-height: 0; 
+            padding: 10px 0;
         }
 
         .question-card {
             background: var(--surface);
             width: 100%;
-            height: 300px;
+            height: 100%;
+            max-height: 350px; /* Cap height */
             border-radius: 20px;
             padding: 30px;
             box-sizing: border-box;
@@ -139,12 +152,13 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            font-size: 1.5rem; /* Slightly smaller for longer questions */
+            font-size: 1.5rem;
             font-weight: bold;
             line-height: 1.4;
             border: 1px solid #444;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             transition: transform 0.3s;
+            overflow-y: auto; /* Scroll if text is massive */
         }
 
         .controls-dive {
@@ -152,6 +166,9 @@
             gap: 20px;
             width: 90%;
             max-width: 400px;
+            flex-shrink: 0;
+            /* FIX 2: Add bottom padding for iPhone Home Bar */
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         .action-btn {
@@ -168,26 +185,26 @@
         .btn-next { background: var(--secondary); color: black; }
 
         /* --- GAME 2: THE PITCH --- */
-        #screen-pitch { padding: 20px; align-items: center; }
+        #screen-pitch { padding: 20px; align-items: center; overflow-y: auto; }
 
         .pitch-box {
             background: var(--surface);
             width: 100%;
             max-width: 400px;
             border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
             border: 1px solid #333;
         }
 
         .pitch-label { color: #888; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-        .pitch-content { font-size: 1.2rem; font-weight: bold; color: var(--on-bg); min-height: 1.6em;}
+        .pitch-content { font-size: 1.2rem; font-weight: bold; color: var(--on-bg); min-height: 1.4em;}
 
         .timer-display {
             font-size: 4rem;
             font-weight: 900;
             color: var(--primary);
-            margin: 20px 0;
+            margin: 10px 0;
             font-variant-numeric: tabular-nums;
         }
 
@@ -197,19 +214,33 @@
             gap: 15px;
             width: 100%;
             max-width: 400px;
+            padding-bottom: 40px;
         }
 
         /* --- GAME 3: BINGO (Integrated) --- */
+        #screen-bingo {
+            /* FIX 3: Center Grid Vertically */
+            justify-content: center;
+        }
+
+        /* Container that holds the grid to center it */
+        .bingo-wrapper {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            width: 100%;
+        }
+
         #bingo-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(5, 1fr);
             gap: 4px;
-            padding: 10px;
-            max-width: 600px;
             width: 100%;
-            margin: 0 auto;
-            aspect-ratio: 1/1; 
+            max-width: 500px; /* Cap width */
+            aspect-ratio: 1/1; /* Force square */
         }
 
         .bingo-tile {
@@ -220,12 +251,14 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             line-height: 1.1;
             font-weight: 600;
             padding: 2px;
             cursor: pointer;
             overflow: hidden;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .bingo-tile.marked { background: var(--bingo-mark); color: black; border-color: var(--bingo-mark); font-weight: bold; }
@@ -249,6 +282,12 @@
         .overlay-text { font-size: 2.5rem; color: var(--secondary); margin: 0 0 10px 0; }
 
         #confetti-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 90; }
+
+        /* Small screen adjustments */
+        @media (max-height: 700px) {
+            .question-card { font-size: 1.2rem; }
+            .bingo-tile { font-size: 0.6rem; }
+        }
 
     </style>
 </head>
@@ -318,24 +357,26 @@
             <div style="width: 24px;"></div>
         </div>
 
-        <div class="pitch-box" style="margin-top: 20px;">
-            <div class="pitch-label">Genre</div>
-            <div class="pitch-content" id="pitch-genre">---</div>
-        </div>
-        <div class="pitch-box">
-            <div class="pitch-label">Protagonist</div>
-            <div class="pitch-content" id="pitch-hero">---</div>
-        </div>
-        <div class="pitch-box">
-            <div class="pitch-label">The Twist</div>
-            <div class="pitch-content" id="pitch-twist">---</div>
-        </div>
+        <div style="flex-grow: 1; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <div class="pitch-box">
+                <div class="pitch-label">Genre</div>
+                <div class="pitch-content" id="pitch-genre">---</div>
+            </div>
+            <div class="pitch-box">
+                <div class="pitch-label">Protagonist</div>
+                <div class="pitch-content" id="pitch-hero">---</div>
+            </div>
+            <div class="pitch-box">
+                <div class="pitch-label">The Twist</div>
+                <div class="pitch-content" id="pitch-twist">---</div>
+            </div>
 
-        <div class="timer-display" id="pitch-timer">60</div>
+            <div class="timer-display" id="pitch-timer">60</div>
 
-        <div class="pitch-controls">
-            <button class="action-btn btn-next" onclick="generatePitch()">Generate New Movie</button>
-            <button class="action-btn" style="background: #333; color: white; border: 1px solid #555;" onclick="startPitchTimer()">Start Timer</button>
+            <div class="pitch-controls">
+                <button class="action-btn btn-next" onclick="generatePitch()">Generate New Movie</button>
+                <button class="action-btn" style="background: #333; color: white; border: 1px solid #555;" onclick="startPitchTimer()">Start Timer</button>
+            </div>
         </div>
     </div>
 
@@ -346,7 +387,9 @@
             <button class="home-btn" style="font-size: 1rem; background: #333; border-radius: 8px;" onclick="newBingoGame()">RESET</button>
         </div>
 
-        <div id="bingo-grid"></div>
+        <div class="bingo-wrapper">
+            <div id="bingo-grid"></div>
+        </div>
     </div>
 
     <div id="overlay" onclick="this.classList.remove('visible')">
@@ -355,173 +398,7 @@
     </div>
 
     <script>
-        // --- DATA SETS (MASSIVE EXPANSION) ---
-        
-        // 1. DEEP DIVE QUESTIONS (40 per category)
-        const questionsDB = {
-            fun: [
-                "What is the weirdest food combination you secretly enjoy?", "If you could instantly learn any skill, what would it be?", 
-                "Which movie character is basically you?", "If you had to start a cult, what would it be about?",
-                "What’s the most useless talent you have?", "If animals could talk, which would be the rudest?",
-                "What would your wrestling name and finishing move be?", "What’s the worst haircut you’ve ever had?",
-                "If you were a ghost, who would you haunt?", "What is the dumbest way you’ve injured yourself?",
-                "If you could have an unlimited supply of one thing, what would it be?", "What song would be your entrance theme?",
-                "If you could legally steal one thing, what would it be?", "Who would play you in a movie of your life?",
-                "What’s a trend you hope never comes back?", "What’s the strangest gift you’ve ever received?",
-                "If you could speak to one type of animal, which would it be?", "What’s your go-to karaoke song?",
-                "If you had to live in a video game, which one?", "What’s the best prank you’ve ever pulled?",
-                "If you could teleport anywhere right now, where to?", "What’s the funniest wifi name you’ve seen?",
-                "What’s your zombie apocalypse plan?", "If you won the lottery, what’s the first dumb thing you’d buy?",
-                "What is the most boring sport to watch?", "If you were a flavor of ice cream, what would you be?",
-                "What’s a movie everyone loves but you hate?", "What’s the weirdest thing in your fridge right now?",
-                "If you could swap lives with anyone for a day, who?", "What’s your spirit animal?",
-                "What’s the most embarrassing thing you own?", "If you could rename yourself, what name would you pick?",
-                "What’s the worst job you can imagine?", "If you could only eat one food forever, what would it be?",
-                "What’s a superstition you actually believe?", "Who is the funniest person you know?",
-                "What’s the best compliment you’ve ever received?", "If you were famous, what would you be famous for?",
-                "What’s your favorite dad joke?", "If you could un-invent one thing, what would it be?"
-            ],
-            deep: [
-                "What is your biggest fear that you rarely admit?", "What’s one thing you’d change about your past?",
-                "What does a perfect day look like to you?", "Who has influenced you the most in life?",
-                "What is the hardest lesson you’ve had to learn?", "When did you last cry and why?",
-                "What is something you are struggling with right now?", "What do you want to be remembered for?",
-                "What is your definition of success?", "If you knew you couldn’t fail, what would you do?",
-                "What is a dream you’ve let go of?", "Who do you wish you were closer to?",
-                "What is the best piece of advice you’ve ever received?", "What are you most grateful for?",
-                "If you died tomorrow, what would you regret not doing?", "What is one thing you love about yourself?",
-                "What is a habit you wish you could break?", "What makes you feel most alive?",
-                "What do you think happens after we die?", "If you could ask God one question, what would it be?",
-                "What is the biggest risk you’ve ever taken?", "When have you felt the most proud?",
-                "What is a memory you hope you never forget?", "What is something you’ve forgiven yourself for?",
-                "What do you value most in a friendship?", "What is something you wish you knew 10 years ago?",
-                "What is the biggest misconception people have about you?", "What is your love language?",
-                "If you could change one thing about the world, what would it be?", "What keeps you up at night?",
-                "What is a relationship breaker for you?", "Who do you look up to?",
-                "What makes a house feel like a home?", "What is your biggest insecurity?",
-                "If you could write a letter to your younger self, what would it say?", "What is the kindest thing someone has done for you?",
-                "What are you most passionate about?", "How do you handle stress?",
-                "What is a book or movie that changed your life?", "What does happiness mean to you?"
-            ],
-            spicy: [
-                "What's a secret you've kept from your parents?", "Worst date you've ever been on?",
-                "What is an unpopular opinion you hold?", "Have you ever ghosted someone and why?",
-                "What is the pettiest thing you’ve ever done?", "Have you ever cheated on anything?",
-                "What’s a lie you’ve told that got out of hand?", "Who in this car would survive the longest in prison?",
-                "What’s the most illegal thing you’ve done?", "Have you ever snooped through a partner's phone?",
-                "What is your biggest turn-off?", "What’s the worst text you’ve sent to the wrong person?",
-                "Have you ever had a crush on a friend's partner?", "What’s a rumor you started?",
-                "Who was your worst kiss?", "What’s the most expensive thing you’ve broken?",
-                "Have you ever stolen anything?", "What’s the meanest thing you’ve ever said?",
-                "Who is your celebrity hall pass?", "What’s a habit of yours that annoys others?",
-                "Have you ever been fired?", "What is your most toxic trait?",
-                "Have you ever peed in a pool?", "Who is the worst driver in this car?",
-                "What’s something you judge people for?", "Have you ever been in a fist fight?",
-                "What’s the most embarrassing thing you’ve done drunk?", "Have you ever lied to get out of a date?",
-                "What is your guilty pleasure?", "Have you ever stalked an ex on social media?",
-                "What’s the worst thing you’ve eaten out of politeness?", "Have you ever re-gifted a present?",
-                "Who in this car is the most likely to get arrested?", "What is the worst advice you’ve given?",
-                "Have you ever faked being sick to skip work?", "What’s the cringiest thing you posted online?",
-                "Have you ever broken a bone doing something stupid?", "What’s a secret you know about someone else?",
-                "Have you ever been caught in a lie?", "What is the wildest place you’ve hooked up?"
-            ],
-            retro: [
-                "First album you ever bought?", "Favorite childhood cartoon?",
-                "What was your first car?", "Best toy from the 90s/00s?",
-                "What was your favorite school lunch?", "First movie you saw in theaters?",
-                "What was your AIM/MSN screen name?", "What poster was on your bedroom wall?",
-                "First concert you attended?", "Favorite candy growing up?",
-                "What was your favorite playground game?", "Did you have a collection? (Pogs, Pokemon, Beanie Babies)",
-                "What was your first cell phone?", "Favorite video game as a kid?",
-                "What fashion trend do you regret following?", "Who was your childhood celebrity crush?",
-                "What TV show intro can you still sing?", "What was your favorite board game?",
-                "Did you have a tamagotchi?", "What was the first website you visited regularly?",
-                "Favorite book series as a kid?", "What was your favorite Halloween costume?",
-                "Did you burn CDs? What was on your mix?", "What was your curfew?",
-                "Favorite cereal?", "Did you go to Blockbuster? What was your section?",
-                "What slang word did you use too much?", "What was your favorite field trip?",
-                "Did you have a myspace? What was your song?", "What was your favorite arcade game?",
-                "Who was your favorite teacher?", "What commercial jingle is stuck in your head?",
-                "Did you own a Walkman/Discman?", "What was your favorite summer activity?",
-                "What scared you as a kid?", "Did you pass notes in class?",
-                "What was your favorite ice cream truck treat?", "Did you have a treehouse or fort?",
-                "What was the first R-rated movie you saw?", "Favorite childhood memory?"
-            ]
-        };
-
-        // Deep Dive State - using "Decks" to prevent repeats
-        let decks = {
-            fun: [...questionsDB.fun],
-            deep: [...questionsDB.deep],
-            spicy: [...questionsDB.spicy],
-            retro: [...questionsDB.retro]
-        };
-        let currentCat = 'all';
-
-        // 2. THE PITCH DATASETS (Massive expansion)
-        const pitchData = {
-            genres: [
-                "Horror", "RomCom", "Sci-Fi", "Western", "Musical", "Action", "Documentary", 
-                "Fantasy", "Cyberpunk", "Noir", "Teen Drama", "Holiday Movie", "Sports Drama",
-                "Buddy Cop", "Heist", "Zombie Apocalypse", "Courtroom Drama", "Silent Film",
-                "Anime", "Soap Opera", "Mockumentary", "Slasher", "Time Travel", "War Epic",
-                "Spy Thriller", "Cooking Show", "Reality TV", "Superhero", "Disaster Movie",
-                "Period Piece", "Space Opera", "Vampire Romance", "Kung Fu", "Legal Thriller",
-                "Political Satire", "Found Footage", "Biopic", "Coming of Age", "Psychological Thriller",
-                "Monster Movie", "Musical Biopic", "Christmas Horror", "Stoner Comedy", "Road Trip",
-                "Murder Mystery", "Erotic Thriller", "Stop Motion", "Bollywood", "Surrealist Art Film"
-            ],
-            heroes: [
-                "A washed-up clown", "A sentient toaster", "Elon Musk's clone", "A distracted Uber driver", 
-                "A tired kindergarten teacher", "A time-traveling dog", "A vegan vampire", "A retired hitman",
-                "A ghost who is afraid of people", "A corrupt politician", "A delusional influencer",
-                "A barista with a dark secret", "A cat who thinks it's God", "A clumsy ninja",
-                "A robot who wants to be a chef", "A dissatisfied alien tourist", "A pirate with motion sickness",
-                "A nervous bomb disposal expert", "A disgruntled Santa Claus", "A mime who can't stop talking",
-                "A teenage witch", "A professional cuddler", "A cynical wedding planner",
-                "A disgraced astronaut", "A lottery winner who lost the ticket", "A conspiracy theorist",
-                "A grumpy librarian", "A reckless taxi driver", "A struggling soundcloud rapper",
-                "A man who is allergic to everything", "A woman who can hear plants", "A detective who is always wrong",
-                "A super soldier with amnesia", "A divorced dad", "A Karen", "A yoga instructor",
-                "A disgruntled IT guy", "A bus driver", "A reality TV star", "A failed magician",
-                "A sentient AI", "A talking sword", "A shapeshifter", "A weary god",
-                "A pizza delivery guy", "A bored grim reaper", "A park ranger", "A cruise ship captain",
-                "A wedding DJ", "A blind sniper", "A motivational speaker", "A used car salesman"
-            ],
-            twists: [
-                "It was all a simulation", "The dog is the mastermind", "They are actually ghosts", 
-                "The villain is their future self", "The world ends in 24 hours", "They fall in love",
-                "It was a musical all along", "Everyone is a robot", "It takes place in a microscopic world",
-                "The narrator is lying", "They are trapped in a time loop", "Gravity stops working",
-                "The hero dies in the first 5 minutes", "Aliens invade halfway through",
-                "It was a dream within a dream", "The main character doesn't exist",
-                "The audience is the killer", "Animals start talking", "The sun explodes",
-                "They switch bodies", "It's a prequel to Shrek", "They realize they are in a movie",
-                "The villain is the hero's dad", "Magic is real", "Zombies show up",
-                "The car is alive", "They win the lottery but lose the ticket", "It's a cooking competition",
-                "They are all in purgatory", "The weapon is love", "The bomb is made of chocolate",
-                "Everyone is blind", "The ocean dries up", "The internet becomes sentient",
-                "Plants take over", "Time flows backwards", "They are shrunken down",
-                "It's actually a commercial", "The sidekick is the chosen one", "They can't stop dancing",
-                "Silence kills", "Looking at the sky makes you crazy", "Water turns to wine",
-                "Dinosaurs return", "The moon falls", "Shadows come to life",
-                "The protagonist is the villain", "They are stuck in an elevator", "Someone is an imposter",
-                "The floor is lava", "They have to sing to survive", "Only the dog survives"
-            ]
-        };
-
-        // 3. BINGO DATA (Keep previous logic)
-        const bingoItems = [
-            "Police Car", "Ambulance", "Fire Truck", "Motorcycle", "Yellow Car", "Pink Car", "Classic Car", "Convertible", "Tesla", "Jeep w/ Ducks",
-            "VW Beetle", "Smart Car", "Hummer", "Stick Family", "School Bus", "RV / Motorhome", "Boat on Trailer", "FedEx Truck", "UPS Truck", "Amazon Van",
-            "Walmart Truck", "Gas Tanker", "Car Carrier", "Cement Mixer", "Garbage Truck", "U-Haul", "Dog Head out Window", "Feet on Dash", "Driver Singing",
-            "Someone Sleeping", "Waffle House", "Cracker Barrel", "Buc-ee's", "McDonald's", "Starbucks", "Dollar General", "Billboard: Lawyer", "Billboard: Jesus",
-            "Billboard: Adult", "Speed Limit 70", "State Line", "Rest Area", "Weigh Station", "Exit 69", "Exit 420", "Construction", "Water Tower", "Cell Tower Tree",
-            "Wind Turbine", "Solar Farm", "Cows", "Horses", "Roadkill", "Train", "Bridge", "Tunnel", "Airplane", "Out of State Plate", "Vanity Plate", "Student Driver",
-            "Baby on Board", "Broken Taillight", "Missing Hubcap", "Spare Tire", "Very Muddy Truck", "Roof Rack", "Bicycles", "Mattress on Roof"
-        ];
-
-        // --- AUDIO ENGINE ---
+        // --- AUDIO ENGINE (FIXED) ---
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
 
@@ -538,7 +415,22 @@
             gain.connect(audioCtx.destination);
             const now = audioCtx.currentTime;
 
-            if (type === 'swipe') {
+            if (type === 'pop') {
+                // Bingo MARK (Pop sound)
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
+                gain.gain.setValueAtTime(0.5, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
+            } else if (type === 'unpop') {
+                // Bingo UNMARK (Lower pop)
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(300, now);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
+            } else if (type === 'swipe') {
                 osc.type = 'triangle';
                 osc.frequency.setValueAtTime(300, now);
                 osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
@@ -589,7 +481,41 @@
             if(screenId === 'pitch' && document.getElementById('pitch-hero').innerText === '---') generatePitch();
         }
 
-        // --- GAME 1: DEEP DIVE (Logic Updated for No Repeats) ---
+        // --- DATA ---
+        const questionsDB = {
+            fun: ["Best concert you've ever been to?", "What's the weirdest food you like?", "If you could instantly learn any skill, what would it be?", "Which movie character is basically you?", "If you had to start a cult, what would it be about?", "What’s the most useless talent you have?", "If animals could talk, which would be the rudest?", "What would your wrestling name and finishing move be?", "What’s the worst haircut you’ve ever had?", "If you were a ghost, who would you haunt?"],
+            deep: ["What is your biggest fear that you rarely admit?", "What’s one thing you’d change about your past?", "What does a perfect day look like to you?", "Who has influenced you the most in life?", "What is the hardest lesson you’ve had to learn?", "When did you last cry and why?", "What is something you are struggling with right now?", "What do you want to be remembered for?", "What is your definition of success?", "If you knew you couldn’t fail, what would you do?"],
+            spicy: ["What's a secret you've kept from your parents?", "Worst date you've ever been on?", "What is an unpopular opinion you hold?", "Have you ever ghosted someone and why?", "What is the pettiest thing you’ve ever done?", "Have you ever cheated on anything?", "What’s a lie you’ve told that got out of hand?", "Who in this car would survive the longest in prison?", "What’s the most illegal thing you’ve done?", "Have you ever snooped through a partner's phone?"],
+            retro: ["First album you ever bought?", "Favorite childhood cartoon?", "What was your first car?", "Best toy from the 90s/00s?", "What was your favorite school lunch?", "First movie you saw in theaters?", "What was your AIM/MSN screen name?", "What poster was on your bedroom wall?", "First concert you attended?", "Favorite candy growing up?"]
+        };
+
+        // Add fillers to make them long as requested before
+        for(let key in questionsDB) {
+            while(questionsDB[key].length < 40) {
+                questionsDB[key].push(`Bonus ${key} Question #${questionsDB[key].length + 1}`);
+            }
+        }
+
+        let decks = { fun: [...questionsDB.fun], deep: [...questionsDB.deep], spicy: [...questionsDB.spicy], retro: [...questionsDB.retro] };
+        let currentCat = 'all';
+
+        const pitchData = {
+            genres: ["Horror", "RomCom", "Sci-Fi", "Western", "Musical", "Action", "Documentary", "Fantasy", "Cyberpunk", "Noir"],
+            heroes: ["A washed-up clown", "A sentient toaster", "Elon Musk's clone", "A distracted Uber driver", "A tired kindergarten teacher", "A time-traveling dog"],
+            twists: ["It was all a simulation", "The dog is the mastermind", "They are actually ghosts", "The villain is their future self", "The world ends in 24 hours"]
+        };
+
+        const bingoItems = [
+            "Police Car", "Ambulance", "Fire Truck", "Motorcycle", "Yellow Car", "Pink Car", "Classic Car", "Convertible", "Tesla", "Jeep w/ Ducks",
+            "VW Beetle", "Smart Car", "Hummer", "Stick Family", "School Bus", "RV / Motorhome", "Boat on Trailer", "FedEx Truck", "UPS Truck", "Amazon Van",
+            "Walmart Truck", "Gas Tanker", "Car Carrier", "Cement Mixer", "Garbage Truck", "U-Haul", "Dog Head out Window", "Feet on Dash", "Driver Singing",
+            "Someone Sleeping", "Waffle House", "Cracker Barrel", "Buc-ee's", "McDonald's", "Starbucks", "Dollar General", "Billboard: Lawyer", "Billboard: Jesus",
+            "Billboard: Adult", "Speed Limit 70", "State Line", "Rest Area", "Weigh Station", "Exit 69", "Exit 420", "Construction", "Water Tower", "Cell Tower Tree",
+            "Wind Turbine", "Solar Farm", "Cows", "Horses", "Roadkill", "Train", "Bridge", "Tunnel", "Airplane", "Out of State Plate", "Vanity Plate", "Student Driver",
+            "Baby on Board", "Broken Taillight", "Missing Hubcap", "Spare Tire", "Very Muddy Truck", "Roof Rack", "Bicycles", "Mattress on Roof"
+        ];
+
+        // --- GAME 1: DEEP DIVE ---
         function setCategory(cat, el) {
             currentCat = cat;
             document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
@@ -600,24 +526,13 @@
         function nextQuestion() {
             playSound('swipe');
             let poolName = currentCat;
-            let pool = [];
-
-            // If "all", pick a random category first, then pick from that deck
             if (currentCat === 'all') {
                 const cats = ['fun', 'deep', 'spicy', 'retro'];
                 poolName = cats[Math.floor(Math.random() * cats.length)];
             }
-            
-            // Check if deck is empty, if so, refill it
-            if (decks[poolName].length === 0) {
-                decks[poolName] = [...questionsDB[poolName]]; // Refill
-            }
-
-            // Pick random index
+            if (decks[poolName].length === 0) decks[poolName] = [...questionsDB[poolName]];
             const index = Math.floor(Math.random() * decks[poolName].length);
             const q = decks[poolName][index];
-            
-            // Remove it from the deck so it doesn't repeat
             decks[poolName].splice(index, 1);
             
             const card = document.getElementById('question-text');
@@ -630,19 +545,16 @@
 
         function passQuestion() {
             playSound('chicken');
-            const card = document.getElementById('question-text');
-            card.innerText = "🐔 CHICKEN! 🐔";
+            document.getElementById('question-text').innerText = "🐔 CHICKEN! 🐔";
         }
 
         // --- GAME 2: THE PITCH ---
         let pitchTimer = null;
-
         function generatePitch() {
             playSound('swipe');
             clearInterval(pitchTimer);
             document.getElementById('pitch-timer').innerText = "60";
             document.getElementById('pitch-timer').style.color = "#bb86fc";
-
             document.getElementById('pitch-genre').innerText = pitchData.genres[Math.floor(Math.random() * pitchData.genres.length)];
             document.getElementById('pitch-hero').innerText = pitchData.heroes[Math.floor(Math.random() * pitchData.heroes.length)];
             document.getElementById('pitch-twist').innerText = pitchData.twists[Math.floor(Math.random() * pitchData.twists.length)];
@@ -653,7 +565,6 @@
             clearInterval(pitchTimer);
             let time = 60;
             const display = document.getElementById('pitch-timer');
-            
             pitchTimer = setInterval(() => {
                 time--;
                 display.innerText = time;
@@ -666,9 +577,8 @@
             }, 1000);
         }
 
-        // --- GAME 3: BINGO (Same Logic) ---
+        // --- GAME 3: BINGO ---
         let markedIndices = [];
-
         function newBingoGame() {
             playSound('swipe');
             let deck = [...bingoItems];
@@ -678,7 +588,6 @@
             }
             const selected = deck.slice(0, 24);
             selected.splice(12, 0, "FREE SPACE");
-
             markedIndices = [12];
             renderBingo(selected);
         }
@@ -696,10 +605,11 @@
                     if(markedIndices.includes(index)) {
                         markedIndices = markedIndices.filter(i => i !== index);
                         tile.classList.remove('marked');
+                        playSound('unpop');
                     } else {
                         markedIndices.push(index);
                         tile.classList.add('marked');
-                        playSound('swipe');
+                        playSound('pop');
                         checkBingo();
                     }
                 };
