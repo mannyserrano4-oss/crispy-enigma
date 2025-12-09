@@ -14,22 +14,50 @@
 
     <style>
         :root {
-            --bg-dark: #121212;
+            /* --- DARK MODE (DEFAULT) --- */
+            --bg-main: #121212;
             --surface: #1e1e1e;
+            --text-main: #ffffff;
+            --text-sub: #aaaaaa;
+            
             --primary: #bb86fc;
             --secondary: #03dac6;
             --error: #cf6679;
-            --on-bg: #ffffff;
+            
+            --border: #333333;
+            --shadow: rgba(0,0,0,0.5);
+            
+            --bingo-tile: #2d3436;
             --bingo-mark: #4cd137;
+            --bingo-text: #ffffff;
+        }
+
+        /* --- LIGHT MODE OVERRIDES --- */
+        body.light-mode {
+            --bg-main: #f0f2f5;
+            --surface: #ffffff;
+            --text-main: #121212;
+            --text-sub: #555555;
+            
+            --primary: #6200ee;
+            --secondary: #018786;
+            --error: #b00020;
+            
+            --border: #e0e0e0;
+            --shadow: rgba(0,0,0,0.1);
+            
+            --bingo-tile: #ffffff;
+            --bingo-mark: #00b894; /* Slightly darker green for contrast */
+            --bingo-text: #121212;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--on-bg);
+            background-color: var(--bg-main);
+            color: var(--text-main);
             margin: 0;
             padding: 0;
-            /* FIX 1: Use Dynamic Viewport Height to prevent cutoff */
+            /* Dynamic Viewport Height for mobile */
             height: 100vh;
             height: 100dvh; 
             overflow: hidden;
@@ -37,6 +65,7 @@
             flex-direction: column;
             user-select: none;
             -webkit-user-select: none;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         /* --- NAVIGATION --- */
@@ -47,8 +76,9 @@
             height: 100%;
             position: absolute;
             top: 0; left: 0;
-            background: var(--bg-dark);
-            overflow: hidden; /* Stop scrolling unless specified */
+            background: var(--bg-main);
+            overflow: hidden;
+            transition: background-color 0.3s ease;
         }
         .screen.active { display: flex; }
 
@@ -57,25 +87,50 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: rgba(255,255,255,0.05);
-            border-bottom: 1px solid #333;
+            background: rgba(125, 125, 125, 0.05); /* See-through tint */
+            border-bottom: 1px solid var(--border);
             z-index: 10;
-            flex-shrink: 0; /* Keep header from shrinking */
+            flex-shrink: 0;
         }
 
-        .home-btn {
-            background: none; border: none; font-size: 1.5rem; cursor: pointer; padding: 5px;
+        .icon-btn {
+            background: none; 
+            border: none; 
+            font-size: 1.5rem; 
+            cursor: pointer; 
+            padding: 5px;
+            color: var(--text-main);
+            border-radius: 8px;
         }
+        
+        .icon-btn:active { background-color: rgba(125,125,125,0.2); }
 
-        .screen-title { font-size: 1.2rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; color: var(--secondary); margin: 0; }
+        .screen-title { 
+            font-size: 1.2rem; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            color: var(--secondary); 
+            margin: 0; 
+        }
 
         /* --- HOME SCREEN --- */
         #screen-home {
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
             padding: 20px;
             gap: 20px;
             overflow-y: auto;
+        }
+        
+        .home-header-row {
+            width: 100%;
+            max-width: 350px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            margin-bottom: 10px;
         }
 
         .menu-card {
@@ -88,20 +143,20 @@
             align-items: center;
             gap: 20px;
             cursor: pointer;
-            border: 1px solid #333;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 10px var(--shadow);
             transition: transform 0.1s;
         }
-        .menu-card:active { transform: scale(0.98); background: #2a2a2a; }
+        .menu-card:active { transform: scale(0.98); opacity: 0.8; }
 
         .menu-icon { font-size: 2.5rem; }
-        .menu-info h2 { margin: 0; font-size: 1.4rem; }
-        .menu-info p { margin: 5px 0 0 0; color: #888; font-size: 0.9rem; }
+        .menu-info h2 { margin: 0; font-size: 1.4rem; color: var(--text-main); }
+        .menu-info p { margin: 5px 0 0 0; color: var(--text-sub); font-size: 0.9rem; }
 
         /* --- GAME 1: DEEP DIVE --- */
         #screen-dive { 
             align-items: center; 
-            justify-content: space-between; /* Push content apart */
+            justify-content: space-between; 
             padding-bottom: 20px; 
         }
 
@@ -113,19 +168,20 @@
             width: 100%;
             box-sizing: border-box;
             flex-shrink: 0;
+            background: var(--bg-main);
         }
 
         .cat-chip {
-            background: #333;
-            color: #aaa;
+            background: var(--surface);
+            color: var(--text-sub);
             padding: 8px 16px;
             border-radius: 20px;
             white-space: nowrap;
             font-size: 0.9rem;
-            border: 1px solid #444;
+            border: 1px solid var(--border);
             cursor: pointer;
         }
-        .cat-chip.active { background: var(--primary); color: black; border-color: var(--primary); font-weight: bold; }
+        .cat-chip.active { background: var(--primary); color: white; border-color: var(--primary); font-weight: bold; }
 
         .card-container {
             flex-grow: 1;
@@ -135,7 +191,6 @@
             align-items: center;
             justify-content: center;
             perspective: 1000px;
-            /* Allow card to shrink if screen is tiny */
             min-height: 0; 
             padding: 10px 0;
         }
@@ -144,7 +199,7 @@
             background: var(--surface);
             width: 100%;
             height: 100%;
-            max-height: 350px; /* Cap height */
+            max-height: 350px;
             border-radius: 20px;
             padding: 30px;
             box-sizing: border-box;
@@ -155,10 +210,11 @@
             font-size: 1.5rem;
             font-weight: bold;
             line-height: 1.4;
-            border: 1px solid #444;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px var(--shadow);
             transition: transform 0.3s;
-            overflow-y: auto; /* Scroll if text is massive */
+            overflow-y: auto;
         }
 
         .controls-dive {
@@ -167,7 +223,6 @@
             width: 90%;
             max-width: 400px;
             flex-shrink: 0;
-            /* FIX 2: Add bottom padding for iPhone Home Bar */
             padding-bottom: env(safe-area-inset-bottom);
         }
 
@@ -180,9 +235,19 @@
             font-weight: bold;
             cursor: pointer;
             text-transform: uppercase;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.1);
         }
-        .btn-pass { background: #333; color: var(--error); border: 1px solid var(--error); }
-        .btn-next { background: var(--secondary); color: black; }
+        
+        .btn-pass { 
+            background: var(--surface); 
+            color: var(--error); 
+            border: 2px solid var(--error); 
+        }
+        .btn-next { 
+            background: var(--secondary); 
+            color: #000; /* Always black text on teal button for contrast */
+        }
+        .action-btn:active { transform: translateY(2px); box-shadow: none; }
 
         /* --- GAME 2: THE PITCH --- */
         #screen-pitch { padding: 20px; align-items: center; overflow-y: auto; }
@@ -194,11 +259,11 @@
             border-radius: 12px;
             padding: 15px 20px;
             margin-bottom: 10px;
-            border: 1px solid #333;
+            border: 1px solid var(--border);
         }
 
-        .pitch-label { color: #888; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-        .pitch-content { font-size: 1.2rem; font-weight: bold; color: var(--on-bg); min-height: 1.4em;}
+        .pitch-label { color: var(--text-sub); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .pitch-content { font-size: 1.2rem; font-weight: bold; color: var(--text-main); min-height: 1.4em;}
 
         .timer-display {
             font-size: 4rem;
@@ -216,14 +281,16 @@
             max-width: 400px;
             padding-bottom: 40px;
         }
-
-        /* --- GAME 3: BINGO (Integrated) --- */
-        #screen-bingo {
-            /* FIX 3: Center Grid Vertically */
-            justify-content: center;
+        
+        .btn-dark {
+            background: var(--surface);
+            color: var(--text-main);
+            border: 1px solid var(--border);
         }
 
-        /* Container that holds the grid to center it */
+        /* --- GAME 3: BINGO --- */
+        #screen-bingo { justify-content: center; }
+
         .bingo-wrapper {
             flex-grow: 1;
             display: flex;
@@ -239,13 +306,14 @@
             grid-template-rows: repeat(5, 1fr);
             gap: 4px;
             width: 100%;
-            max-width: 500px; /* Cap width */
-            aspect-ratio: 1/1; /* Force square */
+            max-width: 500px;
+            aspect-ratio: 1/1; 
         }
 
         .bingo-tile {
-            background: #2d3436;
-            border: 1px solid #444;
+            background: var(--bingo-tile);
+            color: var(--bingo-text);
+            border: 1px solid var(--border);
             border-radius: 4px;
             display: flex;
             align-items: center;
@@ -258,32 +326,41 @@
             cursor: pointer;
             overflow: hidden;
             user-select: none;
-            -webkit-tap-highlight-color: transparent;
+            box-shadow: 0 2px 0 var(--shadow);
         }
 
-        .bingo-tile.marked { background: var(--bingo-mark); color: black; border-color: var(--bingo-mark); font-weight: bold; }
-        .bingo-tile.free { background: var(--primary); color: black; }
+        .bingo-tile.marked { 
+            background: var(--bingo-mark); 
+            color: white; 
+            border-color: var(--bingo-mark); 
+            font-weight: bold; 
+        }
+        .bingo-tile.free { 
+            background: var(--primary); 
+            color: white; 
+            border-color: var(--primary);
+        }
 
         /* --- OVERLAYS --- */
         #overlay {
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%) scale(0);
-            background: rgba(30,30,30, 0.95);
+            background: var(--surface);
             padding: 30px;
             border-radius: 20px;
             text-align: center;
-            border: 2px solid var(--secondary);
+            border: 4px solid var(--secondary);
             z-index: 100;
             transition: transform 0.2s;
             width: 80%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
         #overlay.visible { transform: translate(-50%, -50%) scale(1); }
-        .overlay-text { font-size: 2.5rem; color: var(--secondary); margin: 0 0 10px 0; }
+        .overlay-text { font-size: 2.5rem; color: var(--secondary); margin: 0 0 10px 0; font-weight: 900; }
 
         #confetti-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 90; }
 
-        /* Small screen adjustments */
         @media (max-height: 700px) {
             .question-card { font-size: 1.2rem; }
             .bingo-tile { font-size: 0.6rem; }
@@ -296,7 +373,10 @@
     <canvas id="confetti-canvas"></canvas>
 
     <div id="screen-home" class="screen active">
-        <h1 style="text-align: center; margin-bottom: 10px;">ROAD TRIP HUB</h1>
+        <div class="home-header-row">
+            <h1 style="font-size: 1.8rem; margin: 0; color: var(--primary); font-weight: 900;">ROAD TRIP HUB</h1>
+            <button class="icon-btn" onclick="toggleTheme()" id="theme-btn-home">🌙</button>
+        </div>
         
         <div class="menu-card" onclick="navTo('dive')">
             <div class="menu-icon">💬</div>
@@ -325,9 +405,9 @@
 
     <div id="screen-dive" class="screen">
         <div class="nav-header">
-            <button class="home-btn" onclick="navTo('home')">🏠</button>
+            <button class="icon-btn" onclick="navTo('home')">🏠</button>
             <div class="screen-title">Deep Dive</div>
-            <div style="width: 24px;"></div>
+            <button class="icon-btn" onclick="toggleTheme()">🌓</button>
         </div>
 
         <div class="category-scroll">
@@ -352,9 +432,9 @@
 
     <div id="screen-pitch" class="screen">
         <div class="nav-header">
-            <button class="home-btn" onclick="navTo('home')">🏠</button>
+            <button class="icon-btn" onclick="navTo('home')">🏠</button>
             <div class="screen-title">The Pitch</div>
-            <div style="width: 24px;"></div>
+            <button class="icon-btn" onclick="toggleTheme()">🌓</button>
         </div>
 
         <div style="flex-grow: 1; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
@@ -375,16 +455,19 @@
 
             <div class="pitch-controls">
                 <button class="action-btn btn-next" onclick="generatePitch()">Generate New Movie</button>
-                <button class="action-btn" style="background: #333; color: white; border: 1px solid #555;" onclick="startPitchTimer()">Start Timer</button>
+                <button class="action-btn btn-dark" onclick="startPitchTimer()">Start Timer</button>
             </div>
         </div>
     </div>
 
     <div id="screen-bingo" class="screen">
         <div class="nav-header">
-            <button class="home-btn" onclick="navTo('home')">🏠</button>
+            <button class="icon-btn" onclick="navTo('home')">🏠</button>
             <div class="screen-title">Bingo</div>
-            <button class="home-btn" style="font-size: 1rem; background: #333; border-radius: 8px;" onclick="newBingoGame()">RESET</button>
+            <div style="display: flex; gap: 10px;">
+                <button class="icon-btn" onclick="toggleTheme()">🌓</button>
+                <button class="icon-btn" style="font-size: 1rem; border: 1px solid var(--border); padding: 5px 10px;" onclick="newBingoGame()">NEW</button>
+            </div>
         </div>
 
         <div class="bingo-wrapper">
@@ -394,11 +477,31 @@
 
     <div id="overlay" onclick="this.classList.remove('visible')">
         <div class="overlay-text">BINGO!</div>
-        <div>Tap to continue</div>
+        <div style="color: var(--text-main);">Tap to continue</div>
     </div>
 
     <script>
-        // --- AUDIO ENGINE (FIXED) ---
+        // --- THEME ENGINE ---
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                document.getElementById('theme-btn-home').innerText = '☀️';
+            } else {
+                document.getElementById('theme-btn-home').innerText = '🌙';
+            }
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            
+            // Update Home Icon
+            document.getElementById('theme-btn-home').innerText = isLight ? '☀️' : '🌙';
+        }
+
+        // --- AUDIO ENGINE ---
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
 
@@ -416,7 +519,6 @@
             const now = audioCtx.currentTime;
 
             if (type === 'pop') {
-                // Bingo MARK (Pop sound)
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(600, now);
                 osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
@@ -424,7 +526,6 @@
                 gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
                 osc.start(now); osc.stop(now + 0.1);
             } else if (type === 'unpop') {
-                // Bingo UNMARK (Lower pop)
                 osc.type = 'triangle';
                 osc.frequency.setValueAtTime(300, now);
                 gain.gain.setValueAtTime(0.3, now);
@@ -483,26 +584,19 @@
 
         // --- DATA ---
         const questionsDB = {
-            fun: ["Best concert you've ever been to?", "What's the weirdest food you like?", "If you could instantly learn any skill, what would it be?", "Which movie character is basically you?", "If you had to start a cult, what would it be about?", "What’s the most useless talent you have?", "If animals could talk, which would be the rudest?", "What would your wrestling name and finishing move be?", "What’s the worst haircut you’ve ever had?", "If you were a ghost, who would you haunt?"],
-            deep: ["What is your biggest fear that you rarely admit?", "What’s one thing you’d change about your past?", "What does a perfect day look like to you?", "Who has influenced you the most in life?", "What is the hardest lesson you’ve had to learn?", "When did you last cry and why?", "What is something you are struggling with right now?", "What do you want to be remembered for?", "What is your definition of success?", "If you knew you couldn’t fail, what would you do?"],
-            spicy: ["What's a secret you've kept from your parents?", "Worst date you've ever been on?", "What is an unpopular opinion you hold?", "Have you ever ghosted someone and why?", "What is the pettiest thing you’ve ever done?", "Have you ever cheated on anything?", "What’s a lie you’ve told that got out of hand?", "Who in this car would survive the longest in prison?", "What’s the most illegal thing you’ve done?", "Have you ever snooped through a partner's phone?"],
-            retro: ["First album you ever bought?", "Favorite childhood cartoon?", "What was your first car?", "Best toy from the 90s/00s?", "What was your favorite school lunch?", "First movie you saw in theaters?", "What was your AIM/MSN screen name?", "What poster was on your bedroom wall?", "First concert you attended?", "Favorite candy growing up?"]
+            fun: ["Best concert you've ever been to?", "What's the weirdest food you like?", "If you could instantly learn any skill, what would it be?", "Which movie character is basically you?", "If you had to start a cult, what would it be about?", "What’s the most useless talent you have?", "If animals could talk, which would be the rudest?", "What would your wrestling name and finishing move be?", "What’s the worst haircut you’ve ever had?", "If you were a ghost, who would you haunt?", "What's the dumbest way you've injured yourself?", "If you could have an unlimited supply of one thing, what would it be?", "What song would be your entrance theme?", "Who would play you in a movie?", "What trend do you hope never comes back?", "Strangest gift you've ever received?", "Go-to karaoke song?", "If you had to live in a video game, which one?", "Best prank you've pulled?", "Funniest wifi name you've seen?", "Zombie apocalypse plan?", "If you won the lottery, what's the first dumb thing you'd buy?", "Most boring sport?", "If you were an ice cream flavor, what would you be?", "Movie everyone loves but you hate?", "Weirdest thing in your fridge?", "Swap lives with anyone for a day?", "Spirit animal?", "Most embarrassing thing you own?", "Rename yourself?", "Worst job imaginable?", "One food forever?", "Superstition you believe?", "Funniest person you know?", "Best compliment received?", "What would you be famous for?", "Favorite dad joke?", "Un-invent one thing?", "Weirdest dream you remember?", "Best Halloween costume?"],
+            deep: ["What is your biggest fear that you rarely admit?", "What’s one thing you’d change about your past?", "What does a perfect day look like to you?", "Who has influenced you the most in life?", "What is the hardest lesson you’ve had to learn?", "When did you last cry and why?", "What is something you are struggling with right now?", "What do you want to be remembered for?", "What is your definition of success?", "If you knew you couldn’t fail, what would you do?", "Dream you've let go of?", "Who do you wish you were closer to?", "Best advice received?", "Most grateful for?", "Regret if you died tomorrow?", "One thing you love about yourself?", "Habit you wish to break?", "What makes you feel alive?", "What happens after we die?", "Question for God?", "Biggest risk taken?", "Moment you felt most proud?", "Memory you hope to never forget?", "Thing you've forgiven yourself for?", "Value most in friendship?", "Wish you knew 10 years ago?", "Biggest misconception about you?", "Love language?", "Change one thing about the world?", "What keeps you up at night?", "Relationship breaker?", "Who do you look up to?", "What makes a house a home?", "Biggest insecurity?", "Letter to younger self?", "Kindest thing done for you?", "Most passionate about?", "How do you handle stress?", "Book/Movie that changed your life?", "Meaning of happiness?"],
+            spicy: ["What's a secret you've kept from your parents?", "Worst date you've ever been on?", "What is an unpopular opinion you hold?", "Have you ever ghosted someone and why?", "What is the pettiest thing you’ve ever done?", "Have you ever cheated on anything?", "What’s a lie you’ve told that got out of hand?", "Who in this car would survive the longest in prison?", "What’s the most illegal thing you’ve done?", "Have you ever snooped through a partner's phone?", "Biggest turn-off?", "Worst text sent to wrong person?", "Crush on friend's partner?", "Rumor you started?", "Worst kiss?", "Most expensive thing broken?", "Ever stolen anything?", "Meanest thing said?", "Celebrity hall pass?", "Habit that annoys others?", "Ever been fired?", "Toxic trait?", "Peed in a pool?", "Worst driver in car?", "Judge people for?", "Fist fight?", "Embarrassing drunk moment?", "Lied to get out of date?", "Guilty pleasure?", "Stalked ex online?", "Worst polite food?", "Re-gifted?", "Likely to get arrested?", "Worst advice given?", "Faked sick?", "Cringiest online post?", "Broken bone stupidly?", "Secret about someone else?", "Caught in a lie?", "Wildest hookup place?"],
+            retro: ["First album you ever bought?", "Favorite childhood cartoon?", "What was your first car?", "Best toy from the 90s/00s?", "What was your favorite school lunch?", "First movie you saw in theaters?", "What was your AIM/MSN screen name?", "What poster was on your bedroom wall?", "First concert you attended?", "Favorite candy growing up?", "Favorite playground game?", "Did you collect anything?", "First cell phone?", "Favorite video game?", "Fashion trend regret?", "Childhood celebrity crush?", "TV show intro you can sing?", "Favorite board game?", "Tamagotchi?", "First website visited?", "Favorite book series?", "Halloween costume?", "Burned CDs?", "Curfew?", "Favorite cereal?", "Blockbuster section?", "Slang used too much?", "Favorite field trip?", "Myspace song?", "Arcade game?", "Favorite teacher?", "Commercial jingle?", "Walkman/Discman?", "Summer activity?", "Scared you as kid?", "Pass notes?", "Ice cream truck treat?", "Treehouse?", "First R-rated movie?", "Favorite memory?"]
         };
-
-        // Add fillers to make them long as requested before
-        for(let key in questionsDB) {
-            while(questionsDB[key].length < 40) {
-                questionsDB[key].push(`Bonus ${key} Question #${questionsDB[key].length + 1}`);
-            }
-        }
 
         let decks = { fun: [...questionsDB.fun], deep: [...questionsDB.deep], spicy: [...questionsDB.spicy], retro: [...questionsDB.retro] };
         let currentCat = 'all';
 
         const pitchData = {
-            genres: ["Horror", "RomCom", "Sci-Fi", "Western", "Musical", "Action", "Documentary", "Fantasy", "Cyberpunk", "Noir"],
-            heroes: ["A washed-up clown", "A sentient toaster", "Elon Musk's clone", "A distracted Uber driver", "A tired kindergarten teacher", "A time-traveling dog"],
-            twists: ["It was all a simulation", "The dog is the mastermind", "They are actually ghosts", "The villain is their future self", "The world ends in 24 hours"]
+            genres: ["Horror", "RomCom", "Sci-Fi", "Western", "Musical", "Action", "Documentary", "Fantasy", "Cyberpunk", "Noir", "Teen Drama", "Holiday Movie", "Sports Drama", "Buddy Cop", "Heist", "Zombie Apocalypse", "Courtroom Drama", "Silent Film", "Anime", "Soap Opera", "Mockumentary", "Slasher", "Time Travel", "War Epic", "Spy Thriller", "Cooking Show", "Reality TV", "Superhero", "Disaster Movie", "Period Piece", "Space Opera", "Vampire Romance", "Kung Fu", "Legal Thriller", "Political Satire", "Found Footage", "Biopic", "Coming of Age", "Psychological Thriller", "Monster Movie", "Musical Biopic", "Christmas Horror", "Stoner Comedy", "Road Trip", "Murder Mystery", "Erotic Thriller", "Stop Motion", "Bollywood", "Surrealist Art Film"],
+            heroes: ["A washed-up clown", "A sentient toaster", "Elon Musk's clone", "A distracted Uber driver", "A tired kindergarten teacher", "A time-traveling dog", "A vegan vampire", "A retired hitman", "A ghost who is afraid of people", "A corrupt politician", "A delusional influencer", "A barista with a dark secret", "A cat who thinks it's God", "A clumsy ninja", "A robot who wants to be a chef", "A dissatisfied alien tourist", "A pirate with motion sickness", "A nervous bomb disposal expert", "A disgruntled Santa Claus", "A mime who can't stop talking", "A teenage witch", "A professional cuddler", "A cynical wedding planner", "A disgraced astronaut", "A lottery winner who lost the ticket", "A conspiracy theorist", "A grumpy librarian", "A reckless taxi driver", "A struggling soundcloud rapper", "A man who is allergic to everything", "A woman who can hear plants", "A detective who is always wrong", "A super soldier with amnesia", "A divorced dad", "A Karen", "A yoga instructor", "A disgruntled IT guy", "A bus driver", "A reality TV star", "A failed magician", "A sentient AI", "A talking sword", "A shapeshifter", "A weary god", "A pizza delivery guy", "A bored grim reaper", "A park ranger", "A cruise ship captain", "A wedding DJ", "A blind sniper", "A motivational speaker", "A used car salesman"],
+            twists: ["It was all a simulation", "The dog is the mastermind", "They are actually ghosts", "The villain is their future self", "The world ends in 24 hours", "They fall in love", "It was a musical all along", "Everyone is a robot", "It takes place in a microscopic world", "The narrator is lying", "They are trapped in a time loop", "Gravity stops working", "The hero dies in the first 5 minutes", "Aliens invade halfway through", "It was a dream within a dream", "The main character doesn't exist", "The audience is the killer", "Animals start talking", "The sun explodes", "They switch bodies", "It's a prequel to Shrek", "They realize they are in a movie", "The villain is the hero's dad", "Magic is real", "Zombies show up", "The car is alive", "They win the lottery but lose the ticket", "It's a cooking competition", "They are all in purgatory", "The weapon is love", "The bomb is made of chocolate", "Everyone is blind", "The ocean dries up", "The internet becomes sentient", "Plants take over", "Time flows backwards", "They are shrunken down", "It's actually a commercial", "The sidekick is the chosen one", "They can't stop dancing", "Silence kills", "Looking at the sky makes you crazy", "Water turns to wine", "Dinosaurs return", "The moon falls", "Shadows come to life", "The protagonist is the villain", "They are stuck in an elevator", "Someone is an imposter", "The floor is lava", "They have to sing to survive", "Only the dog survives"]
         };
 
         const bingoItems = [
@@ -554,7 +648,7 @@
             playSound('swipe');
             clearInterval(pitchTimer);
             document.getElementById('pitch-timer').innerText = "60";
-            document.getElementById('pitch-timer').style.color = "#bb86fc";
+            document.getElementById('pitch-timer').style.color = "var(--primary)";
             document.getElementById('pitch-genre').innerText = pitchData.genres[Math.floor(Math.random() * pitchData.genres.length)];
             document.getElementById('pitch-hero').innerText = pitchData.heroes[Math.floor(Math.random() * pitchData.heroes.length)];
             document.getElementById('pitch-twist').innerText = pitchData.twists[Math.floor(Math.random() * pitchData.twists.length)];
@@ -568,7 +662,7 @@
             pitchTimer = setInterval(() => {
                 time--;
                 display.innerText = time;
-                if(time <= 10) display.style.color = "#cf6679"; 
+                if(time <= 10) display.style.color = "var(--error)"; 
                 if(time <= 0) {
                     clearInterval(pitchTimer);
                     playSound('alarm');
@@ -657,6 +751,9 @@
             }
             animate();
         }
+
+        // Init
+        initTheme();
     </script>
 </body>
 </html>
