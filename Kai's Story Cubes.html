@@ -93,6 +93,16 @@
 
         .btn-home { background: var(--btn-red); box-shadow: 0 6px 0 var(--btn-red-shadow); }
         .btn-action { background: var(--btn-green); box-shadow: 0 6px 0 var(--btn-green-shadow); font-size: 1.8rem; width: 80%; }
+        .btn-nav { background: var(--btn-blue); box-shadow: 0 6px 0 var(--btn-blue-shadow); padding: 10px 15px; font-size: 1.2rem; }
+        
+        /* Reset Button Style */
+        .btn-reset { 
+            background: #636e72; 
+            box-shadow: 0 6px 0 #2d3436; 
+            font-size: 1rem; 
+            padding: 10px 20px;
+            margin-top: 15px;
+        }
 
         .bouncy-btn:active { top: 6px; box-shadow: 0 0 0 var(--btn-green-shadow); }
 
@@ -171,7 +181,7 @@
             100% { transform: translateY(-20px) scale(0.8); filter: blur(4px); opacity: 0.5; }
         }
 
-        /* --- GAME 2: ROAD TRIP HUNTER (New) --- */
+        /* --- GAME 2: ROAD TRIP HUNTER --- */
         #screen-hunter { justify-content: center; }
 
         .hunter-grid {
@@ -181,7 +191,9 @@
             width: 100%;
             height: 100%;
             margin-bottom: 20px;
-            padding-top: 50px; /* Space for title/home btn */
+            padding-top: 50px; 
+            overflow-y: auto; /* Allow scrolling if screen is small */
+            max-height: 70vh;
         }
 
         .car-btn {
@@ -196,11 +208,11 @@
             cursor: pointer;
             box-shadow: 0 6px 0 rgba(0,0,0,0.2);
             transition: transform 0.1s;
+            min-height: 120px;
         }
 
         .car-btn:active { top: 6px; box-shadow: none; }
         
-        /* Color themes for buttons */
         .car-btn.red { background: #ff7675; color: white; border: 4px solid #d63031; }
         .car-btn.blue { background: #74b9ff; color: white; border: 4px solid #0984e3; }
         .car-btn.yellow { background: #ffeaa7; color: #d35400; border: 4px solid #fdcb6e; }
@@ -352,6 +364,8 @@
                 <div class="car-count" id="cnt-police">0</div>
             </button>
         </div>
+
+        <button class="bouncy-btn btn-reset" onclick="resetHunter()">🗑️ Reset Score</button>
     </div>
 
     <div id="screen-thisthat" class="screen">
@@ -400,20 +414,36 @@
 
         let carCounts = { red: 0, blue: 0, white: 0, truck: 0, yellow: 0, police: 0 };
 
-        // --- AUDIO SYNTH ---
+        // --- AUDIO SYNTH (Sound Fix) ---
+        // We initialize AudioContext immediately but need to unlock it
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
 
+        // 1. SOUND FIX: Unlock audio on FIRST touch anywhere
+        document.body.addEventListener('touchstart', unlockAudio, { once: true });
+        document.body.addEventListener('click', unlockAudio, { once: true });
+
+        function unlockAudio() {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
         function playTone(freq, type, duration) {
+            // Safety check: resume if suspended
             if (audioCtx.state === 'suspended') audioCtx.resume();
+            
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             osc.type = type;
             osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            
+            // Increased Volume (0.3 instead of 0.1)
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            
             osc.start();
             osc.stop(audioCtx.currentTime + duration);
         }
@@ -422,6 +452,7 @@
         function carSound(type) {
             if (type === 'police') {
                 // Siren (Wee-Woo)
+                if (audioCtx.state === 'suspended') audioCtx.resume();
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.connect(gain);
@@ -434,10 +465,8 @@
                 gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.6);
                 osc.start(); osc.stop(audioCtx.currentTime + 0.6);
             } else if (type === 'truck') {
-                // Deep Honk
                 playTone(100, 'sawtooth', 0.4);
             } else {
-                // Standard Beep
                 playTone(300, 'square', 0.15);
             }
         }
@@ -494,15 +523,25 @@
 
         // --- GAME 2: CAR HUNTER ---
         function countCar(type) {
-            // Audio
             carSound(type);
-            
-            // Logic
             carCounts[type]++;
             document.getElementById(`cnt-${type}`).innerText = carCounts[type];
+            if(Math.random() > 0.7) fireConfetti(); 
+        }
+
+        // NEW: RESET FUNCTION
+        function resetHunter() {
+            sfx('click');
+            // Reset Data
+            carCounts = { red: 0, blue: 0, white: 0, truck: 0, yellow: 0, police: 0 };
             
-            // Visual Pop
-            if(Math.random() > 0.7) fireConfetti(); // Random confetti for motivation
+            // Reset Visuals
+            document.getElementById('cnt-red').innerText = "0";
+            document.getElementById('cnt-blue').innerText = "0";
+            document.getElementById('cnt-white').innerText = "0";
+            document.getElementById('cnt-truck').innerText = "0";
+            document.getElementById('cnt-yellow').innerText = "0";
+            document.getElementById('cnt-police').innerText = "0";
         }
 
         // --- GAME 3: THIS OR THAT ---
