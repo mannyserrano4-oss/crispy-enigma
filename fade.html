@@ -10,8 +10,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <link rel="apple-touch-icon" href="ficon.png">
-    <link rel="icon" type="image/png" href="ficon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
 
     <style>
         :root {
@@ -115,11 +115,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            
-            /* THE FIX: 'cover' ensures the image fills the screen edge-to-edge 
-               so no black bars show up to mess up the slider logic. */
             object-fit: cover; 
-            
             pointer-events: none;
         }
 
@@ -252,14 +248,13 @@
         let animationFrame;
         let startTime;
         
-        // --- ANIMATION SETTINGS ---
+        // --- UPDATED SETTINGS ---
         const DURATION_ONE_WAY = 3000; // 3 seconds per swipe
-        const TOTAL_CYCLES = 3;        // Back and forth 3 times
-        const DELAY = 1000;            // Initial delay
+        const TOTAL_CYCLES = 5;        // Increased to 5 full cycles (Back & Forth)
+        const DELAY = 2500;            // Wait 2.5 seconds (Allow toast to finish)
         
-        let direction = 1; // 1 = Left to Right, -1 = Right to Left
+        let direction = 1; 
         let cycleCount = 0;
-        let currentStartVal = 0;
         let isAnimating = false;
 
         function loadImage(input, type) {
@@ -283,20 +278,24 @@
 
         function startAutoSlide() {
             document.body.classList.add('cinema-mode');
+            
+            // 1. Show Toast
             const toast = document.getElementById('toast');
             toast.style.opacity = '1';
+            
+            // 2. Hide Toast after 2 seconds
             setTimeout(() => { toast.style.opacity = '0'; }, 2000);
 
-            // Reset
+            // 3. Reset everything
             updateVisuals(0);
             direction = 1; // Go towards 100
             cycleCount = 0;
             isAnimating = true;
 
+            // 4. Start Animation AFTER the toast is fully gone (2.5s)
             setTimeout(() => {
                 if (isAnimating) {
                     startTime = null;
-                    currentStartVal = 0; // Starting at 0
                     animationFrame = requestAnimationFrame(animateLoop);
                 }
             }, DELAY);
@@ -313,13 +312,11 @@
             // EaseInOutQuad
             const eased = percent < 0.5 ? 2 * percent * percent : 1 - Math.pow(-2 * percent + 2, 2) / 2;
 
-            // Calculate Value based on direction
+            // Calculate Value
             let val;
             if (direction === 1) {
-                // Going 0 to 100
                 val = eased * 100;
             } else {
-                // Going 100 to 0
                 val = 100 - (eased * 100);
             }
 
@@ -328,15 +325,13 @@
             if (progress < DURATION_ONE_WAY) {
                 if (isAnimating) animationFrame = requestAnimationFrame(animateLoop);
             } else {
-                // Move Finished. Check if we flip direction or stop
+                // Move Finished
                 if (cycleCount < (TOTAL_CYCLES * 2) - 1) {
-                    // Flip direction
                     direction *= -1;
                     cycleCount++;
-                    startTime = null; // Reset time for next loop
+                    startTime = null; 
                     animationFrame = requestAnimationFrame(animateLoop);
                 } else {
-                    // All Done
                     stopAutoSlide();
                 }
             }
