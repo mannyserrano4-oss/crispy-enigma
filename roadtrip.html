@@ -9,8 +9,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <link rel="apple-touch-icon" href="car.png">
-    <link rel="icon" type="image/png" href="car.png">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
 
     <style>
         :root {
@@ -47,7 +47,7 @@
             --shadow: rgba(0,0,0,0.1);
             
             --bingo-tile: #ffffff;
-            --bingo-mark: #00b894; /* Slightly darker green for contrast */
+            --bingo-mark: #00b894;
             --bingo-text: #121212;
         }
 
@@ -57,7 +57,6 @@
             color: var(--text-main);
             margin: 0;
             padding: 0;
-            /* Dynamic Viewport Height for mobile */
             height: 100vh;
             height: 100dvh; 
             overflow: hidden;
@@ -87,7 +86,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: rgba(125, 125, 125, 0.05); /* See-through tint */
+            background: rgba(125, 125, 125, 0.05);
             border-bottom: 1px solid var(--border);
             z-index: 10;
             flex-shrink: 0;
@@ -245,7 +244,7 @@
         }
         .btn-next { 
             background: var(--secondary); 
-            color: #000; /* Always black text on teal button for contrast */
+            color: #000; 
         }
         .action-btn:active { transform: translateY(2px); box-shadow: none; }
 
@@ -326,6 +325,7 @@
             cursor: pointer;
             overflow: hidden;
             user-select: none;
+            -webkit-tap-highlight-color: transparent; /* Remove blue highlight on tap */
             box-shadow: 0 2px 0 var(--shadow);
         }
 
@@ -481,37 +481,22 @@
     </div>
 
     <script>
-        // --- THEME ENGINE ---
-        function initTheme() {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'light') {
-                document.body.classList.add('light-mode');
-                document.getElementById('theme-btn-home').innerText = '☀️';
-            } else {
-                document.getElementById('theme-btn-home').innerText = '🌙';
+        // --- LAZY AUDIO ENGINE (Fixes iOS Sound) ---
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
             }
         }
 
-        function toggleTheme() {
-            document.body.classList.toggle('light-mode');
-            const isLight = document.body.classList.contains('light-mode');
-            localStorage.setItem('theme', isLight ? 'light' : 'dark');
-            
-            // Update Home Icon
-            document.getElementById('theme-btn-home').innerText = isLight ? '☀️' : '🌙';
-        }
-
-        // --- AUDIO ENGINE ---
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        const audioCtx = new AudioContext();
-
-        document.addEventListener('touchstart', unlockAudio, { once: true });
-        document.addEventListener('click', unlockAudio, { once: true });
-
-        function unlockAudio() { if (audioCtx.state === 'suspended') audioCtx.resume(); }
-
         function playSound(type) {
-            unlockAudio();
+            initAudio(); // Force check/create on every sound request
+            
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
@@ -519,6 +504,7 @@
             const now = audioCtx.currentTime;
 
             if (type === 'pop') {
+                // Bingo MARK (Pop)
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(600, now);
                 osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
@@ -526,12 +512,14 @@
                 gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
                 osc.start(now); osc.stop(now + 0.1);
             } else if (type === 'unpop') {
+                // Bingo UNMARK
                 osc.type = 'triangle';
                 osc.frequency.setValueAtTime(300, now);
                 gain.gain.setValueAtTime(0.3, now);
                 gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
                 osc.start(now); osc.stop(now + 0.1);
             } else if (type === 'swipe') {
+                // Card Swipe
                 osc.type = 'triangle';
                 osc.frequency.setValueAtTime(300, now);
                 osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
@@ -559,6 +547,7 @@
                 gain.gain.linearRampToValueAtTime(0, now+0.3);
                 osc.start(now); osc.stop(now+0.3);
             } else if (type === 'win') {
+                // Bingo Win Fanfare
                 [523, 659, 783, 1046].forEach((f, i) => {
                     const o = audioCtx.createOscillator();
                     const g = audioCtx.createGain();
@@ -570,6 +559,24 @@
                     o.start(now + i*0.1); o.stop(now + i*0.1 + 0.5);
                 });
             }
+        }
+
+        // --- THEME ENGINE ---
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                document.getElementById('theme-btn-home').innerText = '☀️';
+            } else {
+                document.getElementById('theme-btn-home').innerText = '🌙';
+            }
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            document.getElementById('theme-btn-home').innerText = isLight ? '☀️' : '🌙';
         }
 
         // --- NAVIGATION ---
@@ -589,6 +596,13 @@
             spicy: ["What's a secret you've kept from your parents?", "Worst date you've ever been on?", "What is an unpopular opinion you hold?", "Have you ever ghosted someone and why?", "What is the pettiest thing you’ve ever done?", "Have you ever cheated on anything?", "What’s a lie you’ve told that got out of hand?", "Who in this car would survive the longest in prison?", "What’s the most illegal thing you’ve done?", "Have you ever snooped through a partner's phone?", "Biggest turn-off?", "Worst text sent to wrong person?", "Crush on friend's partner?", "Rumor you started?", "Worst kiss?", "Most expensive thing broken?", "Ever stolen anything?", "Meanest thing said?", "Celebrity hall pass?", "Habit that annoys others?", "Ever been fired?", "Toxic trait?", "Peed in a pool?", "Worst driver in car?", "Judge people for?", "Fist fight?", "Embarrassing drunk moment?", "Lied to get out of date?", "Guilty pleasure?", "Stalked ex online?", "Worst polite food?", "Re-gifted?", "Likely to get arrested?", "Worst advice given?", "Faked sick?", "Cringiest online post?", "Broken bone stupidly?", "Secret about someone else?", "Caught in a lie?", "Wildest hookup place?"],
             retro: ["First album you ever bought?", "Favorite childhood cartoon?", "What was your first car?", "Best toy from the 90s/00s?", "What was your favorite school lunch?", "First movie you saw in theaters?", "What was your AIM/MSN screen name?", "What poster was on your bedroom wall?", "First concert you attended?", "Favorite candy growing up?", "Favorite playground game?", "Did you collect anything?", "First cell phone?", "Favorite video game?", "Fashion trend regret?", "Childhood celebrity crush?", "TV show intro you can sing?", "Favorite board game?", "Tamagotchi?", "First website visited?", "Favorite book series?", "Halloween costume?", "Burned CDs?", "Curfew?", "Favorite cereal?", "Blockbuster section?", "Slang used too much?", "Favorite field trip?", "Myspace song?", "Arcade game?", "Favorite teacher?", "Commercial jingle?", "Walkman/Discman?", "Summer activity?", "Scared you as kid?", "Pass notes?", "Ice cream truck treat?", "Treehouse?", "First R-rated movie?", "Favorite memory?"]
         };
+
+        // Add fillers just in case
+        for(let key in questionsDB) {
+            while(questionsDB[key].length < 40) {
+                questionsDB[key].push(`Bonus ${key} Question #${questionsDB[key].length + 1}`);
+            }
+        }
 
         let decks = { fun: [...questionsDB.fun], deep: [...questionsDB.deep], spicy: [...questionsDB.spicy], retro: [...questionsDB.retro] };
         let currentCat = 'all';
