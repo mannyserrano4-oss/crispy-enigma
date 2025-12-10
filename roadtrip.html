@@ -113,7 +113,7 @@
             margin: 0; 
         }
 
-        /* --- HOME SCREEN (Fixed Centering) --- */
+        /* --- HOME SCREEN --- */
         #screen-home {
             display: flex;
             flex-direction: column;
@@ -290,10 +290,10 @@
             border: 1px solid var(--border);
         }
 
-        /* --- GAME 3: BINGO (Maximized) --- */
+        /* --- GAME 3: BINGO (SUPER SIZE) --- */
         #screen-bingo { 
-            justify-content: center; 
-            padding: 0; /* Remove padding to maximize space */
+            justify-content: center; /* Center Vertically */
+            padding: 0;
         }
 
         .bingo-wrapper {
@@ -304,19 +304,22 @@
             width: 100%;
             height: 100%;
             box-sizing: border-box;
-            padding: 10px; /* Small safe area */
+            /* Small padding so it doesn't touch the literal edge */
+            padding: 5px; 
         }
 
         #bingo-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(5, 1fr);
-            gap: 4px;
-            /* Use vmin to ensure it fits width OR height, whichever is smaller */
-            width: 100%;
-            height: auto;
-            max-width: 95vmin; 
-            max-height: 95vmin;
+            /* Tight gap to maximize button size */
+            gap: 3px; 
+            
+            /* FORCE FULL WIDTH */
+            width: 98vw;
+            max-width: 600px;
+            
+            /* Aspect ratio ensures it stays square */
             aspect-ratio: 1/1; 
         }
 
@@ -324,16 +327,18 @@
             background: var(--bingo-tile);
             color: var(--bingo-text);
             border: 1px solid var(--border);
-            border-radius: 6px;
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            /* Dynamic font size based on viewport */
-            font-size: clamp(0.6rem, 2vmin, 1rem);
+            
+            /* BIGGER FONT LOGIC */
+            font-size: clamp(0.75rem, 2.5vmin, 1.1rem);
             line-height: 1.1;
-            font-weight: 600;
-            padding: 2px;
+            font-weight: 700;
+            
+            padding: 1px; /* Minimal padding */
             cursor: pointer;
             overflow: hidden;
             user-select: none;
@@ -492,7 +497,7 @@
     </div>
 
     <script>
-        // --- LAZY AUDIO ENGINE (Fixes iOS Sound) ---
+        // --- LAZY AUDIO ENGINE ---
         let audioCtx = null;
 
         function initAudio() {
@@ -515,7 +520,6 @@
             const now = audioCtx.currentTime;
 
             if (type === 'pop') {
-                // Bingo MARK (Pop)
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(600, now);
                 osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
@@ -523,14 +527,12 @@
                 gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
                 osc.start(now); osc.stop(now + 0.1);
             } else if (type === 'unpop') {
-                // Bingo UNMARK
                 osc.type = 'triangle';
                 osc.frequency.setValueAtTime(300, now);
                 gain.gain.setValueAtTime(0.3, now);
                 gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
                 osc.start(now); osc.stop(now + 0.1);
             } else if (type === 'swipe') {
-                // Card Swipe
                 osc.type = 'triangle';
                 osc.frequency.setValueAtTime(300, now);
                 osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
@@ -558,7 +560,6 @@
                 gain.gain.linearRampToValueAtTime(0, now+0.3);
                 osc.start(now); osc.stop(now+0.3);
             } else if (type === 'win') {
-                // Bingo Win Fanfare
                 [523, 659, 783, 1046].forEach((f, i) => {
                     const o = audioCtx.createOscillator();
                     const g = audioCtx.createGain();
