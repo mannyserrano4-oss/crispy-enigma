@@ -57,9 +57,8 @@
             color: var(--text-main);
             margin: 0;
             padding: 0;
-            /* Use d-height to prevent UI cutoff */
+            height: 100vh;
             height: 100dvh; 
-            width: 100vw;
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -70,7 +69,7 @@
 
         /* --- NAVIGATION --- */
         .screen {
-            display: none;
+            display: none; /* Hidden by default */
             flex-direction: column;
             width: 100%;
             height: 100%;
@@ -79,19 +78,22 @@
             background: var(--bg-main);
             overflow: hidden;
             transition: background-color 0.3s ease;
+            z-index: 1;
         }
-        .screen.active { display: flex; }
+        
+        /* Only show when active class is applied */
+        .screen.active { display: flex; z-index: 10; }
 
         .nav-header {
-            padding: 10px 15px; /* Slightly tighter header */
+            padding: 10px 15px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             background: rgba(125, 125, 125, 0.05);
             border-bottom: 1px solid var(--border);
-            z-index: 10;
-            flex-shrink: 0; /* Never shrink the header */
-            height: 60px; /* Fixed height for consistency */
+            z-index: 20;
+            flex-shrink: 0;
+            height: 60px;
             box-sizing: border-box;
         }
 
@@ -118,14 +120,11 @@
 
         /* --- HOME SCREEN --- */
         #screen-home {
-            display: flex;
-            flex-direction: column;
             justify-content: center; 
             align-items: center;     
             padding: 20px;
             gap: 20px;
             overflow-y: auto;
-            width: 100%;
             box-sizing: border-box;
         }
         
@@ -293,53 +292,48 @@
             border: 1px solid var(--border);
         }
 
-        /* --- GAME 3: BINGO (FULL SCREEN FIX) --- */
+        /* --- GAME 3: BINGO (FIXED LAYOUT) --- */
+        /* IMPORTANT: We use the class selector logic to toggle visibility */
         #screen-bingo { 
-            /* This makes the screen a flex container */
-            display: flex;
-            flex-direction: column;
             padding: 0;
-            height: 100dvh; /* Guarantee full height */
+            justify-content: center;
         }
 
         .bingo-wrapper {
-            /* Flex-grow 1 forces this wrapper to take ALL remaining space below header */
             flex-grow: 1;
-            width: 100%;
             display: flex;
-            flex-direction: column;
-            padding: 2px; /* Tiny padding */
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
             box-sizing: border-box;
+            padding: 5px; 
         }
 
         #bingo-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            grid-template-rows: repeat(5, 1fr); /* Distribute height evenly */
+            grid-template-rows: repeat(5, 1fr);
             gap: 3px; 
-            
-            /* Fill the wrapper completely */
             width: 100%;
-            height: 100%; 
-            
-            /* Removed aspect-ratio so it stretches into a rectangle if needed */
+            height: auto;
+            max-width: 95vmin; 
+            max-height: 95vmin;
+            aspect-ratio: 1/1; 
         }
 
         .bingo-tile {
             background: var(--bingo-tile);
             color: var(--bingo-text);
             border: 1px solid var(--border);
-            border-radius: 4px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            
-            /* Font logic: Use viewport width to scale text, capped for readability */
-            font-size: clamp(0.7rem, 3.5vw, 1.2rem); 
+            font-size: clamp(0.7rem, 3.5vw, 1.1rem); 
             line-height: 1.1;
             font-weight: 700;
-            
             padding: 1px;
             cursor: pointer;
             overflow: hidden;
@@ -596,9 +590,12 @@
         // --- NAVIGATION ---
         function navTo(screenId) {
             playSound('swipe');
+            // Remove 'active' from all screens
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            // Add 'active' to target screen
             document.getElementById(`screen-${screenId}`).classList.add('active');
             
+            // Auto-init specific games
             if(screenId === 'bingo' && document.getElementById('bingo-grid').children.length === 0) newBingoGame();
             if(screenId === 'pitch' && document.getElementById('pitch-hero').innerText === '---') generatePitch();
         }
