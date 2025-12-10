@@ -9,8 +9,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <link rel="apple-touch-icon" href="car.png">
-    <link rel="icon" type="image/png" href="car.png">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
 
     <style>
         :root {
@@ -113,13 +113,17 @@
             margin: 0; 
         }
 
-        /* --- HOME SCREEN --- */
+        /* --- HOME SCREEN (Fixed Centering) --- */
         #screen-home {
-            justify-content: flex-start;
-            align-items: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Center Vertically */
+            align-items: center;     /* Center Horizontally */
             padding: 20px;
             gap: 20px;
             overflow-y: auto;
+            width: 100%;
+            box-sizing: border-box;
         }
         
         .home-header-row {
@@ -128,7 +132,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 10px;
             margin-bottom: 10px;
         }
 
@@ -287,16 +290,21 @@
             border: 1px solid var(--border);
         }
 
-        /* --- GAME 3: BINGO --- */
-        #screen-bingo { justify-content: center; }
+        /* --- GAME 3: BINGO (Maximized) --- */
+        #screen-bingo { 
+            justify-content: center; 
+            padding: 0; /* Remove padding to maximize space */
+        }
 
         .bingo-wrapper {
             flex-grow: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 10px;
             width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            padding: 10px; /* Small safe area */
         }
 
         #bingo-grid {
@@ -304,8 +312,11 @@
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(5, 1fr);
             gap: 4px;
+            /* Use vmin to ensure it fits width OR height, whichever is smaller */
             width: 100%;
-            max-width: 500px;
+            height: auto;
+            max-width: 95vmin; 
+            max-height: 95vmin;
             aspect-ratio: 1/1; 
         }
 
@@ -313,19 +324,20 @@
             background: var(--bingo-tile);
             color: var(--bingo-text);
             border: 1px solid var(--border);
-            border-radius: 4px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            font-size: 0.7rem;
+            /* Dynamic font size based on viewport */
+            font-size: clamp(0.6rem, 2vmin, 1rem);
             line-height: 1.1;
             font-weight: 600;
             padding: 2px;
             cursor: pointer;
             overflow: hidden;
             user-select: none;
-            -webkit-tap-highlight-color: transparent; /* Remove blue highlight on tap */
+            -webkit-tap-highlight-color: transparent;
             box-shadow: 0 2px 0 var(--shadow);
         }
 
@@ -363,7 +375,6 @@
 
         @media (max-height: 700px) {
             .question-card { font-size: 1.2rem; }
-            .bingo-tile { font-size: 0.6rem; }
         }
 
     </style>
