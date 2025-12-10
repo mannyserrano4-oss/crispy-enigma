@@ -57,8 +57,9 @@
             color: var(--text-main);
             margin: 0;
             padding: 0;
-            height: 100vh;
+            /* Force full viewport height */
             height: 100dvh; 
+            width: 100vw;
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -69,7 +70,7 @@
 
         /* --- NAVIGATION --- */
         .screen {
-            display: none; /* Hidden by default */
+            display: none;
             flex-direction: column;
             width: 100%;
             height: 100%;
@@ -80,12 +81,10 @@
             transition: background-color 0.3s ease;
             z-index: 1;
         }
-        
-        /* Only show when active class is applied */
         .screen.active { display: flex; z-index: 10; }
 
         .nav-header {
-            padding: 10px 15px;
+            padding: 5px 15px; /* Compact header */
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -93,7 +92,7 @@
             border-bottom: 1px solid var(--border);
             z-index: 20;
             flex-shrink: 0;
-            height: 60px;
+            height: 50px; /* Fixed small height */
             box-sizing: border-box;
         }
 
@@ -110,7 +109,7 @@
         .icon-btn:active { background-color: rgba(125,125,125,0.2); }
 
         .screen-title { 
-            font-size: 1.2rem; 
+            font-size: 1.1rem; 
             font-weight: 800; 
             text-transform: uppercase; 
             letter-spacing: 2px; 
@@ -292,54 +291,58 @@
             border: 1px solid var(--border);
         }
 
-        /* --- GAME 3: BINGO (FIXED LAYOUT) --- */
-        /* IMPORTANT: We use the class selector logic to toggle visibility */
+        /* --- GAME 3: BINGO (STRETCH MODE) --- */
         #screen-bingo { 
             padding: 0;
-            justify-content: center;
+            display: flex;
+            flex-direction: column;
         }
 
         .bingo-wrapper {
+            /* Take up ALL available space */
             flex-grow: 1;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
             width: 100%;
-            height: 100%;
+            /* Minimal padding to prevent edge touches */
+            padding: 2px;
             box-sizing: border-box;
-            padding: 5px; 
         }
 
         #bingo-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(5, 1fr);
-            gap: 3px; 
+            gap: 2px; /* Very tight gap */
+            
+            /* FORCE FULL HEIGHT AND WIDTH */
             width: 100%;
-            height: auto;
-            max-width: 95vmin; 
-            max-height: 95vmin;
-            aspect-ratio: 1/1; 
+            height: 100%;
+            
+            /* NO ASPECT RATIO - This allows it to stretch into rectangles */
         }
 
         .bingo-tile {
             background: var(--bingo-tile);
             color: var(--bingo-text);
             border: 1px solid var(--border);
-            border-radius: 6px;
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            font-size: clamp(0.7rem, 3.5vw, 1.1rem); 
+            
+            /* DYNAMIC FONT: Scale based on height to ensure fit */
+            font-size: clamp(0.6rem, 2.5vh, 1.1rem);
             line-height: 1.1;
             font-weight: 700;
-            padding: 1px;
+            
+            padding: 2px;
             cursor: pointer;
             overflow: hidden;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
-            box-shadow: 0 2px 0 var(--shadow);
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); /* Inset shadow for cleaner look */
         }
 
         .bingo-tile.marked { 
@@ -590,12 +593,9 @@
         // --- NAVIGATION ---
         function navTo(screenId) {
             playSound('swipe');
-            // Remove 'active' from all screens
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            // Add 'active' to target screen
             document.getElementById(`screen-${screenId}`).classList.add('active');
             
-            // Auto-init specific games
             if(screenId === 'bingo' && document.getElementById('bingo-grid').children.length === 0) newBingoGame();
             if(screenId === 'pitch' && document.getElementById('pitch-hero').innerText === '---') generatePitch();
         }
