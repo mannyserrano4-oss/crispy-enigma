@@ -9,92 +9,281 @@
 
     <style>
         :root {
-            --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --subtext: #94a3b8;
-            --border: #334155; --input-bg: #020617;
-            --accent: #818cf8; --red: #f87171; --gold: #fbbf24; 
-            --green: #4ade80; --blue: #60a5fa; --purple: #c084fc;
+            --bg: #0f172a; 
+            --card: #1e293b; 
+            --text: #f8fafc; 
+            --subtext: #94a3b8;
+            --border: #334155; 
+            --input-bg: #020617;
+            
+            /* VIBRANT ACCENTS */
+            --accent: #6366f1; /* Indigo */
+            --red: #f43f5e;    /* Rose */
+            --gold: #f59e0b;   /* Amber */
+            --green: #10b981;  /* Emerald */
+            --blue: #3b82f6;   /* Blue */
+            --purple: #a855f7; /* Purple */
         }
+
         body.light-mode {
-            --bg: #f1f5f9; --card: #ffffff; --text: #334155; --subtext: #64748b;
-            --border: #e2e8f0; --input-bg: #f8fafc;
-            --accent: #4f46e5; --red: #ef4444; --gold: #d97706; --green: #16a34a; --blue: #2563eb; --purple: #9333ea;
+            --bg: #f1f5f9; 
+            --card: #ffffff; 
+            --text: #1e293b; 
+            --subtext: #64748b;
+            --border: #cbd5e1; 
+            --input-bg: #f8fafc;
         }
-        body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif; margin:0; display:flex; flex-direction:column; height:100vh; overflow:hidden; transition: background 0.3s; }
 
-        /* HEADER */
-        .header { padding: 15px; background: var(--card); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;}
-        h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; color: var(--accent); font-weight: 800; }
-        .icon-btn { font-size: 1.4rem; cursor: pointer; opacity: 0.9; background:none; border:none; padding:0 8px; color: var(--text); }
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0; 
+            height: 100dvh; /* Dynamic Height for Mobile */
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+        }
 
-        /* DASHBOARD */
-        .dashboard { padding: 15px; background: var(--bg); display: flex; gap: 10px; overflow-x: auto; flex-shrink: 0; border-bottom: 1px solid var(--border); scrollbar-width: none; }
-        .dash-card { background: var(--card); min-width: 100px; padding: 10px; border-radius: 12px; border: 1px solid var(--border); text-align: center; cursor: pointer; transition: 0.2s; }
-        .dash-card.active { border-color: var(--accent); background: var(--input-bg); transform: translateY(-2px); }
-        .dash-count { font-size: 1.3rem; font-weight: bold; }
-        .dash-lbl { font-size: 0.7rem; text-transform: uppercase; color: var(--subtext); margin-top: 5px; font-weight: bold; }
-        .d-red .dash-count { color: var(--red); } .d-gold .dash-count { color: var(--gold); } .d-blue .dash-count { color: var(--blue); } .d-purple .dash-count { color: var(--purple); }
+        /* --- HEADER --- */
+        .header { 
+            padding: 15px 20px; 
+            background: var(--card); 
+            border-bottom: 1px solid var(--border); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            flex-shrink: 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            z-index: 20;
+        }
+        h1 { margin: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); font-weight: 900; }
+        .icon-btn { font-size: 1.4rem; background: none; border: none; cursor: pointer; padding: 5px; transition: transform 0.2s; }
+        .icon-btn:active { transform: scale(0.9); }
 
-        /* SEARCH & LIST */
+        /* --- DASHBOARD --- */
+        .dashboard { 
+            padding: 15px; 
+            background: var(--bg); 
+            display: flex; 
+            gap: 12px; 
+            overflow-x: auto; 
+            flex-shrink: 0; 
+            border-bottom: 1px solid var(--border); 
+            scrollbar-width: none; 
+        }
+        .dashboard::-webkit-scrollbar { display: none; }
+        
+        .dash-card { 
+            background: var(--card); 
+            min-width: 110px; 
+            padding: 12px; 
+            border-radius: 12px; 
+            border: 1px solid var(--border); 
+            text-align: center; 
+            cursor: pointer; 
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .dash-card.active { border-color: var(--accent); background: rgba(99, 102, 241, 0.1); }
+        .dash-card.active::after { content:''; position:absolute; bottom:0; left:0; width:100%; height:3px; background:var(--accent); }
+        
+        .dash-count { font-size: 1.6rem; font-weight: 800; line-height: 1; }
+        .dash-lbl { font-size: 0.65rem; text-transform: uppercase; font-weight: 700; color: var(--subtext); margin-top: 6px; letter-spacing: 0.5px; }
+        
+        .d-red .dash-count { color: var(--red); }
+        .d-gold .dash-count { color: var(--gold); }
+        .d-blue .dash-count { color: var(--blue); }
+        .d-purple .dash-count { color: var(--purple); }
+
+        /* --- SCROLL AREA --- */
+        #client-list { 
+            flex-grow: 1; 
+            overflow-y: auto; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            -webkit-overflow-scrolling: touch; 
+            padding-bottom: 100px; /* Space for FAB */
+        }
+
+        /* --- SEARCH --- */
         .search-deck { padding: 10px 15px; background: var(--bg); flex-shrink: 0; }
-        .search-input { width: 100%; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); padding: 12px; border-radius: 10px; font-size: 1rem; box-sizing: border-box; }
-        #client-list { flex-grow: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; -webkit-overflow-scrolling: touch; }
+        .search-input { 
+            width: 100%; background: var(--input-bg); border: 1px solid var(--border); 
+            color: var(--text); padding: 12px 15px; border-radius: 10px; 
+            font-size: 1rem; box-sizing: border-box; outline: none;
+        }
+        .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); }
 
-        /* CLIENT CARD */
-        .client-card { background: var(--card); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .card-header { padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .client-name { font-size: 1.1rem; font-weight: bold; }
+        /* --- CLIENT CARD --- */
+        .client-card { 
+            background: var(--card); border-radius: 16px; 
+            border: 1px solid var(--border); 
+            overflow: hidden; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.1s;
+        }
+        .client-card:active { transform: scale(0.99); }
         
-        .badges { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
-        .badge { font-size: 0.65rem; padding: 3px 8px; border-radius: 10px; text-transform: uppercase; font-weight: bold; border: 1px solid currentColor; }
-        .b-red { color: var(--red); background: rgba(248,113,113,0.1); } .b-gold { color: var(--gold); background: rgba(251,191,36,0.1); } .b-blue { color: var(--blue); background: rgba(96,165,250,0.1); } .b-green { color: var(--green); background: rgba(74,222,128,0.1); }
+        .card-header { 
+            padding: 15px; display: flex; justify-content: space-between; align-items: center; 
+            cursor: pointer; border-left: 4px solid transparent;
+        }
+        .card-header.due { border-left-color: var(--red); }
+        .card-header.vip { border-left-color: var(--gold); }
+        
+        .client-name { font-size: 1.1rem; font-weight: 800; color: var(--text); }
+        .badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+        .badge { 
+            font-size: 0.6rem; padding: 3px 8px; border-radius: 6px; 
+            font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .b-red { background: rgba(244, 63, 94, 0.15); color: var(--red); }
+        .b-gold { background: rgba(245, 158, 11, 0.15); color: var(--gold); }
+        .b-green { background: rgba(16, 185, 129, 0.15); color: var(--green); }
+        .b-blue { background: rgba(59, 130, 246, 0.15); color: var(--blue); }
 
-        .client-details { display: none; padding: 15px; border-top: 1px solid var(--border); background: var(--input-bg); }
+        /* --- EXPANDED DETAILS --- */
+        .client-details { 
+            display: none; padding: 15px; 
+            background: var(--input-bg); 
+            border-top: 1px solid var(--border);
+            animation: slideDown 0.2s ease-out;
+        }
         .client-card.open .client-details { display: block; }
+        @keyframes slideDown { from{opacity:0; transform:translateY(-10px);} to{opacity:1; transform:translateY(0);} }
 
-        /* DETAILS COMPONENTS */
-        .prog-bar { height: 6px; background: var(--border); border-radius: 3px; margin: 10px 0; overflow: hidden; }
-        .prog-fill { height: 100%; background: var(--green); width: 0%; transition: width 0.3s; }
-        
+        /* Bank / Stats */
+        .bank-box { 
+            display: flex; gap: 8px; margin-bottom: 15px; 
+            background: var(--card); padding: 12px; border-radius: 12px; 
+            border: 1px solid var(--border); 
+        }
+        .bank-item { flex: 1; text-align: center; }
+        .bank-val { font-size: 1.3rem; font-weight: 900; color: var(--text); }
+        .bank-lbl { font-size: 0.6rem; font-weight: 700; color: var(--subtext); text-transform: uppercase; }
+        .bank-hl { color: var(--gold); }
+
+        /* Formula Boxes */
         .detail-row { display: flex; gap: 10px; margin-bottom: 10px; }
-        .detail-box { flex: 1; background: var(--card); padding: 10px; border-radius: 8px; border: 1px solid var(--border); }
-        .detail-lbl { font-size: 0.65rem; color: var(--accent); margin-bottom: 3px; font-weight: bold; letter-spacing: 1px; }
-        .detail-txt { font-size: 0.95rem; color: var(--text); }
+        .detail-box { 
+            flex: 1; background: var(--card); padding: 10px; 
+            border-radius: 8px; border: 1px solid var(--border); 
+        }
+        .detail-lbl { font-size: 0.65rem; color: var(--accent); font-weight: 800; margin-bottom: 4px; letter-spacing: 1px; }
+        .detail-txt { font-size: 0.95rem; color: var(--text); line-height: 1.4; white-space: pre-wrap; }
 
-        /* BUTTONS */
-        .btn-full { width: 100%; padding: 12px; background: var(--card); border: 1px solid var(--border); color: var(--subtext); border-radius: 8px; margin-bottom: 15px; cursor: pointer; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-main { background: var(--green); color: #000; border:none; font-weight:bold; padding: 15px; width:100%; border-radius: 8px; font-size:1rem; margin-bottom: 10px; cursor: pointer; display:block;}
-        .action-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .btn-act { padding: 10px 5px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 0.8rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        /* Buttons */
+        .btn-main { 
+            width: 100%; padding: 16px; 
+            background: var(--green); color: #000; 
+            border: none; border-radius: 12px; 
+            font-size: 1rem; font-weight: 800; 
+            text-transform: uppercase; letter-spacing: 1px;
+            cursor: pointer; margin-bottom: 12px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+        .btn-full {
+            width: 100%; padding: 12px;
+            background: var(--card); border: 1px solid var(--border);
+            color: var(--text); font-weight: 600;
+            border-radius: 10px; margin-bottom: 12px;
+            cursor: pointer;
+        }
+        
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
+        .btn-act { 
+            background: var(--card); border: 1px solid var(--border); 
+            color: var(--subtext); padding: 10px 5px; 
+            border-radius: 10px; font-size: 0.75rem; font-weight: 700; 
+            cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; 
+        }
+        .btn-act span { font-size: 1.2rem; }
+        .btn-act:active { background: var(--border); color: var(--text); }
 
-        /* MODALS */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(4px); z-index: 100; display: none; justify-content: center; align-items: flex-start; overflow-y: auto; padding: 20px 0; }
-        .modal-content { background: var(--card); width: 90%; max-width: 400px; padding: 20px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 80px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-        
-        /* CONFIRM MODAL SPECIFIC */
-        .confirm-title { font-size: 1.2rem; font-weight: bold; text-align: center; margin-bottom: 20px; }
-        .confirm-btns { display: flex; gap: 10px; }
-        .btn-yes { flex: 1; background: var(--green); color: black; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .btn-no { flex: 1; background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 15px; border-radius: 8px; cursor: pointer; }
+        /* --- MODALS (THE COLORFUL PART) --- */
+        .modal { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); 
+            z-index: 1000; display: none; 
+            justify-content: center; align-items: flex-start; 
+            overflow-y: auto; padding: 20px 0;
+        }
+        .modal-content { 
+            background: var(--card); width: 90%; max-width: 400px; 
+            padding: 20px; border-radius: 20px; 
+            border: 1px solid var(--border); 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); 
+            margin-bottom: 80px; 
+        }
 
-        /* FORM ELEMENTS */
-        .form-group { margin-bottom: 12px; }
-        .form-lbl { display: block; margin-bottom: 5px; font-size: 0.75rem; font-weight:bold; color: var(--subtext); }
-        .form-input { width: 100%; padding: 12px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
+        /* Color Zones */
+        .zone { 
+            border-radius: 12px; padding: 15px; margin-bottom: 15px; 
+            border: 1px solid transparent;
+        }
+        .z-blue { background: rgba(59, 130, 246, 0.05); border-color: rgba(59, 130, 246, 0.2); }
+        .z-gold { background: rgba(245, 158, 11, 0.05); border-color: rgba(245, 158, 11, 0.2); }
+        .z-green { background: rgba(16, 185, 129, 0.05); border-color: rgba(16, 185, 129, 0.2); }
         
-        .fab { position: fixed; bottom: 30px; right: 20px; background: var(--accent); color: white; width: 60px; height: 60px; border-radius: 30px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 5px 20px rgba(0,0,0,0.4); cursor: pointer; border: none; z-index: 500; }
-        
-        /* FULL PROFILE READ ONLY */
-        .ro-row { display: flex; border-bottom: 1px solid var(--border); padding: 12px 0; }
-        .ro-lbl { width: 100px; color: var(--subtext); font-size: 0.9rem; }
-        .ro-val { flex: 1; color: var(--text); font-weight: bold; font-size: 0.9rem; }
+        .z-title { 
+            font-size: 0.7rem; font-weight: 900; text-transform: uppercase; 
+            letter-spacing: 1px; margin-bottom: 10px; display: block;
+        }
+        .z-blue .z-title { color: var(--blue); }
+        .z-gold .z-title { color: var(--gold); }
+        .z-green .z-title { color: var(--green); }
 
-        .chip-container { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 8px; padding-bottom: 5px; }
-        .chip { padding: 6px 12px; background: var(--border); color: var(--text); border-radius: 20px; font-size: 0.75rem; white-space: nowrap; cursor: pointer; border: 1px solid transparent; }
-        .chip:active { background: var(--accent); color:white; }
-        
-        .radio-group { display: flex; gap: 10px; margin-bottom: 15px; }
-        .radio-opt { flex: 1; padding: 10px; border: 1px solid var(--border); border-radius: 8px; text-align: center; cursor: pointer; background: var(--input-bg); }
-        .radio-opt.selected { border-color: var(--accent); background: rgba(129, 140, 248, 0.1); color: var(--accent); font-weight: bold; }
+        .form-row { display: flex; gap: 10px; margin-bottom: 12px; }
+        .form-group { flex: 1; }
+        .form-lbl { display: block; font-size: 0.75rem; color: var(--subtext); margin-bottom: 5px; font-weight: 600; }
+        .form-input { 
+            width: 100%; padding: 12px; background: var(--card); 
+            border: 1px solid var(--border); color: var(--text); 
+            border-radius: 8px; font-size: 1rem; box-sizing: border-box; 
+        }
+        .form-input:focus { border-color: var(--accent); outline: none; }
+
+        /* Chips */
+        .chip-box { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; margin-bottom: 8px; }
+        .chip { 
+            background: var(--input-bg); border: 1px solid var(--border); 
+            padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; 
+            white-space: nowrap; cursor: pointer; color: var(--subtext); font-weight: 600; 
+        }
+        .chip:active { background: var(--accent); color: white; border-color: var(--accent); }
+
+        /* FAB */
+        .fab { 
+            position: fixed; bottom: 30px; right: 20px; 
+            background: var(--accent); color: white; 
+            width: 65px; height: 65px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 2.5rem; box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4); 
+            cursor: pointer; border: none; z-index: 500; 
+            transition: transform 0.2s;
+        }
+        .fab:active { transform: scale(0.9); }
+
+        /* Custom Confirm */
+        .confirm-title { font-size: 1.2rem; font-weight: bold; text-align: center; margin-bottom: 25px; color: var(--text); }
+        .confirm-row { display: flex; gap: 15px; }
+        .btn-yes { flex: 1; background: var(--green); color: black; border: none; padding: 15px; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; }
+        .btn-no { flex: 1; background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+
+        /* Menus */
+        .dropdown { position: absolute; top: 60px; right: 15px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; display: none; flex-direction: column; width: 180px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 200; overflow: hidden; }
+        .dropdown.show { display: flex; }
+        .dd-item { padding: 15px; text-align: left; background: none; border: none; border-bottom: 1px solid var(--border); color: var(--text); font-size: 1rem; cursor: pointer; }
+        .dd-item:last-child { border: none; }
+
+        /* Full Profile Read Only */
+        .ro-row { display: flex; padding: 12px 0; border-bottom: 1px solid var(--border); }
+        .ro-lbl { width: 120px; color: var(--subtext); font-size: 0.9rem; }
+        .ro-val { flex: 1; color: var(--text); font-weight: 700; font-size: 0.95rem; }
 
     </style>
 </head>
@@ -102,19 +291,27 @@
 
     <div class="header">
         <h1>Black Book Ops</h1>
-        <div style="display:flex; gap:5px; align-items:center;">
+        <div style="display:flex; gap:10px; align-items:center;">
             <button class="icon-btn" onclick="toggleTheme()">◑</button>
+            <button class="icon-btn" onclick="openGiftModal()">🎁</button>
             <button class="icon-btn" onclick="openSettings()">⚙️</button>
-            <button class="icon-btn" onclick="exportData()">💾</button>
+            <button class="icon-btn" onclick="toggleMenu()">💾</button>
         </div>
     </div>
+
+    <div id="save-menu" class="dropdown">
+        <button class="dd-item" onclick="exportData('json')">Backup File</button>
+        <button class="dd-item" onclick="exportData('csv')">Export Excel</button>
+        <button class="dd-item" onclick="document.getElementById('file-input').click()">Restore</button>
+    </div>
+    <input type="file" id="file-input" hidden onchange="importData(this)">
 
     <div class="dashboard">
         <div class="dash-card d-red" onclick="filter('due', this)">
             <div class="dash-count" id="d-due">0</div><div class="dash-lbl">Due</div>
         </div>
         <div class="dash-card d-gold" onclick="filter('bday', this)">
-            <div class="dash-count" id="d-bday">0</div><div class="dash-lbl">B-Day Wk</div>
+            <div class="dash-count" id="d-bday">0</div><div class="dash-lbl">B-Day</div>
         </div>
         <div class="dash-card d-purple" onclick="filter('ghosts', this)">
             <div class="dash-count" id="d-ghost">0</div><div class="dash-lbl">Ghosts</div>
@@ -125,16 +322,16 @@
     </div>
 
     <div class="search-deck">
-        <input type="search" id="search" class="search-input" placeholder="Search name, phone, notes..." onkeyup="render()">
+        <input type="search" id="search" class="search-input" placeholder="Search name, notes, phone..." onkeyup="render()">
     </div>
 
     <div id="client-list"></div>
     <button class="fab" onclick="openClientModal()">+</button>
 
-    <div id="confirm-modal" class="modal" style="z-index: 600;">
+    <div id="confirm-modal" class="modal" style="z-index: 2000;">
         <div class="modal-content" style="margin-top: 30vh;">
-            <div id="confirm-msg" class="confirm-title">Message</div>
-            <div class="confirm-btns">
+            <div id="confirm-msg" class="confirm-title">Are you sure?</div>
+            <div class="confirm-row">
                 <button id="btn-no" class="btn-no">No</button>
                 <button id="btn-yes" class="btn-yes">Yes</button>
             </div>
@@ -143,113 +340,131 @@
 
     <div id="settings-modal" class="modal">
         <div class="modal-content">
-            <h3>Shop Settings</h3>
-            <div class="form-group"><label class="form-lbl">Shop Address</label><input id="s-shop-addr" class="form-input" placeholder="123 Barber Ln..."></div>
-            <button class="btn-main" onclick="saveSettings()">SAVE</button>
-            <button class="btn-full" onclick="document.getElementById('file-input').click()">📂 Restore Backup</button>
-            <input type="file" id="file-input" hidden onchange="importData(this)">
-            <button class="btn-no" style="width:100%" onclick="closeModals()">Close</button>
-        </div>
-    </div>
-
-    <div id="cal-modal" class="modal">
-        <div class="modal-content">
-            <h3>Schedule Cut</h3>
-            <input type="hidden" id="cal-id">
-            <div class="form-group"><label class="form-lbl">Date</label><input type="date" id="cal-date" class="form-input"></div>
-            <div class="form-group"><label class="form-lbl">Time</label><input type="time" id="cal-time" class="form-input"></div>
-            
-            <label class="form-lbl">Location</label>
-            <div class="radio-group">
-                <div class="radio-opt selected" id="loc-shop" onclick="selLoc('shop')">My Shop</div>
-                <div class="radio-opt" id="loc-client" onclick="selLoc('client')">Client's</div>
+            <h3 style="text-align:center; margin-top:0;">Shop Settings</h3>
+            <div class="form-group">
+                <label class="form-lbl">Shop Address</label>
+                <input id="s-shop-addr" class="form-input" placeholder="123 Barber Ln, City, ST">
             </div>
-            <input type="text" id="cal-addr" class="form-input" placeholder="Address...">
-
-            <button class="btn-main" onclick="generateICS()">ADD TO CALENDAR</button>
-            <button class="btn-no" style="width:100%" onclick="closeModals()">Cancel</button>
+            <button class="btn-main" onclick="saveSettings()">SAVE</button>
+            <button class="btn-full" onclick="closeModals()">Close</button>
         </div>
     </div>
 
     <div id="profile-modal" class="modal">
         <div class="modal-content">
-            <h3 style="text-align:center; color:var(--accent)" id="ro-title">Client Name</h3>
+            <h3 id="ro-title" style="text-align:center; color:var(--accent); margin-top:0; font-size:1.5rem;">Name</h3>
             <div id="ro-content"></div>
+            <div style="height:20px;"></div>
             <button class="btn-main" onclick="editFromProfile()">EDIT PROFILE</button>
-            <button class="btn-no" style="width:100%" onclick="closeModals()">Close</button>
+            <button class="btn-full" onclick="closeModals()">Close</button>
+        </div>
+    </div>
+
+    <div id="cal-modal" class="modal">
+        <div class="modal-content">
+            <h3 style="text-align:center; margin-top:0;">Schedule Cut</h3>
+            <input type="hidden" id="cal-id">
+            
+            <div class="form-row">
+                <div class="form-group"><label class="form-lbl">Date</label><input type="date" id="cal-date" class="form-input"></div>
+                <div class="form-group"><label class="form-lbl">Time</label><input type="time" id="cal-time" class="form-input"></div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-lbl">Location</label>
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <button class="chip" onclick="selLoc('shop')">📍 My Shop</button>
+                    <button class="chip" onclick="selLoc('client')">🏠 Client House</button>
+                </div>
+                <input id="cal-addr" class="form-input" placeholder="Address...">
+            </div>
+
+            <button class="btn-main" onclick="generateICS()">ADD TO CALENDAR</button>
+            <button class="btn-full" onclick="closeModals()">Cancel</button>
         </div>
     </div>
 
     <div id="client-modal" class="modal">
         <div class="modal-content">
-            <h3 style="text-align:center;">Edit Profile</h3>
+            <h2 style="text-align:center; margin:0 0 20px 0;">Client Profile</h2>
             <input type="hidden" id="c-id">
-            <div class="form-group"><label class="form-lbl">Name</label><input id="c-name" class="form-input"></div>
             
-            <div class="flex">
-                <div class="grow form-group"><label class="form-lbl">Phone</label><input type="tel" id="c-phone" class="form-input"></div>
-                <div class="grow form-group"><label class="form-lbl">Price ($)</label><input type="number" id="c-price" class="form-input"></div>
-            </div>
-            
-            <div class="form-group"><label class="form-lbl">Address</label><input id="c-addr" class="form-input"></div>
-            <div class="form-group"><label class="form-lbl">IG</label><input id="c-social" class="form-input"></div>
-
-            <div class="flex">
-                <div class="grow form-group"><label class="form-lbl">Birthday</label><input type="date" id="c-dob" class="form-input"></div>
-                <div class="grow form-group"><label class="form-lbl">First Cut</label><input type="date" id="c-start" class="form-input"></div>
+            <div class="form-group">
+                <input id="c-name" class="form-input" placeholder="Client Name" style="font-size:1.2rem; font-weight:800; text-align:center;">
             </div>
 
-            <div class="form-group"><label class="form-lbl">Referred By</label>
-                <input id="c-ref" class="form-input" list="ref-list" oninput="updateRefList(this.value)">
-                <datalist id="ref-list"></datalist>
+            <div class="zone z-blue">
+                <span class="z-title">🔵 Contact</span>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-lbl">Phone</label><input type="tel" id="c-phone" class="form-input"></div>
+                    <div class="form-group"><label class="form-lbl">Price $</label><input type="number" id="c-price" class="form-input" placeholder="40"></div>
+                </div>
+                <div class="form-group"><label class="form-lbl">Social</label><input id="c-social" class="form-input" placeholder="@instagram"></div>
+                <div class="form-group"><label class="form-lbl">Address</label><input id="c-addr" class="form-input" placeholder="Client's Home Address"></div>
             </div>
 
-            <div class="flex">
-                <div class="grow form-group"><label class="form-lbl">Freq (Wks)</label><input type="number" id="c-freq" class="form-input"></div>
-                <div class="grow form-group"><label class="form-lbl">Last Cut</label><input type="date" id="c-last" class="form-input"></div>
+            <div class="zone z-gold">
+                <span class="z-title">🟡 Timeline</span>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-lbl">Birthday</label><input type="date" id="c-dob" class="form-input"></div>
+                    <div class="form-group"><label class="form-lbl">First Cut</label><input type="date" id="c-start" class="form-input"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-lbl">Referred By</label><input id="c-ref" class="form-input" list="ref-list" oninput="updateRefList(this.value)"></div>
+                    <datalist id="ref-list"></datalist>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-lbl">Frequency (Wks)</label><input type="number" id="c-freq" class="form-input" placeholder="2"></div>
+                    <div class="form-group"><label class="form-lbl">Last Cut</label><input type="date" id="c-last" class="form-input"></div>
+                </div>
             </div>
 
-            <div class="form-group"><label class="form-lbl">SIDES</label>
-                <div class="chip-container"><span class="chip" onclick="fill('c-sides','Skin Fade')">Skin Fade</span><span class="chip" onclick="fill('c-sides','Taper')">Taper</span><span class="chip" onclick="fill('c-sides','#1')">#1</span></div>
-                <input id="c-sides" class="form-input">
+            <div class="zone z-green">
+                <span class="z-title">🟢 The Cut</span>
+                <div class="form-group">
+                    <label class="form-lbl">Sides</label>
+                    <div class="chip-box"><span class="chip" onclick="fill('c-sides','Skin Fade')">Skin Fade</span><span class="chip" onclick="fill('c-sides','Taper')">Taper</span><span class="chip" onclick="fill('c-sides','#1')">#1</span></div>
+                    <input id="c-sides" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label class="form-lbl">Top</label>
+                    <div class="chip-box"><span class="chip" onclick="fill('c-top','Crop')">Crop</span><span class="chip" onclick="fill('c-top','Trim')">Trim</span><span class="chip" onclick="fill('c-top','Texture')">Texture</span></div>
+                    <input id="c-top" class="form-input">
+                </div>
+                <div class="form-group"><label class="form-lbl">Notes</label><textarea id="c-notes" class="form-input" rows="3"></textarea></div>
             </div>
-            <div class="form-group"><label class="form-lbl">TOP</label>
-                 <div class="chip-container"><span class="chip" onclick="fill('c-top','Crop')">Crop</span><span class="chip" onclick="fill('c-top','Trim')">Trim</span><span class="chip" onclick="fill('c-top','Texture')">Texture</span></div>
-                <input id="c-top" class="form-input">
-            </div>
-             <div class="form-group"><label class="form-lbl">Notes</label><textarea id="c-notes" class="form-input" rows="3"></textarea></div>
 
-            <button class="btn-main" onclick="saveClient()">SAVE</button>
-            <button class="btn-no" style="width:100%" onclick="closeModals()">Cancel</button>
+            <button class="btn-main" onclick="saveClient()">SAVE PROFILE</button>
+            <button class="btn-full" onclick="closeModals()">Cancel</button>
         </div>
     </div>
 
     <script>
-        // --- STATE ---
+        // --- DATA ---
         let clients = JSON.parse(localStorage.getItem('bb_clients_v3') || '[]');
         let shopSettings = JSON.parse(localStorage.getItem('bb_settings') || '{"addr":""}');
         let filterType = 'all';
-        let tempId = null; // Used for passing IDs between modals
+        let tempId = null;
 
-        // --- INIT ---
         if(localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
         render();
 
-        // --- RENDER ---
+        // --- RENDERER ---
         function render() {
             updateDash();
             const list = document.getElementById('client-list');
             const query = document.getElementById('search').value.toLowerCase();
             list.innerHTML = '';
 
+            const today = new Date(); today.setHours(0,0,0,0);
+
             let visible = clients.filter(c => 
                 c.name.toLowerCase().includes(query) || 
-                (c.notes && c.notes.toLowerCase().includes(query)) ||
+                (c.notes && c.notes.toLowerCase().includes(query)) || 
                 (c.phone && c.phone.includes(query))
             );
-            
-            const today = new Date(); today.setHours(0,0,0,0);
-            
+
+            // Filters
             if(filterType === 'due') visible = visible.filter(c => getDueDate(c) <= today);
             if(filterType === 'bday') visible = visible.filter(c => isThisWeek(c.dob));
             if(filterType === 'ghosts') visible = visible.filter(c => {
@@ -265,37 +480,43 @@
                 if(isThisWeek(c.dob)) badges += `<span class="badge b-gold">🎂 BDAY</span>`;
                 const yrs = getYears(c.start);
                 if(yrs > 0 && isThisWeek(c.start)) badges += `<span class="badge b-blue">🎉 ${yrs}YR</span>`;
-                if(c.ltv > 500) badges += `<span class="badge b-green">💎 $${c.ltv}</span>`;
-                else badges += `<span class="badge" style="border:1px solid var(--subtext); color:var(--subtext)">LTV: $${c.ltv||0}</span>`;
-
-                // Due logic
+                
+                // Card Border Color Logic
+                let cardClass = 'client-card';
+                if(c.ltv > 500) { badges += `<span class="badge b-green">💎 VIP</span>`; cardClass += ' vip'; }
+                
+                // Due Date
                 const due = getDueDate(c);
                 const daysTill = due ? Math.ceil((due - today)/86400000) : 999;
                 let dueTxt = due ? (daysTill < 0 ? `Overdue ${Math.abs(daysTill)}d` : `Due ${daysTill}d`) : '';
                 let dueCol = daysTill < 0 ? 'var(--red)' : 'var(--subtext)';
+                if(daysTill < 0) document.querySelector('.card-header')?.classList.add('due'); // Logic applied inside HTML string below
 
-                // Bank Logic
+                // Offers
                 let offer = '';
-                if(c.free>0) offer = `${c.free} FREE CUTS`;
+                if(c.free>0) offer = `${c.free} FREE`;
                 else if(c.credit>0) offer = `$${c.credit} CR`;
 
                 const div = document.createElement('div');
-                div.className = 'client-card';
+                div.className = cardClass;
                 div.innerHTML = `
-                    <div class="card-header" onclick="this.parentElement.classList.toggle('open')">
-                        <div><div class="client-name">${c.name}</div><div class="badges">${badges}</div></div>
+                    <div class="card-header ${daysTill<0?'due':''}" onclick="this.parentElement.classList.toggle('open')">
+                        <div>
+                            <div class="client-name">${c.name}</div>
+                            <div class="badges">${badges}</div>
+                        </div>
                         <div style="text-align:right">
-                            <div style="font-size:0.75rem;font-weight:bold;color:var(--gold)">${offer}</div>
-                            <div style="font-size:0.7rem;color:${dueCol}">${dueTxt}</div>
+                            <div style="font-size:0.8rem; font-weight:800; color:var(--gold);">${offer}</div>
+                            <div style="font-size:0.75rem; color:${dueCol}; font-weight:600;">${dueTxt}</div>
                         </div>
                     </div>
                     <div class="client-details">
                         <div class="bank-box">
-                            <div class="bank-item"><div class="bank-val">${(c.cuts%6)}/6</div><div class="bank-lbl">Loyalty</div></div>
-                            <div class="bank-item"><div class="bank-val">${c.cuts}</div><div class="bank-lbl">Total</div></div>
-                            <div class="bank-item"><div class="bank-val">$${c.credit}</div><div class="bank-lbl">Credit</div></div>
+                            <div class="bank-item"><div class="bank-val">${c.cuts}</div><div class="bank-lbl">Total Cuts</div></div>
+                            <div class="bank-item"><div class="bank-val bank-hl">$${c.ltv||0}</div><div class="bank-lbl">LTV</div></div>
+                            <div class="bank-item"><div class="bank-val">${c.cuts%6}/6</div><div class="bank-lbl">Loyalty</div></div>
                         </div>
-                        
+
                         <div class="detail-row">
                             <div class="detail-box"><div class="detail-lbl">SIDES</div><div class="detail-txt">${c.sides||'-'}</div></div>
                             <div class="detail-box"><div class="detail-lbl">TOP</div><div class="detail-txt">${c.top||'-'}</div></div>
@@ -304,13 +525,12 @@
 
                         <button class="btn-full" onclick="viewFull('${c.id}')">📄 View Full Profile</button>
                         <button class="btn-main" onclick="startCutFlow('${c.id}')">✂️ RECORD CUT</button>
-                        
+
                         <div class="action-grid">
-                            <button class="btn-act" onclick="window.location='tel:${c.phone}'">📞 Call</button>
-                            <button class="btn-act" onclick="openText('${c.id}')">💬 Text</button>
-                            <button class="btn-act" onclick="openSchedule('${c.id}')">📅 Sched</button>
-                            <button class="btn-act" onclick="downloadVCard('${c.id}')">👤 Save</button>
-                            <button class="btn-act" style="grid-column:span 4; color:var(--red); border-color:var(--border);" onclick="delClient('${c.id}')">🗑️ Delete</button>
+                            <button class="btn-act" onclick="window.location='tel:${c.phone}'"><span>📞</span>Call</button>
+                            <button class="btn-act" onclick="openText('${c.id}')"><span>💬</span>Text</button>
+                            <button class="btn-act" onclick="openSchedule('${c.id}')"><span>📅</span>Sched</button>
+                            <button class="btn-act" onclick="downloadVCard('${c.id}')"><span>👤</span>Save</button>
                         </div>
                     </div>
                 `;
@@ -318,17 +538,15 @@
             });
         }
 
-        // --- WORKFLOWS ---
+        // --- CUT FLOW (THE SMART LOGIC) ---
         function startCutFlow(id) {
             tempId = id;
             customConfirm("Did the haircut style change?", 
-                () => { // YES
-                    openClientModal(id); 
-                    // We hook the save to continue the flow? No, simple is better. 
-                    // User edits, saves, then clicks record again or we assume they just wanted to edit.
-                    alert("Update style, Save, then click Record Cut again to finish.");
-                },
-                () => { // NO
+                () => { // YES -> Edit first
+                    openClientModal(id);
+                    alert("Update style -> Save -> Click Record Cut again.");
+                }, 
+                () => { // NO -> Proceed
                     finishCut(id);
                 }
             );
@@ -336,16 +554,16 @@
 
         function finishCut(id) {
             const c = clients.find(x=>x.id==id);
-            const priceStr = prompt("Price paid today?", c.price || 0);
-            if(priceStr === null) return;
-            const paid = parseFloat(priceStr) || 0;
+            const price = prompt("Price paid today?", c.price||0);
+            if(price === null) return;
+            const paid = parseFloat(price)||0;
 
             // Check rewards
             if(c.free > 0 || c.credit > 0) {
-                if(confirm(`Client has ${c.free} free cuts and $${c.credit} credit. Redeem something?`)) {
+                if(confirm(`Rewards Available: ${c.free} Free Cuts, $${c.credit} Credit.\nRedeem something now?`)) {
                     if(c.free > 0 && confirm("Use 1 Free Cut?")) c.free--;
                     else if(c.credit > 0) {
-                        const use = prompt(`Available Credit: $${c.credit}. Amount to use:`, c.credit);
+                        const use = prompt(`Credit Balance: $${c.credit}. Amount to use:`, c.credit);
                         if(use) c.credit -= Math.min(parseFloat(use), c.credit);
                     }
                 }
@@ -358,10 +576,10 @@
             save(); render();
         }
 
-        // --- FULL PROFILE VIEW ---
+        // --- FULL PROFILE ---
         function viewFull(id) {
             const c = clients.find(x=>x.id==id);
-            tempId = id; // Store for edit button
+            tempId = id;
             document.getElementById('ro-title').innerText = c.name;
             let html = `
                 <div class="ro-row"><div class="ro-lbl">Phone</div><div class="ro-val">${c.phone||'-'}</div></div>
@@ -376,30 +594,22 @@
             document.getElementById('ro-content').innerHTML = html;
             document.getElementById('profile-modal').style.display = 'flex';
         }
-        function editFromProfile() {
-            closeModals();
-            openClientModal(tempId);
-        }
+        function editFromProfile() { closeModals(); openClientModal(tempId); }
 
         // --- SCHEDULING ---
         function openSchedule(id) {
             const c = clients.find(x=>x.id==id);
             document.getElementById('cal-id').value = id;
             document.getElementById('cal-date').value = new Date().toISOString().split('T')[0];
-            // Default to shop
-            selLoc('shop');
+            // Default to shop address
+            document.getElementById('cal-addr').value = shopSettings.addr || ''; 
             document.getElementById('cal-modal').style.display = 'flex';
         }
-
         function selLoc(type) {
             const c = clients.find(x=>x.id == document.getElementById('cal-id').value);
-            document.querySelectorAll('.radio-opt').forEach(r=>r.classList.remove('selected'));
-            document.getElementById('loc-'+type).classList.add('selected');
-            
-            if(type === 'shop') document.getElementById('cal-addr').value = shopSettings.addr;
+            if(type === 'shop') document.getElementById('cal-addr').value = shopSettings.addr || '';
             else document.getElementById('cal-addr').value = c.addr || '';
         }
-
         function generateICS() {
             const id = document.getElementById('cal-id').value;
             const c = clients.find(x=>x.id==id);
@@ -410,39 +620,19 @@
             if(!d || !t) return alert("Date/Time required");
             
             const start = new Date(`${d}T${t}`);
-            const end = new Date(start.getTime() + 45*60000); // 45 min default
+            const end = new Date(start.getTime() + 45*60000);
             const fmt = date => date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
             
             const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Cut: ${c.name}\nDTSTART:${fmt(start)}\nDTEND:${fmt(end)}\nLOCATION:${loc}\nDESCRIPTION:${c.notes||''}\nEND:VEVENT\nEND:VCALENDAR`;
             
-            // File download method (Best for iOS)
-            const blob = new Blob([ics], { type: 'text/calendar' });
-            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
+            a.href = URL.createObjectURL(new Blob([ics], {type: 'text/calendar'}));
             a.download = 'appointment.ics';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
             closeModals();
         }
 
-        // --- CONTACTS ---
-        function downloadVCard(id) {
-            const c = clients.find(x=>x.id==id);
-            // Enhanced VCF format for iOS
-            const vcf = `BEGIN:VCARD\nVERSION:3.0\nN:${c.name};;;;\nFN:${c.name}\nTEL;type=CELL;type=VOICE;type=pref:${c.phone||''}\nADR;type=HOME;type=pref:;;${c.addr||''};;;;\nNOTE:Black Book Notes: ${c.notes||''}\nEND:VCARD`;
-            const blob = new Blob([vcf], { type: 'text/vcard' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${c.name.replace(/\s/g,'_')}.vcf`;
-            document.body.appendChild(a);
-            a.click();
-            setTimeout(() => document.body.removeChild(a), 100);
-        }
-
-        // --- SYSTEM CORE ---
+        // --- CORE UTILS ---
         function updateDash() {
             const today = new Date(); today.setHours(0,0,0,0);
             let counts = { due:0, bday:0, ghost:0, all: clients.length };
@@ -457,7 +647,6 @@
             document.getElementById('d-all').innerText = counts.all;
         }
 
-        // --- CUSTOM CONFIRM MODAL ---
         function customConfirm(msg, yesFn, noFn) {
             const m = document.getElementById('confirm-modal');
             document.getElementById('confirm-msg').innerText = msg;
@@ -466,28 +655,10 @@
             document.getElementById('btn-no').onclick = function() { m.style.display='none'; if(noFn) noFn(); };
         }
 
-        // --- SETTINGS ---
-        function openSettings() {
-            document.getElementById('s-shop-addr').value = shopSettings.addr;
-            document.getElementById('settings-modal').style.display = 'flex';
-        }
-        function saveSettings() {
-            shopSettings.addr = document.getElementById('s-shop-addr').value;
-            localStorage.setItem('bb_settings', JSON.stringify(shopSettings));
-            closeModals();
-        }
-
-        // --- STANDARD UTILS ---
         function openClientModal(id) {
             const c = id ? clients.find(x=>x.id==id) : {id:'',name:'',phone:'',price:'',addr:'',social:'',dob:'',start:new Date().toISOString().split('T')[0],ref:'',freq:'',last:'',sides:'',top:'',notes:''};
-            for(let k in c) {
-                const el = document.getElementById('c-'+k);
-                if(el) el.value = c[k];
-            }
-            // Ref List
-            const dl = document.getElementById('ref-list'); dl.innerHTML = '';
-            clients.forEach(cl => { if(cl.id !== c.id) dl.innerHTML += `<option value="${cl.name}">`; });
-            
+            for(let k in c) if(document.getElementById('c-'+k)) document.getElementById('c-'+k).value = c[k];
+            updateRefList('');
             document.getElementById('client-modal').style.display = 'flex';
         }
 
@@ -516,15 +687,14 @@
                 clientData.cuts=0; clientData.free=0; clientData.credit=0; clientData.ltv=0;
                 clients.push(clientData);
                 if(refName) {
-                    const referrer = clients.find(c => c.name.toLowerCase() === refName.toLowerCase() && c.id !== clientData.id);
-                    if(referrer) { referrer.credit+=5; clientData.credit+=5; alert("Referral linked! $5 credits."); }
+                    const ref = clients.find(c => c.name.toLowerCase() === refName.toLowerCase() && c.id !== clientData.id);
+                    if(ref) { ref.credit+=5; clientData.credit+=5; alert("Referral linked! $5 credits."); }
                 }
             }
             save(); closeModals(); render();
         }
 
-        function delClient(id) { customConfirm("Delete permanently?", () => { clients = clients.filter(x=>x.id!=id); save(); render(); }); }
-        
+        // --- HELPERS ---
         function getDueDate(c) {
             if(!c.lastVisit || !c.freq) return null;
             const d = new Date(c.lastVisit); d.setDate(d.getDate() + (c.freq*7)); d.setHours(0,0,0,0); return d;
@@ -534,43 +704,39 @@
             const d=new Date(dStr); const now=new Date(); now.setHours(0,0,0,0);
             const thisYear = new Date(now.getFullYear(), d.getMonth(), d.getDate()+1);
             const diff = Math.ceil((thisYear - now) / 86400000);
-            if(diff >= 0 && diff <= 7) return true;
-            const nextYear = new Date(now.getFullYear()+1, d.getMonth(), d.getDate()+1);
-            const diffNext = Math.ceil((nextYear - now) / 86400000);
-            return diffNext >= 0 && diffNext <= 7;
+            return (diff >= 0 && diff <= 7);
         }
         function getYears(dStr) { if(!dStr) return 0; return new Date().getFullYear() - new Date(dStr).getFullYear(); }
         function setToday(id) { document.getElementById(id).value = new Date().toISOString().split('T')[0]; }
         function fill(id,v) { document.getElementById(id).value = v; }
         function filter(t, el) { filterType=t; document.querySelectorAll('.dash-card').forEach(d=>d.classList.remove('active')); el.classList.add('active'); render(); }
+        function updateRefList(val) { const dl=document.getElementById('ref-list'); dl.innerHTML=''; clients.forEach(cl=>{dl.innerHTML+=`<option value="${cl.name}">`}); }
         function toggleMenu() { document.getElementById('save-menu').classList.toggle('show'); }
         function toggleTheme() { document.body.classList.toggle('light-mode'); localStorage.setItem('theme', document.body.classList.contains('light-mode')?'light':'dark'); }
         function closeModals() { document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); }
         function save() { localStorage.setItem('bb_clients_v3', JSON.stringify(clients)); }
         
-        function openText(id) {
-            const c = clients.find(x=>x.id==id);
-            if(!c.phone) return alert("No phone.");
-            window.location = `sms:${c.phone}`;
-        }
-        function openGiftModal() {
-             const name = prompt("Manual $5 Referral Credit. Enter Client Name:");
-             if(name) { const c=clients.find(x=>x.name.toLowerCase().includes(name.toLowerCase())); if(c){c.credit+=5;save();render();alert(`$5 added to ${c.name}`);} else alert("Not found");}
+        function openSettings() { document.getElementById('s-shop-addr').value = shopSettings.addr; document.getElementById('settings-modal').style.display='flex'; }
+        function saveSettings() { shopSettings.addr = document.getElementById('s-shop-addr').value; localStorage.setItem('bb_settings', JSON.stringify(shopSettings)); closeModals(); }
+        function openGiftModal() { const name = prompt("Manual $5 Credit. Client Name:"); if(name){const c=clients.find(x=>x.name.toLowerCase().includes(name.toLowerCase())); if(c){c.credit+=5;save();render();alert(`$5 added to ${c.name}`);} else alert("Not found");} }
+        function openText(id) { const c=clients.find(x=>x.id==id); if(!c.phone) return alert("No phone"); window.location = `sms:${c.phone}`; }
+        function downloadVCard(id) {
+            const c=clients.find(x=>x.id==id);
+            const vcf=`BEGIN:VCARD\nVERSION:3.0\nFN:${c.name}\nTEL;TYPE=CELL:${c.phone||''}\nADR;TYPE=HOME:;;${c.addr||''};;;\nNOTE:${c.notes||''}\nEND:VCARD`;
+            const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([vcf], {type:'text/vcard'})); a.download=`${c.name}.vcf`; document.body.appendChild(a); a.click(); document.body.removeChild(a);
         }
         function exportData(type) {
+            toggleMenu();
             if(type==='json') {
-                const b = new Blob([JSON.stringify(clients)], {type:'application/json'});
-                const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `bb_backup_${Date.now()}.json`; a.click();
+                const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(clients)],{type:'application/json'})); a.download=`bb_backup_${Date.now()}.json`; a.click();
             } else {
-                let csv = "Name,Phone,LTV,LastVisit\n" + clients.map(c=>`"${c.name}","${c.phone}",${c.ltv},${c.lastVisit}`).join('\n');
-                const b = new Blob([csv], {type:'text/csv'});
-                const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `bb_export.csv`; a.click();
+                let csv="Name,Phone,LTV,LastVisit\n"+clients.map(c=>`"${c.name}","${c.phone}",${c.ltv},${c.lastVisit}`).join('\n');
+                const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=`bb_export.csv`; a.click();
             }
         }
         function importData(el) {
             if(!el.files[0])return;
-            const fr = new FileReader(); fr.onload=e=>{ clients=JSON.parse(e.target.result); save(); render(); alert("Restored!"); };
-            fr.readAsText(el.files[0]);
+            const fr=new FileReader(); fr.onload=e=>{clients=JSON.parse(e.target.result); save(); render(); alert("Restored!");}; fr.readAsText(el.files[0]);
         }
     </script>
 </body>
