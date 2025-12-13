@@ -57,7 +57,6 @@
             display: flex; gap: 8px; padding: 10px 15px;
             overflow-x: auto; background: var(--bg);
             border-bottom: 1px solid var(--border); flex-shrink: 0;
-            /* Hide scrollbar */
             scrollbar-width: none; -ms-overflow-style: none;
         }
         .filter-scroll::-webkit-scrollbar { display: none; }
@@ -76,7 +75,6 @@
         #bit-list {
             flex-grow: 1; overflow-y: auto; padding: 15px;
             display: flex; flex-direction: column; gap: 10px;
-            /* Allow scrolling to dismiss keyboard naturally on iOS */
             -webkit-overflow-scrolling: touch;
         }
 
@@ -89,13 +87,21 @@
         }
         .search-container { padding: 10px 15px 5px 15px; }
         
-        /* Updated to type="search" for the native 'X' button */
+        /* FIXED SEARCH INPUT */
         .search-input {
             width: 100%; background: var(--input-bg); border: 1px solid var(--border);
-            color: var(--text); padding: 8px 15px; border-radius: 10px;
+            color: var(--text); 
+            /* Padding Left increased for the icon */
+            padding: 8px 15px 8px 35px; 
+            border-radius: 10px;
             font-size: 0.95rem; box-sizing: border-box;
-            /* Standard styling reset */
-            -webkit-appearance: none; 
+            
+            /* Icon moved to LEFT side */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%23888' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; 
+            background-position: left 12px center;
+            
+            /* Removed 'appearance: none' so the native X appears! */
         }
         .search-input:focus { outline: 2px solid var(--accent); border-color: transparent; }
 
@@ -126,14 +132,13 @@
         }
         .bit-card.pinned { border: 2px solid var(--pin-color); background: rgba(254, 202, 87, 0.05); }
         
-        /* --- COMPLETE COLOR CODING --- */
-        .bit-card[data-tag="Premise"] { border-left-color: var(--subtext); } /* Grey */
-        .bit-card[data-tag="Clean"] { border-left-color: #54a0ff; }       /* Blue */
-        .bit-card[data-tag="Roast"] { border-left-color: #ff6b6b; }       /* Red */
-        .bit-card[data-tag="Crowd"] { border-left-color: #1dd1a1; }       /* Green */
-        .bit-card[data-tag="Opener"] { border-left-color: var(--accent); }/* Orange/Gold */
-        .bit-card[data-tag="Dark"] { border-left-color: #a55eea; }        /* Purple */
-        .bit-card[data-tag="Closer"] { border-left-color: #eb3b5a; }      /* Neon Pink/Crimson */
+        .bit-card[data-tag="Premise"] { border-left-color: var(--subtext); } 
+        .bit-card[data-tag="Clean"] { border-left-color: #54a0ff; }       
+        .bit-card[data-tag="Roast"] { border-left-color: #ff6b6b; }       
+        .bit-card[data-tag="Crowd"] { border-left-color: #1dd1a1; }       
+        .bit-card[data-tag="Opener"] { border-left-color: var(--accent); }
+        .bit-card[data-tag="Dark"] { border-left-color: #a55eea; }        
+        .bit-card[data-tag="Closer"] { border-left-color: #eb3b5a; }      
 
         .bit-content { font-size: 1.1rem; line-height: 1.4; white-space: pre-wrap; margin-bottom: 8px; color: var(--text); font-weight: 500;}
         .notes-preview {
