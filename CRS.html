@@ -185,7 +185,6 @@
 <body>
 
     <div class="header">
-        <a href="../apps.html" class="header-icon">🏠</a>
         <h1>Black Book</h1>
         <div class="icon-group">
             <div class="header-icon" onclick="toggleTheme()" id="theme-icon">☀️</div>
@@ -631,26 +630,16 @@
             const date = new Date().toISOString().slice(0,10);
             
             if(type === 'csv') {
-                // EXCEL EXPORT
                 let csvContent = "data:text/csv;charset=utf-8,";
                 csvContent += "Name,Phone,Price,Last Visit,Frequency (Wks),Loyalty Points,Free Cuts,Credit,Total Cuts,Notes\n";
-                
                 clients.forEach(c => {
                     const row = [
-                        `"${c.name}"`,
-                        `"${c.phone || ''}"`,
-                        c.price || 0,
-                        c.lastVisit || '',
-                        c.freq || 0,
-                        c.loyalty || 0,
-                        c.freeCuts || 0,
-                        c.credit || 0,
-                        c.totalCuts || 0,
-                        `"${(c.notes || '').replace(/"/g, '""')}"` // Escape quotes
+                        `"${c.name}"`, `"${c.phone || ''}"`, c.price || 0, c.lastVisit || '', c.freq || 0,
+                        c.loyalty || 0, c.freeCuts || 0, c.credit || 0, c.totalCuts || 0,
+                        `"${(c.notes || '').replace(/"/g, '""')}"`
                     ];
                     csvContent += row.join(",") + "\n";
                 });
-                
                 const encodedUri = encodeURI(csvContent);
                 const link = document.createElement("a");
                 link.setAttribute("href", encodedUri);
@@ -658,7 +647,6 @@
                 document.body.appendChild(link);
                 link.click();
             } else {
-                // BACKUP EXPORT
                 const a = document.createElement('a');
                 a.href = URL.createObjectURL(new Blob([JSON.stringify(clients, null, 2)], {type:"application/json"}));
                 a.download = `blackbook_backup_${date}.json`;
