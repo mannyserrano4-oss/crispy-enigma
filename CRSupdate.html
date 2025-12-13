@@ -9,15 +9,17 @@
 
     <style>
         :root {
-            /* DARK MODE DEFAULTS */
+            /* DARK MODE */
             --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --subtext: #94a3b8;
             --border: #334155; --input-bg: #020617;
-            --accent: #818cf8; --red: #f87171; --gold: #fbbf24; --green: #4ade80; --blue: #60a5fa; --purple: #c084fc;
+            /* ACCENTS */
+            --accent: #818cf8; --red: #f87171; --gold: #fbbf24; 
+            --green: #4ade80; --blue: #60a5fa; --purple: #c084fc;
         }
         body.light-mode {
-            /* LIGHT MODE OVERRIDES */
-            --bg: #f8fafc; --card: #ffffff; --text: #334155; --subtext: #64748b;
-            --border: #e2e8f0; --input-bg: #f1f5f9;
+            /* LIGHT MODE */
+            --bg: #f1f5f9; --card: #ffffff; --text: #334155; --subtext: #64748b;
+            --border: #e2e8f0; --input-bg: #f8fafc;
             --accent: #4f46e5; --red: #ef4444; --gold: #d97706; --green: #16a34a; --blue: #2563eb; --purple: #9333ea;
         }
         body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif; margin:0; display:flex; flex-direction:column; height:100vh; overflow:hidden; transition: background 0.3s; }
@@ -25,7 +27,6 @@
         /* UTILS */
         .flex { display: flex; gap: 10px; }
         .grow { flex-grow: 1; }
-        .hidden { display: none !important; }
         .btn-today { padding: 0 10px; background: var(--border); color: var(--text); border: 1px solid var(--border); border-radius: 0 8px 8px 0; cursor: pointer; font-size: 0.8rem; font-weight:bold;}
         .input-group-date { display: flex; width:100%; }
         .input-group-date .form-input { border-radius: 8px 0 0 8px; flex-grow: 1; }
@@ -34,22 +35,15 @@
         .header { padding: 15px; background: var(--card); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;}
         h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; color: var(--accent); font-weight: 800; }
         .icon-btn { font-size: 1.5rem; cursor: pointer; opacity: 0.9; background:none; border:none; padding:0 8px; color: var(--text); }
-        .icon-btn:hover { transform: scale(1.1); }
 
         /* DASHBOARD */
         .dashboard { padding: 15px; background: var(--bg); display: flex; gap: 10px; overflow-x: auto; flex-shrink: 0; border-bottom: 1px solid var(--border); scrollbar-width: none; }
         .dashboard::-webkit-scrollbar { display: none; }
-        
         .dash-card { background: var(--card); min-width: 100px; padding: 12px; border-radius: 12px; border: 1px solid var(--border); text-align: center; cursor: pointer; transition: 0.2s; }
         .dash-card.active { border-color: var(--accent); background: var(--input-bg); transform: translateY(-2px); }
         .dash-count { font-size: 1.5rem; font-weight: bold; }
         .dash-lbl { font-size: 0.7rem; text-transform: uppercase; color: var(--subtext); margin-top: 5px; font-weight: bold; }
-        
-        /* Dashboard Colors */
-        .d-red .dash-count { color: var(--red); }
-        .d-gold .dash-count { color: var(--gold); }
-        .d-blue .dash-count { color: var(--blue); }
-        .d-purple .dash-count { color: var(--purple); }
+        .d-red .dash-count { color: var(--red); } .d-gold .dash-count { color: var(--gold); } .d-blue .dash-count { color: var(--blue); } .d-purple .dash-count { color: var(--purple); }
 
         /* LIST AREA */
         .search-deck { padding: 10px 15px; background: var(--bg); flex-shrink: 0; }
@@ -62,13 +56,8 @@
         .card-header { padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .client-name { font-size: 1.1rem; font-weight: bold; }
         .badges { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
-        
-        /* Badges Fixed */
         .badge { font-size: 0.65rem; padding: 3px 8px; border-radius: 10px; text-transform: uppercase; font-weight: bold; border: 1px solid currentColor; }
-        .b-red { color: var(--red); background: rgba(248,113,113,0.1); }
-        .b-gold { color: var(--gold); background: rgba(251,191,36,0.1); }
-        .b-blue { color: var(--blue); background: rgba(96,165,250,0.1); }
-        .b-green { color: var(--green); background: rgba(74,222,128,0.1); }
+        .b-red { color: var(--red); background: rgba(248,113,113,0.1); } .b-gold { color: var(--gold); background: rgba(251,191,36,0.1); } .b-blue { color: var(--blue); background: rgba(96,165,250,0.1); } .b-green { color: var(--green); background: rgba(74,222,128,0.1); }
         
         .client-details { display: none; padding: 15px; border-top: 1px solid var(--border); background: var(--input-bg); }
         .client-card.open .client-details { display: block; }
@@ -89,18 +78,29 @@
         .btn-main { background: var(--green); color: #000; border:none; font-weight:bold; padding: 15px; width:100%; border-radius: 8px; font-size:1rem; margin-bottom: 10px; cursor: pointer; display:block;}
         .btn-redeem { background: var(--gold); color: black; font-size: 0.7rem; padding: 5px 12px; border-radius: 4px; border:none; cursor: pointer; font-weight: bold;}
 
-        /* MODALS & FAB */
-        .fab { position: absolute; bottom: 30px; right: 20px; background: var(--accent); color: white; width: 60px; height: 60px; border-radius: 30px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 5px 20px rgba(0,0,0,0.4); cursor: pointer; border: none; z-index: 50; }
-        
+        /* MODAL STYLING (COLORFUL) */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(3px); z-index: 100; display: none; justify-content: center; align-items: flex-start; overflow-y: auto; padding: 20px 0; }
         .modal-content { background: var(--card); width: 90%; max-width: 400px; padding: 20px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.5); margin-bottom: 80px; }
         
-        .form-group { margin-bottom: 15px; }
-        .form-lbl { display: block; margin-bottom: 5px; color: var(--subtext); font-size: 0.85rem; font-weight:bold;}
+        .section-box { padding: 10px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 15px; }
+        
+        /* Contact Section (Blue) */
+        .sec-contact { border-left: 4px solid var(--blue); background: rgba(96, 165, 250, 0.05); }
+        .sec-contact .form-lbl { color: var(--blue); }
+        
+        /* Timeline Section (Gold) */
+        .sec-time { border-left: 4px solid var(--gold); background: rgba(251, 191, 36, 0.05); }
+        .sec-time .form-lbl { color: var(--gold); }
+        
+        /* Cut Section (Green) */
+        .sec-cut { border-left: 4px solid var(--green); background: rgba(74, 222, 128, 0.05); }
+        .sec-cut .form-lbl { color: var(--green); }
+
+        .form-group { margin-bottom: 12px; }
+        .form-lbl { display: block; margin-bottom: 5px; font-size: 0.75rem; font-weight:bold; text-transform: uppercase; letter-spacing: 0.5px;}
         .form-input { width: 100%; padding: 12px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
         .form-input:focus { outline: 2px solid var(--accent); border-color: transparent; }
 
-        /* CHIPS & MENU */
         .chip-container { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 8px; padding-bottom: 5px; }
         .chip { padding: 6px 12px; background: var(--border); color: var(--text); border-radius: 20px; font-size: 0.75rem; white-space: nowrap; cursor: pointer; border: 1px solid transparent; }
         .chip:active { background: var(--accent); color:white; }
@@ -157,51 +157,52 @@
 
     <div id="client-modal" class="modal">
         <div class="modal-content">
-            <h2 style="margin-top:0; margin-bottom:20px; color:var(--accent);">Client Profile</h2>
+            <h2 style="margin-top:0; margin-bottom:20px; color:var(--text); text-align:center;">Client Profile</h2>
             <input type="hidden" id="c-id">
             
-            <div class="form-group"><label class="form-lbl">Name</label><input id="c-name" class="form-input"></div>
+            <div class="form-group"><input id="c-name" class="form-input" placeholder="Client Name" style="font-size:1.2rem; font-weight:bold; text-align:center;"></div>
             
-            <div class="flex">
-                <div class="grow form-group"><label class="form-lbl">Phone</label><input type="tel" id="c-phone" class="form-input"></div>
-                <div class="grow form-group"><label class="form-lbl">Price ($)</label><input type="number" id="c-price" class="form-input" placeholder="40"></div>
+            <div class="section-box sec-contact">
+                <div class="flex">
+                    <div class="grow form-group"><label class="form-lbl">📞 Phone</label><input type="tel" id="c-phone" class="form-input"></div>
+                    <div class="grow form-group"><label class="form-lbl">💲 Price</label><input type="number" id="c-price" class="form-input" placeholder="40"></div>
+                </div>
+                <div class="form-group"><label class="form-lbl">📸 Social (IG)</label><input id="c-social" class="form-input" placeholder="@username"></div>
+                <div class="form-group"><label class="form-lbl">📍 Address (Mobile)</label><input id="c-addr" class="form-input" placeholder="123 Main St..."></div>
             </div>
             
-            <div class="form-group"><label class="form-lbl">Address (Mobile)</label><input id="c-addr" class="form-input" placeholder="123 Main St..."></div>
-            
-            <div class="flex">
-                <div class="grow form-group">
-                    <label class="form-lbl">Birthday</label>
-                    <div class="input-group-date"><input type="date" id="c-dob" class="form-input"><button class="btn-today" onclick="setToday('c-dob')">Today</button></div>
+            <div class="section-box sec-time">
+                <div class="flex">
+                    <div class="grow form-group">
+                        <label class="form-lbl">🎁 Birthday</label>
+                        <div class="input-group-date"><input type="date" id="c-dob" class="form-input"></div>
+                    </div>
+                    <div class="grow form-group">
+                        <label class="form-lbl">🗓️ First Cut</label>
+                        <div class="input-group-date"><input type="date" id="c-start" class="form-input"></div>
+                    </div>
                 </div>
-                <div class="grow form-group">
-                    <label class="form-lbl">Start Date</label>
-                    <div class="input-group-date"><input type="date" id="c-start" class="form-input"><button class="btn-today" onclick="setToday('c-start')">Today</button></div>
+                <div class="flex">
+                    <div class="grow form-group"><label class="form-lbl">⏳ Freq (Wks)</label><input type="number" id="c-freq" class="form-input" placeholder="2"></div>
+                    <div class="grow form-group"><label class="form-lbl">✂️ Last Cut</label><div class="input-group-date"><input type="date" id="c-last" class="form-input"><button class="btn-today" onclick="setToday('c-last')">Today</button></div></div>
                 </div>
-            </div>
-            
-            <div class="form-group"><label class="form-lbl">Referred By</label>
-                <input id="c-ref" class="form-input" list="ref-list" placeholder="Start typing name...">
-                <datalist id="ref-list"></datalist>
+                <div class="form-group"><label class="form-lbl">🤝 Referred By</label>
+                    <input id="c-ref" class="form-input" list="ref-list" placeholder="Start typing name...">
+                    <datalist id="ref-list"></datalist>
+                </div>
             </div>
 
-             <div class="flex">
-                <div class="grow form-group"><label class="form-lbl">Freq (Weeks)</label><input type="number" id="c-freq" class="form-input" placeholder="2"></div>
-                <div class="grow form-group">
-                    <label class="form-lbl">Last Visit</label>
-                    <div class="input-group-date"><input type="date" id="c-last" class="form-input"><button class="btn-today" onclick="setToday('c-last')">Today</button></div>
+            <div class="section-box sec-cut">
+                <div class="form-group"><label class="form-lbl">💈 Sides</label>
+                    <div class="chip-container"><span class="chip" onclick="fill('c-sides','Skin Fade')">Skin Fade</span><span class="chip" onclick="fill('c-sides','Taper')">Taper</span><span class="chip" onclick="fill('c-sides','#1')">#1</span><span class="chip" onclick="fill('c-sides','#2')">#2</span></div>
+                    <input id="c-sides" class="form-input">
                 </div>
+                <div class="form-group"><label class="form-lbl">💇‍♂️ Top</label>
+                     <div class="chip-container"><span class="chip" onclick="fill('c-top','Crop')">Crop</span><span class="chip" onclick="fill('c-top','Trim')">Trim</span><span class="chip" onclick="fill('c-top','Texture')">Texture</span></div>
+                    <input id="c-top" class="form-input">
+                </div>
+                 <div class="form-group"><label class="form-lbl">📝 Notes</label><textarea id="c-notes" class="form-input" rows="3"></textarea></div>
             </div>
-
-            <div class="form-group"><label class="form-lbl">SIDES Formula</label>
-                <div class="chip-container"><span class="chip" onclick="fill('c-sides','Skin Fade')">Skin Fade</span><span class="chip" onclick="fill('c-sides','Taper')">Taper</span><span class="chip" onclick="fill('c-sides','#1')">#1</span><span class="chip" onclick="fill('c-sides','#2')">#2</span></div>
-                <input id="c-sides" class="form-input">
-            </div>
-            <div class="form-group"><label class="form-lbl">TOP Formula</label>
-                 <div class="chip-container"><span class="chip" onclick="fill('c-top','Crop')">Crop</span><span class="chip" onclick="fill('c-top','Trim')">Trim</span><span class="chip" onclick="fill('c-top','Texture')">Texture</span></div>
-                <input id="c-top" class="form-input">
-            </div>
-             <div class="form-group"><label class="form-lbl">Notes</label><textarea id="c-notes" class="form-input" rows="3"></textarea></div>
 
             <button class="btn-main" onclick="saveClient()">SAVE PROFILE</button>
             <button class="list-option" style="text-align:center; color:var(--red);" onclick="closeModals()">Cancel</button>
@@ -250,14 +251,17 @@
 
             visible.forEach(c => {
                 let badges = '';
-                if(isThisWeek(c.dob)) badges += `<span class="badge b-gold">🎂 BDAY WK</span>`;
-                if(isThisWeek(c.start)) badges += `<span class="badge b-blue">🎉 ${getYears(c.start)}YR ANNI</span>`;
-                if(c.ltv > 500) badges += `<span class="badge b-green">💎 VIP ($${c.ltv})</span>`;
+                if(isThisWeek(c.dob)) badges += `<span class="badge b-gold" style="color:var(--gold)">🎂 BDAY WK</span>`;
+                if(isThisWeek(c.start)) badges += `<span class="badge b-blue" style="color:var(--blue)">🎉 ${getYears(c.start)}YR ANNI</span>`;
+                if(c.ltv > 500) badges += `<span class="badge b-green" style="color:var(--green)">💎 VIP ($${c.ltv})</span>`;
 
                 const due = getDueDate(c);
                 const daysTill = due ? Math.ceil((due - today) / (86400000)) : 999;
                 let dueTxt = due ? (daysTill < 0 ? `Overdue ${Math.abs(daysTill)}d` : `Due in ${daysTill}d`) : '';
                 let dueColor = daysTill < 0 ? 'var(--red)' : 'var(--subtext)';
+                
+                // Show LAST CUT DATE explicitly
+                let lastCutTxt = c.lastVisit ? `Last: ${c.lastVisit.slice(5)}` : 'New';
 
                 const div = document.createElement('div');
                 div.className = 'client-card';
@@ -266,6 +270,7 @@
                         <div><div class="client-name">${c.name}</div><div class="badges">${badges}</div></div>
                         <div style="text-align:right">
                             <div style="font-size:0.8rem;font-weight:bold;color:var(--gold)">${(c.free>0?`${c.free} FREE CUTS` : (c.credit>0?`$${c.credit} CR`:''))}</div>
+                            <div style="font-size:0.7rem;color:var(--text); margin-top:2px;">${lastCutTxt}</div>
                             <div style="font-size:0.7rem;color:${dueColor}">${dueTxt}</div>
                         </div>
                     </div>
@@ -346,7 +351,6 @@
                 {lbl:"Follow Up", txt:`Hey ${name}, just checking in on that fresh cut. All good?`},
                 {lbl:"Due Soon", txt:`Yo ${name}, getting scruffy. Time to book?`}
             ];
-            // Fixed the syntax error here with proper ternary for iOS & body
             const separator = navigator.userAgent.match(/iPhone|iPad/i) ? '&' : '?';
             
             openListModal("Send Text", opts.map(o => ({
@@ -372,7 +376,7 @@
 
         // --- EDIT MODAL ---
         function openClientModal(id) {
-            const c = id ? clients.find(x=>x.id==id) : {id:'',name:'',phone:'',price:'',addr:'',dob:'',start:new Date().toISOString().split('T')[0],ref:'',freq:'',last:'',sides:'',top:'',notes:''};
+            const c = id ? clients.find(x=>x.id==id) : {id:'',name:'',phone:'',price:'',addr:'',social:'',dob:'',start:new Date().toISOString().split('T')[0],ref:'',freq:'',last:'',sides:'',top:'',notes:''};
             
             for(let k in c) {
                 const el = document.getElementById('c-'+k);
@@ -397,6 +401,7 @@
                 phone: document.getElementById('c-phone').value,
                 price: parseFloat(document.getElementById('c-price').value)||0,
                 addr: document.getElementById('c-addr').value,
+                social: document.getElementById('c-social').value,
                 dob: document.getElementById('c-dob').value,
                 start: document.getElementById('c-start').value,
                 ref: refName,
@@ -433,12 +438,10 @@
             if(!dStr) return false; 
             const d=new Date(dStr); const now=new Date(); now.setHours(0,0,0,0);
             
-            // Check logic for yearly recurring event
             const thisYear = new Date(now.getFullYear(), d.getMonth(), d.getDate()+1);
             const diff = Math.ceil((thisYear - now) / 86400000);
             if(diff >= 0 && diff <= 7) return true;
             
-            // Wrap around year check (e.g. today Dec 30, bday Jan 2)
             const nextYear = new Date(now.getFullYear()+1, d.getMonth(), d.getDate()+1);
             const diffNext = Math.ceil((nextYear - now) / 86400000);
             return diffNext >= 0 && diffNext <= 7;
@@ -447,8 +450,8 @@
             if(!dStr) return false; 
             const d = new Date(dStr); d.setHours(0,0,0,0);
             const yest = new Date(); yest.setDate(yest.getDate()-1); yest.setHours(0,0,0,0);
-            // Must account for timezone offset if strictly using strings, but date obj compare is safer
-            return d.getTime() === yest.getTime();
+            // Fix timezone issue by comparing strings
+            return d.toISOString().split('T')[0] === yest.toISOString().split('T')[0];
         }
         function getYears(dStr) { if(!dStr) return 0; return new Date().getFullYear() - new Date(dStr).getFullYear(); }
         function setToday(id) { document.getElementById(id).value = new Date().toISOString().split('T')[0]; }
