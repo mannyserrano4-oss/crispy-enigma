@@ -10,12 +10,27 @@
 
     <style>
         :root {
+            /* DARK MODE (Default) */
             --bg: #121212;
             --card: #1e1e1e;
             --text: #ffffff;
-            --accent: #feca57; /* Gold/Yellow */
+            --subtext: #888;
+            --accent: #feca57; /* Gold */
             --danger: #ff6b6b;
+            --success: #4cd137;
             --border: #333;
+            --input-bg: #111;
+        }
+
+        /* LIGHT MODE */
+        body.light-mode {
+            --bg: #f5f5f7;
+            --card: #ffffff;
+            --text: #1d1d1f;
+            --subtext: #666;
+            --accent: #ff9f0a; /* Darker Gold for contrast */
+            --border: #e0e0e0;
+            --input-bg: #f0f0f0;
         }
 
         body {
@@ -25,34 +40,38 @@
             margin: 0; padding: 0;
             display: flex; flex-direction: column;
             height: 100vh; overflow: hidden;
+            transition: background 0.3s, color 0.3s;
         }
 
         /* HEADER */
         .header {
             padding: 15px;
-            background: rgba(30, 30, 30, 0.95);
+            background: var(--card);
             border-bottom: 1px solid var(--border);
             display: flex; justify-content: space-between; align-items: center;
             z-index: 10;
         }
         h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); }
-        
-        .btn-icon { background: none; border: none; font-size: 1.5rem; cursor: pointer; text-decoration: none;}
+        .btn-icon { background: none; border: none; font-size: 1.4rem; cursor: pointer; text-decoration: none; padding: 5px; }
 
         /* FILTER BAR */
         .filter-scroll {
-            display: flex; gap: 10px; padding: 10px 15px;
+            display: flex; gap: 8px; padding: 10px 15px;
             overflow-x: auto; background: var(--bg);
             border-bottom: 1px solid var(--border); flex-shrink: 0;
         }
         .filter-chip {
             background: var(--card); padding: 6px 14px;
-            border-radius: 20px; font-size: 0.85rem; color: #888;
+            border-radius: 20px; font-size: 0.85rem; color: var(--subtext);
             border: 1px solid var(--border); white-space: nowrap; cursor: pointer;
+            transition: all 0.2s;
         }
         .filter-chip.active {
             background: var(--accent); color: black; font-weight: bold; border-color: var(--accent);
         }
+        /* Special style for 'New' filter */
+        .filter-chip[data-tag="New"] { border-color: var(--success); color: var(--success); }
+        .filter-chip[data-tag="New"].active { background: var(--success); color: white; }
 
         /* LIST AREA */
         #bit-list {
@@ -62,22 +81,53 @@
 
         .bit-card {
             background: var(--card); padding: 15px; border-radius: 12px;
-            border-left: 4px solid var(--accent); position: relative;
+            border-left: 4px solid var(--subtext); position: relative;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        /* Color code the border based on tag */
+        .bit-card[data-tag="Premise"] { border-left-color: var(--subtext); }
+        .bit-card[data-tag="Clean"] { border-left-color: #54a0ff; }
+        .bit-card[data-tag="Roast"] { border-left-color: #ff6b6b; }
+        .bit-card[data-tag="Crowd"] { border-left-color: #1dd1a1; }
+
+        .bit-content { font-size: 1.1rem; line-height: 1.4; white-space: pre-wrap; margin-bottom: 8px; color: var(--text); }
+        
+        .notes-preview {
+            font-size: 0.85rem; color: var(--subtext); margin-bottom: 8px;
+            font-style: italic; display: flex; align-items: center; gap: 5px;
         }
 
-        .bit-content { font-size: 1.1rem; line-height: 1.4; white-space: pre-wrap; margin-bottom: 8px; }
-        
         .bit-meta {
             display: flex; justify-content: space-between; align-items: center;
-            font-size: 0.75rem; color: #666;
+            font-size: 0.75rem; color: var(--subtext);
         }
         
         .tag-badge { 
-            background: #333; padding: 2px 8px; border-radius: 4px; 
-            color: #aaa; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 1px;
+            background: var(--input-bg); padding: 3px 8px; border-radius: 4px; 
+            color: var(--subtext); text-transform: uppercase; font-size: 0.65rem; letter-spacing: 1px;
+            font-weight: bold;
         }
 
-        .delete-btn { color: var(--danger); cursor: pointer; padding: 5px; font-size: 1rem; }
+        .action-btn { cursor: pointer; padding: 5px; font-size: 1rem; margin-left: 10px; opacity: 0.6; }
+        .action-btn:hover { opacity: 1; }
+
+        /* EDIT MODE STYLES */
+        .edit-area {
+            background: var(--input-bg); border: 1px solid var(--accent); color: var(--text);
+            padding: 10px; border-radius: 6px; font-size: 1rem;
+            width: 100%; box-sizing: border-box; font-family: inherit; resize: vertical;
+            min-height: 60px; margin-bottom: 10px;
+        }
+        .edit-notes {
+            background: var(--bg); border: 1px dashed var(--subtext); color: var(--subtext);
+            padding: 10px; border-radius: 6px; font-size: 0.9rem;
+            width: 100%; box-sizing: border-box; font-family: inherit; resize: vertical;
+            min-height: 40px; margin-bottom: 10px;
+        }
+
+        .edit-controls { display: flex; gap: 10px; flex-wrap: wrap;}
+        .btn-save { background: var(--success); color: white; border: none; padding: 10px; border-radius: 5px; font-weight: bold; flex-grow: 1;}
+        .btn-cancel { background: var(--input-bg); color: var(--text); border: 1px solid var(--border); padding: 10px; border-radius: 5px; }
 
         /* INPUT AREA */
         .input-area {
@@ -87,35 +137,38 @@
             padding-bottom: max(15px, env(safe-area-inset-bottom));
         }
 
-        textarea {
-            background: #111; border: 1px solid var(--border);
-            color: white; padding: 12px; border-radius: 8px;
-            resize: none; height: 60px; font-family: inherit; font-size: 1rem;
+        .input-main {
+            background: var(--input-bg); border: 1px solid var(--border);
+            color: var(--text); padding: 12px; border-radius: 8px;
+            resize: none; height: 50px; font-family: inherit; font-size: 1rem;
         }
-        textarea:focus { outline: 2px solid var(--accent); border-color: transparent; }
+        .input-main:focus { outline: 2px solid var(--accent); border-color: transparent; }
 
         .input-row { display: flex; gap: 10px; }
         
-        select { background: #333; color: white; border: none; padding: 0 10px; border-radius: 8px; flex-grow: 1; }
+        select { 
+            background: var(--input-bg); color: var(--text); border: 1px solid var(--border); 
+            padding: 0 10px; border-radius: 8px; flex-grow: 1; height: 45px; font-size: 1rem;
+        }
 
         .btn-add {
             background: var(--accent); color: black; border: none;
-            padding: 12px 25px; border-radius: 8px; font-weight: bold;
+            padding: 0 20px; border-radius: 8px; font-weight: bold;
             text-transform: uppercase; cursor: pointer;
         }
         
-        /* SETTINGS MENU (Hidden by default) */
+        /* SETTINGS MENU */
         #settings-menu {
-            position: absolute; top: 60px; right: 10px;
-            background: #252525; border: 1px solid #444;
+            position: absolute; top: 60px; left: 15px; /* Moved to Left since Home is gone */
+            background: var(--card); border: 1px solid var(--border);
             border-radius: 8px; padding: 10px;
             display: none; flex-direction: column; gap: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 100;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 100; min-width: 200px;
         }
         #settings-menu.visible { display: flex; }
         
         .menu-btn {
-            background: #333; color: white; border: none; padding: 10px;
+            background: var(--input-bg); color: var(--text); border: none; padding: 10px;
             border-radius: 5px; cursor: pointer; text-align: left; font-size: 0.9rem;
         }
 
@@ -124,89 +177,178 @@
 <body>
 
     <div class="header">
-        <a href="../apps.html" class="btn-icon">🏠</a>
-        <h1>Comedy Vault</h1>
         <button class="btn-icon" onclick="toggleMenu()">⚙️</button>
+        <h1>Comedy Vault</h1>
+        <button class="btn-icon" onclick="toggleTheme()" id="theme-icon">☀️</button>
     </div>
 
     <div id="settings-menu">
-        <button class="menu-btn" onclick="shareToNotes()">📝 Export to Notes App</button>
-        <button class="menu-btn" onclick="exportData()">💾 Backup to File</button>
-        <button class="menu-btn" onclick="document.getElementById('file-input').click()">📂 Restore from File</button>
-        <div style="font-size:0.7rem; color:#888; text-align:center;">Safe & Secure</div>
+        <button class="menu-btn" onclick="shareToNotes()">📝 Export to Notes</button>
+        <button class="menu-btn" onclick="exportData()">💾 Backup File</button>
+        <button class="menu-btn" onclick="document.getElementById('file-input').click()">📂 Restore File</button>
+        <div style="font-size:0.7rem; color:var(--subtext); text-align:center;">Vault v2.0</div>
     </div>
-    
     <input type="file" id="file-input" style="display:none" onchange="importData(this)">
 
     <div class="filter-scroll">
         <div class="filter-chip active" onclick="filterBits('all', this)">All</div>
-        <div class="filter-chip" onclick="filterBits('New', this)">New</div>
-        <div class="filter-chip" onclick="filterBits('Opener', this)">Opener</div>
-        <div class="filter-chip" onclick="filterBits('Closer', this)">Closer</div>
+        <div class="filter-chip" data-tag="New" onclick="filterBits('New', this)">★ New</div>
+        <div class="filter-chip" onclick="filterBits('Premise', this)">Premise</div>
+        <div class="filter-chip" onclick="filterBits('Clean', this)">Clean</div>
         <div class="filter-chip" onclick="filterBits('Roast', this)">Roast</div>
-        <div class="filter-chip" onclick="filterBits('Crowd Work', this)">Crowd</div>
+        <div class="filter-chip" onclick="filterBits('Crowd', this)">Crowd</div>
         <div class="filter-chip" onclick="filterBits('Dark', this)">Dark</div>
     </div>
 
     <div id="bit-list"></div>
 
     <div class="input-area">
-        <textarea id="new-text" placeholder="Write a new premise..."></textarea>
+        <textarea class="input-main" id="new-text" placeholder="Quick Premise..."></textarea>
         <div class="input-row">
             <select id="new-tag">
-                <option value="New">New Idea</option>
+                <option value="Premise">Premise (Idea)</option>
+                <option value="Clean">Clean</option>
+                <option value="Roast">Roast</option>
+                <option value="Crowd">Crowd Work</option>
+                <option value="Dark">Dark</option>
                 <option value="Opener">Opener</option>
                 <option value="Closer">Closer</option>
-                <option value="Roast">Roast</option>
-                <option value="Crowd Work">Crowd Work</option>
-                <option value="Dark">Dark</option>
             </select>
             <button class="btn-add" onclick="addBit()">Add</button>
         </div>
     </div>
 
     <script>
+        // --- INIT ---
         let bits = JSON.parse(localStorage.getItem('comedy_bits') || '[]');
         let currentFilter = 'all';
+        let editingId = null;
 
+        // Theme Logic
+        if(localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-mode');
+            document.getElementById('theme-icon').innerText = '🌙';
+        }
+
+        // --- RENDER ---
         function render() {
             const list = document.getElementById('bit-list');
             list.innerHTML = '';
             
-            const visibleBits = currentFilter === 'all' ? bits : bits.filter(b => b.tag === currentFilter);
+            let visibleBits = [];
+
+            // FILTER LOGIC
+            if (currentFilter === 'all') {
+                visibleBits = bits;
+            } else if (currentFilter === 'New') {
+                // "New" is a smart filter: Top 5 most recent
+                visibleBits = bits.slice(0, 5);
+            } else {
+                // Normal tag filter
+                visibleBits = bits.filter(b => b.tag === currentFilter);
+            }
 
             if (visibleBits.length === 0) {
-                list.innerHTML = '<div style="text-align:center; color:#444; margin-top:50px;">Nothing here yet.</div>';
+                list.innerHTML = '<div style="text-align:center; color:var(--subtext); margin-top:50px; font-style:italic;">No jokes found.</div>';
                 return;
             }
 
             visibleBits.forEach(bit => {
                 const div = document.createElement('div');
                 div.className = 'bit-card';
-                div.innerHTML = `
-                    <div class="bit-content">${escapeHtml(bit.text)}</div>
-                    <div class="bit-meta">
-                        <span class="tag-badge">${bit.tag}</span>
-                        <div style="display:flex; gap:15px; align-items:center;">
-                            <span>${new Date(bit.date).toLocaleDateString()}</span>
-                            <span class="delete-btn" onclick="deleteBit(${bit.id})">🗑️</span>
+                div.setAttribute('data-tag', bit.tag); // For CSS coloring
+                div.id = `card-${bit.id}`;
+
+                // EDIT MODE
+                if (editingId === bit.id) {
+                    div.innerHTML = `
+                        <div style="font-size:0.8rem; color:var(--accent); margin-bottom:5px;">SETUP / PREMISE</div>
+                        <textarea class="edit-area" id="edit-text-${bit.id}">${bit.text}</textarea>
+                        
+                        <div style="font-size:0.8rem; color:var(--accent); margin-bottom:5px;">WORKSHOP NOTES (Tags, Alts, Delivery)</div>
+                        <textarea class="edit-notes" id="edit-notes-${bit.id}" placeholder="Add alternate punchlines or notes here...">${bit.notes || ''}</textarea>
+                        
+                        <div class="edit-controls">
+                            <select id="edit-tag-${bit.id}">
+                                ${getOptionsHtml(bit.tag)}
+                            </select>
+                            <button class="btn-save" onclick="saveEdit(${bit.id})">SAVE</button>
+                            <button class="btn-cancel" onclick="cancelEdit()">CANCEL</button>
                         </div>
-                    </div>
-                `;
+                    `;
+                } else {
+                    // VIEW MODE
+                    // Check if notes exist to show an indicator
+                    const hasNotes = bit.notes && bit.notes.trim().length > 0;
+                    const noteIndicator = hasNotes ? `<div class="notes-preview">📝 Has workshop notes...</div>` : '';
+
+                    div.innerHTML = `
+                        <div class="bit-content">${escapeHtml(bit.text)}</div>
+                        ${noteIndicator}
+                        <div class="bit-meta">
+                            <span class="tag-badge">${bit.tag}</span>
+                            <div style="display:flex; align-items:center;">
+                                <span style="font-size:0.7rem; margin-right:10px;">${new Date(bit.date).toLocaleDateString()}</span>
+                                <span class="action-btn" onclick="startEdit(${bit.id})">✏️</span>
+                                <span class="action-btn" style="color:var(--danger)" onclick="deleteBit(${bit.id})">🗑️</span>
+                            </div>
+                        </div>
+                    `;
+                }
                 list.appendChild(div);
             });
         }
 
+        // --- ACTIONS ---
         function addBit() {
             const input = document.getElementById('new-text');
             const tagSelect = document.getElementById('new-tag');
             const text = input.value.trim();
             if (!text) return;
 
-            const newBit = { id: Date.now(), text: text, tag: tagSelect.value, date: Date.now() };
-            bits.unshift(newBit);
+            const newBit = { 
+                id: Date.now(), 
+                text: text, 
+                tag: tagSelect.value, 
+                notes: "", // New field for fleshing it out
+                date: Date.now() 
+            };
+            bits.unshift(newBit); // Add to top
             save();
             input.value = '';
+            // If we are in a specific filter, switch to All or the Tag so user sees the new bit
+            if(currentFilter === 'New' || currentFilter === 'all' || currentFilter === tagSelect.value) {
+                render();
+            } else {
+                filterBits('all', document.querySelector('.filter-chip')); // Reset to all
+            }
+        }
+
+        function startEdit(id) {
+            editingId = id;
+            render();
+        }
+
+        function saveEdit(id) {
+            const newText = document.getElementById(`edit-text-${id}`).value.trim();
+            const newNotes = document.getElementById(`edit-notes-${id}`).value.trim();
+            const newTag = document.getElementById(`edit-tag-${id}`).value;
+            
+            if (!newText) return cancelEdit();
+
+            const index = bits.findIndex(b => b.id === id);
+            if (index !== -1) {
+                bits[index].text = newText;
+                bits[index].notes = newNotes;
+                bits[index].tag = newTag;
+                save();
+            }
+            editingId = null;
+            render();
+        }
+
+        function cancelEdit() {
+            editingId = null;
             render();
         }
 
@@ -225,75 +367,68 @@
             render();
         }
 
+        // --- UTILS ---
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            document.getElementById('theme-icon').innerText = isLight ? '🌙' : '☀️';
+        }
+
         function toggleMenu() {
-            const menu = document.getElementById('settings-menu');
-            menu.classList.toggle('visible');
+            document.getElementById('settings-menu').classList.toggle('visible');
         }
 
-        // --- SHARE TO NOTES (THE NEW FEATURE) ---
-        function shareToNotes() {
-            if (!navigator.share) {
-                alert("Your browser doesn't support sharing. Try Safari on iPhone.");
-                return;
-            }
-
-            // Create a nice text list of all jokes
-            let textToShare = "🎤 MY COMEDY BITS \n\n";
-            bits.forEach(b => {
-                textToShare += `[${b.tag.toUpperCase()}] \n${b.text} \n-------------------\n`;
-            });
-
-            // Open iOS Share Sheet
-            navigator.share({
-                title: 'Comedy Vault Backup',
-                text: textToShare
-            }).catch(console.error);
-        }
-
-        // --- BACKUP TO FILE (THE SAFETY NET) ---
-        function exportData() {
-            const dataStr = JSON.stringify(bits, null, 2);
-            const blob = new Blob([dataStr], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `jokes_backup_${new Date().toISOString().slice(0,10)}.json`;
-            a.click();
-            
-            toggleMenu(); 
-        }
-
-        // --- RESTORE FROM FILE ---
-        function importData(input) {
-            const file = input.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const importedBits = JSON.parse(e.target.result);
-                    if (Array.isArray(importedBits)) {
-                        if(confirm(`Found ${importedBits.length} jokes. This will OVERWRITE current list. Continue?`)) {
-                            bits = importedBits;
-                            save();
-                            render();
-                            alert("Jokes restored!");
-                        }
-                    } else {
-                        alert("Invalid file.");
-                    }
-                } catch (err) {
-                    alert("Error reading file.");
-                }
-            };
-            reader.readAsText(file);
-            toggleMenu();
+        function getOptionsHtml(selected) {
+            const opts = ["Premise", "Clean", "Roast", "Crowd", "Dark", "Opener", "Closer"];
+            return opts.map(o => `<option value="${o}" ${o===selected?'selected':''}>${o}</option>`).join('');
         }
 
         function save() { localStorage.setItem('comedy_bits', JSON.stringify(bits)); }
+        
         function escapeHtml(text) {
+            if(!text) return "";
             return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        // --- EXPORT/IMPORT ---
+        function shareToNotes() {
+            if (!navigator.share) { alert("Sharing not supported"); return; }
+            let txt = "🎤 COMEDY VAULT EXPORT \n\n";
+            bits.forEach(b => {
+                txt += `[${b.tag}] ${b.text}\n`;
+                if(b.notes) txt += `   NOTES: ${b.notes}\n`;
+                txt += `-------------------\n`;
+            });
+            navigator.share({ title: 'Comedy Export', text: txt }).catch(console.error);
+            toggleMenu();
+        }
+
+        function exportData() {
+            const blob = new Blob([JSON.stringify(bits, null, 2)], { type: "application/json" });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `comedy_backup_${Date.now()}.json`;
+            a.click();
+            toggleMenu();
+        }
+
+        function importData(input) {
+            const file = input.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if(Array.isArray(data)) {
+                        if(confirm(`Restore ${data.length} items? Overwrites current list.`)) {
+                            bits = data; save(); render();
+                        }
+                    }
+                } catch(err) { alert("Error reading file"); }
+            };
+            reader.readAsText(file);
+            toggleMenu();
         }
 
         render();
