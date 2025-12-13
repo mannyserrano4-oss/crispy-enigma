@@ -10,7 +10,6 @@
 
     <style>
         :root {
-            /* --- NIGHT MODE (Black & Orange) --- */
             --bg: #000000;
             --card: #121212;
             --text: #ffffff;
@@ -21,9 +20,9 @@
             --danger: #ff4757;
             --success: #2ed573;
             --pin-color: #feca57;
+            --warning: #f1c40f;
         }
 
-        /* --- DAY MODE (White & Purple) --- */
         body.light-mode {
             --bg: #f8f9fa;
             --card: #ffffff;
@@ -43,16 +42,59 @@
             transition: background 0.3s, color 0.3s;
         }
 
-        /* HEADER */
+        /* --- HEADER --- */
         .header {
             padding: 15px; background: var(--card); border-bottom: 1px solid var(--border);
             display: flex; justify-content: space-between; align-items: center; z-index: 10;
         }
         h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-weight: 900;}
-        .btn-icon { background: none; border: none; font-size: 1.4rem; cursor: pointer; text-decoration: none; padding: 5px; opacity: 0.8; transition: opacity 0.2s; }
-        .btn-icon:hover { opacity: 1; transform: scale(1.1); }
+        .btn-icon { background: none; border: none; font-size: 1.4rem; cursor: pointer; text-decoration: none; padding: 5px; opacity: 0.8; }
 
-        /* FILTER BAR */
+        /* --- STAGE TIMER DISPLAY (Hidden by default) --- */
+        #stage-timer {
+            display: none; background: #000; padding: 15px; text-align: center;
+            border-bottom: 2px solid #333; position: relative;
+        }
+        #timer-digits { font-size: 3.5rem; font-weight: 900; font-variant-numeric: tabular-nums; line-height: 1; }
+        #timer-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; margin-top: 5px; opacity: 0.7; }
+        
+        /* Timer States */
+        .t-green { color: var(--success); }
+        .t-yellow { color: var(--warning); }
+        .t-red { color: var(--danger); }
+        .t-flash { color: var(--danger); animation: flash 1s infinite; background: rgba(255, 71, 87, 0.1); }
+        
+        @keyframes flash { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        /* --- SETUP MODAL (Green Room) --- */
+        #timer-setup {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 2000;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            padding: 20px; box-sizing: border-box;
+        }
+        .setup-title { font-size: 2rem; font-weight: 900; color: var(--text); margin-bottom: 30px; }
+        .time-presets { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; width: 100%; max-width: 400px; margin-bottom: 20px; }
+        .preset-btn { 
+            background: var(--card); border: 1px solid var(--border); color: var(--text); 
+            padding: 15px; border-radius: 12px; font-size: 1.2rem; font-weight: bold; cursor: pointer;
+        }
+        .preset-btn.selected { background: var(--accent); color: black; border-color: var(--accent); }
+        
+        .setup-row { display: flex; gap: 10px; width: 100%; max-width: 400px; margin-bottom: 20px; align-items: center; color: var(--subtext); }
+        .setup-input { 
+            background: var(--input-bg); border: 1px solid var(--border); color: var(--text);
+            padding: 10px; border-radius: 8px; font-size: 1.2rem; width: 80px; text-align: center;
+        }
+        
+        .start-btn { 
+            background: var(--success); color: black; width: 100%; max-width: 400px;
+            padding: 20px; border-radius: 15px; font-size: 1.5rem; font-weight: 900; 
+            border: none; text-transform: uppercase; cursor: pointer; margin-top: 20px;
+        }
+        .close-setup { margin-top: 20px; background: none; border: none; color: var(--subtext); font-size: 1rem; text-decoration: underline; cursor: pointer; }
+
+        /* --- STANDARD UI --- */
         .filter-scroll {
             display: flex; gap: 8px; padding: 10px 15px;
             overflow-x: auto; background: var(--bg);
@@ -71,67 +113,32 @@
         .filter-chip[data-tag="New"] { border-color: var(--success); color: var(--success); }
         .filter-chip[data-tag="New"].active { background: var(--success); color: white; }
 
-        /* LIST AREA */
-        #bit-list {
-            flex-grow: 1; overflow-y: auto; padding: 15px;
-            display: flex; flex-direction: column; gap: 10px;
-            -webkit-overflow-scrolling: touch;
-        }
+        #bit-list { flex-grow: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; -webkit-overflow-scrolling: touch; }
 
-        /* BOTTOM DECK */
         .bottom-deck {
             background: var(--card); border-top: 1px solid var(--border);
             display: flex; flex-direction: column;
             padding-bottom: max(15px, env(safe-area-inset-bottom));
-            transition: transform 0.3s ease;
         }
         .search-container { padding: 10px 15px 5px 15px; }
-        
-        /* FIXED SEARCH INPUT */
         .search-input {
             width: 100%; background: var(--input-bg); border: 1px solid var(--border);
-            color: var(--text); 
-            /* Padding Left increased for the icon */
-            padding: 8px 15px 8px 35px; 
-            border-radius: 10px;
+            color: var(--text); padding: 8px 15px 8px 35px; border-radius: 10px;
             font-size: 0.95rem; box-sizing: border-box;
-            
-            /* Icon moved to LEFT side */
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%23888' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat; 
-            background-position: left 12px center;
-            
-            /* Removed 'appearance: none' so the native X appears! */
+            background-repeat: no-repeat; background-position: left 12px center;
         }
         .search-input:focus { outline: 2px solid var(--accent); border-color: transparent; }
 
         .input-area { padding: 5px 15px 15px 15px; display: flex; flex-direction: column; gap: 10px; }
-        .input-main {
-            background: var(--input-bg); border: 1px solid var(--border);
-            color: var(--text); padding: 12px; border-radius: 8px;
-            resize: none; height: 50px; font-family: inherit; font-size: 1rem;
-        }
+        .input-main { background: var(--input-bg); border: 1px solid var(--border); color: var(--text); padding: 12px; border-radius: 8px; resize: none; height: 50px; font-family: inherit; font-size: 1rem; }
         .input-main:focus { outline: 2px solid var(--accent); border-color: transparent; }
         .input-row { display: flex; gap: 10px; }
-        select { 
-            background: var(--input-bg); color: var(--text); border: 1px solid var(--border); 
-            padding: 0 10px; border-radius: 8px; flex-grow: 1; height: 45px; font-size: 1rem;
-        }
-        .btn-add {
-            background: var(--accent); color: var(--bg); border: none;
-            padding: 0 20px; border-radius: 8px; font-weight: bold;
-            text-transform: uppercase; cursor: pointer;
-        }
+        select { background: var(--input-bg); color: var(--text); border: 1px solid var(--border); padding: 0 10px; border-radius: 8px; flex-grow: 1; height: 45px; font-size: 1rem; }
+        .btn-add { background: var(--accent); color: var(--bg); border: none; padding: 0 20px; border-radius: 8px; font-weight: bold; text-transform: uppercase; cursor: pointer; }
 
-        /* BIT CARDS & COLORS */
-        .bit-card {
-            background: var(--card); padding: 15px; border-radius: 12px;
-            border-left: 4px solid var(--subtext); position: relative;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: all 0.2s ease;
-        }
+        .bit-card { background: var(--card); padding: 15px; border-radius: 12px; border-left: 4px solid var(--subtext); position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .bit-card.pinned { border: 2px solid var(--pin-color); background: rgba(254, 202, 87, 0.05); }
-        
         .bit-card[data-tag="Premise"] { border-left-color: var(--subtext); } 
         .bit-card[data-tag="Clean"] { border-left-color: #54a0ff; }       
         .bit-card[data-tag="Roast"] { border-left-color: #ff6b6b; }       
@@ -141,82 +148,69 @@
         .bit-card[data-tag="Closer"] { border-left-color: #eb3b5a; }      
 
         .bit-content { font-size: 1.1rem; line-height: 1.4; white-space: pre-wrap; margin-bottom: 8px; color: var(--text); font-weight: 500;}
-        .notes-preview {
-            font-size: 0.85rem; color: var(--subtext); margin-bottom: 8px;
-            font-style: italic; display: flex; align-items: center; gap: 5px;
-            padding: 5px; background: rgba(125,125,125,0.05); border-radius: 4px;
-        }
-        .bit-meta {
-            display: flex; justify-content: space-between; align-items: center;
-            font-size: 0.75rem; color: var(--subtext); margin-top: 10px;
-        }
-        .tag-badge { 
-            background: var(--input-bg); padding: 3px 8px; border-radius: 4px; 
-            color: var(--subtext); text-transform: uppercase; font-size: 0.65rem; letter-spacing: 1px;
-            font-weight: bold; border: 1px solid var(--border);
-        }
-        .action-row { display: flex; align-items: center; gap: 15px; }
-        .action-btn { cursor: pointer; font-size: 1.1rem; opacity: 0.6; transition: 0.2s;}
-        .action-btn:hover { opacity: 1; transform: scale(1.2); }
+        .notes-preview { font-size: 0.85rem; color: var(--subtext); margin-bottom: 8px; font-style: italic; display: flex; align-items: center; gap: 5px; padding: 5px; background: rgba(125,125,125,0.05); border-radius: 4px; }
+        .bit-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--subtext); margin-top: 10px; }
+        .tag-badge { background: var(--input-bg); padding: 3px 8px; border-radius: 4px; color: var(--subtext); text-transform: uppercase; font-size: 0.65rem; letter-spacing: 1px; font-weight: bold; border: 1px solid var(--border); }
+        .action-btn { cursor: pointer; font-size: 1.1rem; opacity: 0.6; }
         .pin-active { opacity: 1; transform: scale(1.1); filter: drop-shadow(0 0 5px var(--pin-color)); }
 
-        /* FOCUS MODE */
-        body.focus-mode .header,
-        body.focus-mode .filter-scroll,
-        body.focus-mode .bottom-deck,
-        body.focus-mode .action-btn, 
-        body.focus-mode .bit-meta span:first-child { 
-            display: none !important; 
-        }
-        body.focus-mode #bit-list { padding-top: 60px; }
-        #exit-focus-btn {
-            position: fixed; top: 20px; right: 20px; z-index: 1000;
-            background: var(--accent); color: var(--bg); border: none;
-            padding: 10px 20px; border-radius: 30px; font-weight: bold;
-            display: none; box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-        }
-        body.focus-mode #exit-focus-btn { display: block; }
-
-        /* EDIT MODE */
-        .edit-area {
-            background: var(--input-bg); border: 1px solid var(--accent); color: var(--text);
-            padding: 10px; border-radius: 6px; font-size: 1rem; width: 100%;
-            min-height: 60px; margin-bottom: 10px; resize: vertical; box-sizing: border-box; font-family: inherit;
-        }
-        .edit-notes {
-            background: var(--bg); border: 1px dashed var(--subtext); color: var(--text);
-            padding: 10px; border-radius: 6px; font-size: 0.9rem; width: 100%;
-            min-height: 40px; margin-bottom: 10px; resize: vertical; box-sizing: border-box; font-family: inherit;
-        }
+        .edit-area { background: var(--input-bg); border: 1px solid var(--accent); color: var(--text); padding: 10px; border-radius: 6px; font-size: 1rem; width: 100%; min-height: 60px; margin-bottom: 10px; resize: vertical; box-sizing: border-box; font-family: inherit; }
+        .edit-notes { background: var(--bg); border: 1px dashed var(--subtext); color: var(--text); padding: 10px; border-radius: 6px; font-size: 0.9rem; width: 100%; min-height: 40px; margin-bottom: 10px; resize: vertical; box-sizing: border-box; font-family: inherit; }
         .edit-controls { display: flex; gap: 10px; }
         .btn-save { background: var(--success); color: white; border: none; padding: 10px; border-radius: 5px; flex-grow: 1; font-weight: bold;}
         .btn-cancel { background: var(--input-bg); color: var(--text); border: 1px solid var(--border); padding: 10px; border-radius: 5px; }
 
-        /* SETTINGS MENU */
-        #settings-menu {
-            position: absolute; top: 60px; left: 15px;
-            background: var(--card); border: 1px solid var(--border);
-            border-radius: 8px; padding: 10px; display: none; flex-direction: column; gap: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 100; min-width: 220px;
+        /* FOCUS MODE OVERRIDES */
+        body.focus-mode .header, 
+        body.focus-mode .filter-scroll, 
+        body.focus-mode .bottom-deck, 
+        body.focus-mode .action-btn, 
+        body.focus-mode .bit-meta span:first-child { display: none !important; }
+        
+        body.focus-mode #stage-timer { display: block; } /* Show Timer */
+        
+        #exit-focus-btn {
+            position: fixed; top: 10px; right: 10px; z-index: 1000;
+            background: #333; color: white; border: 1px solid #555;
+            padding: 5px 12px; border-radius: 20px; font-size: 0.8rem;
+            display: none; opacity: 0.5;
         }
-        #settings-menu.visible { display: flex; }
-        .menu-btn {
-            background: var(--input-bg); color: var(--text); border: none; padding: 12px;
-            border-radius: 5px; cursor: pointer; text-align: left; font-size: 0.9rem; font-weight: 500;
-            display: flex; align-items: center; gap: 10px;
-        }
+        body.focus-mode #exit-focus-btn { display: block; }
 
+        /* SETTINGS MENU */
+        #settings-menu { position: absolute; top: 60px; left: 15px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 10px; display: none; flex-direction: column; gap: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 100; min-width: 220px; }
+        #settings-menu.visible { display: flex; }
+        .menu-btn { background: var(--input-bg); color: var(--text); border: none; padding: 12px; border-radius: 5px; cursor: pointer; text-align: left; font-size: 0.9rem; font-weight: 500; display: flex; align-items: center; gap: 10px; }
     </style>
 </head>
 <body>
 
-    <button id="exit-focus-btn" onclick="toggleFocusMode()">🚫 Exit Stage Mode</button>
+    <div id="timer-setup">
+        <div class="setup-title">Green Room</div>
+        <div class="time-presets">
+            <button class="preset-btn" onclick="selectTime(5, this)">5m</button>
+            <button class="preset-btn" onclick="selectTime(10, this)">10m</button>
+            <button class="preset-btn" onclick="selectTime(15, this)">15m</button>
+        </div>
+        <div class="setup-row">
+            <span>Custom Mins:</span>
+            <input type="number" id="custom-min" class="setup-input" placeholder="0">
+        </div>
+        <div class="setup-row">
+            <span>Warning Light (Mins Left):</span>
+            <input type="number" id="warning-min" class="setup-input" value="1">
+        </div>
+        <button class="start-btn" onclick="enterStageMode()">START SET</button>
+        <button class="close-setup" onclick="closeSetup()">Cancel</button>
+    </div>
+
+    <button id="exit-focus-btn" onclick="exitFocusMode()">Exit</button>
 
     <div class="header">
         <button class="btn-icon" onclick="toggleMenu()">⚙️</button>
         <h1>Comedy Vault</h1>
         <div style="display:flex; gap:10px;">
-            <button class="btn-icon" onclick="toggleFocusMode()" title="Stage Mode">👁️</button>
+            <button class="btn-icon" onclick="openSetup()" title="Stage Mode">👁️</button>
             <button class="btn-icon" onclick="toggleTheme()" id="theme-icon">☀️</button>
         </div>
     </div>
@@ -228,6 +222,11 @@
         <button class="menu-btn" onclick="document.getElementById('file-input').click()"><span>📂</span> Restore File</button>
     </div>
     <input type="file" id="file-input" style="display:none" onchange="importData(this)">
+
+    <div id="stage-timer">
+        <div id="timer-digits" class="t-green">00:00</div>
+        <div id="timer-label">On Stage</div>
+    </div>
 
     <div class="filter-scroll">
         <div class="filter-chip active" onclick="filterBits('all', this)">All</div>
@@ -268,15 +267,97 @@
         let currentFilter = 'all';
         let editingId = null;
 
+        // --- TIMER VARIABLES ---
+        let timerInterval = null;
+        let setDurationSecs = 0;
+        let warningSecs = 60;
+        let startTime = 0;
+        let selectedPreset = 0;
+
         if(localStorage.getItem('theme') === 'light') {
             document.body.classList.add('light-mode');
             document.getElementById('theme-icon').innerText = '🌙';
         }
 
-        // --- DISMISS KEYBOARD LOGIC ---
+        // --- SETUP LOGIC ---
+        function openSetup() {
+            document.getElementById('timer-setup').style.display = 'flex';
+        }
+        function closeSetup() {
+            document.getElementById('timer-setup').style.display = 'none';
+        }
+        function selectTime(mins, btn) {
+            selectedPreset = mins;
+            document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            document.getElementById('custom-min').value = '';
+        }
+        
+        function enterStageMode() {
+            // Calculate Time
+            let mins = parseInt(document.getElementById('custom-min').value) || selectedPreset;
+            let warnMins = parseInt(document.getElementById('warning-min').value) || 1;
+            
+            if(mins <= 0) { alert("Pick a time!"); return; }
+            
+            setDurationSecs = mins * 60;
+            warningSecs = warnMins * 60;
+            startTime = Date.now();
+            
+            closeSetup();
+            document.body.classList.add('focus-mode');
+            
+            // Start Clock
+            clearInterval(timerInterval);
+            updateTimerDisplay(); // Immediate update
+            timerInterval = setInterval(updateTimerDisplay, 1000);
+            
+            // Auto filter to Pinned if available, else all
+            const hasPinned = bits.some(b => b.pinned);
+            if(hasPinned) {
+                filterBits('Pinned', document.querySelector('.filter-chip[data-tag="New"]').nextElementSibling);
+            }
+        }
+
+        function exitFocusMode() {
+            clearInterval(timerInterval);
+            document.body.classList.remove('focus-mode');
+        }
+
+        function updateTimerDisplay() {
+            const now = Date.now();
+            const elapsed = Math.floor((now - startTime) / 1000);
+            const remaining = setDurationSecs - elapsed;
+            
+            const display = document.getElementById('timer-digits');
+            const label = document.getElementById('timer-label');
+            
+            // FORMATTING
+            let absSeconds = Math.abs(remaining);
+            let m = Math.floor(absSeconds / 60).toString().padStart(2, '0');
+            let s = (absSeconds % 60).toString().padStart(2, '0');
+            
+            display.innerText = `${m}:${s}`;
+            display.className = ''; // Reset classes
+
+            if (remaining > warningSecs) {
+                display.classList.add('t-green');
+                label.innerText = "ON TIME";
+            } else if (remaining > 0) {
+                display.classList.add('t-yellow');
+                label.innerText = "WRAP IT UP";
+            } else if (remaining > -10) {
+                display.classList.add('t-red');
+                label.innerText = "TIME'S UP";
+            } else {
+                display.classList.add('t-flash');
+                label.innerText = `OVER TIME (+${m}:${s})`;
+            }
+        }
+
+        // --- STANDARD APP LOGIC ---
         function dismissKeyboard() {
-            if (document.activeElement && 
-               (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "TEXTAREA")) {
+            if (document.activeElement && (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "TEXTAREA")) {
                 document.activeElement.blur();
             }
         }
@@ -289,7 +370,6 @@
             
             let visibleBits = bits;
 
-            // 1. FILTERING
             if (currentFilter === 'New') {
                 visibleBits = bits.slice(0, 5);
             } else if (currentFilter === 'Pinned') {
@@ -298,15 +378,12 @@
                 visibleBits = bits.filter(b => b.tag === currentFilter);
             }
 
-            // 2. SEARCH
             if (searchQuery) {
                 visibleBits = visibleBits.filter(b => 
-                    b.text.toLowerCase().includes(searchQuery) || 
-                    (b.notes && b.notes.toLowerCase().includes(searchQuery))
+                    b.text.toLowerCase().includes(searchQuery) || (b.notes && b.notes.toLowerCase().includes(searchQuery))
                 );
             }
 
-            // 3. SORTING
             if (currentFilter !== 'New') {
                 visibleBits.sort((a, b) => (b.pinned === true ? 1 : 0) - (a.pinned === true ? 1 : 0));
             }
@@ -364,7 +441,7 @@
             if (!text) return;
             const newBit = { id: Date.now(), text: text, tag: tagSelect.value, notes: "", date: Date.now(), pinned: false };
             bits.unshift(newBit); save(); input.value = '';
-            document.getElementById('search-bar').value = ""; // Auto clear search
+            document.getElementById('search-bar').value = ""; 
             if(currentFilter !== 'New' && currentFilter !== 'all' && currentFilter !== tagSelect.value) {
                 filterBits('all', document.querySelector('.filter-chip'));
             } else { render(); }
@@ -410,7 +487,6 @@
             document.getElementById('theme-icon').innerText = isLight ? '🌙' : '☀️';
         }
         
-        function toggleFocusMode() { document.body.classList.toggle('focus-mode'); }
         function toggleMenu() { document.getElementById('settings-menu').classList.toggle('visible'); }
 
         function getOptionsHtml(selected) {
