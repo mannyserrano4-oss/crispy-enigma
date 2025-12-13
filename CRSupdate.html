@@ -19,7 +19,6 @@
             --border: #cbd5e1; --input-bg: #f8fafc;
         }
 
-        /* LAYOUT */
         body { 
             background: var(--bg); color: var(--text); 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -33,7 +32,8 @@
             display: flex; justify-content: space-between; align-items: center; z-index: 20;
         }
         h1 { margin: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); font-weight: 900; }
-        .icon-btn { font-size: 1.4rem; background: none; border: none; cursor: pointer; padding: 5px; }
+        .icon-btn { font-size: 1.4rem; background: none; border: none; cursor: pointer; padding: 5px; transition: transform 0.2s; }
+        .icon-btn:active { transform: scale(0.9); }
 
         /* DASHBOARD */
         .dashboard { 
@@ -80,11 +80,12 @@
         .b-gold { background: rgba(245, 158, 11, 0.15); color: var(--gold); }
         .b-blue { background: rgba(59, 130, 246, 0.15); color: var(--blue); }
         .b-green { background: rgba(16, 185, 129, 0.15); color: var(--green); }
+        .b-ltv { border: 1px solid var(--subtext); color: var(--subtext); }
 
         .client-details { display: none; padding: 15px; background: var(--input-bg); border-top: 1px solid var(--border); }
         .client-card.open .client-details { display: block; }
 
-        /* DETAILS */
+        /* BANK */
         .bank-box { display: flex; gap: 8px; margin-bottom: 15px; background: var(--card); padding: 12px; border-radius: 12px; border: 1px solid var(--border); }
         .bank-item { flex: 1; text-align: center; }
         .bank-val { font-size: 1.3rem; font-weight: 900; }
@@ -99,15 +100,14 @@
         .btn-main { width: 100%; padding: 16px; background: var(--green); color: #000; border: none; border-radius: 12px; font-size: 1rem; font-weight: 800; text-transform: uppercase; cursor: pointer; margin-bottom: 12px; }
         .btn-full { width: 100%; padding: 12px; background: var(--card); border: 1px solid var(--border); color: var(--text); font-weight: 600; border-radius: 10px; margin-bottom: 12px; cursor: pointer; }
         
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-        .btn-act { background: var(--card); border: 1px solid var(--border); color: var(--subtext); padding: 10px 5px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .action-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .btn-act { background: var(--card); border: 1px solid var(--border); color: var(--subtext); padding: 10px 5px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; text-decoration: none;}
         .btn-act span { font-size: 1.2rem; }
 
-        /* MODALS */
+        /* MODALS & ZONES */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: flex-start; overflow-y: auto; padding: 20px 0; }
         .modal-content { background: var(--card); width: 90%; max-width: 400px; padding: 20px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.5); margin-bottom: 80px; }
 
-        /* ZONES & FORMS */
         .zone { border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid transparent; }
         .z-blue { background: rgba(59, 130, 246, 0.05); border-color: rgba(59, 130, 246, 0.2); } .z-blue .z-title { color: var(--blue); }
         .z-gold { background: rgba(245, 158, 11, 0.05); border-color: rgba(245, 158, 11, 0.2); } .z-gold .z-title { color: var(--gold); }
@@ -115,27 +115,30 @@
         .z-title { font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
 
         .form-row { display: flex; gap: 10px; margin-bottom: 12px; }
-        .form-group { flex: 1; }
+        .form-group { flex: 1; min-width: 0; /* Fix flex overflow */ }
         .form-lbl { display: block; font-size: 0.75rem; color: var(--subtext); margin-bottom: 5px; font-weight: 600; }
         .form-input { width: 100%; padding: 12px; background: var(--card); border: 1px solid var(--border); color: var(--text); border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
         
+        .input-group-date { display: flex; width:100%; }
+        .input-group-date .form-input { border-radius: 8px 0 0 8px; flex: 1; min-width: 0; }
+        .btn-today { padding: 0 10px; background: var(--border); color: var(--text); border: 1px solid var(--border); border-radius: 0 8px 8px 0; cursor: pointer; font-size: 0.8rem; font-weight:bold;}
+
         .chip-box { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; margin-bottom: 8px; }
         .chip { background: var(--input-bg); border: 1px solid var(--border); padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; white-space: nowrap; cursor: pointer; color: var(--subtext); font-weight: 600; }
         
         .fab { position: fixed; bottom: 30px; right: 20px; background: var(--accent); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4); cursor: pointer; border: none; z-index: 500; }
         
-        /* LIST OPTIONS */
-        .list-option { width: 100%; padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; font-size: 1rem; background: var(--card); color: var(--text); text-align: left; border:none; border-bottom: 1px solid var(--border); }
-        .list-option:last-child { border-bottom: none; }
-
-        /* DROPDOWN */
+        .list-option { width: 100%; padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; font-size: 1rem; background: var(--card); color: var(--text); text-align: left; border:none; }
         .dropdown { position: absolute; top: 60px; right: 15px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; display: none; flex-direction: column; width: 180px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 200; }
         .dropdown.show { display: flex; }
 
-        /* READ ONLY PROFILE */
         .ro-row { display: flex; padding: 12px 0; border-bottom: 1px solid var(--border); }
         .ro-lbl { width: 120px; color: var(--subtext); font-size: 0.9rem; }
         .ro-val { flex: 1; color: var(--text); font-weight: 700; font-size: 0.95rem; }
+        
+        /* Stats Table */
+        .stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
+        .stat-val { font-weight: bold; color: var(--accent); }
     </style>
 </head>
 <body>
@@ -200,7 +203,6 @@
     <div id="credit-modal" class="modal">
         <div class="modal-content">
             <h3 style="text-align:center; margin-top:0;">Add Credit</h3>
-            <p style="text-align:center; color:var(--subtext); font-size:0.9rem;">Search for a client to give $5 referral credit.</p>
             <div class="form-group">
                 <label class="form-lbl">Client Name</label>
                 <input id="credit-input" class="form-input" list="ref-list" placeholder="Start typing..." oninput="updateRefList()">
@@ -213,7 +215,14 @@
 
     <div id="settings-modal" class="modal">
         <div class="modal-content">
-            <h3 style="text-align:center; margin-top:0;">Shop Settings</h3>
+            <h3 style="text-align:center; margin-top:0;">Business Report</h3>
+            <div style="margin-bottom:20px;">
+                <div class="stat-row"><span>Total Revenue</span><span class="stat-val" id="st-rev">$0</span></div>
+                <div class="stat-row"><span>Total Cuts</span><span class="stat-val" id="st-cuts">0</span></div>
+                <div class="stat-row"><span>Referrals</span><span class="stat-val" id="st-ref">0</span></div>
+                <div class="stat-row"><span>Redeemed Value</span><span class="stat-val" id="st-red">$0</span></div>
+            </div>
+            <h3 style="text-align:center;">Settings</h3>
             <div class="form-group"><label class="form-lbl">Shop Address</label><input id="s-shop-addr" class="form-input"></div>
             <button class="btn-main" onclick="saveSettings()">SAVE</button>
             <button class="btn-full" onclick="closeModals()">Close</button>
@@ -263,22 +272,22 @@
                     <div class="form-group"><label class="form-lbl">Phone</label><input type="tel" id="c-phone" class="form-input"></div>
                     <div class="form-group"><label class="form-lbl">Price $</label><input type="number" id="c-price" class="form-input" placeholder="40"></div>
                 </div>
-                <div class="form-group"><label class="form-lbl">Social</label><input id="c-social" class="form-input"></div>
+                <div class="form-group"><label class="form-lbl">Social (Handle Only)</label><input id="c-social" class="form-input" placeholder="username_only"></div>
                 <div class="form-group"><label class="form-lbl">Address</label><input id="c-addr" class="form-input"></div>
             </div>
             
             <div class="zone z-gold">
                 <span class="z-title">🟡 Timeline</span>
                 <div class="form-row">
-                    <div class="form-group"><label class="form-lbl">Birthday</label><input type="date" id="c-dob" class="form-input"></div>
-                    <div class="form-group"><label class="form-lbl">First Cut</label><input type="date" id="c-start" class="form-input"></div>
+                    <div class="form-group"><label class="form-lbl">Birthday</label><div class="input-group-date"><input type="date" id="c-dob" class="form-input"></div></div>
+                    <div class="form-group"><label class="form-lbl">First Cut</label><div class="input-group-date"><input type="date" id="c-start" class="form-input"></div></div>
                 </div>
                 <div class="form-row">
                     <div class="form-group"><label class="form-lbl">Referred By</label><input id="c-ref" class="form-input" list="ref-list" oninput="updateRefList()"></div>
                 </div>
                 <div class="form-row">
                     <div class="form-group"><label class="form-lbl">Freq (Wks)</label><input type="number" id="c-freq" class="form-input" placeholder="2"></div>
-                    <div class="form-group"><label class="form-lbl">Last Cut</label><input type="date" id="c-last" class="form-input"></div>
+                    <div class="form-group"><label class="form-lbl">Last Cut</label><div class="input-group-date"><input type="date" id="c-last" class="form-input"><button class="btn-today" onclick="setToday('c-last')">Today</button></div></div>
                 </div>
             </div>
 
@@ -299,7 +308,7 @@
         let shopSettings = JSON.parse(localStorage.getItem('bb_settings') || '{"addr":""}');
         let filterType = 'all';
         let tempId = null;
-        let pendingCutId = null; // Stores ID if we interrupt cut flow to edit
+        let pendingCutId = null; 
 
         if(localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
         render();
@@ -326,10 +335,13 @@
 
             visible.forEach(c => {
                 let badges = '';
+                // LTV Always First
+                if(c.ltv > 500) badges += `<span class="badge b-green">💎 $${c.ltv}</span>`;
+                else badges += `<span class="badge b-ltv">LTV: $${c.ltv||0}</span>`;
+
                 if(isThisWeek(c.dob)) badges += `<span class="badge b-gold">🎂 BDAY</span>`;
                 const yrs = getYears(c.start);
                 if(yrs > 0 && isThisWeek(c.start)) badges += `<span class="badge b-blue">🎉 ${yrs}YR</span>`;
-                if(c.ltv > 500) badges += `<span class="badge b-green">💎 $${c.ltv}</span>`;
 
                 const due = getDueDate(c);
                 const daysTill = due ? Math.ceil((due - today)/86400000) : 999;
@@ -339,6 +351,17 @@
                 let cardClass = daysTill < 0 ? 'card-header due' : 'card-header';
 
                 let offer = c.free > 0 ? `${c.free} FREE` : (c.credit > 0 ? `$${c.credit} CR` : '');
+
+                // Social Button Logic
+                let socialBtn = '';
+                if(c.social) {
+                    socialBtn = `<button class="btn-act" onclick="window.open('https://instagram.com/${c.social.replace('@','')}')"><span>📸</span>IG</button>`;
+                }
+
+                // Loyalty Logic: 5 steps. 6th is free.
+                let punch = (c.loyalty || 0); 
+                let loyaltyText = `${punch}/5`;
+                if(punch >= 5) loyaltyText = "EARNED FREE!";
 
                 const div = document.createElement('div');
                 div.className = 'client-card';
@@ -353,9 +376,9 @@
                     </div>
                     <div class="client-details">
                         <div class="bank-box">
-                            <div class="bank-item"><div class="bank-val">${c.cuts}</div><div class="bank-lbl">Total</div></div>
-                            <div class="bank-item"><div class="bank-val" style="color:var(--gold)">$${c.ltv||0}</div><div class="bank-lbl">LTV</div></div>
-                            <div class="bank-item"><div class="bank-val">${c.cuts%6}/6</div><div class="bank-lbl">Loyalty</div></div>
+                            <div class="bank-item"><div class="bank-val">${c.cuts}</div><div class="bank-lbl">Total Cuts</div></div>
+                            <div class="bank-item"><div class="bank-val">${loyaltyText}</div><div class="bank-lbl">Loyalty</div></div>
+                            <div class="bank-item"><div class="bank-val" style="color:var(--gold)">$${c.credit||0}</div><div class="bank-lbl">Credit</div></div>
                         </div>
                         <div class="detail-row"><div class="detail-box"><div class="detail-lbl">SIDES</div><div class="detail-txt">${c.sides||'-'}</div></div><div class="detail-box"><div class="detail-lbl">TOP</div><div class="detail-txt">${c.top||'-'}</div></div></div>
                         <div class="detail-box" style="margin-bottom:10px;"><div class="detail-lbl">NOTES</div><div class="detail-txt">${c.notes||'-'}</div></div>
@@ -364,6 +387,7 @@
                         <div class="action-grid">
                             <button class="btn-act" onclick="window.location='tel:${c.phone}'"><span>📞</span>Call</button>
                             <button class="btn-act" onclick="openText('${c.id}')"><span>💬</span>Text</button>
+                            ${socialBtn}
                             <button class="btn-act" onclick="openSchedule('${c.id}')"><span>📅</span>Sched</button>
                         </div>
                     </div>
@@ -372,55 +396,86 @@
             });
         }
 
-        // --- CUT LOGIC (PRECISION FLOW) ---
+        // --- CUT LOGIC (CEO FLOW) ---
         function startCutFlow(id) {
+            const c = clients.find(x=>x.id==id);
+            
+            // 1. Check Free Cut First
+            if(c.free > 0) {
+                customConfirm(`🌟 Client has ${c.free} FREE CUT available.\nRedeem it now?`, 
+                    () => { // YES -> Redeem Free
+                        c.free--;
+                        // If redeeming, price is 0. Still check formula.
+                        confirmFormulaAndSave(c, 0); 
+                    },
+                    () => { // NO -> Proceed to paid
+                        proceedToPaid(c);
+                    }
+                );
+            } else {
+                proceedToPaid(c);
+            }
+        }
+
+        function proceedToPaid(c) {
+            // 2. Ask Price
+            const price = prompt("Price paid today? (Enter 0 if unpaid)", c.price||0);
+            if(price === null) return; // Cancelled
+            let paid = parseFloat(price)||0;
+
+            // 3. Check Credit
+            if(c.credit > 0 && paid > 0) {
+                const use = prompt(`Credit Balance: $${c.credit}.\nHow much to use?`, 0);
+                if(use !== null) {
+                    let creditUsed = parseFloat(use)||0;
+                    if(creditUsed > c.credit) creditUsed = c.credit;
+                    c.credit -= creditUsed;
+                    // Paid amount is separate from credit usage in LTV?
+                    // Usually LTV = Cash out of pocket. 
+                    // If cut is 30, use 5 credit, they pay 25. LTV +25.
+                    // User requested: "Should not affect how much credit used... just lets me know to give discount".
+                    // User said: "Charge 30 and click redeemed 5".
+                    // So LTV adds 'paid' (30). Credit subtracts 'use' (5). 
+                }
+            }
+            
+            confirmFormulaAndSave(c, paid);
+        }
+
+        function confirmFormulaAndSave(c, paid) {
             customConfirm("Did the haircut style change?", 
-                () => { // YES -> Edit first
-                    pendingCutId = id; // Flag to continue after save
-                    openClientModal(id);
+                () => { // YES -> Edit
+                    tempId = c.id; 
+                    // We need to attach the payment logic to the save button now? 
+                    // Or just save formula then process stats?
+                    // Simpler: Open modal, let them save. WE handle the stats update now.
+                    openClientModal(c.id);
+                    // We'll update the stats in background, User just updates styling text.
+                    processStats(c, paid);
+                    alert("Stats updated. Update style formula then Save.");
                 }, 
-                () => { // NO -> Proceed directly
-                    finishCut(id);
+                () => { // NO -> Just save stats
+                    processStats(c, paid);
+                    save(); render();
                 }
             );
         }
 
-        function finishCut(id) {
-            const c = clients.find(x=>x.id==id);
-            const price = prompt("Price PAID Today? (Cash/Card)", c.price||0);
-            if(price === null) return;
-            const paid = parseFloat(price)||0;
-
-            // Credit / Free Logic
-            if(c.free > 0 || c.credit > 0) {
-                customConfirm(`Bal: ${c.free} Free Cuts, $${c.credit} Credit.\nRedeem something?`, () => {
-                    // They want to redeem
-                    const redeemList = [];
-                    if(c.free > 0) redeemList.push({lbl: "Use 1 Free Cut", fn: () => { c.free--; }});
-                    if(c.credit > 0) redeemList.push({lbl: "Use Credit Amount", fn: () => {
-                        const amt = prompt(`Credit Bal: $${c.credit}. Amount to use:`, c.credit);
-                        if(amt) c.credit -= Math.min(parseFloat(amt), c.credit);
-                    }});
-                    // We need to execute the reward then save
-                    openListModal("Select Reward", redeemList, () => {
-                        completeCutRecord(c, paid);
-                    });
-                }, () => {
-                    // No redeem, just save
-                    completeCutRecord(c, paid);
-                });
-            } else {
-                completeCutRecord(c, paid);
-            }
-        }
-
-        function completeCutRecord(c, paid) {
+        function processStats(c, paid) {
             c.lastVisit = new Date().toISOString().split('T')[0];
-            c.cuts++;
+            c.cuts = (c.cuts || 0) + 1;
             c.ltv = (c.ltv || 0) + paid;
-            if(c.cuts % 6 === 0) { c.free++; alert("🎉 6th Cut! Free cut added."); }
-            save(); render();
-            pendingCutId = null; // Clear flag
+            
+            // Loyalty Logic: 0,1,2,3,4 -> 5 (Free) -> 0
+            // Increment logic
+            let currentPoints = (c.loyalty || 0) + 1;
+            if(currentPoints >= 5) {
+                c.free = (c.free || 0) + 1;
+                c.loyalty = 0;
+                alert("🎉 5 Cuts Reached! Free Cut added to bank.");
+            } else {
+                c.loyalty = currentPoints;
+            }
         }
 
         // --- CREDIT MANAGER ---
@@ -434,6 +489,23 @@
             const c = clients.find(x => x.name.toLowerCase() === name.toLowerCase());
             if(c) { c.credit += 5; save(); render(); alert(`$5 added to ${c.name}`); closeModals(); }
             else { alert("Client not found."); }
+        }
+
+        // --- GLOBAL STATS ---
+        function openSettings() {
+            // Calc Stats
+            let rev = clients.reduce((a,b)=>a+(b.ltv||0),0);
+            let cuts = clients.reduce((a,b)=>a+(b.cuts||0),0);
+            let refs = clients.filter(c=>c.ref && c.ref.length>0).length;
+            let red = clients.reduce((a,b)=>a+(b.redeemedVal||0),0); // Assuming we track this later, for now 0 or logic
+
+            document.getElementById('st-rev').innerText = `$${rev}`;
+            document.getElementById('st-cuts').innerText = cuts;
+            document.getElementById('st-ref').innerText = refs;
+            // document.getElementById('st-red').innerText = `$${red}`;
+
+            document.getElementById('s-shop-addr').value = shopSettings.addr;
+            document.getElementById('settings-modal').style.display = 'flex';
         }
 
         // --- UTILS ---
@@ -467,7 +539,7 @@
                 const idx = clients.findIndex(x=>x.id==id);
                 clients[idx] = {...clients[idx], ...data};
             } else {
-                data.id = Date.now().toString(); data.cuts=0; data.free=0; data.credit=0; data.ltv=0;
+                data.id = Date.now().toString(); data.cuts=0; data.free=0; data.credit=0; data.ltv=0; data.loyalty=0;
                 clients.push(data);
                 if(ref) {
                     const referrer = clients.find(c => c.name.toLowerCase() === ref.toLowerCase() && c.id !== data.id);
@@ -475,11 +547,6 @@
                 }
             }
             save(); closeModals(); render();
-            
-            // Resume cut flow if pending
-            if(pendingCutId) {
-                finishCut(pendingCutId);
-            }
         }
 
         function viewFull(id) {
@@ -514,7 +581,7 @@
             })));
         }
 
-        // --- SCHEDULING ---
+        // --- SCHEDULING (IOS COMPATIBLE) ---
         function openSchedule(id) {
             const c=clients.find(x=>x.id==id); document.getElementById('cal-id').value=id;
             document.getElementById('cal-date').value=new Date().toISOString().split('T')[0];
@@ -532,6 +599,7 @@
             const s=new Date(`${d}T${t}`); const e=new Date(s.getTime()+45*60000);
             const fmt=dt=>dt.toISOString().replace(/[-:]/g,'').split('.')[0]+'Z';
             const ics=`BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Cut: ${c.name}\nDTSTART:${fmt(s)}\nDTEND:${fmt(e)}\nLOCATION:${loc}\nDESCRIPTION:${c.notes||''}\nEND:VEVENT\nEND:VCALENDAR`;
+            
             const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar'})); a.download='appt.ics'; document.body.appendChild(a); a.click(); document.body.removeChild(a); closeModals();
         }
 
@@ -565,14 +633,15 @@
         function getDueDate(c) { if(!c.lastVisit||!c.freq)return null; const d=new Date(c.lastVisit); d.setDate(d.getDate()+(c.freq*7)); d.setHours(0,0,0,0); return d; }
         function isThisWeek(dStr) { if(!dStr)return false; const d=new Date(dStr); const n=new Date(); n.setHours(0,0,0,0); const ty=new Date(n.getFullYear(),d.getMonth(),d.getDate()+1); const diff=Math.ceil((ty-n)/86400000); return diff>=0&&diff<=7; }
         function getYears(dStr) { if(!dStr)return 0; return new Date().getFullYear()-new Date(dStr).getFullYear(); }
-        function toggleTheme() { document.body.classList.toggle('light-mode'); localStorage.setItem('theme', document.body.classList.contains('light-mode')?'light':'dark'); }
-        function toggleMenu() { document.getElementById('save-menu').classList.toggle('show'); }
-        function closeModals() { document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); }
-        function save() { localStorage.setItem('bb_clients_v3', JSON.stringify(clients)); }
+        function setToday(id) { document.getElementById(id).value = new Date().toISOString().split('T')[0]; }
         function fill(id,v) { document.getElementById(id).value=v; }
         function filter(t,el) { filterType=t; document.querySelectorAll('.dash-card').forEach(d=>d.classList.remove('active')); el.classList.add('active'); render(); }
-        function openSettings() { document.getElementById('s-shop-addr').value=shopSettings.addr; document.getElementById('settings-modal').style.display='flex'; }
+        function toggleMenu() { document.getElementById('save-menu').classList.toggle('show'); }
+        function toggleTheme() { document.body.classList.toggle('light-mode'); localStorage.setItem('theme', document.body.classList.contains('light-mode')?'light':'dark'); }
+        function closeModals() { document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); }
+        function save() { localStorage.setItem('bb_clients_v3', JSON.stringify(clients)); }
         function saveSettings() { shopSettings.addr=document.getElementById('s-shop-addr').value; localStorage.setItem('bb_settings', JSON.stringify(shopSettings)); closeModals(); }
+        function delClient(id) { customConfirm("Delete?", ()=>{clients=clients.filter(x=>x.id!=id); save(); render();}); }
         function exportData(type) { toggleMenu(); if(type==='json'){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(clients)],{type:'application/json'})); a.download=`bb_${Date.now()}.json`; a.click();} else { let csv="Name,Phone,LTV\n"+clients.map(c=>`"${c.name}","${c.phone}",${c.ltv}`).join('\n'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=`bb.csv`; a.click(); }}
         function importData(el) { if(!el.files[0])return; const fr=new FileReader(); fr.onload=e=>{clients=JSON.parse(e.target.result); save(); render(); alert("Restored!");}; fr.readAsText(el.files[0]); }
     </script>
