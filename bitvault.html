@@ -11,67 +11,70 @@
     <style>
         :root {
             /* --- NIGHT MODE (Black & Orange) --- */
-            --bg: #000000;          /* Pure Black */
-            --card: #121212;        /* Off Black */
+            --bg: #000000;
+            --card: #121212;
             --text: #ffffff;
             --subtext: #888888;
-            --accent: #ff9f43;      /* Neon Orange */
-            --accent-dim: #b36b25;  /* Darker Orange for borders */
-            --danger: #ff4757;
-            --success: #2ed573;
+            --accent: #ff9f43;
             --border: #333333;
             --input-bg: #1c1c1c;
+            --danger: #ff4757;
+            --success: #2ed573;
         }
 
         /* --- DAY MODE (White & Purple) --- */
         body.light-mode {
-            --bg: #f8f9fa;          /* Off White */
-            --card: #ffffff;        /* Pure White */
-            --text: #2d3436;        /* Dark Grey */
+            --bg: #f8f9fa;
+            --card: #ffffff;
+            --text: #2d3436;
             --subtext: #636e72;
-            --accent: #8e44ad;      /* Royal Purple */
-            --accent-dim: #9b59b6;
+            --accent: #8e44ad;
             --border: #dfe6e9;
             --input-bg: #f1f2f6;
         }
 
         body {
-            background-color: var(--bg);
-            color: var(--text);
+            background-color: var(--bg); color: var(--text);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            margin: 0; padding: 0;
-            display: flex; flex-direction: column;
+            margin: 0; padding: 0; display: flex; flex-direction: column;
             height: 100vh; overflow: hidden;
             transition: background 0.3s, color 0.3s;
         }
 
         /* HEADER */
         .header {
-            padding: 15px;
-            background: var(--card);
-            border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center;
-            z-index: 10;
+            padding: 15px; background: var(--card); border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center; z-index: 10;
         }
         h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-weight: 900;}
         .btn-icon { background: none; border: none; font-size: 1.4rem; cursor: pointer; text-decoration: none; padding: 5px; }
 
+        /* SEARCH BAR (NEW) */
+        .search-container {
+            padding: 10px 15px; background: var(--bg);
+        }
+        .search-input {
+            width: 100%; background: var(--input-bg); border: 1px solid var(--border);
+            color: var(--text); padding: 10px 40px 10px 15px; border-radius: 20px;
+            font-size: 1rem; box-sizing: border-box;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23888' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 15px center;
+        }
+        .search-input:focus { outline: 2px solid var(--accent); border-color: transparent; }
+
         /* FILTER BAR */
         .filter-scroll {
-            display: flex; gap: 8px; padding: 10px 15px;
+            display: flex; gap: 8px; padding: 0 15px 10px 15px; /* Adjusted padding */
             overflow-x: auto; background: var(--bg);
             border-bottom: 1px solid var(--border); flex-shrink: 0;
         }
         .filter-chip {
-            background: var(--card); padding: 8px 16px;
+            background: var(--card); padding: 6px 14px;
             border-radius: 20px; font-size: 0.85rem; color: var(--subtext);
             border: 1px solid var(--border); white-space: nowrap; cursor: pointer;
             transition: all 0.2s; font-weight: 600;
         }
-        .filter-chip.active {
-            background: var(--accent); color: var(--bg); font-weight: bold; border-color: var(--accent);
-        }
-        /* Special style for 'New' filter */
+        .filter-chip.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
         .filter-chip[data-tag="New"] { border-color: var(--success); color: var(--success); }
         .filter-chip[data-tag="New"].active { background: var(--success); color: white; }
 
@@ -86,7 +89,6 @@
             border-left: 4px solid var(--subtext); position: relative;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        /* Color code the border based on tag */
         .bit-card[data-tag="Premise"] { border-left-color: var(--subtext); }
         .bit-card[data-tag="Clean"] { border-left-color: #54a0ff; }
         .bit-card[data-tag="Roast"] { border-left-color: #ff6b6b; }
@@ -94,7 +96,6 @@
         .bit-card[data-tag="Opener"] { border-left-color: var(--accent); }
 
         .bit-content { font-size: 1.1rem; line-height: 1.4; white-space: pre-wrap; margin-bottom: 8px; color: var(--text); font-weight: 500;}
-        
         .notes-preview {
             font-size: 0.85rem; color: var(--subtext); margin-bottom: 8px;
             font-style: italic; display: flex; align-items: center; gap: 5px;
@@ -105,17 +106,15 @@
             display: flex; justify-content: space-between; align-items: center;
             font-size: 0.75rem; color: var(--subtext); margin-top: 10px;
         }
-        
         .tag-badge { 
             background: var(--input-bg); padding: 3px 8px; border-radius: 4px; 
             color: var(--subtext); text-transform: uppercase; font-size: 0.65rem; letter-spacing: 1px;
             font-weight: bold; border: 1px solid var(--border);
         }
-
         .action-btn { cursor: pointer; padding: 5px; font-size: 1rem; margin-left: 10px; opacity: 0.6; }
         .action-btn:hover { opacity: 1; }
 
-        /* EDIT MODE STYLES */
+        /* EDIT MODE */
         .edit-area {
             background: var(--input-bg); border: 1px solid var(--accent); color: var(--text);
             padding: 10px; border-radius: 6px; font-size: 1rem;
@@ -128,40 +127,34 @@
             width: 100%; box-sizing: border-box; font-family: inherit; resize: vertical;
             min-height: 40px; margin-bottom: 10px;
         }
-
         .edit-controls { display: flex; gap: 10px; flex-wrap: wrap;}
         .btn-save { background: var(--success); color: white; border: none; padding: 10px; border-radius: 5px; font-weight: bold; flex-grow: 1;}
         .btn-cancel { background: var(--input-bg); color: var(--text); border: 1px solid var(--border); padding: 10px; border-radius: 5px; }
 
         /* INPUT AREA */
         .input-area {
-            background: var(--card); padding: 15px;
-            border-top: 1px solid var(--border);
+            background: var(--card); padding: 15px; border-top: 1px solid var(--border);
             display: flex; flex-direction: column; gap: 10px;
             padding-bottom: max(15px, env(safe-area-inset-bottom));
         }
-
         .input-main {
             background: var(--input-bg); border: 1px solid var(--border);
             color: var(--text); padding: 12px; border-radius: 8px;
             resize: none; height: 50px; font-family: inherit; font-size: 1rem;
         }
         .input-main:focus { outline: 2px solid var(--accent); border-color: transparent; }
-
         .input-row { display: flex; gap: 10px; }
-        
         select { 
             background: var(--input-bg); color: var(--text); border: 1px solid var(--border); 
             padding: 0 10px; border-radius: 8px; flex-grow: 1; height: 45px; font-size: 1rem;
         }
-
         .btn-add {
             background: var(--accent); color: var(--bg); border: none;
             padding: 0 20px; border-radius: 8px; font-weight: bold;
             text-transform: uppercase; cursor: pointer;
         }
         
-        /* SETTINGS MENU */
+        /* MENU */
         #settings-menu {
             position: absolute; top: 60px; left: 15px;
             background: var(--card); border: 1px solid var(--border);
@@ -170,7 +163,6 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 100; min-width: 220px;
         }
         #settings-menu.visible { display: flex; }
-        
         .menu-btn {
             background: var(--input-bg); color: var(--text); border: none; padding: 12px;
             border-radius: 5px; cursor: pointer; text-align: left; font-size: 0.9rem; font-weight: 500;
@@ -189,20 +181,15 @@
 
     <div id="settings-menu">
         <div style="font-size:0.7rem; color:var(--subtext); text-transform:uppercase; letter-spacing:1px; margin-bottom:5px;">Data Safety</div>
-        
-        <button class="menu-btn" onclick="shareToNotes()" style="border-left: 3px solid var(--success);">
-            <span>☁️</span> Save to iCloud Notes
-        </button>
-        
-        <button class="menu-btn" onclick="exportData()">
-            <span>💾</span> Download Backup File
-        </button>
-        
-        <button class="menu-btn" onclick="document.getElementById('file-input').click()">
-            <span>📂</span> Restore from File
-        </button>
+        <button class="menu-btn" onclick="shareToNotes()" style="border-left: 3px solid var(--success);"><span>☁️</span> Save to Notes</button>
+        <button class="menu-btn" onclick="exportData()"><span>💾</span> Download Backup</button>
+        <button class="menu-btn" onclick="document.getElementById('file-input').click()"><span>📂</span> Restore File</button>
     </div>
     <input type="file" id="file-input" style="display:none" onchange="importData(this)">
+
+    <div class="search-container">
+        <input type="text" id="search-bar" class="search-input" placeholder="Search jokes..." onkeyup="render()">
+    </div>
 
     <div class="filter-scroll">
         <div class="filter-chip active" onclick="filterBits('all', this)">All</div>
@@ -238,7 +225,6 @@
         let currentFilter = 'all';
         let editingId = null;
 
-        // Load Theme Preference
         if(localStorage.getItem('theme') === 'light') {
             document.body.classList.add('light-mode');
             document.getElementById('theme-icon').innerText = '🌙';
@@ -247,16 +233,24 @@
         // --- RENDER ---
         function render() {
             const list = document.getElementById('bit-list');
+            const searchQuery = document.getElementById('search-bar').value.toLowerCase();
             list.innerHTML = '';
             
-            let visibleBits = [];
+            let visibleBits = bits;
 
-            if (currentFilter === 'all') {
-                visibleBits = bits;
-            } else if (currentFilter === 'New') {
+            // 1. Apply Tag Filter
+            if (currentFilter === 'New') {
                 visibleBits = bits.slice(0, 5);
-            } else {
+            } else if (currentFilter !== 'all') {
                 visibleBits = bits.filter(b => b.tag === currentFilter);
+            }
+
+            // 2. Apply Search Filter
+            if (searchQuery) {
+                visibleBits = visibleBits.filter(b => 
+                    b.text.toLowerCase().includes(searchQuery) || 
+                    (b.notes && b.notes.toLowerCase().includes(searchQuery))
+                );
             }
 
             if (visibleBits.length === 0) {
@@ -315,17 +309,14 @@
             if (!text) return;
 
             const newBit = { 
-                id: Date.now(), 
-                text: text, 
-                tag: tagSelect.value, 
-                notes: "", 
-                date: Date.now() 
+                id: Date.now(), text: text, tag: tagSelect.value, notes: "", date: Date.now() 
             };
             bits.unshift(newBit);
             save();
             input.value = '';
             
-            // Auto switch to show new bit
+            // Clear Search & Reset Filter to show new bit
+            document.getElementById('search-bar').value = "";
             if(currentFilter !== 'New' && currentFilter !== 'all' && currentFilter !== tagSelect.value) {
                 filterBits('all', document.querySelector('.filter-chip'));
             } else {
@@ -377,9 +368,7 @@
             document.getElementById('theme-icon').innerText = isLight ? '🌙' : '☀️';
         }
 
-        function toggleMenu() {
-            document.getElementById('settings-menu').classList.toggle('visible');
-        }
+        function toggleMenu() { document.getElementById('settings-menu').classList.toggle('visible'); }
 
         function getOptionsHtml(selected) {
             const opts = ["Premise", "Clean", "Roast", "Crowd", "Dark", "Opener", "Closer"];
@@ -393,10 +382,9 @@
             return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
 
-        // --- EXPORT/IMPORT ---
         function shareToNotes() {
-            if (!navigator.share) { alert("Use Safari to share to Notes."); return; }
-            let txt = "🎤 COMEDY VAULT BACKUP \n\n";
+            if (!navigator.share) { alert("Use Safari on iPhone to share."); return; }
+            let txt = "🎤 COMEDY VAULT EXPORT \n\n";
             bits.forEach(b => {
                 txt += `[${b.tag.toUpperCase()}] ${b.text}\n`;
                 if(b.notes) txt += `>>> Notes: ${b.notes}\n`;
@@ -410,7 +398,7 @@
             const blob = new Blob([JSON.stringify(bits, null, 2)], { type: "application/json" });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = `comedy_backup_${new Date().toISOString().slice(0,10)}.json`;
+            a.download = `comedy_backup_${Date.now()}.json`;
             a.click();
             toggleMenu();
         }
@@ -423,7 +411,7 @@
                 try {
                     const data = JSON.parse(e.target.result);
                     if(Array.isArray(data)) {
-                        if(confirm(`Restore ${data.length} jokes? This replaces current list.`)) {
+                        if(confirm(`Restore ${data.length} jokes? This overwrites current list.`)) {
                             bits = data; save(); render();
                         }
                     }
