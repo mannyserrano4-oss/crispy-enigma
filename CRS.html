@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+    <title>The Black Book</title>
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
+
+    <style>
+        :root {
+            /* NIGHT MODE */
+            --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --subtext: #94a3b8;
+            --border: #334155; --input-bg: #020617;
+            /* ACCENTS */
+            --accent: #818cf8; --red: #f87171; --gold: #fbbf24; 
+            --green: #4ade80; --blue: #60a5fa; --purple: #c084fc;
+        }
+
+        body.light-mode {
+            /* DAY MODE */
+            --bg: #f8fafc; --card: #ffffff; --text: #334155; --subtext: #64748b;
+            --border: #e2e8f0; --input-bg: #f1f5f9;
+            --accent: #4f46e5; --red: #ef4444; --gold: #d97706; 
+            --green: #16a34a; --blue: #2563eb; --purple: #9333ea;
+        }
+
+        body {
+            background-color: var(--bg); color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0; padding: 0; display: flex; flex-direction: column;
+            height: 100vh; overflow: hidden; transition: background 0.3s, color 0.3s;
+        }
+
+        .header {
+            padding: 15px; background: var(--card); border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center; z-index: 10;
+        }
+        h1 { margin: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-weight: 800; }
+        .icon-group { display: flex; gap: 15px; }
+        .header-icon { font-size: 1.2rem; cursor: pointer; opacity: 0.8; text-decoration: none; position: relative;}
+        
+        /* DROPDOWN MENU */
+        .dropdown { position: absolute; top: 40px; right: 0; background: var(--card); border: 1px solid var(--border); border-radius: 8px; display: none; flex-direction: column; width: 150px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); z-index: 200; }
+        .dropdown.show { display: flex; }
+        .dd-item { padding: 12px; font-size: 0.9rem; color: var(--text); border-bottom: 1px solid var(--border); cursor: pointer; }
+        .dd-item:last-child { border: none; }
+        .dd-item:active { background: var(--input-bg); }
+
+        /* DASHBOARD */
+        .dashboard {
+            padding: 15px; background: var(--bg); display: flex; gap: 10px; overflow-x: auto; flex-shrink: 0;
+            border-bottom: 1px solid var(--border); scrollbar-width: none;
+        }
+        .dashboard::-webkit-scrollbar { display: none; }
+
+        .dash-card {
+            background: var(--card); min-width: 120px; padding: 12px; border-radius: 12px;
+            display: flex; flex-direction: column; justify-content: space-between;
+            border: 1px solid var(--border); cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .dash-count { font-size: 1.4rem; font-weight: bold; color: var(--text); }
+        .dash-label { font-size: 0.65rem; text-transform: uppercase; color: var(--subtext); font-weight: 600; margin-top: 5px; }
+        
+        .d-red .dash-count { color: var(--red); }
+        .d-gold .dash-count { color: var(--gold); }
+        .d-blue .dash-count { color: var(--blue); }
+        .d-purple .dash-count { color: var(--purple); }
+
+        /* LIST AREA */
+        .search-deck { padding: 10px 15px; background: var(--bg); flex-shrink: 0; }
+        .search-input {
+            width: 100%; background: var(--input-bg); border: 1px solid var(--border);
+            color: var(--text); padding: 10px 15px; border-radius: 10px;
+            font-size: 1rem; box-sizing: border-box; -webkit-appearance: none;
+        }
+        .search-input:focus { outline: 2px solid var(--accent); border-color: transparent; }
+        
+        #client-list {
+            flex-grow: 1; overflow-y: auto; padding: 15px;
+            display: flex; flex-direction: column; gap: 12px; -webkit-overflow-scrolling: touch;
+        }
+
+        .client-card {
+            background: var(--card); border-radius: 12px; border: 1px solid var(--border); 
+            overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .card-header {
+            padding: 15px; display: flex; justify-content: space-between; align-items: center;
+            background: var(--card); cursor: pointer;
+        }
+        .client-name { font-size: 1.1rem; font-weight: bold; color: var(--text); }
+        
+        .status-badges { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
+        .badge { 
+            font-size: 0.6rem; padding: 2px 8px; border-radius: 10px; 
+            text-transform: uppercase; font-weight: bold; border: 1px solid currentColor;
+        }
+        .b-red { color: var(--red); background: rgba(248, 113, 113, 0.1); }
+        .b-gold { color: var(--gold); background: rgba(251, 191, 36, 0.1); }
+        .b-blue { color: var(--blue); background: rgba(96, 165, 250, 0.1); }
+        .b-green { color: var(--green); background: rgba(74, 222, 128, 0.1); }
+        .b-purple { color: var(--purple); background: rgba(192, 132, 252, 0.1); }
+
+        .client-details { display: none; padding: 15px; border-top: 1px solid var(--border); background: var(--input-bg); }
+        .client-card.open .client-details { display: block; }
+
+        /* LOYALTY & BANK */
+        .loyalty-section { 
+            background: var(--card); padding: 10px; border-radius: 8px; border: 1px solid var(--border);
+            margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .dots { display: flex; gap: 6px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); }
+        .dot.filled { background: var(--green); box-shadow: 0 0 8px var(--green); }
+        
+        .bank-box { 
+            display: flex; gap: 10px; margin-bottom: 15px; 
+            background: var(--card); padding: 10px; border-radius: 8px; border: 1px solid var(--border);
+        }
+        .bank-item { flex: 1; text-align: center; }
+        .bank-val { font-size: 1.2rem; font-weight: bold; color: var(--gold); }
+        .bank-lbl { font-size: 0.6rem; color: var(--subtext); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* DETAILS */
+        .detail-row { display: flex; gap: 10px; margin-bottom: 15px; }
+        .detail-box { flex: 1; background: var(--card); padding: 10px; border-radius: 8px; border: 1px solid var(--border); }
+        .detail-label { font-size: 0.65rem; color: var(--accent); margin-bottom: 5px; font-weight: bold; letter-spacing: 1px; }
+        .detail-text { font-size: 0.95rem; color: var(--text); white-space: pre-wrap; }
+
+        /* BUTTONS */
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .btn {
+            padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer;
+            text-align: center; text-decoration: none; font-size: 0.9rem; transition: opacity 0.2s;
+        }
+        .btn:active { opacity: 0.7; transform: translateY(1px); }
+        .btn-cut { background: var(--green); color: #000; grid-column: span 2; }
+        .btn-call { background: var(--card); border: 1px solid var(--border); color: var(--text); }
+        .btn-text { background: var(--card); border: 1px solid var(--border); color: var(--text); }
+        .btn-ig { background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%); color: white; }
+        .btn-edit { background: var(--border); color: var(--text); }
+        .btn-redeem { background: var(--gold); color: black; font-size: 0.7rem; padding: 4px 10px; border-radius: 4px; border:none; cursor: pointer; font-weight: bold;}
+
+        /* MODALS */
+        .fab {
+            position: absolute; bottom: 30px; right: 20px; background: var(--accent); color: white;
+            width: 55px; height: 55px; border-radius: 30px; display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; box-shadow: 0 5px 20px rgba(0,0,0,0.3); cursor: pointer; border: none; z-index: 50;
+        }
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 100; 
+            display: none; justify-content: center; align-items: flex-start;
+            overflow-y: auto; padding-top: 20px;
+        }
+        .modal-content {
+            background: var(--card); width: 90%; max-width: 400px;
+            padding: 20px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 50px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        .form-group { margin-bottom: 12px; }
+        .form-label { display: block; margin-bottom: 5px; color: var(--subtext); font-size: 0.8rem; }
+        .form-input { 
+            width: 100%; padding: 12px; background: var(--input-bg); 
+            border: 1px solid var(--border); color: var(--text); border-radius: 8px;
+            box-sizing: border-box; font-size: 1rem;
+        }
+        .chip-container { display: flex; gap: 5px; overflow-x: auto; margin-bottom: 5px; padding-bottom: 5px; }
+        .chip {
+            padding: 5px 10px; background: var(--border); color: var(--subtext); border-radius: 15px;
+            font-size: 0.7rem; white-space: nowrap; cursor: pointer; border: 1px solid transparent;
+        }
+        
+        /* TEXT TEMPLATE LIST */
+        .text-option {
+            padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer;
+        }
+        .text-option:last-child { border-bottom: none; }
+        .text-title { font-weight: bold; color: var(--accent); font-size: 0.9rem; }
+        .text-body { font-size: 0.8rem; color: var(--subtext); margin-top: 3px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <a href="../apps.html" class="header-icon">🏠</a>
+        <h1>Black Book</h1>
+        <div class="icon-group">
+            <div class="header-icon" onclick="toggleTheme()" id="theme-icon">☀️</div>
+            <div class="header-icon" onclick="openSearchReferral()">🎁</div>
+            
+            <div style="position:relative;">
+                <div class="header-icon" onclick="toggleSaveMenu()">💾</div>
+                <div id="save-menu" class="dropdown">
+                    <div class="dd-item" onclick="exportData('json')">Backup (App File)</div>
+                    <div class="dd-item" onclick="exportData('csv')">Export to Excel</div>
+                    <div class="dd-item" onclick="document.getElementById('file-input').click()">Restore Backup</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <input type="file" id="file-input" style="display:none" onchange="importData(this)">
+
+    <div class="dashboard">
+        <div class="dash-card d-red" onclick="filterList('due')">
+            <div class="dash-count" id="count-due">0</div>
+            <div class="dash-label">Due Now</div>
+        </div>
+        <div class="dash-card d-gold" onclick="filterList('bday')">
+            <div class="dash-count" id="count-bday">0</div>
+            <div class="dash-label">Birthdays</div>
+        </div>
+        <div class="dash-card d-purple" onclick="filterList('ghosts')">
+            <div class="dash-count" id="count-ghosts">0</div>
+            <div class="dash-label">Ghosts</div>
+        </div>
+        <div class="dash-card d-blue" onclick="filterList('anni')">
+            <div class="dash-count" id="count-anni">0</div>
+            <div class="dash-label">Anniversaries</div>
+        </div>
+        <div class="dash-card" onclick="filterList('all')">
+            <div class="dash-count" id="count-all">0</div>
+            <div class="dash-label">Total Clients</div>
+        </div>
+    </div>
+
+    <div class="search-deck">
+        <input type="search" id="search-input" class="search-input" placeholder="Search name, notes..." onkeyup="render()" onsearch="render()">
+    </div>
+
+    <div id="client-list"></div>
+
+    <button class="fab" onclick="openModal()">+</button>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h2 style="margin-top:0; color:var(--text); border-bottom:1px solid var(--border); padding-bottom:10px;">Client Profile</h2>
+            <input type="hidden" id="c-id">
+            
+            <div class="form-group"><label class="form-label">Name</label><input type="text" id="c-name" class="form-input"></div>
+            <div style="display:flex; gap:10px;">
+                <div class="form-group" style="flex:1" onclick="callFromEdit()"><label class="form-label">Phone 📞</label><input type="tel" id="c-phone" class="form-input"></div>
+                <div class="form-group" style="flex:1"><label class="form-label">Price ($)</label><input type="number" id="c-price" class="form-input" placeholder="40"></div>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <div class="form-group" style="flex:1"><label class="form-label">Birthday</label><input type="date" id="c-dob" class="form-input"></div>
+                <div class="form-group" style="flex:1"><label class="form-label">Start Date</label><input type="date" id="c-start" class="form-input"></div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Social / Referral</label>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="c-social" class="form-input" placeholder="IG: @username">
+                    <input type="text" id="c-referral" class="form-input" placeholder="Ref by...">
+                </div>
+            </div>
+            <hr style="border:0; border-top:1px solid var(--border); margin:15px 0;">
+            <div style="display:flex; gap:10px;">
+                <div class="form-group" style="flex:1"><label class="form-label">Freq (Weeks)</label><input type="number" id="c-freq" class="form-input" placeholder="2"></div>
+                <div class="form-group" style="flex:1"><label class="form-label">Last Visit</label><input type="date" id="c-last" class="form-input"></div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">SIDES</label>
+                <div class="chip-container">
+                    <div class="chip" onclick="fillInput('c-sides', 'Skin Fade')">Skin Fade</div>
+                    <div class="chip" onclick="fillInput('c-sides', 'Drop Fade')">Drop Fade</div>
+                    <div class="chip" onclick="fillInput('c-sides', 'Taper')">Taper</div>
+                    <div class="chip" onclick="fillInput('c-sides', '#1 Guard')">#1</div>
+                    <div class="chip" onclick="fillInput('c-sides', '#2 Guard')">#2</div>
+                </div>
+                <input type="text" id="c-sides" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">TOP</label>
+                <div class="chip-container">
+                    <div class="chip" onclick="fillInput('c-top', 'Crop')">Crop</div>
+                    <div class="chip" onclick="fillInput('c-top', 'Trim')">Trim</div>
+                    <div class="chip" onclick="fillInput('c-top', 'Texture')">Texture</div>
+                </div>
+                <input type="text" id="c-top" class="form-input">
+            </div>
+            <div class="form-group"><label class="form-label">NOTES</label><textarea id="c-notes" class="form-input" style="height:60px;"></textarea></div>
+            <button class="btn btn-cut" onclick="saveClient()">SAVE CLIENT</button>
+            <button class="btn" style="background:none; color:var(--subtext); width:100%; margin-top:10px;" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+
+    <div id="text-modal" class="modal">
+        <div class="modal-content">
+            <h2 style="margin-top:0; color:var(--text);">Select Message</h2>
+            <div id="text-options"></div>
+            <button class="btn" style="background:none; color:var(--subtext); width:100%; margin-top:10px;" onclick="document.getElementById('text-modal').style.display='none'">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        let clients = JSON.parse(localStorage.getItem('bb_clients') || '[]');
+        let currentFilter = 'all';
+
+        if(localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-mode');
+            document.getElementById('theme-icon').innerText = '🌙';
+        }
+
+        // --- DASHBOARD ---
+        function updateDashboard() {
+            let due = 0, bday = 0, anni = 0, ghosts = 0;
+            clients.forEach(c => {
+                if (c.lastVisit) {
+                    if(c.freq) {
+                        const last = new Date(c.lastVisit);
+                        const next = new Date(last);
+                        next.setDate(last.getDate() + (c.freq * 7));
+                        if (new Date() >= next) due++;
+                    }
+                    const daysAgo = Math.ceil((new Date() - new Date(c.lastVisit)) / (86400000));
+                    if(daysAgo > 100) ghosts++;
+                }
+                if (c.dob && isDateComingUp(c.dob, 7)) bday++;
+                if (c.start && isDateComingUp(c.start, 7)) anni++;
+            });
+            document.getElementById('count-due').innerText = due;
+            document.getElementById('count-bday').innerText = bday;
+            document.getElementById('count-anni').innerText = anni;
+            document.getElementById('count-ghosts').innerText = ghosts;
+            document.getElementById('count-all').innerText = clients.length;
+        }
+
+        function isDateComingUp(dateStr, windowDays) {
+            if(!dateStr) return false;
+            const eventDate = new Date(dateStr);
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const eventThisYear = new Date(today.getFullYear(), eventDate.getMonth(), eventDate.getDate()+1); 
+            const diffDays = Math.ceil((eventThisYear - today) / (1000 * 60 * 60 * 24));
+            if (diffDays >= 0 && diffDays <= windowDays) return true;
+            const eventNextYear = new Date(today.getFullYear() + 1, eventDate.getMonth(), eventDate.getDate()+1);
+            const diffNext = Math.ceil((eventNextYear - today) / (1000 * 60 * 60 * 24));
+            return diffNext >= 0 && diffNext <= windowDays;
+        }
+
+        function getYearsSince(dateStr) {
+            if(!dateStr) return 0;
+            const start = new Date(dateStr);
+            const today = new Date();
+            return today.getFullYear() - start.getFullYear();
+        }
+
+        // --- RENDER ---
+        function render() {
+            updateDashboard();
+            const list = document.getElementById('client-list');
+            const search = document.getElementById('search-input').value.toLowerCase();
+            list.innerHTML = '';
+
+            let visible = clients.filter(c => 
+                c.name.toLowerCase().includes(search) || 
+                (c.notes && c.notes.toLowerCase().includes(search))
+            );
+
+            if (currentFilter === 'due') {
+                visible = visible.filter(c => {
+                    if(!c.lastVisit || !c.freq) return false;
+                    const next = new Date(new Date(c.lastVisit).setDate(new Date(c.lastVisit).getDate() + (c.freq * 7)));
+                    return new Date() >= next;
+                });
+            } else if (currentFilter === 'bday') {
+                visible = visible.filter(c => c.dob && isDateComingUp(c.dob, 7));
+            } else if (currentFilter === 'anni') {
+                visible = visible.filter(c => c.start && isDateComingUp(c.start, 7));
+            } else if (currentFilter === 'ghosts') {
+                visible = visible.filter(c => {
+                    if(!c.lastVisit) return false;
+                    const daysAgo = Math.ceil((new Date() - new Date(c.lastVisit)) / (86400000));
+                    return daysAgo > 100;
+                });
+            }
+
+            visible.sort((a, b) => a.name.localeCompare(b.name));
+
+            if(visible.length === 0) {
+                list.innerHTML = '<div style="text-align:center; color:var(--subtext); margin-top:30px;">No clients found.</div>';
+                return;
+            }
+
+            visible.forEach(c => {
+                let dotsHtml = '';
+                for(let i=0; i<5; i++) { dotsHtml += `<div class="dot ${i < c.loyalty ? 'filled' : ''}"></div>`; }
+
+                let badges = '';
+                if(c.dob && isDateComingUp(c.dob, 7)) badges += `<span class="badge b-gold">🎂 B-DAY DEAL</span>`;
+                if(c.start && isDateComingUp(c.start, 7)) badges += `<span class="badge b-blue">🎉 ${getYearsSince(c.start)} YR ANNI</span>`;
+                
+                // LTV Badge
+                const ltv = (c.totalCuts || 0) * (c.price || 0);
+                if(ltv > 0) badges += `<span class="badge b-green">LTV: $${ltv}</span>`;
+                
+                // Ghost Badge
+                if(c.lastVisit && Math.ceil((new Date() - new Date(c.lastVisit)) / (86400000)) > 100) {
+                    badges += `<span class="badge b-purple">👻 GHOST</span>`;
+                }
+
+                // Due Date Logic
+                let dueText = "";
+                let dueClass = "";
+                if(c.lastVisit && c.freq) {
+                    const last = new Date(c.lastVisit);
+                    const next = new Date(last);
+                    next.setDate(last.getDate() + (c.freq * 7));
+                    const daysTill = Math.ceil((next - new Date()) / (1000*60*60*24));
+                    if(daysTill < 0) { dueText = `Overdue by ${Math.abs(daysTill)} days`; dueClass="color:var(--red)"; }
+                    else { dueText = `Due in ${daysTill} days`; dueClass="color:var(--subtext)"; }
+                }
+
+                let totalDiscount = c.credit;
+                let offerText = "";
+                if(c.freeCuts > 0) offerText = "1 FREE CUT";
+                else if(c.credit > 0) offerText = `$${c.credit} Credit`;
+                
+                const div = document.createElement('div');
+                div.className = 'client-card';
+                div.innerHTML = `
+                    <div class="card-header" onclick="this.parentElement.classList.toggle('open')">
+                        <div>
+                            <div class="client-name">${c.name}</div>
+                            <div class="status-badges">${badges}</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-size:0.8rem; font-weight:bold; color:var(--gold)">${offerText}</div>
+                            <div style="font-size:0.7rem; margin-top:2px; ${dueClass}">${dueText}</div>
+                        </div>
+                    </div>
+                    <div class="client-details">
+                        <div class="loyalty-section">
+                            <div style="font-size:0.7rem; color:var(--subtext); text-transform:uppercase;">Cuts Tracker (${c.totalCuts || 0})</div>
+                            <div class="dots">${dotsHtml}</div>
+                        </div>
+
+                        <div class="bank-box">
+                            <div class="bank-item"><div class="bank-val">${c.freeCuts}</div><div class="bank-lbl">Free Cuts</div></div>
+                            <div class="bank-item"><div class="bank-val">$${c.credit}</div><div class="bank-lbl">Credit</div></div>
+                            <div class="bank-item" style="display:flex; align-items:center; justify-content:center;">
+                                <button class="btn-redeem" onclick="redeem(${c.id})">REDEEM</button>
+                            </div>
+                        </div>
+
+                        <div class="detail-row">
+                            <div class="detail-box"><div class="detail-label">SIDES</div><div class="detail-text">${c.sides || '-'}</div></div>
+                            <div class="detail-box"><div class="detail-label">TOP</div><div class="detail-text">${c.top || '-'}</div></div>
+                        </div>
+                        <div class="detail-box" style="margin-bottom:15px;">
+                            <div class="detail-label">NOTES</div><div class="detail-text">${c.notes || '-'}</div>
+                        </div>
+
+                        <button class="btn btn-cut" onclick="addCut(${c.id})">✂️ RECORD CUT (Add Point)</button>
+                        
+                        <div class="action-grid">
+                            <a href="tel:${c.phone}" class="btn btn-call">📞 Call</a>
+                            <button class="btn btn-text" onclick="openTextMenu('${c.phone}', '${c.name.replace(/'/g, "\\'")}')">💬 Text</button>
+                            <a href="https://instagram.com/${c.social ? c.social.replace('@','') : ''}" target="_blank" class="btn btn-ig">📸 IG</a>
+                            <button class="btn btn-edit" onclick="editClient(${c.id})">✏️ Edit</button>
+                        </div>
+                        <div style="text-align:center; margin-top:15px;">
+                             <button class="btn" style="color:var(--red); font-size:0.8rem; background:none;" onclick="deleteClient(${c.id})">Delete Profile</button>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        // --- SMART TEXTING ---
+        function openTextMenu(phone, name) {
+            if(!phone) return alert("No phone number saved.");
+            const firstName = name.split(' ')[0];
+            const templates = [
+                { title: "Running Late", body: `Hey ${firstName}, running about 15 mins behind schedule. Thanks for your patience!` },
+                { title: "Re-book", body: `Hey ${firstName}, been a while! Ready to get that cut fresh?` },
+                { title: "Confirmation", body: `Hey ${firstName}, just confirming our cut tomorrow. You still good?` },
+                { title: "Birthday", body: `Happy Birthday ${firstName}! Come in this week for 50% off.` }
+            ];
+            
+            const container = document.getElementById('text-options');
+            container.innerHTML = '';
+            
+            templates.forEach(t => {
+                const div = document.createElement('div');
+                div.className = 'text-option';
+                div.innerHTML = `<div class="text-title">${t.title}</div><div class="text-body">"${t.body}"</div>`;
+                div.onclick = () => {
+                    window.location.href = `sms:${phone}&body=${encodeURIComponent(t.body)}`;
+                };
+                container.appendChild(div);
+            });
+            const manual = document.createElement('div');
+            manual.className = 'text-option';
+            manual.innerHTML = `<div class="text-title">Custom Message</div>`;
+            manual.onclick = () => { window.location.href = `sms:${phone}`; };
+            container.appendChild(manual);
+            document.getElementById('text-modal').style.display = 'flex';
+        }
+
+        // --- ACTIONS ---
+        function openModal() {
+            document.getElementById('c-id').value = '';
+            ['name','phone','price','social','dob','start','referral','freq','last','sides','top','notes'].forEach(id => {
+                const el = document.getElementById('c-'+id); if(el) el.value = '';
+            });
+            document.getElementById('c-start').value = new Date().toISOString().split('T')[0];
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function fillInput(id, val) { document.getElementById(id).value = val; }
+
+        function saveClient() {
+            const id = document.getElementById('c-id').value;
+            const name = document.getElementById('c-name').value;
+            const referrerName = document.getElementById('c-referral').value;
+            if(!name) return alert("Name is required");
+
+            const newClient = {
+                id: id ? parseInt(id) : Date.now(),
+                name: name,
+                phone: document.getElementById('c-phone').value,
+                price: parseInt(document.getElementById('c-price').value) || 0,
+                social: document.getElementById('c-social').value,
+                dob: document.getElementById('c-dob').value,
+                start: document.getElementById('c-start').value,
+                referral: referrerName,
+                freq: parseInt(document.getElementById('c-freq').value) || 3,
+                lastVisit: document.getElementById('c-last').value,
+                sides: document.getElementById('c-sides').value,
+                top: document.getElementById('c-top').value,
+                notes: document.getElementById('c-notes').value,
+                loyalty: 0, freeCuts: 0, credit: 0, totalCuts: 0
+            };
+
+            if(id) {
+                const index = clients.findIndex(x => x.id == id);
+                newClient.loyalty = clients[index].loyalty;
+                newClient.freeCuts = clients[index].freeCuts;
+                newClient.credit = clients[index].credit;
+                newClient.totalCuts = clients[index].totalCuts || 0;
+                clients[index] = newClient;
+            } else {
+                if(referrerName) {
+                    const ref = clients.find(c => c.name.toLowerCase() === referrerName.toLowerCase());
+                    if(ref) { ref.credit += 5; newClient.credit = 5; alert(`Referral matched! Credits applied.`); }
+                }
+                clients.push(newClient);
+            }
+            save(); closeModal(); render();
+        }
+
+        function addCut(id) {
+            const c = clients.find(x => x.id === id);
+            c.lastVisit = new Date().toISOString().split('T')[0];
+            c.loyalty++;
+            c.totalCuts = (c.totalCuts || 0) + 1;
+            if(c.loyalty >= 6) { c.loyalty = 0; c.freeCuts++; alert("🎉 Loyalty Goal Reached!"); }
+            save(); render();
+        }
+
+        function redeem(id) {
+            const c = clients.find(x => x.id === id);
+            if(c.freeCuts > 0) { if(confirm("Use 1 Free Cut?")) c.freeCuts--; } 
+            else if (c.credit > 0) { if(confirm(`Use $${c.credit} Credit?`)) c.credit = 0; } 
+            else { alert("Nothing to redeem."); }
+            save(); render();
+        }
+
+        function deleteClient(id) { if(confirm("Delete this client?")) { clients = clients.filter(c => c.id !== id); save(); render(); } }
+
+        function editClient(id) {
+            const c = clients.find(x => x.id === id);
+            document.getElementById('c-id').value = c.id;
+            document.getElementById('c-name').value = c.name;
+            document.getElementById('c-phone').value = c.phone;
+            document.getElementById('c-price').value = c.price;
+            document.getElementById('c-social').value = c.social;
+            document.getElementById('c-dob').value = c.dob;
+            document.getElementById('c-start').value = c.start;
+            document.getElementById('c-referral').value = c.referral;
+            document.getElementById('c-freq').value = c.freq;
+            document.getElementById('c-last').value = c.lastVisit;
+            document.getElementById('c-sides').value = c.sides;
+            document.getElementById('c-top').value = c.top;
+            document.getElementById('c-notes').value = c.notes;
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function callFromEdit() {
+            const num = document.getElementById('c-phone').value;
+            if(num) window.location.href = `tel:${num}`;
+        }
+
+        function filterList(type) { currentFilter = type; render(); }
+        
+        function openSearchReferral() {
+            const name = prompt("Enter name to add $5 referral credit manually:");
+            if(name) {
+                const c = clients.find(x => x.name.toLowerCase().includes(name.toLowerCase()));
+                if(c) { c.credit += 5; save(); render(); alert(`Added $5 to ${c.name}`); } 
+                else { alert("Client not found."); }
+            }
+        }
+        function closeModal() { document.getElementById('modal').style.display = 'none'; document.getElementById('text-modal').style.display = 'none'; }
+        function save() { localStorage.setItem('bb_clients', JSON.stringify(clients)); }
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            document.getElementById('theme-icon').innerText = isLight ? '🌙' : '☀️';
+        }
+        
+        function toggleSaveMenu() { 
+            const menu = document.getElementById('save-menu');
+            menu.classList.toggle('show');
+            setTimeout(() => {
+                document.addEventListener('click', function closeMenu(e) {
+                    if(!e.target.closest('.header-icon') && !e.target.closest('.dropdown')) {
+                        menu.classList.remove('show');
+                        document.removeEventListener('click', closeMenu);
+                    }
+                });
+            }, 100);
+        }
+
+        function exportData(type) {
+            const date = new Date().toISOString().slice(0,10);
+            
+            if(type === 'csv') {
+                // EXCEL EXPORT
+                let csvContent = "data:text/csv;charset=utf-8,";
+                csvContent += "Name,Phone,Price,Last Visit,Frequency (Wks),Loyalty Points,Free Cuts,Credit,Total Cuts,Notes\n";
+                
+                clients.forEach(c => {
+                    const row = [
+                        `"${c.name}"`,
+                        `"${c.phone || ''}"`,
+                        c.price || 0,
+                        c.lastVisit || '',
+                        c.freq || 0,
+                        c.loyalty || 0,
+                        c.freeCuts || 0,
+                        c.credit || 0,
+                        c.totalCuts || 0,
+                        `"${(c.notes || '').replace(/"/g, '""')}"` // Escape quotes
+                    ];
+                    csvContent += row.join(",") + "\n";
+                });
+                
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", `blackbook_export_${date}.csv`);
+                document.body.appendChild(link);
+                link.click();
+            } else {
+                // BACKUP EXPORT
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(new Blob([JSON.stringify(clients, null, 2)], {type:"application/json"}));
+                a.download = `blackbook_backup_${date}.json`;
+                a.click();
+            }
+            document.getElementById('save-menu').classList.remove('show');
+        }
+
+        function importData(input) {
+            const file = input.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if(Array.isArray(data)) {
+                        if(confirm(`Restore ${data.length} clients?`)) { clients = data; save(); render(); }
+                    }
+                } catch(err) { alert("Error reading file"); }
+            };
+            reader.readAsText(file);
+        }
+        render();
+    </script>
+</body>
+</html>
