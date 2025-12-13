@@ -47,7 +47,6 @@
         .header {
             padding: 15px; background: var(--card); border-bottom: 1px solid var(--border);
             display: flex; justify-content: space-between; align-items: center; z-index: 10;
-            transition: transform 0.3s ease;
         }
         h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-weight: 900;}
         .btn-icon { background: none; border: none; font-size: 1.4rem; cursor: pointer; text-decoration: none; padding: 5px; opacity: 0.8; transition: opacity 0.2s; }
@@ -58,8 +57,11 @@
             display: flex; gap: 8px; padding: 10px 15px;
             overflow-x: auto; background: var(--bg);
             border-bottom: 1px solid var(--border); flex-shrink: 0;
-            transition: transform 0.3s ease;
+            /* Hide scrollbar */
+            scrollbar-width: none; -ms-overflow-style: none;
         }
+        .filter-scroll::-webkit-scrollbar { display: none; }
+        
         .filter-chip {
             background: var(--card); padding: 6px 14px;
             border-radius: 20px; font-size: 0.85rem; color: var(--subtext);
@@ -74,6 +76,8 @@
         #bit-list {
             flex-grow: 1; overflow-y: auto; padding: 15px;
             display: flex; flex-direction: column; gap: 10px;
+            /* Allow scrolling to dismiss keyboard naturally on iOS */
+            -webkit-overflow-scrolling: touch;
         }
 
         /* BOTTOM DECK */
@@ -84,10 +88,14 @@
             transition: transform 0.3s ease;
         }
         .search-container { padding: 10px 15px 5px 15px; }
+        
+        /* Updated to type="search" for the native 'X' button */
         .search-input {
             width: 100%; background: var(--input-bg); border: 1px solid var(--border);
-            color: var(--text); padding: 8px 35px 8px 15px; border-radius: 10px;
+            color: var(--text); padding: 8px 15px; border-radius: 10px;
             font-size: 0.95rem; box-sizing: border-box;
+            /* Standard styling reset */
+            -webkit-appearance: none; 
         }
         .search-input:focus { outline: 2px solid var(--accent); border-color: transparent; }
 
@@ -109,7 +117,7 @@
             text-transform: uppercase; cursor: pointer;
         }
 
-        /* BIT CARDS */
+        /* BIT CARDS & COLORS */
         .bit-card {
             background: var(--card); padding: 15px; border-radius: 12px;
             border-left: 4px solid var(--subtext); position: relative;
@@ -118,19 +126,21 @@
         }
         .bit-card.pinned { border: 2px solid var(--pin-color); background: rgba(254, 202, 87, 0.05); }
         
-        .bit-card[data-tag="Clean"] { border-left-color: #54a0ff; }
-        .bit-card[data-tag="Roast"] { border-left-color: #ff6b6b; }
-        .bit-card[data-tag="Crowd"] { border-left-color: #1dd1a1; }
-        .bit-card[data-tag="Opener"] { border-left-color: var(--accent); }
+        /* --- COMPLETE COLOR CODING --- */
+        .bit-card[data-tag="Premise"] { border-left-color: var(--subtext); } /* Grey */
+        .bit-card[data-tag="Clean"] { border-left-color: #54a0ff; }       /* Blue */
+        .bit-card[data-tag="Roast"] { border-left-color: #ff6b6b; }       /* Red */
+        .bit-card[data-tag="Crowd"] { border-left-color: #1dd1a1; }       /* Green */
+        .bit-card[data-tag="Opener"] { border-left-color: var(--accent); }/* Orange/Gold */
+        .bit-card[data-tag="Dark"] { border-left-color: #a55eea; }        /* Purple */
+        .bit-card[data-tag="Closer"] { border-left-color: #eb3b5a; }      /* Neon Pink/Crimson */
 
         .bit-content { font-size: 1.1rem; line-height: 1.4; white-space: pre-wrap; margin-bottom: 8px; color: var(--text); font-weight: 500;}
-        
         .notes-preview {
             font-size: 0.85rem; color: var(--subtext); margin-bottom: 8px;
             font-style: italic; display: flex; align-items: center; gap: 5px;
             padding: 5px; background: rgba(125,125,125,0.05); border-radius: 4px;
         }
-
         .bit-meta {
             display: flex; justify-content: space-between; align-items: center;
             font-size: 0.75rem; color: var(--subtext); margin-top: 10px;
@@ -145,7 +155,7 @@
         .action-btn:hover { opacity: 1; transform: scale(1.2); }
         .pin-active { opacity: 1; transform: scale(1.1); filter: drop-shadow(0 0 5px var(--pin-color)); }
 
-        /* FOCUS MODE (The Magic Trick) */
+        /* FOCUS MODE */
         body.focus-mode .header,
         body.focus-mode .filter-scroll,
         body.focus-mode .bottom-deck,
@@ -154,8 +164,6 @@
             display: none !important; 
         }
         body.focus-mode #bit-list { padding-top: 60px; }
-        
-        /* Floating Exit Button for Focus Mode */
         #exit-focus-btn {
             position: fixed; top: 20px; right: 20px; z-index: 1000;
             background: var(--accent); color: var(--bg); border: none;
@@ -227,11 +235,11 @@
         <div class="filter-chip" onclick="filterBits('Dark', this)">Dark</div>
     </div>
 
-    <div id="bit-list"></div>
+    <div id="bit-list" ontouchstart="dismissKeyboard()"></div>
 
     <div class="bottom-deck">
         <div class="search-container">
-            <input type="text" id="search-bar" class="search-input" placeholder="Search jokes..." onkeyup="render()">
+            <input type="search" id="search-bar" class="search-input" placeholder="Search jokes..." onkeyup="render()" onsearch="render()">
         </div>
         <div class="input-area">
             <textarea class="input-main" id="new-text" placeholder="Quick Premise..."></textarea>
@@ -251,7 +259,6 @@
     </div>
 
     <script>
-        // --- INIT ---
         let bits = JSON.parse(localStorage.getItem('comedy_bits') || '[]');
         let currentFilter = 'all';
         let editingId = null;
@@ -261,10 +268,18 @@
             document.getElementById('theme-icon').innerText = '🌙';
         }
 
-        // --- RENDER ---
+        // --- DISMISS KEYBOARD LOGIC ---
+        function dismissKeyboard() {
+            if (document.activeElement && 
+               (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "TEXTAREA")) {
+                document.activeElement.blur();
+            }
+        }
+
         function render() {
             const list = document.getElementById('bit-list');
-            const searchQuery = document.getElementById('search-bar').value.toLowerCase();
+            const searchInput = document.getElementById('search-bar');
+            const searchQuery = searchInput.value.toLowerCase();
             list.innerHTML = '';
             
             let visibleBits = bits;
@@ -286,7 +301,7 @@
                 );
             }
 
-            // 3. SORTING (Pinned always on top unless filtering by New)
+            // 3. SORTING
             if (currentFilter !== 'New') {
                 visibleBits.sort((a, b) => (b.pinned === true ? 1 : 0) - (a.pinned === true ? 1 : 0));
             }
@@ -303,14 +318,11 @@
                 div.id = `card-${bit.id}`;
 
                 if (editingId === bit.id) {
-                    // EDIT MODE
                     div.innerHTML = `
                         <div style="font-size:0.7rem; color:var(--accent); margin-bottom:5px; font-weight:bold;">PREMISE</div>
                         <textarea class="edit-area" id="edit-text-${bit.id}">${bit.text}</textarea>
-                        
                         <div style="font-size:0.7rem; color:var(--accent); margin-bottom:5px; font-weight:bold;">NOTES</div>
                         <textarea class="edit-notes" id="edit-notes-${bit.id}" placeholder="Tags, punchlines...">${bit.notes || ''}</textarea>
-                        
                         <div class="edit-controls">
                             <select id="edit-tag-${bit.id}">${getOptionsHtml(bit.tag)}</select>
                             <button class="btn-save" onclick="saveEdit(${bit.id})">SAVE</button>
@@ -318,7 +330,6 @@
                         </div>
                     `;
                 } else {
-                    // VIEW MODE
                     const hasNotes = bit.notes && bit.notes.trim().length > 0;
                     const noteIndicator = hasNotes ? `<div class="notes-preview">📝 ${escapeHtml(bit.notes.substring(0, 40))}...</div>` : '';
                     const pinIcon = bit.pinned ? '📌' : '📍';
@@ -341,35 +352,22 @@
             });
         }
 
-        // --- ACTIONS ---
         function addBit() {
             const input = document.getElementById('new-text');
             const tagSelect = document.getElementById('new-tag');
             const text = input.value.trim();
             if (!text) return;
-
-            const newBit = { 
-                id: Date.now(), text: text, tag: tagSelect.value, notes: "", date: Date.now(), pinned: false 
-            };
-            bits.unshift(newBit);
-            save();
-            input.value = '';
-            
-            // Clear Search & Reset UI
-            document.getElementById('search-bar').value = "";
+            const newBit = { id: Date.now(), text: text, tag: tagSelect.value, notes: "", date: Date.now(), pinned: false };
+            bits.unshift(newBit); save(); input.value = '';
+            document.getElementById('search-bar').value = ""; // Auto clear search
             if(currentFilter !== 'New' && currentFilter !== 'all' && currentFilter !== tagSelect.value) {
                 filterBits('all', document.querySelector('.filter-chip'));
-            } else {
-                render();
-            }
+            } else { render(); }
         }
 
         function togglePin(id) {
             const index = bits.findIndex(b => b.id === id);
-            if(index !== -1) {
-                bits[index].pinned = !bits[index].pinned; // Flip boolean
-                save(); render();
-            }
+            if(index !== -1) { bits[index].pinned = !bits[index].pinned; save(); render(); }
         }
 
         function startEdit(id) { editingId = id; render(); }
@@ -378,14 +376,10 @@
             const newText = document.getElementById(`edit-text-${id}`).value.trim();
             const newNotes = document.getElementById(`edit-notes-${id}`).value.trim();
             const newTag = document.getElementById(`edit-tag-${id}`).value;
-            
             if (!newText) return cancelEdit();
-
             const index = bits.findIndex(b => b.id === id);
             if (index !== -1) {
-                bits[index].text = newText;
-                bits[index].notes = newNotes;
-                bits[index].tag = newTag;
+                bits[index].text = newText; bits[index].notes = newNotes; bits[index].tag = newTag;
                 save();
             }
             editingId = null; render();
@@ -394,10 +388,7 @@
         function cancelEdit() { editingId = null; render(); }
 
         function deleteBit(id) {
-            if(confirm("Delete this joke?")) {
-                bits = bits.filter(b => b.id !== id);
-                save(); render();
-            }
+            if(confirm("Delete this joke?")) { bits = bits.filter(b => b.id !== id); save(); render(); }
         }
 
         function filterBits(tag, element) {
@@ -414,10 +405,7 @@
             document.getElementById('theme-icon').innerText = isLight ? '🌙' : '☀️';
         }
         
-        function toggleFocusMode() {
-            document.body.classList.toggle('focus-mode');
-        }
-
+        function toggleFocusMode() { document.body.classList.toggle('focus-mode'); }
         function toggleMenu() { document.getElementById('settings-menu').classList.toggle('visible'); }
 
         function getOptionsHtml(selected) {
@@ -428,7 +416,6 @@
         function save() { localStorage.setItem('comedy_bits', JSON.stringify(bits)); }
         function escapeHtml(text) { return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : ""; }
 
-        // --- EXPORT/IMPORT ---
         function shareToNotes() {
             if (!navigator.share) { alert("Use Safari on iPhone."); return; }
             let txt = "🎤 COMEDY VAULT \n\n";
@@ -459,9 +446,7 @@
                 try {
                     const data = JSON.parse(e.target.result);
                     if(Array.isArray(data)) {
-                        if(confirm(`Restore ${data.length} jokes? Overwrites current list.`)) {
-                            bits = data; save(); render();
-                        }
+                        if(confirm(`Restore ${data.length} jokes?`)) { bits = data; save(); render(); }
                     }
                 } catch(err) { alert("Error reading file"); }
             };
