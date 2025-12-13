@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
     <title>Comedy Vault</title>
     
     <link rel="apple-touch-icon" href="icon.png">
@@ -20,6 +20,7 @@
             --input-bg: #1c1c1c;
             --danger: #ff4757;
             --success: #2ed573;
+            --pin-color: #feca57;
         }
 
         /* --- DAY MODE (White & Purple) --- */
@@ -31,6 +32,7 @@
             --accent: #8e44ad;
             --border: #dfe6e9;
             --input-bg: #f1f2f6;
+            --pin-color: #f1c40f;
         }
 
         body {
@@ -45,15 +47,18 @@
         .header {
             padding: 15px; background: var(--card); border-bottom: 1px solid var(--border);
             display: flex; justify-content: space-between; align-items: center; z-index: 10;
+            transition: transform 0.3s ease;
         }
         h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-weight: 900;}
-        .btn-icon { background: none; border: none; font-size: 1.4rem; cursor: pointer; text-decoration: none; padding: 5px; }
+        .btn-icon { background: none; border: none; font-size: 1.4rem; cursor: pointer; text-decoration: none; padding: 5px; opacity: 0.8; transition: opacity 0.2s; }
+        .btn-icon:hover { opacity: 1; transform: scale(1.1); }
 
-        /* FILTER BAR (Top) */
+        /* FILTER BAR */
         .filter-scroll {
             display: flex; gap: 8px; padding: 10px 15px;
             overflow-x: auto; background: var(--bg);
             border-bottom: 1px solid var(--border); flex-shrink: 0;
+            transition: transform 0.3s ease;
         }
         .filter-chip {
             background: var(--card); padding: 6px 14px;
@@ -71,32 +76,22 @@
             display: flex; flex-direction: column; gap: 10px;
         }
 
-        /* BOTTOM CONTROL DECK (Search + Input) */
+        /* BOTTOM DECK */
         .bottom-deck {
-            background: var(--card);
-            border-top: 1px solid var(--border);
+            background: var(--card); border-top: 1px solid var(--border);
             display: flex; flex-direction: column;
             padding-bottom: max(15px, env(safe-area-inset-bottom));
+            transition: transform 0.3s ease;
         }
-
-        /* SEARCH BAR (Bottom) */
-        .search-container {
-            padding: 10px 15px 5px 15px;
-        }
+        .search-container { padding: 10px 15px 5px 15px; }
         .search-input {
             width: 100%; background: var(--input-bg); border: 1px solid var(--border);
             color: var(--text); padding: 8px 35px 8px 15px; border-radius: 10px;
             font-size: 0.95rem; box-sizing: border-box;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%23888' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat; background-position: right 10px center;
         }
         .search-input:focus { outline: 2px solid var(--accent); border-color: transparent; }
 
-        /* INPUT AREA (Bottom) */
-        .input-area {
-            padding: 5px 15px 15px 15px;
-            display: flex; flex-direction: column; gap: 10px;
-        }
+        .input-area { padding: 5px 15px 15px 15px; display: flex; flex-direction: column; gap: 10px; }
         .input-main {
             background: var(--input-bg); border: 1px solid var(--border);
             color: var(--text); padding: 12px; border-radius: 8px;
@@ -119,19 +114,23 @@
             background: var(--card); padding: 15px; border-radius: 12px;
             border-left: 4px solid var(--subtext); position: relative;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
         }
-        .bit-card[data-tag="Premise"] { border-left-color: var(--subtext); }
+        .bit-card.pinned { border: 2px solid var(--pin-color); background: rgba(254, 202, 87, 0.05); }
+        
         .bit-card[data-tag="Clean"] { border-left-color: #54a0ff; }
         .bit-card[data-tag="Roast"] { border-left-color: #ff6b6b; }
         .bit-card[data-tag="Crowd"] { border-left-color: #1dd1a1; }
         .bit-card[data-tag="Opener"] { border-left-color: var(--accent); }
 
         .bit-content { font-size: 1.1rem; line-height: 1.4; white-space: pre-wrap; margin-bottom: 8px; color: var(--text); font-weight: 500;}
+        
         .notes-preview {
             font-size: 0.85rem; color: var(--subtext); margin-bottom: 8px;
             font-style: italic; display: flex; align-items: center; gap: 5px;
             padding: 5px; background: rgba(125,125,125,0.05); border-radius: 4px;
         }
+
         .bit-meta {
             display: flex; justify-content: space-between; align-items: center;
             font-size: 0.75rem; color: var(--subtext); margin-top: 10px;
@@ -141,32 +140,50 @@
             color: var(--subtext); text-transform: uppercase; font-size: 0.65rem; letter-spacing: 1px;
             font-weight: bold; border: 1px solid var(--border);
         }
-        .action-btn { cursor: pointer; padding: 5px; font-size: 1rem; margin-left: 10px; opacity: 0.6; }
-        .action-btn:hover { opacity: 1; }
+        .action-row { display: flex; align-items: center; gap: 15px; }
+        .action-btn { cursor: pointer; font-size: 1.1rem; opacity: 0.6; transition: 0.2s;}
+        .action-btn:hover { opacity: 1; transform: scale(1.2); }
+        .pin-active { opacity: 1; transform: scale(1.1); filter: drop-shadow(0 0 5px var(--pin-color)); }
+
+        /* FOCUS MODE (The Magic Trick) */
+        body.focus-mode .header,
+        body.focus-mode .filter-scroll,
+        body.focus-mode .bottom-deck,
+        body.focus-mode .action-btn, 
+        body.focus-mode .bit-meta span:first-child { 
+            display: none !important; 
+        }
+        body.focus-mode #bit-list { padding-top: 60px; }
+        
+        /* Floating Exit Button for Focus Mode */
+        #exit-focus-btn {
+            position: fixed; top: 20px; right: 20px; z-index: 1000;
+            background: var(--accent); color: var(--bg); border: none;
+            padding: 10px 20px; border-radius: 30px; font-weight: bold;
+            display: none; box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+        body.focus-mode #exit-focus-btn { display: block; }
 
         /* EDIT MODE */
         .edit-area {
             background: var(--input-bg); border: 1px solid var(--accent); color: var(--text);
-            padding: 10px; border-radius: 6px; font-size: 1rem;
-            width: 100%; box-sizing: border-box; font-family: inherit; resize: vertical;
-            min-height: 60px; margin-bottom: 10px;
+            padding: 10px; border-radius: 6px; font-size: 1rem; width: 100%;
+            min-height: 60px; margin-bottom: 10px; resize: vertical; box-sizing: border-box; font-family: inherit;
         }
         .edit-notes {
             background: var(--bg); border: 1px dashed var(--subtext); color: var(--text);
-            padding: 10px; border-radius: 6px; font-size: 0.9rem;
-            width: 100%; box-sizing: border-box; font-family: inherit; resize: vertical;
-            min-height: 40px; margin-bottom: 10px;
+            padding: 10px; border-radius: 6px; font-size: 0.9rem; width: 100%;
+            min-height: 40px; margin-bottom: 10px; resize: vertical; box-sizing: border-box; font-family: inherit;
         }
-        .edit-controls { display: flex; gap: 10px; flex-wrap: wrap;}
-        .btn-save { background: var(--success); color: white; border: none; padding: 10px; border-radius: 5px; font-weight: bold; flex-grow: 1;}
+        .edit-controls { display: flex; gap: 10px; }
+        .btn-save { background: var(--success); color: white; border: none; padding: 10px; border-radius: 5px; flex-grow: 1; font-weight: bold;}
         .btn-cancel { background: var(--input-bg); color: var(--text); border: 1px solid var(--border); padding: 10px; border-radius: 5px; }
 
         /* SETTINGS MENU */
         #settings-menu {
             position: absolute; top: 60px; left: 15px;
             background: var(--card); border: 1px solid var(--border);
-            border-radius: 8px; padding: 10px;
-            display: none; flex-direction: column; gap: 10px;
+            border-radius: 8px; padding: 10px; display: none; flex-direction: column; gap: 10px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 100; min-width: 220px;
         }
         #settings-menu.visible { display: flex; }
@@ -180,10 +197,15 @@
 </head>
 <body>
 
+    <button id="exit-focus-btn" onclick="toggleFocusMode()">🚫 Exit Stage Mode</button>
+
     <div class="header">
         <button class="btn-icon" onclick="toggleMenu()">⚙️</button>
         <h1>Comedy Vault</h1>
-        <button class="btn-icon" onclick="toggleTheme()" id="theme-icon">☀️</button>
+        <div style="display:flex; gap:10px;">
+            <button class="btn-icon" onclick="toggleFocusMode()" title="Stage Mode">👁️</button>
+            <button class="btn-icon" onclick="toggleTheme()" id="theme-icon">☀️</button>
+        </div>
     </div>
 
     <div id="settings-menu">
@@ -197,6 +219,7 @@
     <div class="filter-scroll">
         <div class="filter-chip active" onclick="filterBits('all', this)">All</div>
         <div class="filter-chip" data-tag="New" onclick="filterBits('New', this)">★ New</div>
+        <div class="filter-chip" onclick="filterBits('Pinned', this)">📌 Pinned</div>
         <div class="filter-chip" onclick="filterBits('Premise', this)">Premise</div>
         <div class="filter-chip" onclick="filterBits('Clean', this)">Clean</div>
         <div class="filter-chip" onclick="filterBits('Roast', this)">Roast</div>
@@ -210,7 +233,6 @@
         <div class="search-container">
             <input type="text" id="search-bar" class="search-input" placeholder="Search jokes..." onkeyup="render()">
         </div>
-
         <div class="input-area">
             <textarea class="input-main" id="new-text" placeholder="Quick Premise..."></textarea>
             <div class="input-row">
@@ -247,19 +269,26 @@
             
             let visibleBits = bits;
 
-            // 1. Tag Filter
+            // 1. FILTERING
             if (currentFilter === 'New') {
                 visibleBits = bits.slice(0, 5);
+            } else if (currentFilter === 'Pinned') {
+                visibleBits = bits.filter(b => b.pinned);
             } else if (currentFilter !== 'all') {
                 visibleBits = bits.filter(b => b.tag === currentFilter);
             }
 
-            // 2. Search Filter
+            // 2. SEARCH
             if (searchQuery) {
                 visibleBits = visibleBits.filter(b => 
                     b.text.toLowerCase().includes(searchQuery) || 
                     (b.notes && b.notes.toLowerCase().includes(searchQuery))
                 );
+            }
+
+            // 3. SORTING (Pinned always on top unless filtering by New)
+            if (currentFilter !== 'New') {
+                visibleBits.sort((a, b) => (b.pinned === true ? 1 : 0) - (a.pinned === true ? 1 : 0));
             }
 
             if (visibleBits.length === 0) {
@@ -269,37 +298,39 @@
 
             visibleBits.forEach(bit => {
                 const div = document.createElement('div');
-                div.className = 'bit-card';
+                div.className = `bit-card ${bit.pinned ? 'pinned' : ''}`;
                 div.setAttribute('data-tag', bit.tag);
                 div.id = `card-${bit.id}`;
 
                 if (editingId === bit.id) {
+                    // EDIT MODE
                     div.innerHTML = `
-                        <div style="font-size:0.7rem; color:var(--accent); margin-bottom:5px; font-weight:bold;">SETUP / PREMISE</div>
+                        <div style="font-size:0.7rem; color:var(--accent); margin-bottom:5px; font-weight:bold;">PREMISE</div>
                         <textarea class="edit-area" id="edit-text-${bit.id}">${bit.text}</textarea>
                         
-                        <div style="font-size:0.7rem; color:var(--accent); margin-bottom:5px; font-weight:bold;">WORKSHOP NOTES</div>
-                        <textarea class="edit-notes" id="edit-notes-${bit.id}" placeholder="Tags, punchlines, delivery notes...">${bit.notes || ''}</textarea>
+                        <div style="font-size:0.7rem; color:var(--accent); margin-bottom:5px; font-weight:bold;">NOTES</div>
+                        <textarea class="edit-notes" id="edit-notes-${bit.id}" placeholder="Tags, punchlines...">${bit.notes || ''}</textarea>
                         
                         <div class="edit-controls">
-                            <select id="edit-tag-${bit.id}">
-                                ${getOptionsHtml(bit.tag)}
-                            </select>
+                            <select id="edit-tag-${bit.id}">${getOptionsHtml(bit.tag)}</select>
                             <button class="btn-save" onclick="saveEdit(${bit.id})">SAVE</button>
                             <button class="btn-cancel" onclick="cancelEdit()">CANCEL</button>
                         </div>
                     `;
                 } else {
+                    // VIEW MODE
                     const hasNotes = bit.notes && bit.notes.trim().length > 0;
-                    const noteIndicator = hasNotes ? `<div class="notes-preview">📝 ${escapeHtml(bit.notes.substring(0, 50))}...</div>` : '';
+                    const noteIndicator = hasNotes ? `<div class="notes-preview">📝 ${escapeHtml(bit.notes.substring(0, 40))}...</div>` : '';
+                    const pinIcon = bit.pinned ? '📌' : '📍';
+                    const pinClass = bit.pinned ? 'pin-active' : '';
 
                     div.innerHTML = `
                         <div class="bit-content">${escapeHtml(bit.text)}</div>
                         ${noteIndicator}
                         <div class="bit-meta">
                             <span class="tag-badge">${bit.tag}</span>
-                            <div style="display:flex; align-items:center;">
-                                <span style="font-size:0.7rem; margin-right:10px;">${new Date(bit.date).toLocaleDateString()}</span>
+                            <div class="action-row">
+                                <span class="action-btn ${pinClass}" onclick="togglePin(${bit.id})">${pinIcon}</span>
                                 <span class="action-btn" onclick="startEdit(${bit.id})">✏️</span>
                                 <span class="action-btn" style="color:var(--danger)" onclick="deleteBit(${bit.id})">🗑️</span>
                             </div>
@@ -318,18 +349,26 @@
             if (!text) return;
 
             const newBit = { 
-                id: Date.now(), text: text, tag: tagSelect.value, notes: "", date: Date.now() 
+                id: Date.now(), text: text, tag: tagSelect.value, notes: "", date: Date.now(), pinned: false 
             };
             bits.unshift(newBit);
             save();
             input.value = '';
             
-            // Clear Search & Reset Filter
+            // Clear Search & Reset UI
             document.getElementById('search-bar').value = "";
             if(currentFilter !== 'New' && currentFilter !== 'all' && currentFilter !== tagSelect.value) {
                 filterBits('all', document.querySelector('.filter-chip'));
             } else {
                 render();
+            }
+        }
+
+        function togglePin(id) {
+            const index = bits.findIndex(b => b.id === id);
+            if(index !== -1) {
+                bits[index].pinned = !bits[index].pinned; // Flip boolean
+                save(); render();
             }
         }
 
@@ -349,8 +388,7 @@
                 bits[index].tag = newTag;
                 save();
             }
-            editingId = null;
-            render();
+            editingId = null; render();
         }
 
         function cancelEdit() { editingId = null; render(); }
@@ -358,8 +396,7 @@
         function deleteBit(id) {
             if(confirm("Delete this joke?")) {
                 bits = bits.filter(b => b.id !== id);
-                save();
-                render();
+                save(); render();
             }
         }
 
@@ -376,6 +413,10 @@
             localStorage.setItem('theme', isLight ? 'light' : 'dark');
             document.getElementById('theme-icon').innerText = isLight ? '🌙' : '☀️';
         }
+        
+        function toggleFocusMode() {
+            document.body.classList.toggle('focus-mode');
+        }
 
         function toggleMenu() { document.getElementById('settings-menu').classList.toggle('visible'); }
 
@@ -385,18 +426,16 @@
         }
 
         function save() { localStorage.setItem('comedy_bits', JSON.stringify(bits)); }
-        
-        function escapeHtml(text) {
-            if(!text) return "";
-            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        }
+        function escapeHtml(text) { return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : ""; }
 
+        // --- EXPORT/IMPORT ---
         function shareToNotes() {
-            if (!navigator.share) { alert("Use Safari on iPhone to share."); return; }
-            let txt = "🎤 COMEDY VAULT EXPORT \n\n";
+            if (!navigator.share) { alert("Use Safari on iPhone."); return; }
+            let txt = "🎤 COMEDY VAULT \n\n";
             bits.forEach(b => {
-                txt += `[${b.tag.toUpperCase()}] ${b.text}\n`;
-                if(b.notes) txt += `>>> Notes: ${b.notes}\n`;
+                const pin = b.pinned ? "📌 " : "";
+                txt += `${pin}[${b.tag}] ${b.text}\n`;
+                if(b.notes) txt += `   >>> ${b.notes}\n`;
                 txt += `-------------------\n`;
             });
             navigator.share({ title: 'Comedy Backup', text: txt }).catch(console.error);
@@ -420,7 +459,7 @@
                 try {
                     const data = JSON.parse(e.target.result);
                     if(Array.isArray(data)) {
-                        if(confirm(`Restore ${data.length} jokes? This overwrites current list.`)) {
+                        if(confirm(`Restore ${data.length} jokes? Overwrites current list.`)) {
                             bits = data; save(); render();
                         }
                     }
