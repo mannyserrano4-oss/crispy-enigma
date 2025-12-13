@@ -10,27 +10,29 @@
 
     <style>
         :root {
-            /* DARK MODE (Default) */
-            --bg: #121212;
-            --card: #1e1e1e;
+            /* --- NIGHT MODE (Black & Orange) --- */
+            --bg: #000000;          /* Pure Black */
+            --card: #121212;        /* Off Black */
             --text: #ffffff;
-            --subtext: #888;
-            --accent: #feca57; /* Gold */
-            --danger: #ff6b6b;
-            --success: #4cd137;
-            --border: #333;
-            --input-bg: #111;
+            --subtext: #888888;
+            --accent: #ff9f43;      /* Neon Orange */
+            --accent-dim: #b36b25;  /* Darker Orange for borders */
+            --danger: #ff4757;
+            --success: #2ed573;
+            --border: #333333;
+            --input-bg: #1c1c1c;
         }
 
-        /* LIGHT MODE */
+        /* --- DAY MODE (White & Purple) --- */
         body.light-mode {
-            --bg: #f5f5f7;
-            --card: #ffffff;
-            --text: #1d1d1f;
-            --subtext: #666;
-            --accent: #ff9f0a; /* Darker Gold for contrast */
-            --border: #e0e0e0;
-            --input-bg: #f0f0f0;
+            --bg: #f8f9fa;          /* Off White */
+            --card: #ffffff;        /* Pure White */
+            --text: #2d3436;        /* Dark Grey */
+            --subtext: #636e72;
+            --accent: #8e44ad;      /* Royal Purple */
+            --accent-dim: #9b59b6;
+            --border: #dfe6e9;
+            --input-bg: #f1f2f6;
         }
 
         body {
@@ -51,7 +53,7 @@
             display: flex; justify-content: space-between; align-items: center;
             z-index: 10;
         }
-        h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); }
+        h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-weight: 900;}
         .btn-icon { background: none; border: none; font-size: 1.4rem; cursor: pointer; text-decoration: none; padding: 5px; }
 
         /* FILTER BAR */
@@ -61,13 +63,13 @@
             border-bottom: 1px solid var(--border); flex-shrink: 0;
         }
         .filter-chip {
-            background: var(--card); padding: 6px 14px;
+            background: var(--card); padding: 8px 16px;
             border-radius: 20px; font-size: 0.85rem; color: var(--subtext);
             border: 1px solid var(--border); white-space: nowrap; cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s; font-weight: 600;
         }
         .filter-chip.active {
-            background: var(--accent); color: black; font-weight: bold; border-color: var(--accent);
+            background: var(--accent); color: var(--bg); font-weight: bold; border-color: var(--accent);
         }
         /* Special style for 'New' filter */
         .filter-chip[data-tag="New"] { border-color: var(--success); color: var(--success); }
@@ -82,30 +84,32 @@
         .bit-card {
             background: var(--card); padding: 15px; border-radius: 12px;
             border-left: 4px solid var(--subtext); position: relative;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         /* Color code the border based on tag */
         .bit-card[data-tag="Premise"] { border-left-color: var(--subtext); }
         .bit-card[data-tag="Clean"] { border-left-color: #54a0ff; }
         .bit-card[data-tag="Roast"] { border-left-color: #ff6b6b; }
         .bit-card[data-tag="Crowd"] { border-left-color: #1dd1a1; }
+        .bit-card[data-tag="Opener"] { border-left-color: var(--accent); }
 
-        .bit-content { font-size: 1.1rem; line-height: 1.4; white-space: pre-wrap; margin-bottom: 8px; color: var(--text); }
+        .bit-content { font-size: 1.1rem; line-height: 1.4; white-space: pre-wrap; margin-bottom: 8px; color: var(--text); font-weight: 500;}
         
         .notes-preview {
             font-size: 0.85rem; color: var(--subtext); margin-bottom: 8px;
             font-style: italic; display: flex; align-items: center; gap: 5px;
+            padding: 5px; background: rgba(125,125,125,0.05); border-radius: 4px;
         }
 
         .bit-meta {
             display: flex; justify-content: space-between; align-items: center;
-            font-size: 0.75rem; color: var(--subtext);
+            font-size: 0.75rem; color: var(--subtext); margin-top: 10px;
         }
         
         .tag-badge { 
             background: var(--input-bg); padding: 3px 8px; border-radius: 4px; 
             color: var(--subtext); text-transform: uppercase; font-size: 0.65rem; letter-spacing: 1px;
-            font-weight: bold;
+            font-weight: bold; border: 1px solid var(--border);
         }
 
         .action-btn { cursor: pointer; padding: 5px; font-size: 1rem; margin-left: 10px; opacity: 0.6; }
@@ -119,7 +123,7 @@
             min-height: 60px; margin-bottom: 10px;
         }
         .edit-notes {
-            background: var(--bg); border: 1px dashed var(--subtext); color: var(--subtext);
+            background: var(--bg); border: 1px dashed var(--subtext); color: var(--text);
             padding: 10px; border-radius: 6px; font-size: 0.9rem;
             width: 100%; box-sizing: border-box; font-family: inherit; resize: vertical;
             min-height: 40px; margin-bottom: 10px;
@@ -152,24 +156,25 @@
         }
 
         .btn-add {
-            background: var(--accent); color: black; border: none;
+            background: var(--accent); color: var(--bg); border: none;
             padding: 0 20px; border-radius: 8px; font-weight: bold;
             text-transform: uppercase; cursor: pointer;
         }
         
         /* SETTINGS MENU */
         #settings-menu {
-            position: absolute; top: 60px; left: 15px; /* Moved to Left since Home is gone */
+            position: absolute; top: 60px; left: 15px;
             background: var(--card); border: 1px solid var(--border);
             border-radius: 8px; padding: 10px;
             display: none; flex-direction: column; gap: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 100; min-width: 200px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 100; min-width: 220px;
         }
         #settings-menu.visible { display: flex; }
         
         .menu-btn {
-            background: var(--input-bg); color: var(--text); border: none; padding: 10px;
-            border-radius: 5px; cursor: pointer; text-align: left; font-size: 0.9rem;
+            background: var(--input-bg); color: var(--text); border: none; padding: 12px;
+            border-radius: 5px; cursor: pointer; text-align: left; font-size: 0.9rem; font-weight: 500;
+            display: flex; align-items: center; gap: 10px;
         }
 
     </style>
@@ -183,10 +188,19 @@
     </div>
 
     <div id="settings-menu">
-        <button class="menu-btn" onclick="shareToNotes()">📝 Export to Notes</button>
-        <button class="menu-btn" onclick="exportData()">💾 Backup File</button>
-        <button class="menu-btn" onclick="document.getElementById('file-input').click()">📂 Restore File</button>
-        <div style="font-size:0.7rem; color:var(--subtext); text-align:center;">Vault v2.0</div>
+        <div style="font-size:0.7rem; color:var(--subtext); text-transform:uppercase; letter-spacing:1px; margin-bottom:5px;">Data Safety</div>
+        
+        <button class="menu-btn" onclick="shareToNotes()" style="border-left: 3px solid var(--success);">
+            <span>☁️</span> Save to iCloud Notes
+        </button>
+        
+        <button class="menu-btn" onclick="exportData()">
+            <span>💾</span> Download Backup File
+        </button>
+        
+        <button class="menu-btn" onclick="document.getElementById('file-input').click()">
+            <span>📂</span> Restore from File
+        </button>
     </div>
     <input type="file" id="file-input" style="display:none" onchange="importData(this)">
 
@@ -224,7 +238,7 @@
         let currentFilter = 'all';
         let editingId = null;
 
-        // Theme Logic
+        // Load Theme Preference
         if(localStorage.getItem('theme') === 'light') {
             document.body.classList.add('light-mode');
             document.getElementById('theme-icon').innerText = '🌙';
@@ -237,14 +251,11 @@
             
             let visibleBits = [];
 
-            // FILTER LOGIC
             if (currentFilter === 'all') {
                 visibleBits = bits;
             } else if (currentFilter === 'New') {
-                // "New" is a smart filter: Top 5 most recent
                 visibleBits = bits.slice(0, 5);
             } else {
-                // Normal tag filter
                 visibleBits = bits.filter(b => b.tag === currentFilter);
             }
 
@@ -256,17 +267,16 @@
             visibleBits.forEach(bit => {
                 const div = document.createElement('div');
                 div.className = 'bit-card';
-                div.setAttribute('data-tag', bit.tag); // For CSS coloring
+                div.setAttribute('data-tag', bit.tag);
                 div.id = `card-${bit.id}`;
 
-                // EDIT MODE
                 if (editingId === bit.id) {
                     div.innerHTML = `
-                        <div style="font-size:0.8rem; color:var(--accent); margin-bottom:5px;">SETUP / PREMISE</div>
+                        <div style="font-size:0.7rem; color:var(--accent); margin-bottom:5px; font-weight:bold;">SETUP / PREMISE</div>
                         <textarea class="edit-area" id="edit-text-${bit.id}">${bit.text}</textarea>
                         
-                        <div style="font-size:0.8rem; color:var(--accent); margin-bottom:5px;">WORKSHOP NOTES (Tags, Alts, Delivery)</div>
-                        <textarea class="edit-notes" id="edit-notes-${bit.id}" placeholder="Add alternate punchlines or notes here...">${bit.notes || ''}</textarea>
+                        <div style="font-size:0.7rem; color:var(--accent); margin-bottom:5px; font-weight:bold;">WORKSHOP NOTES</div>
+                        <textarea class="edit-notes" id="edit-notes-${bit.id}" placeholder="Tags, punchlines, delivery notes...">${bit.notes || ''}</textarea>
                         
                         <div class="edit-controls">
                             <select id="edit-tag-${bit.id}">
@@ -277,10 +287,8 @@
                         </div>
                     `;
                 } else {
-                    // VIEW MODE
-                    // Check if notes exist to show an indicator
                     const hasNotes = bit.notes && bit.notes.trim().length > 0;
-                    const noteIndicator = hasNotes ? `<div class="notes-preview">📝 Has workshop notes...</div>` : '';
+                    const noteIndicator = hasNotes ? `<div class="notes-preview">📝 ${escapeHtml(bit.notes.substring(0, 50))}...</div>` : '';
 
                     div.innerHTML = `
                         <div class="bit-content">${escapeHtml(bit.text)}</div>
@@ -310,24 +318,22 @@
                 id: Date.now(), 
                 text: text, 
                 tag: tagSelect.value, 
-                notes: "", // New field for fleshing it out
+                notes: "", 
                 date: Date.now() 
             };
-            bits.unshift(newBit); // Add to top
+            bits.unshift(newBit);
             save();
             input.value = '';
-            // If we are in a specific filter, switch to All or the Tag so user sees the new bit
-            if(currentFilter === 'New' || currentFilter === 'all' || currentFilter === tagSelect.value) {
-                render();
+            
+            // Auto switch to show new bit
+            if(currentFilter !== 'New' && currentFilter !== 'all' && currentFilter !== tagSelect.value) {
+                filterBits('all', document.querySelector('.filter-chip'));
             } else {
-                filterBits('all', document.querySelector('.filter-chip')); // Reset to all
+                render();
             }
         }
 
-        function startEdit(id) {
-            editingId = id;
-            render();
-        }
+        function startEdit(id) { editingId = id; render(); }
 
         function saveEdit(id) {
             const newText = document.getElementById(`edit-text-${id}`).value.trim();
@@ -347,10 +353,7 @@
             render();
         }
 
-        function cancelEdit() {
-            editingId = null;
-            render();
-        }
+        function cancelEdit() { editingId = null; render(); }
 
         function deleteBit(id) {
             if(confirm("Delete this joke?")) {
@@ -367,7 +370,6 @@
             render();
         }
 
-        // --- UTILS ---
         function toggleTheme() {
             document.body.classList.toggle('light-mode');
             const isLight = document.body.classList.contains('light-mode');
@@ -393,14 +395,14 @@
 
         // --- EXPORT/IMPORT ---
         function shareToNotes() {
-            if (!navigator.share) { alert("Sharing not supported"); return; }
-            let txt = "🎤 COMEDY VAULT EXPORT \n\n";
+            if (!navigator.share) { alert("Use Safari to share to Notes."); return; }
+            let txt = "🎤 COMEDY VAULT BACKUP \n\n";
             bits.forEach(b => {
-                txt += `[${b.tag}] ${b.text}\n`;
-                if(b.notes) txt += `   NOTES: ${b.notes}\n`;
+                txt += `[${b.tag.toUpperCase()}] ${b.text}\n`;
+                if(b.notes) txt += `>>> Notes: ${b.notes}\n`;
                 txt += `-------------------\n`;
             });
-            navigator.share({ title: 'Comedy Export', text: txt }).catch(console.error);
+            navigator.share({ title: 'Comedy Backup', text: txt }).catch(console.error);
             toggleMenu();
         }
 
@@ -408,7 +410,7 @@
             const blob = new Blob([JSON.stringify(bits, null, 2)], { type: "application/json" });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = `comedy_backup_${Date.now()}.json`;
+            a.download = `comedy_backup_${new Date().toISOString().slice(0,10)}.json`;
             a.click();
             toggleMenu();
         }
@@ -421,7 +423,7 @@
                 try {
                     const data = JSON.parse(e.target.result);
                     if(Array.isArray(data)) {
-                        if(confirm(`Restore ${data.length} items? Overwrites current list.`)) {
+                        if(confirm(`Restore ${data.length} jokes? This replaces current list.`)) {
                             bits = data; save(); render();
                         }
                     }
