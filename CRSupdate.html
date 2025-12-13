@@ -19,13 +19,12 @@
             --border: #cbd5e1; --input-bg: #f8fafc;
         }
 
-        /* --- LAYOUT ENGINE (GRID FIX FOR SCROLLING) --- */
+        /* LAYOUT */
         body { 
             background: var(--bg); color: var(--text); 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            margin: 0; height: 100dvh; width: 100vw; overflow: hidden;
-            display: grid; 
-            grid-template-rows: auto auto 1fr; /* Header, Dash, List */
+            margin: 0; height: 100dvh; display: grid; grid-template-rows: auto auto 1fr; 
+            overflow: hidden;
         }
 
         /* HEADER */
@@ -53,11 +52,10 @@
         .d-red .dash-count { color: var(--red); } .d-gold .dash-count { color: var(--gold); }
         .d-blue .dash-count { color: var(--blue); } .d-purple .dash-count { color: var(--purple); }
 
-        /* SCROLLABLE LIST AREA */
+        /* SCROLL AREA */
         #main-area {
             position: relative; overflow-y: auto; -webkit-overflow-scrolling: touch;
-            padding: 15px; display: flex; flex-direction: column; gap: 15px;
-            padding-bottom: 100px; /* Space for FAB */
+            padding: 15px; padding-bottom: 100px; display: flex; flex-direction: column; gap: 15px;
         }
 
         /* SEARCH */
@@ -68,7 +66,7 @@
         }
         .search-input:focus { border-color: var(--accent); }
 
-        /* CLIENT CARD */
+        /* CARDS */
         .client-card { 
             background: var(--card); border-radius: 16px; border: 1px solid var(--border); 
             overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); flex-shrink: 0;
@@ -101,7 +99,7 @@
         .btn-main { width: 100%; padding: 16px; background: var(--green); color: #000; border: none; border-radius: 12px; font-size: 1rem; font-weight: 800; text-transform: uppercase; cursor: pointer; margin-bottom: 12px; }
         .btn-full { width: 100%; padding: 12px; background: var(--card); border: 1px solid var(--border); color: var(--text); font-weight: 600; border-radius: 10px; margin-bottom: 12px; cursor: pointer; }
         
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
         .btn-act { background: var(--card); border: 1px solid var(--border); color: var(--subtext); padding: 10px 5px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; }
         .btn-act span { font-size: 1.2rem; }
 
@@ -109,7 +107,7 @@
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: flex-start; overflow-y: auto; padding: 20px 0; }
         .modal-content { background: var(--card); width: 90%; max-width: 400px; padding: 20px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.5); margin-bottom: 80px; }
 
-        /* ZONES */
+        /* ZONES & FORMS */
         .zone { border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid transparent; }
         .z-blue { background: rgba(59, 130, 246, 0.05); border-color: rgba(59, 130, 246, 0.2); } .z-blue .z-title { color: var(--blue); }
         .z-gold { background: rgba(245, 158, 11, 0.05); border-color: rgba(245, 158, 11, 0.2); } .z-gold .z-title { color: var(--gold); }
@@ -126,10 +124,13 @@
         
         .fab { position: fixed; bottom: 30px; right: 20px; background: var(--accent); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4); cursor: pointer; border: none; z-index: 500; }
         
+        /* LIST OPTIONS */
+        .list-option { width: 100%; padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; font-size: 1rem; background: var(--card); color: var(--text); text-align: left; border:none; border-bottom: 1px solid var(--border); }
+        .list-option:last-child { border-bottom: none; }
+
         /* DROPDOWN */
         .dropdown { position: absolute; top: 60px; right: 15px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; display: none; flex-direction: column; width: 180px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 200; }
         .dropdown.show { display: flex; }
-        .dd-item { padding: 15px; text-align: left; background: none; border: none; border-bottom: 1px solid var(--border); color: var(--text); font-size: 1rem; cursor: pointer; }
 
         /* READ ONLY PROFILE */
         .ro-row { display: flex; padding: 12px 0; border-bottom: 1px solid var(--border); }
@@ -150,9 +151,9 @@
     </div>
 
     <div id="save-menu" class="dropdown">
-        <button class="dd-item" onclick="exportData('json')">Backup File</button>
-        <button class="dd-item" onclick="exportData('csv')">Export Excel</button>
-        <button class="dd-item" onclick="document.getElementById('file-input').click()">Restore</button>
+        <button class="list-option" onclick="exportData('json')">Backup File</button>
+        <button class="list-option" onclick="exportData('csv')">Export Excel</button>
+        <button class="list-option" onclick="document.getElementById('file-input').click()">Restore</button>
     </div>
     <input type="file" id="file-input" hidden onchange="importData(this)">
 
@@ -188,13 +189,22 @@
         </div>
     </div>
 
+    <div id="list-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="list-title" style="margin-top:0; color:var(--text);">Select</h3>
+            <div id="list-options"></div>
+            <button class="list-option" style="text-align:center; color:var(--red); margin-top:10px;" onclick="closeModals()">Cancel</button>
+        </div>
+    </div>
+
     <div id="credit-modal" class="modal">
         <div class="modal-content">
             <h3 style="text-align:center; margin-top:0;">Add Credit</h3>
             <p style="text-align:center; color:var(--subtext); font-size:0.9rem;">Search for a client to give $5 referral credit.</p>
             <div class="form-group">
                 <label class="form-lbl">Client Name</label>
-                <input id="credit-input" class="form-input" list="ref-list" placeholder="Start typing...">
+                <input id="credit-input" class="form-input" list="ref-list" placeholder="Start typing..." oninput="updateRefList()">
+                <datalist id="ref-list"></datalist>
             </div>
             <button class="btn-main" onclick="applyCredit()">ADD $5 CREDIT</button>
             <button class="btn-full" onclick="closeModals()">Cancel</button>
@@ -265,7 +275,6 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group"><label class="form-lbl">Referred By</label><input id="c-ref" class="form-input" list="ref-list" oninput="updateRefList()"></div>
-                    <datalist id="ref-list"></datalist>
                 </div>
                 <div class="form-row">
                     <div class="form-group"><label class="form-lbl">Freq (Wks)</label><input type="number" id="c-freq" class="form-input" placeholder="2"></div>
@@ -290,6 +299,7 @@
         let shopSettings = JSON.parse(localStorage.getItem('bb_settings') || '{"addr":""}');
         let filterType = 'all';
         let tempId = null;
+        let pendingCutId = null; // Stores ID if we interrupt cut flow to edit
 
         if(localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
         render();
@@ -355,7 +365,6 @@
                             <button class="btn-act" onclick="window.location='tel:${c.phone}'"><span>📞</span>Call</button>
                             <button class="btn-act" onclick="openText('${c.id}')"><span>💬</span>Text</button>
                             <button class="btn-act" onclick="openSchedule('${c.id}')"><span>📅</span>Sched</button>
-                            <button class="btn-act" onclick="downloadVCard('${c.id}')"><span>👤</span>Save</button>
                         </div>
                     </div>
                 `;
@@ -363,36 +372,55 @@
             });
         }
 
-        // --- CUT LOGIC ---
+        // --- CUT LOGIC (PRECISION FLOW) ---
         function startCutFlow(id) {
-            tempId = id;
             customConfirm("Did the haircut style change?", 
-                () => { openClientModal(id); alert("Update style -> Save -> Click Record Cut again."); }, 
-                () => { finishCut(id); }
+                () => { // YES -> Edit first
+                    pendingCutId = id; // Flag to continue after save
+                    openClientModal(id);
+                }, 
+                () => { // NO -> Proceed directly
+                    finishCut(id);
+                }
             );
         }
 
         function finishCut(id) {
             const c = clients.find(x=>x.id==id);
-            const price = prompt("Price paid today?", c.price||0);
+            const price = prompt("Price PAID Today? (Cash/Card)", c.price||0);
             if(price === null) return;
             const paid = parseFloat(price)||0;
 
+            // Credit / Free Logic
             if(c.free > 0 || c.credit > 0) {
-                if(confirm(`Client has ${c.free} Free Cuts, $${c.credit} Credit.\nRedeem now?`)) {
-                    if(c.free > 0 && confirm("Use 1 Free Cut?")) c.free--;
-                    else if(c.credit > 0) {
-                        const use = prompt(`Use how much credit? (Bal: $${c.credit})`, c.credit);
-                        if(use) c.credit -= Math.min(parseFloat(use), c.credit);
-                    }
-                }
+                customConfirm(`Bal: ${c.free} Free Cuts, $${c.credit} Credit.\nRedeem something?`, () => {
+                    // They want to redeem
+                    const redeemList = [];
+                    if(c.free > 0) redeemList.push({lbl: "Use 1 Free Cut", fn: () => { c.free--; }});
+                    if(c.credit > 0) redeemList.push({lbl: "Use Credit Amount", fn: () => {
+                        const amt = prompt(`Credit Bal: $${c.credit}. Amount to use:`, c.credit);
+                        if(amt) c.credit -= Math.min(parseFloat(amt), c.credit);
+                    }});
+                    // We need to execute the reward then save
+                    openListModal("Select Reward", redeemList, () => {
+                        completeCutRecord(c, paid);
+                    });
+                }, () => {
+                    // No redeem, just save
+                    completeCutRecord(c, paid);
+                });
+            } else {
+                completeCutRecord(c, paid);
             }
+        }
 
+        function completeCutRecord(c, paid) {
             c.lastVisit = new Date().toISOString().split('T')[0];
             c.cuts++;
             c.ltv = (c.ltv || 0) + paid;
             if(c.cuts % 6 === 0) { c.free++; alert("🎉 6th Cut! Free cut added."); }
             save(); render();
+            pendingCutId = null; // Clear flag
         }
 
         // --- CREDIT MANAGER ---
@@ -405,7 +433,7 @@
             const name = document.getElementById('credit-input').value;
             const c = clients.find(x => x.name.toLowerCase() === name.toLowerCase());
             if(c) { c.credit += 5; save(); render(); alert(`$5 added to ${c.name}`); closeModals(); }
-            else { alert("Client not found. Check spelling."); }
+            else { alert("Client not found."); }
         }
 
         // --- UTILS ---
@@ -419,6 +447,7 @@
             updateRefList();
             document.getElementById('client-modal').style.display = 'flex';
         }
+        
         function saveClient() {
             const id = document.getElementById('c-id').value;
             const name = document.getElementById('c-name').value;
@@ -446,6 +475,11 @@
                 }
             }
             save(); closeModals(); render();
+            
+            // Resume cut flow if pending
+            if(pendingCutId) {
+                finishCut(pendingCutId);
+            }
         }
 
         function viewFull(id) {
@@ -456,12 +490,31 @@
                         <div class="ro-row"><div class="ro-lbl">Social</div><div class="ro-val">${c.social||'-'}</div></div>
                         <div class="ro-row"><div class="ro-lbl">Birthday</div><div class="ro-val">${c.dob||'-'}</div></div>
                         <div class="ro-row"><div class="ro-lbl">First Cut</div><div class="ro-val">${c.start||'-'}</div></div>
-                        <div class="ro-row"><div class="ro-lbl">Referred By</div><div class="ro-val">${c.ref||'-'}</div></div>`;
+                        <div class="ro-row"><div class="ro-lbl">Last Cut</div><div class="ro-val">${c.lastVisit||'-'}</div></div>
+                        <div class="ro-row"><div class="ro-lbl">Referred By</div><div class="ro-val">${c.ref||'-'}</div></div>
+                        <div class="ro-row"><div class="ro-lbl">Default $</div><div class="ro-val">$${c.price||'-'}</div></div>`;
             document.getElementById('ro-content').innerHTML = html;
             document.getElementById('profile-modal').style.display = 'flex';
         }
         function editFromProfile() { closeModals(); openClientModal(tempId); }
 
+        function openText(id) {
+            const c = clients.find(x=>x.id==id);
+            if(!c.phone) return alert("No phone.");
+            const n = c.name.split(' ')[0];
+            const opts = [
+                {lbl:"Running Late", txt:`Hey ${n}, running a bit behind schedule. Thanks!`},
+                {lbl:"Confirm Cut", txt:`Hey ${n}, confirming our cut tomorrow. Still good?`},
+                {lbl:"Follow Up", txt:`Hey ${n}, checking in on the fresh cut. All good?`},
+                {lbl:"Custom", txt:''}
+            ];
+            const sep = navigator.userAgent.match(/iPhone|iPad/i) ? '&' : '?';
+            openListModal("Send Text", opts.map(o=>({
+                lbl: o.lbl, fn: ()=>{ window.location = `sms:${c.phone}${sep}body=${encodeURIComponent(o.txt)}`; }
+            })));
+        }
+
+        // --- SCHEDULING ---
         function openSchedule(id) {
             const c=clients.find(x=>x.id==id); document.getElementById('cal-id').value=id;
             document.getElementById('cal-date').value=new Date().toISOString().split('T')[0];
@@ -499,11 +552,19 @@
             document.getElementById('btn-yes').onclick=()=>{document.getElementById('confirm-modal').style.display='none';yes();};
             document.getElementById('btn-no').onclick=()=>{document.getElementById('confirm-modal').style.display='none';if(no)no();};
         }
+        function openListModal(title, options, callback) {
+            document.getElementById('list-title').innerText = title;
+            const container = document.getElementById('list-options'); container.innerHTML = '';
+            options.forEach(o => {
+                const btn = document.createElement('button'); btn.className = 'list-option';
+                btn.innerText = o.lbl; btn.onclick = () => { o.fn(); closeModals(); if(callback) callback(); };
+                container.appendChild(btn);
+            });
+            document.getElementById('list-modal').style.display = 'flex';
+        }
         function getDueDate(c) { if(!c.lastVisit||!c.freq)return null; const d=new Date(c.lastVisit); d.setDate(d.getDate()+(c.freq*7)); d.setHours(0,0,0,0); return d; }
         function isThisWeek(dStr) { if(!dStr)return false; const d=new Date(dStr); const n=new Date(); n.setHours(0,0,0,0); const ty=new Date(n.getFullYear(),d.getMonth(),d.getDate()+1); const diff=Math.ceil((ty-n)/86400000); return diff>=0&&diff<=7; }
         function getYears(dStr) { if(!dStr)return 0; return new Date().getFullYear()-new Date(dStr).getFullYear(); }
-        function openText(id) { const c=clients.find(x=>x.id==id); if(!c.phone)return alert("No phone"); window.location=`sms:${c.phone}`; }
-        function downloadVCard(id) { const c=clients.find(x=>x.id==id); const vcf=`BEGIN:VCARD\nVERSION:3.0\nN:${c.name};;;;\nFN:${c.name}\nTEL;type=CELL:${c.phone||''}\nADR;type=HOME:;;${c.addr||''};;;\nNOTE:${c.notes||''}\nEND:VCARD`; const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([vcf],{type:'text/vcard'})); a.download=`${c.name.replace(/\s/g,'_')}.vcf`; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
         function toggleTheme() { document.body.classList.toggle('light-mode'); localStorage.setItem('theme', document.body.classList.contains('light-mode')?'light':'dark'); }
         function toggleMenu() { document.getElementById('save-menu').classList.toggle('show'); }
         function closeModals() { document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); }
@@ -512,9 +573,8 @@
         function filter(t,el) { filterType=t; document.querySelectorAll('.dash-card').forEach(d=>d.classList.remove('active')); el.classList.add('active'); render(); }
         function openSettings() { document.getElementById('s-shop-addr').value=shopSettings.addr; document.getElementById('settings-modal').style.display='flex'; }
         function saveSettings() { shopSettings.addr=document.getElementById('s-shop-addr').value; localStorage.setItem('bb_settings', JSON.stringify(shopSettings)); closeModals(); }
-        function delClient(id) { customConfirm("Delete?", ()=>{clients=clients.filter(x=>x.id!=id); save(); render();}); }
         function exportData(type) { toggleMenu(); if(type==='json'){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(clients)],{type:'application/json'})); a.download=`bb_${Date.now()}.json`; a.click();} else { let csv="Name,Phone,LTV\n"+clients.map(c=>`"${c.name}","${c.phone}",${c.ltv}`).join('\n'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=`bb.csv`; a.click(); }}
-        function importData(el) { toggleMenu(); if(!el.files[0])return; const fr=new FileReader(); fr.onload=e=>{clients=JSON.parse(e.target.result); save(); render(); alert("Restored!");}; fr.readAsText(el.files[0]); }
+        function importData(el) { if(!el.files[0])return; const fr=new FileReader(); fr.onload=e=>{clients=JSON.parse(e.target.result); save(); render(); alert("Restored!");}; fr.readAsText(el.files[0]); }
     </script>
 </body>
 </html>
