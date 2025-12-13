@@ -49,22 +49,9 @@
         h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-weight: 900;}
         .btn-icon { background: none; border: none; font-size: 1.4rem; cursor: pointer; text-decoration: none; padding: 5px; }
 
-        /* SEARCH BAR (NEW) */
-        .search-container {
-            padding: 10px 15px; background: var(--bg);
-        }
-        .search-input {
-            width: 100%; background: var(--input-bg); border: 1px solid var(--border);
-            color: var(--text); padding: 10px 40px 10px 15px; border-radius: 20px;
-            font-size: 1rem; box-sizing: border-box;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23888' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat; background-position: right 15px center;
-        }
-        .search-input:focus { outline: 2px solid var(--accent); border-color: transparent; }
-
-        /* FILTER BAR */
+        /* FILTER BAR (Top) */
         .filter-scroll {
-            display: flex; gap: 8px; padding: 0 15px 10px 15px; /* Adjusted padding */
+            display: flex; gap: 8px; padding: 10px 15px;
             overflow-x: auto; background: var(--bg);
             border-bottom: 1px solid var(--border); flex-shrink: 0;
         }
@@ -84,6 +71,50 @@
             display: flex; flex-direction: column; gap: 10px;
         }
 
+        /* BOTTOM CONTROL DECK (Search + Input) */
+        .bottom-deck {
+            background: var(--card);
+            border-top: 1px solid var(--border);
+            display: flex; flex-direction: column;
+            padding-bottom: max(15px, env(safe-area-inset-bottom));
+        }
+
+        /* SEARCH BAR (Bottom) */
+        .search-container {
+            padding: 10px 15px 5px 15px;
+        }
+        .search-input {
+            width: 100%; background: var(--input-bg); border: 1px solid var(--border);
+            color: var(--text); padding: 8px 35px 8px 15px; border-radius: 10px;
+            font-size: 0.95rem; box-sizing: border-box;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%23888' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 10px center;
+        }
+        .search-input:focus { outline: 2px solid var(--accent); border-color: transparent; }
+
+        /* INPUT AREA (Bottom) */
+        .input-area {
+            padding: 5px 15px 15px 15px;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .input-main {
+            background: var(--input-bg); border: 1px solid var(--border);
+            color: var(--text); padding: 12px; border-radius: 8px;
+            resize: none; height: 50px; font-family: inherit; font-size: 1rem;
+        }
+        .input-main:focus { outline: 2px solid var(--accent); border-color: transparent; }
+        .input-row { display: flex; gap: 10px; }
+        select { 
+            background: var(--input-bg); color: var(--text); border: 1px solid var(--border); 
+            padding: 0 10px; border-radius: 8px; flex-grow: 1; height: 45px; font-size: 1rem;
+        }
+        .btn-add {
+            background: var(--accent); color: var(--bg); border: none;
+            padding: 0 20px; border-radius: 8px; font-weight: bold;
+            text-transform: uppercase; cursor: pointer;
+        }
+
+        /* BIT CARDS */
         .bit-card {
             background: var(--card); padding: 15px; border-radius: 12px;
             border-left: 4px solid var(--subtext); position: relative;
@@ -101,7 +132,6 @@
             font-style: italic; display: flex; align-items: center; gap: 5px;
             padding: 5px; background: rgba(125,125,125,0.05); border-radius: 4px;
         }
-
         .bit-meta {
             display: flex; justify-content: space-between; align-items: center;
             font-size: 0.75rem; color: var(--subtext); margin-top: 10px;
@@ -131,30 +161,7 @@
         .btn-save { background: var(--success); color: white; border: none; padding: 10px; border-radius: 5px; font-weight: bold; flex-grow: 1;}
         .btn-cancel { background: var(--input-bg); color: var(--text); border: 1px solid var(--border); padding: 10px; border-radius: 5px; }
 
-        /* INPUT AREA */
-        .input-area {
-            background: var(--card); padding: 15px; border-top: 1px solid var(--border);
-            display: flex; flex-direction: column; gap: 10px;
-            padding-bottom: max(15px, env(safe-area-inset-bottom));
-        }
-        .input-main {
-            background: var(--input-bg); border: 1px solid var(--border);
-            color: var(--text); padding: 12px; border-radius: 8px;
-            resize: none; height: 50px; font-family: inherit; font-size: 1rem;
-        }
-        .input-main:focus { outline: 2px solid var(--accent); border-color: transparent; }
-        .input-row { display: flex; gap: 10px; }
-        select { 
-            background: var(--input-bg); color: var(--text); border: 1px solid var(--border); 
-            padding: 0 10px; border-radius: 8px; flex-grow: 1; height: 45px; font-size: 1rem;
-        }
-        .btn-add {
-            background: var(--accent); color: var(--bg); border: none;
-            padding: 0 20px; border-radius: 8px; font-weight: bold;
-            text-transform: uppercase; cursor: pointer;
-        }
-        
-        /* MENU */
+        /* SETTINGS MENU */
         #settings-menu {
             position: absolute; top: 60px; left: 15px;
             background: var(--card); border: 1px solid var(--border);
@@ -187,10 +194,6 @@
     </div>
     <input type="file" id="file-input" style="display:none" onchange="importData(this)">
 
-    <div class="search-container">
-        <input type="text" id="search-bar" class="search-input" placeholder="Search jokes..." onkeyup="render()">
-    </div>
-
     <div class="filter-scroll">
         <div class="filter-chip active" onclick="filterBits('all', this)">All</div>
         <div class="filter-chip" data-tag="New" onclick="filterBits('New', this)">★ New</div>
@@ -203,19 +206,25 @@
 
     <div id="bit-list"></div>
 
-    <div class="input-area">
-        <textarea class="input-main" id="new-text" placeholder="Quick Premise..."></textarea>
-        <div class="input-row">
-            <select id="new-tag">
-                <option value="Premise">Premise (Idea)</option>
-                <option value="Clean">Clean</option>
-                <option value="Roast">Roast</option>
-                <option value="Crowd">Crowd Work</option>
-                <option value="Dark">Dark</option>
-                <option value="Opener">Opener</option>
-                <option value="Closer">Closer</option>
-            </select>
-            <button class="btn-add" onclick="addBit()">Add</button>
+    <div class="bottom-deck">
+        <div class="search-container">
+            <input type="text" id="search-bar" class="search-input" placeholder="Search jokes..." onkeyup="render()">
+        </div>
+
+        <div class="input-area">
+            <textarea class="input-main" id="new-text" placeholder="Quick Premise..."></textarea>
+            <div class="input-row">
+                <select id="new-tag">
+                    <option value="Premise">Premise (Idea)</option>
+                    <option value="Clean">Clean</option>
+                    <option value="Roast">Roast</option>
+                    <option value="Crowd">Crowd Work</option>
+                    <option value="Dark">Dark</option>
+                    <option value="Opener">Opener</option>
+                    <option value="Closer">Closer</option>
+                </select>
+                <button class="btn-add" onclick="addBit()">Add</button>
+            </div>
         </div>
     </div>
 
@@ -238,14 +247,14 @@
             
             let visibleBits = bits;
 
-            // 1. Apply Tag Filter
+            // 1. Tag Filter
             if (currentFilter === 'New') {
                 visibleBits = bits.slice(0, 5);
             } else if (currentFilter !== 'all') {
                 visibleBits = bits.filter(b => b.tag === currentFilter);
             }
 
-            // 2. Apply Search Filter
+            // 2. Search Filter
             if (searchQuery) {
                 visibleBits = visibleBits.filter(b => 
                     b.text.toLowerCase().includes(searchQuery) || 
@@ -315,7 +324,7 @@
             save();
             input.value = '';
             
-            // Clear Search & Reset Filter to show new bit
+            // Clear Search & Reset Filter
             document.getElementById('search-bar').value = "";
             if(currentFilter !== 'New' && currentFilter !== 'all' && currentFilter !== tagSelect.value) {
                 filterBits('all', document.querySelector('.filter-chip'));
