@@ -104,10 +104,11 @@
         .btn-act { background: var(--card); border: 1px solid var(--border); color: var(--subtext); padding: 10px 5px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; text-decoration: none;}
         .btn-act span { font-size: 1.2rem; }
 
-        /* MODALS & ZONES */
+        /* MODALS */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: flex-start; overflow-y: auto; padding: 20px 0; }
         .modal-content { background: var(--card); width: 90%; max-width: 400px; padding: 20px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.5); margin-bottom: 80px; }
 
+        /* ZONES & FORMS */
         .zone { border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid transparent; }
         .z-blue { background: rgba(59, 130, 246, 0.05); border-color: rgba(59, 130, 246, 0.2); } .z-blue .z-title { color: var(--blue); }
         .z-gold { background: rgba(245, 158, 11, 0.05); border-color: rgba(245, 158, 11, 0.2); } .z-gold .z-title { color: var(--gold); }
@@ -115,7 +116,7 @@
         .z-title { font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
 
         .form-row { display: flex; gap: 10px; margin-bottom: 12px; }
-        .form-group { flex: 1; min-width: 0; /* Fix flex overflow */ }
+        .form-group { flex: 1; min-width: 0; }
         .form-lbl { display: block; font-size: 0.75rem; color: var(--subtext); margin-bottom: 5px; font-weight: 600; }
         .form-input { width: 100%; padding: 12px; background: var(--card); border: 1px solid var(--border); color: var(--text); border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
         
@@ -128,15 +129,20 @@
         
         .fab { position: fixed; bottom: 30px; right: 20px; background: var(--accent); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4); cursor: pointer; border: none; z-index: 500; }
         
+        /* LIST OPTIONS */
         .list-option { width: 100%; padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; font-size: 1rem; background: var(--card); color: var(--text); text-align: left; border:none; }
+        .list-option:last-child { border-bottom: none; }
+
+        /* DROPDOWN */
         .dropdown { position: absolute; top: 60px; right: 15px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; display: none; flex-direction: column; width: 180px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 200; }
         .dropdown.show { display: flex; }
 
+        /* READ ONLY PROFILE */
         .ro-row { display: flex; padding: 12px 0; border-bottom: 1px solid var(--border); }
         .ro-lbl { width: 120px; color: var(--subtext); font-size: 0.9rem; }
         .ro-val { flex: 1; color: var(--text); font-weight: 700; font-size: 0.95rem; }
         
-        /* Stats Table */
+        /* STATS */
         .stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
         .stat-val { font-weight: bold; color: var(--accent); }
     </style>
@@ -219,8 +225,8 @@
             <div style="margin-bottom:20px;">
                 <div class="stat-row"><span>Total Revenue</span><span class="stat-val" id="st-rev">$0</span></div>
                 <div class="stat-row"><span>Total Cuts</span><span class="stat-val" id="st-cuts">0</span></div>
-                <div class="stat-row"><span>Referrals</span><span class="stat-val" id="st-ref">0</span></div>
                 <div class="stat-row"><span>Redeemed Value</span><span class="stat-val" id="st-red">$0</span></div>
+                <div class="stat-row"><span>Referrals</span><span class="stat-val" id="st-ref">0</span></div>
             </div>
             <h3 style="text-align:center;">Settings</h3>
             <div class="form-group"><label class="form-lbl">Shop Address</label><input id="s-shop-addr" class="form-input"></div>
@@ -272,7 +278,7 @@
                     <div class="form-group"><label class="form-lbl">Phone</label><input type="tel" id="c-phone" class="form-input"></div>
                     <div class="form-group"><label class="form-lbl">Price $</label><input type="number" id="c-price" class="form-input" placeholder="40"></div>
                 </div>
-                <div class="form-group"><label class="form-lbl">Social (Handle Only)</label><input id="c-social" class="form-input" placeholder="username_only"></div>
+                <div class="form-group"><label class="form-lbl">Social</label><input id="c-social" class="form-input"></div>
                 <div class="form-group"><label class="form-lbl">Address</label><input id="c-addr" class="form-input"></div>
             </div>
             
@@ -347,18 +353,24 @@
                 const daysTill = due ? Math.ceil((due - today)/86400000) : 999;
                 let dueTxt = due ? (daysTill < 0 ? `Overdue ${Math.abs(daysTill)}d` : `Due ${daysTill}d`) : '';
                 let dueCol = daysTill < 0 ? 'var(--red)' : 'var(--subtext)';
-                let lastCutTxt = c.lastVisit ? `Last: ${c.lastVisit.slice(5)}` : 'New';
+                
+                // FIXED: Date display (e.g., Dec 13, 2025)
+                let lastCutTxt = 'New';
+                if(c.lastVisit) {
+                    const d = new Date(c.lastVisit);
+                    lastCutTxt = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                }
+                
                 let cardClass = daysTill < 0 ? 'card-header due' : 'card-header';
-
                 let offer = c.free > 0 ? `${c.free} FREE` : (c.credit > 0 ? `$${c.credit} CR` : '');
 
-                // Social Button Logic
+                // Social Button
                 let socialBtn = '';
                 if(c.social) {
                     socialBtn = `<button class="btn-act" onclick="window.open('https://instagram.com/${c.social.replace('@','')}')"><span>📸</span>IG</button>`;
                 }
 
-                // Loyalty Logic: 5 steps. 6th is free.
+                // Loyalty
                 let punch = (c.loyalty || 0); 
                 let loyaltyText = `${punch}/5`;
                 if(punch >= 5) loyaltyText = "EARNED FREE!";
@@ -396,21 +408,17 @@
             });
         }
 
-        // --- CUT LOGIC (CEO FLOW) ---
+        // --- CUT LOGIC (PRECISION + REDEEMED TRACKING) ---
         function startCutFlow(id) {
             const c = clients.find(x=>x.id==id);
-            
-            // 1. Check Free Cut First
             if(c.free > 0) {
                 customConfirm(`🌟 Client has ${c.free} FREE CUT available.\nRedeem it now?`, 
                     () => { // YES -> Redeem Free
                         c.free--;
-                        // If redeeming, price is 0. Still check formula.
+                        c.redeemedVal = (c.redeemedVal || 0) + (c.price || 30); // Track Value
                         confirmFormulaAndSave(c, 0); 
                     },
-                    () => { // NO -> Proceed to paid
-                        proceedToPaid(c);
-                    }
+                    () => { proceedToPaid(c); } // NO -> Paid
                 );
             } else {
                 proceedToPaid(c);
@@ -418,27 +426,19 @@
         }
 
         function proceedToPaid(c) {
-            // 2. Ask Price
             const price = prompt("Price paid today? (Enter 0 if unpaid)", c.price||0);
-            if(price === null) return; // Cancelled
+            if(price === null) return;
             let paid = parseFloat(price)||0;
 
-            // 3. Check Credit
             if(c.credit > 0 && paid > 0) {
                 const use = prompt(`Credit Balance: $${c.credit}.\nHow much to use?`, 0);
                 if(use !== null) {
                     let creditUsed = parseFloat(use)||0;
                     if(creditUsed > c.credit) creditUsed = c.credit;
                     c.credit -= creditUsed;
-                    // Paid amount is separate from credit usage in LTV?
-                    // Usually LTV = Cash out of pocket. 
-                    // If cut is 30, use 5 credit, they pay 25. LTV +25.
-                    // User requested: "Should not affect how much credit used... just lets me know to give discount".
-                    // User said: "Charge 30 and click redeemed 5".
-                    // So LTV adds 'paid' (30). Credit subtracts 'use' (5). 
+                    c.redeemedVal = (c.redeemedVal || 0) + creditUsed; // Track Value
                 }
             }
-            
             confirmFormulaAndSave(c, paid);
         }
 
@@ -446,11 +446,7 @@
             customConfirm("Did the haircut style change?", 
                 () => { // YES -> Edit
                     tempId = c.id; 
-                    // We need to attach the payment logic to the save button now? 
-                    // Or just save formula then process stats?
-                    // Simpler: Open modal, let them save. WE handle the stats update now.
                     openClientModal(c.id);
-                    // We'll update the stats in background, User just updates styling text.
                     processStats(c, paid);
                     alert("Stats updated. Update style formula then Save.");
                 }, 
@@ -466,8 +462,6 @@
             c.cuts = (c.cuts || 0) + 1;
             c.ltv = (c.ltv || 0) + paid;
             
-            // Loyalty Logic: 0,1,2,3,4 -> 5 (Free) -> 0
-            // Increment logic
             let currentPoints = (c.loyalty || 0) + 1;
             if(currentPoints >= 5) {
                 c.free = (c.free || 0) + 1;
@@ -493,19 +487,57 @@
 
         // --- GLOBAL STATS ---
         function openSettings() {
-            // Calc Stats
             let rev = clients.reduce((a,b)=>a+(b.ltv||0),0);
             let cuts = clients.reduce((a,b)=>a+(b.cuts||0),0);
             let refs = clients.filter(c=>c.ref && c.ref.length>0).length;
-            let red = clients.reduce((a,b)=>a+(b.redeemedVal||0),0); // Assuming we track this later, for now 0 or logic
+            let red = clients.reduce((a,b)=>a+(b.redeemedVal||0),0);
 
             document.getElementById('st-rev').innerText = `$${rev}`;
             document.getElementById('st-cuts').innerText = cuts;
             document.getElementById('st-ref').innerText = refs;
-            // document.getElementById('st-red').innerText = `$${red}`;
+            document.getElementById('st-red').innerText = `$${red}`;
 
             document.getElementById('s-shop-addr').value = shopSettings.addr;
             document.getElementById('settings-modal').style.display = 'flex';
+        }
+
+        // --- SCHEDULING (FIXED DATE STRING) ---
+        function openSchedule(id) {
+            const c=clients.find(x=>x.id==id); document.getElementById('cal-id').value=id;
+            document.getElementById('cal-date').value=new Date().toISOString().split('T')[0];
+            selLoc('shop'); document.getElementById('cal-modal').style.display='flex';
+        }
+        function selLoc(type) {
+            const c=clients.find(x=>x.id==document.getElementById('cal-id').value);
+            document.getElementById('cal-addr').value = type==='shop' ? (shopSettings.addr||'') : (c.addr||'');
+        }
+        function generateICS() {
+            const c=clients.find(x=>x.id==document.getElementById('cal-id').value);
+            const d=document.getElementById('cal-date').value; const t=document.getElementById('cal-time').value;
+            const loc=document.getElementById('cal-addr').value;
+            if(!d||!t) return alert("Date/Time needed");
+            
+            // Format for ICS (YYYYMMDDTHHmmss) - Apple Friendly
+            const startRaw = d.replace(/-/g, '') + 'T' + t.replace(/:/g, '') + '00';
+            // Calculate End Time (manual math to avoid timezone shifts)
+            let h = parseInt(t.split(':')[0]);
+            let m = parseInt(t.split(':')[1]) + 45;
+            if(m>=60) { h++; m-=60; }
+            const endRaw = d.replace(/-/g, '') + 'T' + (h<10?'0':'')+h + (m<10?'0':'')+m + '00';
+
+            const ics = 
+`BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+SUMMARY:Cut with ${c.name}
+DTSTART:${startRaw}
+DTEND:${endRaw}
+LOCATION:${loc}
+DESCRIPTION:${c.notes||'Haircut'}
+END:VEVENT
+END:VCALENDAR`;
+            
+            const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar'})); a.download='appt.ics'; document.body.appendChild(a); a.click(); document.body.removeChild(a); closeModals();
         }
 
         // --- UTILS ---
@@ -539,7 +571,7 @@
                 const idx = clients.findIndex(x=>x.id==id);
                 clients[idx] = {...clients[idx], ...data};
             } else {
-                data.id = Date.now().toString(); data.cuts=0; data.free=0; data.credit=0; data.ltv=0; data.loyalty=0;
+                data.id = Date.now().toString(); data.cuts=0; data.free=0; data.credit=0; data.ltv=0; data.loyalty=0; data.redeemedVal=0;
                 clients.push(data);
                 if(ref) {
                     const referrer = clients.find(c => c.name.toLowerCase() === ref.toLowerCase() && c.id !== data.id);
@@ -579,28 +611,6 @@
             openListModal("Send Text", opts.map(o=>({
                 lbl: o.lbl, fn: ()=>{ window.location = `sms:${c.phone}${sep}body=${encodeURIComponent(o.txt)}`; }
             })));
-        }
-
-        // --- SCHEDULING (IOS COMPATIBLE) ---
-        function openSchedule(id) {
-            const c=clients.find(x=>x.id==id); document.getElementById('cal-id').value=id;
-            document.getElementById('cal-date').value=new Date().toISOString().split('T')[0];
-            selLoc('shop'); document.getElementById('cal-modal').style.display='flex';
-        }
-        function selLoc(type) {
-            const c=clients.find(x=>x.id==document.getElementById('cal-id').value);
-            document.getElementById('cal-addr').value = type==='shop' ? (shopSettings.addr||'') : (c.addr||'');
-        }
-        function generateICS() {
-            const c=clients.find(x=>x.id==document.getElementById('cal-id').value);
-            const d=document.getElementById('cal-date').value; const t=document.getElementById('cal-time').value;
-            const loc=document.getElementById('cal-addr').value;
-            if(!d||!t) return alert("Date/Time needed");
-            const s=new Date(`${d}T${t}`); const e=new Date(s.getTime()+45*60000);
-            const fmt=dt=>dt.toISOString().replace(/[-:]/g,'').split('.')[0]+'Z';
-            const ics=`BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Cut: ${c.name}\nDTSTART:${fmt(s)}\nDTEND:${fmt(e)}\nLOCATION:${loc}\nDESCRIPTION:${c.notes||''}\nEND:VEVENT\nEND:VCALENDAR`;
-            
-            const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar'})); a.download='appt.ics'; document.body.appendChild(a); a.click(); document.body.removeChild(a); closeModals();
         }
 
         // --- CORE ---
