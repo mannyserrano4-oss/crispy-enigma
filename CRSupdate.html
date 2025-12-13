@@ -9,282 +9,132 @@
 
     <style>
         :root {
-            --bg: #0f172a; 
-            --card: #1e293b; 
-            --text: #f8fafc; 
-            --subtext: #94a3b8;
-            --border: #334155; 
-            --input-bg: #020617;
-            
-            /* VIBRANT ACCENTS */
-            --accent: #6366f1; /* Indigo */
-            --red: #f43f5e;    /* Rose */
-            --gold: #f59e0b;   /* Amber */
-            --green: #10b981;  /* Emerald */
-            --blue: #3b82f6;   /* Blue */
-            --purple: #a855f7; /* Purple */
+            --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --subtext: #94a3b8;
+            --border: #334155; --input-bg: #020617;
+            --accent: #6366f1; --red: #f43f5e; --gold: #f59e0b; 
+            --green: #10b981; --blue: #3b82f6; --purple: #a855f7;
         }
-
         body.light-mode {
-            --bg: #f1f5f9; 
-            --card: #ffffff; 
-            --text: #1e293b; 
-            --subtext: #64748b;
-            --border: #cbd5e1; 
-            --input-bg: #f8fafc;
+            --bg: #f1f5f9; --card: #ffffff; --text: #1e293b; --subtext: #64748b;
+            --border: #cbd5e1; --input-bg: #f8fafc;
         }
 
+        /* --- LAYOUT ENGINE (GRID FIX FOR SCROLLING) --- */
         body { 
-            background: var(--bg); 
-            color: var(--text); 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            margin: 0; 
-            height: 100dvh; /* Dynamic Height for Mobile */
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden; 
+            background: var(--bg); color: var(--text); 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0; height: 100dvh; width: 100vw; overflow: hidden;
+            display: grid; 
+            grid-template-rows: auto auto 1fr; /* Header, Dash, List */
         }
 
-        /* --- HEADER --- */
+        /* HEADER */
         .header { 
-            padding: 15px 20px; 
-            background: var(--card); 
-            border-bottom: 1px solid var(--border); 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            flex-shrink: 0;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            z-index: 20;
+            padding: 15px 20px; background: var(--card); border-bottom: 1px solid var(--border); 
+            display: flex; justify-content: space-between; align-items: center; z-index: 20;
         }
         h1 { margin: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); font-weight: 900; }
-        .icon-btn { font-size: 1.4rem; background: none; border: none; cursor: pointer; padding: 5px; transition: transform 0.2s; }
-        .icon-btn:active { transform: scale(0.9); }
+        .icon-btn { font-size: 1.4rem; background: none; border: none; cursor: pointer; padding: 5px; }
 
-        /* --- DASHBOARD --- */
+        /* DASHBOARD */
         .dashboard { 
-            padding: 15px; 
-            background: var(--bg); 
-            display: flex; 
-            gap: 12px; 
-            overflow-x: auto; 
-            flex-shrink: 0; 
-            border-bottom: 1px solid var(--border); 
-            scrollbar-width: none; 
+            padding: 12px; background: var(--bg); display: flex; gap: 10px; 
+            overflow-x: auto; border-bottom: 1px solid var(--border); 
+            scrollbar-width: none; flex-shrink: 0;
         }
         .dashboard::-webkit-scrollbar { display: none; }
-        
         .dash-card { 
-            background: var(--card); 
-            min-width: 110px; 
-            padding: 12px; 
-            border-radius: 12px; 
-            border: 1px solid var(--border); 
-            text-align: center; 
-            cursor: pointer; 
-            transition: all 0.2s;
-            position: relative;
-            overflow: hidden;
+            background: var(--card); min-width: 100px; padding: 10px; border-radius: 12px; 
+            border: 1px solid var(--border); text-align: center; cursor: pointer; 
         }
         .dash-card.active { border-color: var(--accent); background: rgba(99, 102, 241, 0.1); }
-        .dash-card.active::after { content:''; position:absolute; bottom:0; left:0; width:100%; height:3px; background:var(--accent); }
-        
-        .dash-count { font-size: 1.6rem; font-weight: 800; line-height: 1; }
-        .dash-lbl { font-size: 0.65rem; text-transform: uppercase; font-weight: 700; color: var(--subtext); margin-top: 6px; letter-spacing: 0.5px; }
-        
-        .d-red .dash-count { color: var(--red); }
-        .d-gold .dash-count { color: var(--gold); }
-        .d-blue .dash-count { color: var(--blue); }
-        .d-purple .dash-count { color: var(--purple); }
+        .dash-count { font-size: 1.4rem; font-weight: 800; }
+        .dash-lbl { font-size: 0.65rem; text-transform: uppercase; font-weight: 700; color: var(--subtext); margin-top: 4px; }
+        .d-red .dash-count { color: var(--red); } .d-gold .dash-count { color: var(--gold); }
+        .d-blue .dash-count { color: var(--blue); } .d-purple .dash-count { color: var(--purple); }
 
-        /* --- SCROLL AREA --- */
-        #client-list { 
-            flex-grow: 1; 
-            overflow-y: auto; 
-            padding: 15px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; 
-            -webkit-overflow-scrolling: touch; 
+        /* SCROLLABLE LIST AREA */
+        #main-area {
+            position: relative; overflow-y: auto; -webkit-overflow-scrolling: touch;
+            padding: 15px; display: flex; flex-direction: column; gap: 15px;
             padding-bottom: 100px; /* Space for FAB */
         }
 
-        /* --- SEARCH --- */
-        .search-deck { padding: 10px 15px; background: var(--bg); flex-shrink: 0; }
+        /* SEARCH */
         .search-input { 
             width: 100%; background: var(--input-bg); border: 1px solid var(--border); 
             color: var(--text); padding: 12px 15px; border-radius: 10px; 
-            font-size: 1rem; box-sizing: border-box; outline: none;
+            font-size: 1rem; box-sizing: border-box; outline: none; margin-bottom: 10px;
         }
-        .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); }
+        .search-input:focus { border-color: var(--accent); }
 
-        /* --- CLIENT CARD --- */
+        /* CLIENT CARD */
         .client-card { 
-            background: var(--card); border-radius: 16px; 
-            border: 1px solid var(--border); 
-            overflow: hidden; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: transform 0.1s;
+            background: var(--card); border-radius: 16px; border: 1px solid var(--border); 
+            overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); flex-shrink: 0;
         }
-        .client-card:active { transform: scale(0.99); }
+        .card-header { padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .card-header.due { border-left: 4px solid var(--red); }
         
-        .card-header { 
-            padding: 15px; display: flex; justify-content: space-between; align-items: center; 
-            cursor: pointer; border-left: 4px solid transparent;
-        }
-        .card-header.due { border-left-color: var(--red); }
-        .card-header.vip { border-left-color: var(--gold); }
-        
-        .client-name { font-size: 1.1rem; font-weight: 800; color: var(--text); }
-        .badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
-        .badge { 
-            font-size: 0.6rem; padding: 3px 8px; border-radius: 6px; 
-            font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        .b-red { background: rgba(244, 63, 94, 0.15); color: var(--red); }
+        .client-name { font-size: 1.1rem; font-weight: 800; }
+        .badges { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
+        .badge { font-size: 0.6rem; padding: 3px 8px; border-radius: 6px; font-weight: 700; text-transform: uppercase; }
         .b-gold { background: rgba(245, 158, 11, 0.15); color: var(--gold); }
-        .b-green { background: rgba(16, 185, 129, 0.15); color: var(--green); }
         .b-blue { background: rgba(59, 130, 246, 0.15); color: var(--blue); }
+        .b-green { background: rgba(16, 185, 129, 0.15); color: var(--green); }
 
-        /* --- EXPANDED DETAILS --- */
-        .client-details { 
-            display: none; padding: 15px; 
-            background: var(--input-bg); 
-            border-top: 1px solid var(--border);
-            animation: slideDown 0.2s ease-out;
-        }
+        .client-details { display: none; padding: 15px; background: var(--input-bg); border-top: 1px solid var(--border); }
         .client-card.open .client-details { display: block; }
-        @keyframes slideDown { from{opacity:0; transform:translateY(-10px);} to{opacity:1; transform:translateY(0);} }
 
-        /* Bank / Stats */
-        .bank-box { 
-            display: flex; gap: 8px; margin-bottom: 15px; 
-            background: var(--card); padding: 12px; border-radius: 12px; 
-            border: 1px solid var(--border); 
-        }
+        /* DETAILS */
+        .bank-box { display: flex; gap: 8px; margin-bottom: 15px; background: var(--card); padding: 12px; border-radius: 12px; border: 1px solid var(--border); }
         .bank-item { flex: 1; text-align: center; }
-        .bank-val { font-size: 1.3rem; font-weight: 900; color: var(--text); }
+        .bank-val { font-size: 1.3rem; font-weight: 900; }
         .bank-lbl { font-size: 0.6rem; font-weight: 700; color: var(--subtext); text-transform: uppercase; }
-        .bank-hl { color: var(--gold); }
-
-        /* Formula Boxes */
+        
         .detail-row { display: flex; gap: 10px; margin-bottom: 10px; }
-        .detail-box { 
-            flex: 1; background: var(--card); padding: 10px; 
-            border-radius: 8px; border: 1px solid var(--border); 
-        }
+        .detail-box { flex: 1; background: var(--card); padding: 10px; border-radius: 8px; border: 1px solid var(--border); }
         .detail-lbl { font-size: 0.65rem; color: var(--accent); font-weight: 800; margin-bottom: 4px; letter-spacing: 1px; }
-        .detail-txt { font-size: 0.95rem; color: var(--text); line-height: 1.4; white-space: pre-wrap; }
+        .detail-txt { font-size: 0.95rem; line-height: 1.4; }
 
-        /* Buttons */
-        .btn-main { 
-            width: 100%; padding: 16px; 
-            background: var(--green); color: #000; 
-            border: none; border-radius: 12px; 
-            font-size: 1rem; font-weight: 800; 
-            text-transform: uppercase; letter-spacing: 1px;
-            cursor: pointer; margin-bottom: 12px;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-        }
-        .btn-full {
-            width: 100%; padding: 12px;
-            background: var(--card); border: 1px solid var(--border);
-            color: var(--text); font-weight: 600;
-            border-radius: 10px; margin-bottom: 12px;
-            cursor: pointer;
-        }
+        /* BUTTONS */
+        .btn-main { width: 100%; padding: 16px; background: var(--green); color: #000; border: none; border-radius: 12px; font-size: 1rem; font-weight: 800; text-transform: uppercase; cursor: pointer; margin-bottom: 12px; }
+        .btn-full { width: 100%; padding: 12px; background: var(--card); border: 1px solid var(--border); color: var(--text); font-weight: 600; border-radius: 10px; margin-bottom: 12px; cursor: pointer; }
         
         .action-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
-        .btn-act { 
-            background: var(--card); border: 1px solid var(--border); 
-            color: var(--subtext); padding: 10px 5px; 
-            border-radius: 10px; font-size: 0.75rem; font-weight: 700; 
-            cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; 
-        }
+        .btn-act { background: var(--card); border: 1px solid var(--border); color: var(--subtext); padding: 10px 5px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; }
         .btn-act span { font-size: 1.2rem; }
-        .btn-act:active { background: var(--border); color: var(--text); }
 
-        /* --- MODALS (THE COLORFUL PART) --- */
-        .modal { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); 
-            z-index: 1000; display: none; 
-            justify-content: center; align-items: flex-start; 
-            overflow-y: auto; padding: 20px 0;
-        }
-        .modal-content { 
-            background: var(--card); width: 90%; max-width: 400px; 
-            padding: 20px; border-radius: 20px; 
-            border: 1px solid var(--border); 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5); 
-            margin-bottom: 80px; 
-        }
+        /* MODALS */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: flex-start; overflow-y: auto; padding: 20px 0; }
+        .modal-content { background: var(--card); width: 90%; max-width: 400px; padding: 20px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.5); margin-bottom: 80px; }
 
-        /* Color Zones */
-        .zone { 
-            border-radius: 12px; padding: 15px; margin-bottom: 15px; 
-            border: 1px solid transparent;
-        }
-        .z-blue { background: rgba(59, 130, 246, 0.05); border-color: rgba(59, 130, 246, 0.2); }
-        .z-gold { background: rgba(245, 158, 11, 0.05); border-color: rgba(245, 158, 11, 0.2); }
-        .z-green { background: rgba(16, 185, 129, 0.05); border-color: rgba(16, 185, 129, 0.2); }
-        
-        .z-title { 
-            font-size: 0.7rem; font-weight: 900; text-transform: uppercase; 
-            letter-spacing: 1px; margin-bottom: 10px; display: block;
-        }
-        .z-blue .z-title { color: var(--blue); }
-        .z-gold .z-title { color: var(--gold); }
-        .z-green .z-title { color: var(--green); }
+        /* ZONES */
+        .zone { border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid transparent; }
+        .z-blue { background: rgba(59, 130, 246, 0.05); border-color: rgba(59, 130, 246, 0.2); } .z-blue .z-title { color: var(--blue); }
+        .z-gold { background: rgba(245, 158, 11, 0.05); border-color: rgba(245, 158, 11, 0.2); } .z-gold .z-title { color: var(--gold); }
+        .z-green { background: rgba(16, 185, 129, 0.05); border-color: rgba(16, 185, 129, 0.2); } .z-green .z-title { color: var(--green); }
+        .z-title { font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
 
         .form-row { display: flex; gap: 10px; margin-bottom: 12px; }
         .form-group { flex: 1; }
         .form-lbl { display: block; font-size: 0.75rem; color: var(--subtext); margin-bottom: 5px; font-weight: 600; }
-        .form-input { 
-            width: 100%; padding: 12px; background: var(--card); 
-            border: 1px solid var(--border); color: var(--text); 
-            border-radius: 8px; font-size: 1rem; box-sizing: border-box; 
-        }
-        .form-input:focus { border-color: var(--accent); outline: none; }
-
-        /* Chips */
+        .form-input { width: 100%; padding: 12px; background: var(--card); border: 1px solid var(--border); color: var(--text); border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
+        
         .chip-box { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; margin-bottom: 8px; }
-        .chip { 
-            background: var(--input-bg); border: 1px solid var(--border); 
-            padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; 
-            white-space: nowrap; cursor: pointer; color: var(--subtext); font-weight: 600; 
-        }
-        .chip:active { background: var(--accent); color: white; border-color: var(--accent); }
-
-        /* FAB */
-        .fab { 
-            position: fixed; bottom: 30px; right: 20px; 
-            background: var(--accent); color: white; 
-            width: 65px; height: 65px; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 2.5rem; box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4); 
-            cursor: pointer; border: none; z-index: 500; 
-            transition: transform 0.2s;
-        }
-        .fab:active { transform: scale(0.9); }
-
-        /* Custom Confirm */
-        .confirm-title { font-size: 1.2rem; font-weight: bold; text-align: center; margin-bottom: 25px; color: var(--text); }
-        .confirm-row { display: flex; gap: 15px; }
-        .btn-yes { flex: 1; background: var(--green); color: black; border: none; padding: 15px; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; }
-        .btn-no { flex: 1; background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-
-        /* Menus */
-        .dropdown { position: absolute; top: 60px; right: 15px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; display: none; flex-direction: column; width: 180px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 200; overflow: hidden; }
+        .chip { background: var(--input-bg); border: 1px solid var(--border); padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; white-space: nowrap; cursor: pointer; color: var(--subtext); font-weight: 600; }
+        
+        .fab { position: fixed; bottom: 30px; right: 20px; background: var(--accent); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4); cursor: pointer; border: none; z-index: 500; }
+        
+        /* DROPDOWN */
+        .dropdown { position: absolute; top: 60px; right: 15px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; display: none; flex-direction: column; width: 180px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 200; }
         .dropdown.show { display: flex; }
         .dd-item { padding: 15px; text-align: left; background: none; border: none; border-bottom: 1px solid var(--border); color: var(--text); font-size: 1rem; cursor: pointer; }
-        .dd-item:last-child { border: none; }
 
-        /* Full Profile Read Only */
+        /* READ ONLY PROFILE */
         .ro-row { display: flex; padding: 12px 0; border-bottom: 1px solid var(--border); }
         .ro-lbl { width: 120px; color: var(--subtext); font-size: 0.9rem; }
         .ro-val { flex: 1; color: var(--text); font-weight: 700; font-size: 0.95rem; }
-
     </style>
 </head>
 <body>
@@ -293,7 +143,7 @@
         <h1>Black Book Ops</h1>
         <div style="display:flex; gap:10px; align-items:center;">
             <button class="icon-btn" onclick="toggleTheme()">◑</button>
-            <button class="icon-btn" onclick="openGiftModal()">🎁</button>
+            <button class="icon-btn" onclick="openCreditModal()">🎁</button>
             <button class="icon-btn" onclick="openSettings()">⚙️</button>
             <button class="icon-btn" onclick="toggleMenu()">💾</button>
         </div>
@@ -321,32 +171,63 @@
         </div>
     </div>
 
-    <div class="search-deck">
+    <div id="main-area">
         <input type="search" id="search" class="search-input" placeholder="Search name, notes, phone..." onkeyup="render()">
+        <div id="client-list"></div>
     </div>
 
-    <div id="client-list"></div>
     <button class="fab" onclick="openClientModal()">+</button>
 
     <div id="confirm-modal" class="modal" style="z-index: 2000;">
         <div class="modal-content" style="margin-top: 30vh;">
-            <div id="confirm-msg" class="confirm-title">Are you sure?</div>
-            <div class="confirm-row">
-                <button id="btn-no" class="btn-no">No</button>
-                <button id="btn-yes" class="btn-yes">Yes</button>
+            <div id="confirm-msg" style="font-size:1.2rem; font-weight:bold; text-align:center; margin-bottom:20px;">Msg</div>
+            <div style="display:flex; gap:10px;">
+                <button id="btn-no" style="flex:1; padding:15px; border-radius:10px; background:var(--card); border:1px solid var(--border); color:var(--text); font-weight:bold;">No</button>
+                <button id="btn-yes" style="flex:1; padding:15px; border-radius:10px; background:var(--green); border:none; color:black; font-weight:bold;">Yes</button>
             </div>
+        </div>
+    </div>
+
+    <div id="credit-modal" class="modal">
+        <div class="modal-content">
+            <h3 style="text-align:center; margin-top:0;">Add Credit</h3>
+            <p style="text-align:center; color:var(--subtext); font-size:0.9rem;">Search for a client to give $5 referral credit.</p>
+            <div class="form-group">
+                <label class="form-lbl">Client Name</label>
+                <input id="credit-input" class="form-input" list="ref-list" placeholder="Start typing...">
+            </div>
+            <button class="btn-main" onclick="applyCredit()">ADD $5 CREDIT</button>
+            <button class="btn-full" onclick="closeModals()">Cancel</button>
         </div>
     </div>
 
     <div id="settings-modal" class="modal">
         <div class="modal-content">
             <h3 style="text-align:center; margin-top:0;">Shop Settings</h3>
-            <div class="form-group">
-                <label class="form-lbl">Shop Address</label>
-                <input id="s-shop-addr" class="form-input" placeholder="123 Barber Ln, City, ST">
-            </div>
+            <div class="form-group"><label class="form-lbl">Shop Address</label><input id="s-shop-addr" class="form-input"></div>
             <button class="btn-main" onclick="saveSettings()">SAVE</button>
             <button class="btn-full" onclick="closeModals()">Close</button>
+        </div>
+    </div>
+
+    <div id="cal-modal" class="modal">
+        <div class="modal-content">
+            <h3 style="text-align:center; margin-top:0;">Schedule Cut</h3>
+            <input type="hidden" id="cal-id">
+            <div class="form-row">
+                <div class="form-group"><label class="form-lbl">Date</label><input type="date" id="cal-date" class="form-input"></div>
+                <div class="form-group"><label class="form-lbl">Time</label><input type="time" id="cal-time" class="form-input"></div>
+            </div>
+            <div class="form-group">
+                <label class="form-lbl">Location</label>
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <button class="chip" onclick="selLoc('shop')">📍 My Shop</button>
+                    <button class="chip" onclick="selLoc('client')">🏠 Client House</button>
+                </div>
+                <input id="cal-addr" class="form-input" placeholder="Address...">
+            </div>
+            <button class="btn-main" onclick="generateICS()">ADD TO CALENDAR</button>
+            <button class="btn-full" onclick="closeModals()">Cancel</button>
         </div>
     </div>
 
@@ -360,49 +241,22 @@
         </div>
     </div>
 
-    <div id="cal-modal" class="modal">
-        <div class="modal-content">
-            <h3 style="text-align:center; margin-top:0;">Schedule Cut</h3>
-            <input type="hidden" id="cal-id">
-            
-            <div class="form-row">
-                <div class="form-group"><label class="form-lbl">Date</label><input type="date" id="cal-date" class="form-input"></div>
-                <div class="form-group"><label class="form-lbl">Time</label><input type="time" id="cal-time" class="form-input"></div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-lbl">Location</label>
-                <div style="display:flex; gap:10px; margin-bottom:10px;">
-                    <button class="chip" onclick="selLoc('shop')">📍 My Shop</button>
-                    <button class="chip" onclick="selLoc('client')">🏠 Client House</button>
-                </div>
-                <input id="cal-addr" class="form-input" placeholder="Address...">
-            </div>
-
-            <button class="btn-main" onclick="generateICS()">ADD TO CALENDAR</button>
-            <button class="btn-full" onclick="closeModals()">Cancel</button>
-        </div>
-    </div>
-
     <div id="client-modal" class="modal">
         <div class="modal-content">
             <h2 style="text-align:center; margin:0 0 20px 0;">Client Profile</h2>
             <input type="hidden" id="c-id">
+            <div class="form-group"><input id="c-name" class="form-input" placeholder="Client Name" style="font-size:1.2rem; font-weight:800; text-align:center;"></div>
             
-            <div class="form-group">
-                <input id="c-name" class="form-input" placeholder="Client Name" style="font-size:1.2rem; font-weight:800; text-align:center;">
-            </div>
-
             <div class="zone z-blue">
                 <span class="z-title">🔵 Contact</span>
                 <div class="form-row">
                     <div class="form-group"><label class="form-lbl">Phone</label><input type="tel" id="c-phone" class="form-input"></div>
                     <div class="form-group"><label class="form-lbl">Price $</label><input type="number" id="c-price" class="form-input" placeholder="40"></div>
                 </div>
-                <div class="form-group"><label class="form-lbl">Social</label><input id="c-social" class="form-input" placeholder="@instagram"></div>
-                <div class="form-group"><label class="form-lbl">Address</label><input id="c-addr" class="form-input" placeholder="Client's Home Address"></div>
+                <div class="form-group"><label class="form-lbl">Social</label><input id="c-social" class="form-input"></div>
+                <div class="form-group"><label class="form-lbl">Address</label><input id="c-addr" class="form-input"></div>
             </div>
-
+            
             <div class="zone z-gold">
                 <span class="z-title">🟡 Timeline</span>
                 <div class="form-row">
@@ -410,27 +264,19 @@
                     <div class="form-group"><label class="form-lbl">First Cut</label><input type="date" id="c-start" class="form-input"></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label class="form-lbl">Referred By</label><input id="c-ref" class="form-input" list="ref-list" oninput="updateRefList(this.value)"></div>
+                    <div class="form-group"><label class="form-lbl">Referred By</label><input id="c-ref" class="form-input" list="ref-list" oninput="updateRefList()"></div>
                     <datalist id="ref-list"></datalist>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label class="form-lbl">Frequency (Wks)</label><input type="number" id="c-freq" class="form-input" placeholder="2"></div>
+                    <div class="form-group"><label class="form-lbl">Freq (Wks)</label><input type="number" id="c-freq" class="form-input" placeholder="2"></div>
                     <div class="form-group"><label class="form-lbl">Last Cut</label><input type="date" id="c-last" class="form-input"></div>
                 </div>
             </div>
 
             <div class="zone z-green">
                 <span class="z-title">🟢 The Cut</span>
-                <div class="form-group">
-                    <label class="form-lbl">Sides</label>
-                    <div class="chip-box"><span class="chip" onclick="fill('c-sides','Skin Fade')">Skin Fade</span><span class="chip" onclick="fill('c-sides','Taper')">Taper</span><span class="chip" onclick="fill('c-sides','#1')">#1</span></div>
-                    <input id="c-sides" class="form-input">
-                </div>
-                <div class="form-group">
-                    <label class="form-lbl">Top</label>
-                    <div class="chip-box"><span class="chip" onclick="fill('c-top','Crop')">Crop</span><span class="chip" onclick="fill('c-top','Trim')">Trim</span><span class="chip" onclick="fill('c-top','Texture')">Texture</span></div>
-                    <input id="c-top" class="form-input">
-                </div>
+                <div class="form-group"><label class="form-lbl">Sides</label><div class="chip-box"><span class="chip" onclick="fill('c-sides','Skin Fade')">Skin Fade</span><span class="chip" onclick="fill('c-sides','Taper')">Taper</span><span class="chip" onclick="fill('c-sides','#1')">#1</span></div><input id="c-sides" class="form-input"></div>
+                <div class="form-group"><label class="form-lbl">Top</label><div class="chip-box"><span class="chip" onclick="fill('c-top','Crop')">Crop</span><span class="chip" onclick="fill('c-top','Trim')">Trim</span></div><input id="c-top" class="form-input"></div>
                 <div class="form-group"><label class="form-lbl">Notes</label><textarea id="c-notes" class="form-input" rows="3"></textarea></div>
             </div>
 
@@ -440,7 +286,6 @@
     </div>
 
     <script>
-        // --- DATA ---
         let clients = JSON.parse(localStorage.getItem('bb_clients_v3') || '[]');
         let shopSettings = JSON.parse(localStorage.getItem('bb_settings') || '{"addr":""}');
         let filterType = 'all';
@@ -449,7 +294,6 @@
         if(localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
         render();
 
-        // --- RENDERER ---
         function render() {
             updateDash();
             const list = document.getElementById('client-list');
@@ -464,68 +308,49 @@
                 (c.phone && c.phone.includes(query))
             );
 
-            // Filters
             if(filterType === 'due') visible = visible.filter(c => getDueDate(c) <= today);
             if(filterType === 'bday') visible = visible.filter(c => isThisWeek(c.dob));
-            if(filterType === 'ghosts') visible = visible.filter(c => {
-                if(!c.lastVisit) return false;
-                return Math.ceil((today - new Date(c.lastVisit))/86400000) > 90;
-            });
+            if(filterType === 'ghosts') visible = visible.filter(c => c.lastVisit && Math.ceil((today - new Date(c.lastVisit))/86400000) > 90);
 
             visible.sort((a,b) => a.name.localeCompare(b.name));
 
             visible.forEach(c => {
-                // Badges
                 let badges = '';
                 if(isThisWeek(c.dob)) badges += `<span class="badge b-gold">🎂 BDAY</span>`;
                 const yrs = getYears(c.start);
                 if(yrs > 0 && isThisWeek(c.start)) badges += `<span class="badge b-blue">🎉 ${yrs}YR</span>`;
-                
-                // Card Border Color Logic
-                let cardClass = 'client-card';
-                if(c.ltv > 500) { badges += `<span class="badge b-green">💎 VIP</span>`; cardClass += ' vip'; }
-                
-                // Due Date
+                if(c.ltv > 500) badges += `<span class="badge b-green">💎 $${c.ltv}</span>`;
+
                 const due = getDueDate(c);
                 const daysTill = due ? Math.ceil((due - today)/86400000) : 999;
                 let dueTxt = due ? (daysTill < 0 ? `Overdue ${Math.abs(daysTill)}d` : `Due ${daysTill}d`) : '';
                 let dueCol = daysTill < 0 ? 'var(--red)' : 'var(--subtext)';
-                if(daysTill < 0) document.querySelector('.card-header')?.classList.add('due'); // Logic applied inside HTML string below
+                let lastCutTxt = c.lastVisit ? `Last: ${c.lastVisit.slice(5)}` : 'New';
+                let cardClass = daysTill < 0 ? 'card-header due' : 'card-header';
 
-                // Offers
-                let offer = '';
-                if(c.free>0) offer = `${c.free} FREE`;
-                else if(c.credit>0) offer = `$${c.credit} CR`;
+                let offer = c.free > 0 ? `${c.free} FREE` : (c.credit > 0 ? `$${c.credit} CR` : '');
 
                 const div = document.createElement('div');
-                div.className = cardClass;
+                div.className = 'client-card';
                 div.innerHTML = `
-                    <div class="card-header ${daysTill<0?'due':''}" onclick="this.parentElement.classList.toggle('open')">
-                        <div>
-                            <div class="client-name">${c.name}</div>
-                            <div class="badges">${badges}</div>
-                        </div>
+                    <div class="${cardClass}" onclick="this.parentElement.classList.toggle('open')">
+                        <div><div class="client-name">${c.name}</div><div class="badges">${badges}</div></div>
                         <div style="text-align:right">
                             <div style="font-size:0.8rem; font-weight:800; color:var(--gold);">${offer}</div>
-                            <div style="font-size:0.75rem; color:${dueCol}; font-weight:600;">${dueTxt}</div>
+                            <div style="font-size:0.7rem; color:var(--text); margin-top:2px;">${lastCutTxt}</div>
+                            <div style="font-size:0.7rem; color:${dueCol};">${dueTxt}</div>
                         </div>
                     </div>
                     <div class="client-details">
                         <div class="bank-box">
-                            <div class="bank-item"><div class="bank-val">${c.cuts}</div><div class="bank-lbl">Total Cuts</div></div>
-                            <div class="bank-item"><div class="bank-val bank-hl">$${c.ltv||0}</div><div class="bank-lbl">LTV</div></div>
+                            <div class="bank-item"><div class="bank-val">${c.cuts}</div><div class="bank-lbl">Total</div></div>
+                            <div class="bank-item"><div class="bank-val" style="color:var(--gold)">$${c.ltv||0}</div><div class="bank-lbl">LTV</div></div>
                             <div class="bank-item"><div class="bank-val">${c.cuts%6}/6</div><div class="bank-lbl">Loyalty</div></div>
                         </div>
-
-                        <div class="detail-row">
-                            <div class="detail-box"><div class="detail-lbl">SIDES</div><div class="detail-txt">${c.sides||'-'}</div></div>
-                            <div class="detail-box"><div class="detail-lbl">TOP</div><div class="detail-txt">${c.top||'-'}</div></div>
-                        </div>
-                        <div class="detail-box"><div class="detail-lbl">NOTES</div><div class="detail-txt">${c.notes||'-'}</div></div>
-
+                        <div class="detail-row"><div class="detail-box"><div class="detail-lbl">SIDES</div><div class="detail-txt">${c.sides||'-'}</div></div><div class="detail-box"><div class="detail-lbl">TOP</div><div class="detail-txt">${c.top||'-'}</div></div></div>
+                        <div class="detail-box" style="margin-bottom:10px;"><div class="detail-lbl">NOTES</div><div class="detail-txt">${c.notes||'-'}</div></div>
                         <button class="btn-full" onclick="viewFull('${c.id}')">📄 View Full Profile</button>
                         <button class="btn-main" onclick="startCutFlow('${c.id}')">✂️ RECORD CUT</button>
-
                         <div class="action-grid">
                             <button class="btn-act" onclick="window.location='tel:${c.phone}'"><span>📞</span>Call</button>
                             <button class="btn-act" onclick="openText('${c.id}')"><span>💬</span>Text</button>
@@ -538,17 +363,12 @@
             });
         }
 
-        // --- CUT FLOW (THE SMART LOGIC) ---
+        // --- CUT LOGIC ---
         function startCutFlow(id) {
             tempId = id;
             customConfirm("Did the haircut style change?", 
-                () => { // YES -> Edit first
-                    openClientModal(id);
-                    alert("Update style -> Save -> Click Record Cut again.");
-                }, 
-                () => { // NO -> Proceed
-                    finishCut(id);
-                }
+                () => { openClientModal(id); alert("Update style -> Save -> Click Record Cut again."); }, 
+                () => { finishCut(id); }
             );
         }
 
@@ -558,12 +378,11 @@
             if(price === null) return;
             const paid = parseFloat(price)||0;
 
-            // Check rewards
             if(c.free > 0 || c.credit > 0) {
-                if(confirm(`Rewards Available: ${c.free} Free Cuts, $${c.credit} Credit.\nRedeem something now?`)) {
+                if(confirm(`Client has ${c.free} Free Cuts, $${c.credit} Credit.\nRedeem now?`)) {
                     if(c.free > 0 && confirm("Use 1 Free Cut?")) c.free--;
                     else if(c.credit > 0) {
-                        const use = prompt(`Credit Balance: $${c.credit}. Amount to use:`, c.credit);
+                        const use = prompt(`Use how much credit? (Bal: $${c.credit})`, c.credit);
                         if(use) c.credit -= Math.min(parseFloat(use), c.credit);
                     }
                 }
@@ -572,172 +391,130 @@
             c.lastVisit = new Date().toISOString().split('T')[0];
             c.cuts++;
             c.ltv = (c.ltv || 0) + paid;
-            if(c.cuts % 6 === 0) { c.free++; alert("🎉 6th Cut Reached! Free cut added."); }
+            if(c.cuts % 6 === 0) { c.free++; alert("🎉 6th Cut! Free cut added."); }
             save(); render();
         }
 
-        // --- FULL PROFILE ---
-        function viewFull(id) {
-            const c = clients.find(x=>x.id==id);
-            tempId = id;
-            document.getElementById('ro-title').innerText = c.name;
-            let html = `
-                <div class="ro-row"><div class="ro-lbl">Phone</div><div class="ro-val">${c.phone||'-'}</div></div>
-                <div class="ro-row"><div class="ro-lbl">Address</div><div class="ro-val">${c.addr||'-'}</div></div>
-                <div class="ro-row"><div class="ro-lbl">Social</div><div class="ro-val">${c.social||'-'}</div></div>
-                <div class="ro-row"><div class="ro-lbl">Birthday</div><div class="ro-val">${c.dob||'-'}</div></div>
-                <div class="ro-row"><div class="ro-lbl">First Cut</div><div class="ro-val">${c.start||'-'}</div></div>
-                <div class="ro-row"><div class="ro-lbl">Last Cut</div><div class="ro-val">${c.lastVisit||'-'}</div></div>
-                <div class="ro-row"><div class="ro-lbl">Referred By</div><div class="ro-val">${c.ref||'-'}</div></div>
-                <div class="ro-row"><div class="ro-lbl">Default $</div><div class="ro-val">$${c.price||'-'}</div></div>
-            `;
-            document.getElementById('ro-content').innerHTML = html;
-            document.getElementById('profile-modal').style.display = 'flex';
+        // --- CREDIT MANAGER ---
+        function openCreditModal() {
+            updateRefList();
+            document.getElementById('credit-input').value = '';
+            document.getElementById('credit-modal').style.display = 'flex';
         }
-        function editFromProfile() { closeModals(); openClientModal(tempId); }
-
-        // --- SCHEDULING ---
-        function openSchedule(id) {
-            const c = clients.find(x=>x.id==id);
-            document.getElementById('cal-id').value = id;
-            document.getElementById('cal-date').value = new Date().toISOString().split('T')[0];
-            // Default to shop address
-            document.getElementById('cal-addr').value = shopSettings.addr || ''; 
-            document.getElementById('cal-modal').style.display = 'flex';
-        }
-        function selLoc(type) {
-            const c = clients.find(x=>x.id == document.getElementById('cal-id').value);
-            if(type === 'shop') document.getElementById('cal-addr').value = shopSettings.addr || '';
-            else document.getElementById('cal-addr').value = c.addr || '';
-        }
-        function generateICS() {
-            const id = document.getElementById('cal-id').value;
-            const c = clients.find(x=>x.id==id);
-            const d = document.getElementById('cal-date').value;
-            const t = document.getElementById('cal-time').value;
-            const loc = document.getElementById('cal-addr').value;
-            
-            if(!d || !t) return alert("Date/Time required");
-            
-            const start = new Date(`${d}T${t}`);
-            const end = new Date(start.getTime() + 45*60000);
-            const fmt = date => date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-            
-            const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Cut: ${c.name}\nDTSTART:${fmt(start)}\nDTEND:${fmt(end)}\nLOCATION:${loc}\nDESCRIPTION:${c.notes||''}\nEND:VEVENT\nEND:VCALENDAR`;
-            
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(new Blob([ics], {type: 'text/calendar'}));
-            a.download = 'appointment.ics';
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
-            closeModals();
+        function applyCredit() {
+            const name = document.getElementById('credit-input').value;
+            const c = clients.find(x => x.name.toLowerCase() === name.toLowerCase());
+            if(c) { c.credit += 5; save(); render(); alert(`$5 added to ${c.name}`); closeModals(); }
+            else { alert("Client not found. Check spelling."); }
         }
 
-        // --- CORE UTILS ---
-        function updateDash() {
-            const today = new Date(); today.setHours(0,0,0,0);
-            let counts = { due:0, bday:0, ghost:0, all: clients.length };
-            clients.forEach(c => {
-                if(getDueDate(c) <= today) counts.due++;
-                if(isThisWeek(c.dob)) counts.bday++;
-                if(c.lastVisit && Math.ceil((today - new Date(c.lastVisit))/86400000) > 90) counts.ghost++;
-            });
-            document.getElementById('d-due').innerText = counts.due;
-            document.getElementById('d-bday').innerText = counts.bday;
-            document.getElementById('d-ghost').innerText = counts.ghost;
-            document.getElementById('d-all').innerText = counts.all;
+        // --- UTILS ---
+        function updateRefList() {
+            const dl = document.getElementById('ref-list'); dl.innerHTML = '';
+            clients.forEach(cl => { dl.innerHTML += `<option value="${cl.name}">`; });
         }
-
-        function customConfirm(msg, yesFn, noFn) {
-            const m = document.getElementById('confirm-modal');
-            document.getElementById('confirm-msg').innerText = msg;
-            m.style.display = 'flex';
-            document.getElementById('btn-yes').onclick = function() { m.style.display='none'; yesFn(); };
-            document.getElementById('btn-no').onclick = function() { m.style.display='none'; if(noFn) noFn(); };
-        }
-
         function openClientModal(id) {
             const c = id ? clients.find(x=>x.id==id) : {id:'',name:'',phone:'',price:'',addr:'',social:'',dob:'',start:new Date().toISOString().split('T')[0],ref:'',freq:'',last:'',sides:'',top:'',notes:''};
             for(let k in c) if(document.getElementById('c-'+k)) document.getElementById('c-'+k).value = c[k];
-            updateRefList('');
+            updateRefList();
             document.getElementById('client-modal').style.display = 'flex';
         }
-
         function saveClient() {
             const id = document.getElementById('c-id').value;
             const name = document.getElementById('c-name').value;
             if(!name) return alert("Name required");
-            const refName = document.getElementById('c-ref').value;
-
-            let clientData = {
+            const ref = document.getElementById('c-ref').value;
+            
+            let data = {
                 name, phone: document.getElementById('c-phone').value,
                 price: parseFloat(document.getElementById('c-price').value)||0,
                 addr: document.getElementById('c-addr').value, social: document.getElementById('c-social').value,
-                dob: document.getElementById('c-dob').value, start: document.getElementById('c-start').value,
-                ref: refName, freq: parseInt(document.getElementById('c-freq').value)||0,
-                lastVisit: document.getElementById('c-last').value,
-                sides: document.getElementById('c-sides').value, top: document.getElementById('c-top').value,
-                notes: document.getElementById('c-notes').value,
+                dob: document.getElementById('c-dob').value, start: document.getElementById('c-start').value, ref,
+                freq: parseInt(document.getElementById('c-freq').value)||0, lastVisit: document.getElementById('c-last').value,
+                sides: document.getElementById('c-sides').value, top: document.getElementById('c-top').value, notes: document.getElementById('c-notes').value
             };
 
             if(id) {
                 const idx = clients.findIndex(x=>x.id==id);
-                clients[idx] = {...clients[idx], ...clientData};
+                clients[idx] = {...clients[idx], ...data};
             } else {
-                clientData.id = Date.now().toString();
-                clientData.cuts=0; clientData.free=0; clientData.credit=0; clientData.ltv=0;
-                clients.push(clientData);
-                if(refName) {
-                    const ref = clients.find(c => c.name.toLowerCase() === refName.toLowerCase() && c.id !== clientData.id);
-                    if(ref) { ref.credit+=5; clientData.credit+=5; alert("Referral linked! $5 credits."); }
+                data.id = Date.now().toString(); data.cuts=0; data.free=0; data.credit=0; data.ltv=0;
+                clients.push(data);
+                if(ref) {
+                    const referrer = clients.find(c => c.name.toLowerCase() === ref.toLowerCase() && c.id !== data.id);
+                    if(referrer) { referrer.credit+=5; data.credit+=5; alert("Referral linked! $5 credits."); }
                 }
             }
             save(); closeModals(); render();
         }
 
-        // --- HELPERS ---
-        function getDueDate(c) {
-            if(!c.lastVisit || !c.freq) return null;
-            const d = new Date(c.lastVisit); d.setDate(d.getDate() + (c.freq*7)); d.setHours(0,0,0,0); return d;
+        function viewFull(id) {
+            const c = clients.find(x=>x.id==id); tempId=id;
+            document.getElementById('ro-title').innerText = c.name;
+            let html = `<div class="ro-row"><div class="ro-lbl">Phone</div><div class="ro-val">${c.phone||'-'}</div></div>
+                        <div class="ro-row"><div class="ro-lbl">Address</div><div class="ro-val">${c.addr||'-'}</div></div>
+                        <div class="ro-row"><div class="ro-lbl">Social</div><div class="ro-val">${c.social||'-'}</div></div>
+                        <div class="ro-row"><div class="ro-lbl">Birthday</div><div class="ro-val">${c.dob||'-'}</div></div>
+                        <div class="ro-row"><div class="ro-lbl">First Cut</div><div class="ro-val">${c.start||'-'}</div></div>
+                        <div class="ro-row"><div class="ro-lbl">Referred By</div><div class="ro-val">${c.ref||'-'}</div></div>`;
+            document.getElementById('ro-content').innerHTML = html;
+            document.getElementById('profile-modal').style.display = 'flex';
         }
-        function isThisWeek(dStr) {
-            if(!dStr) return false; 
-            const d=new Date(dStr); const now=new Date(); now.setHours(0,0,0,0);
-            const thisYear = new Date(now.getFullYear(), d.getMonth(), d.getDate()+1);
-            const diff = Math.ceil((thisYear - now) / 86400000);
-            return (diff >= 0 && diff <= 7);
+        function editFromProfile() { closeModals(); openClientModal(tempId); }
+
+        function openSchedule(id) {
+            const c=clients.find(x=>x.id==id); document.getElementById('cal-id').value=id;
+            document.getElementById('cal-date').value=new Date().toISOString().split('T')[0];
+            selLoc('shop'); document.getElementById('cal-modal').style.display='flex';
         }
-        function getYears(dStr) { if(!dStr) return 0; return new Date().getFullYear() - new Date(dStr).getFullYear(); }
-        function setToday(id) { document.getElementById(id).value = new Date().toISOString().split('T')[0]; }
-        function fill(id,v) { document.getElementById(id).value = v; }
-        function filter(t, el) { filterType=t; document.querySelectorAll('.dash-card').forEach(d=>d.classList.remove('active')); el.classList.add('active'); render(); }
-        function updateRefList(val) { const dl=document.getElementById('ref-list'); dl.innerHTML=''; clients.forEach(cl=>{dl.innerHTML+=`<option value="${cl.name}">`}); }
-        function toggleMenu() { document.getElementById('save-menu').classList.toggle('show'); }
+        function selLoc(type) {
+            const c=clients.find(x=>x.id==document.getElementById('cal-id').value);
+            document.getElementById('cal-addr').value = type==='shop' ? (shopSettings.addr||'') : (c.addr||'');
+        }
+        function generateICS() {
+            const c=clients.find(x=>x.id==document.getElementById('cal-id').value);
+            const d=document.getElementById('cal-date').value; const t=document.getElementById('cal-time').value;
+            const loc=document.getElementById('cal-addr').value;
+            if(!d||!t) return alert("Date/Time needed");
+            const s=new Date(`${d}T${t}`); const e=new Date(s.getTime()+45*60000);
+            const fmt=dt=>dt.toISOString().replace(/[-:]/g,'').split('.')[0]+'Z';
+            const ics=`BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Cut: ${c.name}\nDTSTART:${fmt(s)}\nDTEND:${fmt(e)}\nLOCATION:${loc}\nDESCRIPTION:${c.notes||''}\nEND:VEVENT\nEND:VCALENDAR`;
+            const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar'})); a.download='appt.ics'; document.body.appendChild(a); a.click(); document.body.removeChild(a); closeModals();
+        }
+
+        // --- CORE ---
+        function updateDash() {
+            const today=new Date(); today.setHours(0,0,0,0);
+            let counts={due:0, bday:0, ghost:0, all:clients.length};
+            clients.forEach(c=>{
+                if(getDueDate(c)<=today) counts.due++;
+                if(isThisWeek(c.dob)) counts.bday++;
+                if(c.lastVisit && Math.ceil((today-new Date(c.lastVisit))/86400000)>90) counts.ghost++;
+            });
+            document.getElementById('d-due').innerText=counts.due; document.getElementById('d-bday').innerText=counts.bday;
+            document.getElementById('d-ghost').innerText=counts.ghost; document.getElementById('d-all').innerText=counts.all;
+        }
+        function customConfirm(msg,yes,no) {
+            document.getElementById('confirm-msg').innerText=msg; document.getElementById('confirm-modal').style.display='flex';
+            document.getElementById('btn-yes').onclick=()=>{document.getElementById('confirm-modal').style.display='none';yes();};
+            document.getElementById('btn-no').onclick=()=>{document.getElementById('confirm-modal').style.display='none';if(no)no();};
+        }
+        function getDueDate(c) { if(!c.lastVisit||!c.freq)return null; const d=new Date(c.lastVisit); d.setDate(d.getDate()+(c.freq*7)); d.setHours(0,0,0,0); return d; }
+        function isThisWeek(dStr) { if(!dStr)return false; const d=new Date(dStr); const n=new Date(); n.setHours(0,0,0,0); const ty=new Date(n.getFullYear(),d.getMonth(),d.getDate()+1); const diff=Math.ceil((ty-n)/86400000); return diff>=0&&diff<=7; }
+        function getYears(dStr) { if(!dStr)return 0; return new Date().getFullYear()-new Date(dStr).getFullYear(); }
+        function openText(id) { const c=clients.find(x=>x.id==id); if(!c.phone)return alert("No phone"); window.location=`sms:${c.phone}`; }
+        function downloadVCard(id) { const c=clients.find(x=>x.id==id); const vcf=`BEGIN:VCARD\nVERSION:3.0\nN:${c.name};;;;\nFN:${c.name}\nTEL;type=CELL:${c.phone||''}\nADR;type=HOME:;;${c.addr||''};;;\nNOTE:${c.notes||''}\nEND:VCARD`; const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([vcf],{type:'text/vcard'})); a.download=`${c.name.replace(/\s/g,'_')}.vcf`; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
         function toggleTheme() { document.body.classList.toggle('light-mode'); localStorage.setItem('theme', document.body.classList.contains('light-mode')?'light':'dark'); }
+        function toggleMenu() { document.getElementById('save-menu').classList.toggle('show'); }
         function closeModals() { document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); }
         function save() { localStorage.setItem('bb_clients_v3', JSON.stringify(clients)); }
-        
-        function openSettings() { document.getElementById('s-shop-addr').value = shopSettings.addr; document.getElementById('settings-modal').style.display='flex'; }
-        function saveSettings() { shopSettings.addr = document.getElementById('s-shop-addr').value; localStorage.setItem('bb_settings', JSON.stringify(shopSettings)); closeModals(); }
-        function openGiftModal() { const name = prompt("Manual $5 Credit. Client Name:"); if(name){const c=clients.find(x=>x.name.toLowerCase().includes(name.toLowerCase())); if(c){c.credit+=5;save();render();alert(`$5 added to ${c.name}`);} else alert("Not found");} }
-        function openText(id) { const c=clients.find(x=>x.id==id); if(!c.phone) return alert("No phone"); window.location = `sms:${c.phone}`; }
-        function downloadVCard(id) {
-            const c=clients.find(x=>x.id==id);
-            const vcf=`BEGIN:VCARD\nVERSION:3.0\nFN:${c.name}\nTEL;TYPE=CELL:${c.phone||''}\nADR;TYPE=HOME:;;${c.addr||''};;;\nNOTE:${c.notes||''}\nEND:VCARD`;
-            const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([vcf], {type:'text/vcard'})); a.download=`${c.name}.vcf`; document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        }
-        function exportData(type) {
-            toggleMenu();
-            if(type==='json') {
-                const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(clients)],{type:'application/json'})); a.download=`bb_backup_${Date.now()}.json`; a.click();
-            } else {
-                let csv="Name,Phone,LTV,LastVisit\n"+clients.map(c=>`"${c.name}","${c.phone}",${c.ltv},${c.lastVisit}`).join('\n');
-                const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=`bb_export.csv`; a.click();
-            }
-        }
-        function importData(el) {
-            if(!el.files[0])return;
-            const fr=new FileReader(); fr.onload=e=>{clients=JSON.parse(e.target.result); save(); render(); alert("Restored!");}; fr.readAsText(el.files[0]);
-        }
+        function fill(id,v) { document.getElementById(id).value=v; }
+        function filter(t,el) { filterType=t; document.querySelectorAll('.dash-card').forEach(d=>d.classList.remove('active')); el.classList.add('active'); render(); }
+        function openSettings() { document.getElementById('s-shop-addr').value=shopSettings.addr; document.getElementById('settings-modal').style.display='flex'; }
+        function saveSettings() { shopSettings.addr=document.getElementById('s-shop-addr').value; localStorage.setItem('bb_settings', JSON.stringify(shopSettings)); closeModals(); }
+        function delClient(id) { customConfirm("Delete?", ()=>{clients=clients.filter(x=>x.id!=id); save(); render();}); }
+        function exportData(type) { toggleMenu(); if(type==='json'){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(clients)],{type:'application/json'})); a.download=`bb_${Date.now()}.json`; a.click();} else { let csv="Name,Phone,LTV\n"+clients.map(c=>`"${c.name}","${c.phone}",${c.ltv}`).join('\n'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=`bb.csv`; a.click(); }}
+        function importData(el) { toggleMenu(); if(!el.files[0])return; const fr=new FileReader(); fr.onload=e=>{clients=JSON.parse(e.target.result); save(); render(); alert("Restored!");}; fr.readAsText(el.files[0]); }
     </script>
 </body>
 </html>
