@@ -341,7 +341,6 @@
 
             visible.forEach(c => {
                 let badges = '';
-                // LTV Always First
                 if(c.ltv > 500) badges += `<span class="badge b-green">💎 $${c.ltv}</span>`;
                 else badges += `<span class="badge b-ltv">LTV: $${c.ltv||0}</span>`;
 
@@ -354,23 +353,21 @@
                 let dueTxt = due ? (daysTill < 0 ? `Overdue ${Math.abs(daysTill)}d` : `Due ${daysTill}d`) : '';
                 let dueCol = daysTill < 0 ? 'var(--red)' : 'var(--subtext)';
                 
-                // FIXED: Date display (e.g., Dec 13, 2025)
                 let lastCutTxt = 'New';
                 if(c.lastVisit) {
                     const d = new Date(c.lastVisit);
-                    lastCutTxt = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    // Force User Timezone to prevent day shift
+                    lastCutTxt = new Date(d.getTime() + d.getTimezoneOffset() * 60000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                 }
                 
                 let cardClass = daysTill < 0 ? 'card-header due' : 'card-header';
                 let offer = c.free > 0 ? `${c.free} FREE` : (c.credit > 0 ? `$${c.credit} CR` : '');
 
-                // Social Button
                 let socialBtn = '';
                 if(c.social) {
                     socialBtn = `<button class="btn-act" onclick="window.open('https://instagram.com/${c.social.replace('@','')}')"><span>📸</span>IG</button>`;
                 }
 
-                // Loyalty
                 let punch = (c.loyalty || 0); 
                 let loyaltyText = `${punch}/5`;
                 if(punch >= 5) loyaltyText = "EARNED FREE!";
@@ -408,17 +405,17 @@
             });
         }
 
-        // --- CUT LOGIC (PRECISION + REDEEMED TRACKING) ---
+        // --- CUT LOGIC ---
         function startCutFlow(id) {
             const c = clients.find(x=>x.id==id);
             if(c.free > 0) {
                 customConfirm(`🌟 Client has ${c.free} FREE CUT available.\nRedeem it now?`, 
-                    () => { // YES -> Redeem Free
+                    () => { 
                         c.free--;
-                        c.redeemedVal = (c.redeemedVal || 0) + (c.price || 30); // Track Value
+                        c.redeemedVal = (c.redeemedVal || 0) + (c.price || 30); 
                         confirmFormulaAndSave(c, 0); 
                     },
-                    () => { proceedToPaid(c); } // NO -> Paid
+                    () => { proceedToPaid(c); } 
                 );
             } else {
                 proceedToPaid(c);
@@ -436,7 +433,7 @@
                     let creditUsed = parseFloat(use)||0;
                     if(creditUsed > c.credit) creditUsed = c.credit;
                     c.credit -= creditUsed;
-                    c.redeemedVal = (c.redeemedVal || 0) + creditUsed; // Track Value
+                    c.redeemedVal = (c.redeemedVal || 0) + creditUsed; 
                 }
             }
             confirmFormulaAndSave(c, paid);
@@ -444,13 +441,13 @@
 
         function confirmFormulaAndSave(c, paid) {
             customConfirm("Did the haircut style change?", 
-                () => { // YES -> Edit
+                () => { 
                     tempId = c.id; 
                     openClientModal(c.id);
                     processStats(c, paid);
                     alert("Stats updated. Update style formula then Save.");
                 }, 
-                () => { // NO -> Just save stats
+                () => { 
                     processStats(c, paid);
                     save(); render();
                 }
@@ -461,7 +458,6 @@
             c.lastVisit = new Date().toISOString().split('T')[0];
             c.cuts = (c.cuts || 0) + 1;
             c.ltv = (c.ltv || 0) + paid;
-            
             let currentPoints = (c.loyalty || 0) + 1;
             if(currentPoints >= 5) {
                 c.free = (c.free || 0) + 1;
@@ -501,7 +497,7 @@
             document.getElementById('settings-modal').style.display = 'flex';
         }
 
-        // --- SCHEDULING (FIXED DATE STRING) ---
+        // --- SCHEDULING (DATA URI FIX) ---
         function openSchedule(id) {
             const c=clients.find(x=>x.id==id); document.getElementById('cal-id').value=id;
             document.getElementById('cal-date').value=new Date().toISOString().split('T')[0];
@@ -517,27 +513,17 @@
             const loc=document.getElementById('cal-addr').value;
             if(!d||!t) return alert("Date/Time needed");
             
-            // Format for ICS (YYYYMMDDTHHmmss) - Apple Friendly
             const startRaw = d.replace(/-/g, '') + 'T' + t.replace(/:/g, '') + '00';
-            // Calculate End Time (manual math to avoid timezone shifts)
-            let h = parseInt(t.split(':')[0]);
-            let m = parseInt(t.split(':')[1]) + 45;
+            let h = parseInt(t.split(':')[0]); let m = parseInt(t.split(':')[1]) + 45;
             if(m>=60) { h++; m-=60; }
             const endRaw = d.replace(/-/g, '') + 'T' + (h<10?'0':'')+h + (m<10?'0':'')+m + '00';
 
-            const ics = 
-`BEGIN:VCALENDAR
-VERSION:2.0
-BEGIN:VEVENT
-SUMMARY:Cut with ${c.name}
-DTSTART:${startRaw}
-DTEND:${endRaw}
-LOCATION:${loc}
-DESCRIPTION:${c.notes||'Haircut'}
-END:VEVENT
-END:VCALENDAR`;
+            const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Cut: ${c.name}\nDTSTART:${startRaw}\nDTEND:${endRaw}\nLOCATION:${loc}\nDESCRIPTION:${c.notes||'Haircut'}\nEND:VEVENT\nEND:VCALENDAR`;
             
-            const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar'})); a.download='appt.ics'; document.body.appendChild(a); a.click(); document.body.removeChild(a); closeModals();
+            // DATA URI METHOD (IOS COMPATIBLE)
+            const uri = "data:text/calendar;charset=utf8," + encodeURIComponent(ics);
+            window.location.href = uri;
+            closeModals();
         }
 
         // --- UTILS ---
@@ -584,12 +570,15 @@ END:VCALENDAR`;
         function viewFull(id) {
             const c = clients.find(x=>x.id==id); tempId=id;
             document.getElementById('ro-title').innerText = c.name;
+            
+            const fmt = (d) => d ? new Date(d).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) : '-';
+
             let html = `<div class="ro-row"><div class="ro-lbl">Phone</div><div class="ro-val">${c.phone||'-'}</div></div>
                         <div class="ro-row"><div class="ro-lbl">Address</div><div class="ro-val">${c.addr||'-'}</div></div>
                         <div class="ro-row"><div class="ro-lbl">Social</div><div class="ro-val">${c.social||'-'}</div></div>
-                        <div class="ro-row"><div class="ro-lbl">Birthday</div><div class="ro-val">${c.dob||'-'}</div></div>
-                        <div class="ro-row"><div class="ro-lbl">First Cut</div><div class="ro-val">${c.start||'-'}</div></div>
-                        <div class="ro-row"><div class="ro-lbl">Last Cut</div><div class="ro-val">${c.lastVisit||'-'}</div></div>
+                        <div class="ro-row"><div class="ro-lbl">Birthday</div><div class="ro-val">${fmt(c.dob)}</div></div>
+                        <div class="ro-row"><div class="ro-lbl">First Cut</div><div class="ro-val">${fmt(c.start)}</div></div>
+                        <div class="ro-row"><div class="ro-lbl">Last Cut</div><div class="ro-val">${fmt(c.lastVisit)}</div></div>
                         <div class="ro-row"><div class="ro-lbl">Referred By</div><div class="ro-val">${c.ref||'-'}</div></div>
                         <div class="ro-row"><div class="ro-lbl">Default $</div><div class="ro-val">$${c.price||'-'}</div></div>`;
             document.getElementById('ro-content').innerHTML = html;
