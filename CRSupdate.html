@@ -12,7 +12,6 @@
             /* DARK MODE */
             --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --subtext: #94a3b8;
             --border: #334155; --input-bg: #020617;
-            /* ACCENTS */
             --accent: #818cf8; --red: #f87171; --gold: #fbbf24; 
             --green: #4ade80; --blue: #60a5fa; --purple: #c084fc;
         }
@@ -52,7 +51,7 @@
         #client-list { flex-grow: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; -webkit-overflow-scrolling: touch; }
 
         /* CLIENT CARD */
-        .client-card { background: var(--card); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .client-card { background: var(--card); border-radius: 12px; border: 1px solid var(--border); overflow: visible; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .card-header { padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .client-name { font-size: 1.1rem; font-weight: bold; }
         .badges { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
@@ -70,7 +69,7 @@
         
         .detail-box { background: var(--card); padding: 10px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px; }
         .detail-lbl { font-size: 0.7rem; color: var(--accent); margin-bottom: 5px; font-weight: bold; letter-spacing: 1px; }
-        .detail-txt { font-size: 1rem; white-space: pre-wrap; color: var(--text); }
+        .detail-txt { font-size: 1rem; white-space: pre-wrap; color: var(--text); overflow-wrap: break-word;}
 
         /* ACTIONS */
         .action-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
@@ -78,23 +77,14 @@
         .btn-main { background: var(--green); color: #000; border:none; font-weight:bold; padding: 15px; width:100%; border-radius: 8px; font-size:1rem; margin-bottom: 10px; cursor: pointer; display:block;}
         .btn-redeem { background: var(--gold); color: black; font-size: 0.7rem; padding: 5px 12px; border-radius: 4px; border:none; cursor: pointer; font-weight: bold;}
 
-        /* MODAL STYLING (COLORFUL) */
+        /* MODAL STYLING */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(3px); z-index: 100; display: none; justify-content: center; align-items: flex-start; overflow-y: auto; padding: 20px 0; }
         .modal-content { background: var(--card); width: 90%; max-width: 400px; padding: 20px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.5); margin-bottom: 80px; }
         
         .section-box { padding: 10px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 15px; }
-        
-        /* Contact Section (Blue) */
-        .sec-contact { border-left: 4px solid var(--blue); background: rgba(96, 165, 250, 0.05); }
-        .sec-contact .form-lbl { color: var(--blue); }
-        
-        /* Timeline Section (Gold) */
-        .sec-time { border-left: 4px solid var(--gold); background: rgba(251, 191, 36, 0.05); }
-        .sec-time .form-lbl { color: var(--gold); }
-        
-        /* Cut Section (Green) */
-        .sec-cut { border-left: 4px solid var(--green); background: rgba(74, 222, 128, 0.05); }
-        .sec-cut .form-lbl { color: var(--green); }
+        .sec-contact { border-left: 4px solid var(--blue); background: rgba(96, 165, 250, 0.05); } .sec-contact .form-lbl { color: var(--blue); }
+        .sec-time { border-left: 4px solid var(--gold); background: rgba(251, 191, 36, 0.05); } .sec-time .form-lbl { color: var(--gold); }
+        .sec-cut { border-left: 4px solid var(--green); background: rgba(74, 222, 128, 0.05); } .sec-cut .form-lbl { color: var(--green); }
 
         .form-group { margin-bottom: 12px; }
         .form-lbl { display: block; margin-bottom: 5px; font-size: 0.75rem; font-weight:bold; text-transform: uppercase; letter-spacing: 0.5px;}
@@ -110,6 +100,9 @@
 
         .dropdown { position: absolute; top: 60px; right: 10px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; display: none; flex-direction: column; width: 180px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); z-index: 200; overflow:hidden;}
         .dropdown.show { display: flex; }
+
+        /* FAB */
+        .fab { position: fixed; bottom: 30px; right: 20px; background: var(--accent); color: white; width: 60px; height: 60px; border-radius: 30px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 5px 20px rgba(0,0,0,0.4); cursor: pointer; border: none; z-index: 500; }
     </style>
 </head>
 <body>
@@ -173,21 +166,15 @@
             
             <div class="section-box sec-time">
                 <div class="flex">
-                    <div class="grow form-group">
-                        <label class="form-lbl">🎁 Birthday</label>
-                        <div class="input-group-date"><input type="date" id="c-dob" class="form-input"></div>
-                    </div>
-                    <div class="grow form-group">
-                        <label class="form-lbl">🗓️ First Cut</label>
-                        <div class="input-group-date"><input type="date" id="c-start" class="form-input"></div>
-                    </div>
+                    <div class="grow form-group"><label class="form-lbl">🎁 Birthday</label><div class="input-group-date"><input type="date" id="c-dob" class="form-input"></div></div>
+                    <div class="grow form-group"><label class="form-lbl">🗓️ First Cut</label><div class="input-group-date"><input type="date" id="c-start" class="form-input"></div></div>
                 </div>
                 <div class="flex">
                     <div class="grow form-group"><label class="form-lbl">⏳ Freq (Wks)</label><input type="number" id="c-freq" class="form-input" placeholder="2"></div>
                     <div class="grow form-group"><label class="form-lbl">✂️ Last Cut</label><div class="input-group-date"><input type="date" id="c-last" class="form-input"><button class="btn-today" onclick="setToday('c-last')">Today</button></div></div>
                 </div>
                 <div class="form-group"><label class="form-lbl">🤝 Referred By</label>
-                    <input id="c-ref" class="form-input" list="ref-list" placeholder="Start typing name...">
+                    <input id="c-ref" class="form-input" list="ref-list" placeholder="Start typing name..." oninput="updateRefList(this.value)">
                     <datalist id="ref-list"></datalist>
                 </div>
             </div>
@@ -217,16 +204,25 @@
         </div>
     </div>
 
+    <div id="cal-modal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-top:0; color:var(--accent);">Schedule Cut</h3>
+            <input type="hidden" id="cal-id">
+            <div class="form-group"><label class="form-lbl">Date</label><input type="date" id="cal-date" class="form-input"></div>
+            <div class="form-group"><label class="form-lbl">Time</label><input type="time" id="cal-time" class="form-input"></div>
+            <div class="form-group"><label class="form-lbl">Location</label><input type="text" id="cal-loc" class="form-input" placeholder="Shop or Client Address"></div>
+            <button class="btn-main" onclick="generateICS()">ADD TO CALENDAR</button>
+            <button class="list-option" style="text-align:center; color:var(--red);" onclick="closeModals()">Cancel</button>
+        </div>
+    </div>
+
     <script>
-        // --- DATA & STATE ---
         let clients = JSON.parse(localStorage.getItem('bb_clients_v2') || '[]');
         let filterType = 'all';
 
-        // --- INIT ---
         if(localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
         render();
 
-        // --- CORE RENDER ---
         function render() {
             updateDash();
             const list = document.getElementById('client-list');
@@ -235,7 +231,6 @@
 
             let visible = clients.filter(c => c.name.toLowerCase().includes(query));
             
-            // Filtering logic
             const today = new Date(); today.setHours(0,0,0,0);
             if(filterType === 'due') visible = visible.filter(c => getDueDate(c) <= today);
             if(filterType === 'bday') visible = visible.filter(c => isThisWeek(c.dob));
@@ -244,23 +239,16 @@
             
             visible.sort((a,b) => a.name.localeCompare(b.name));
 
-            if(visible.length === 0) {
-                list.innerHTML = '<div style="text-align:center;color:var(--subtext);margin-top:30px;">No clients found.</div>';
-                return;
-            }
-
             visible.forEach(c => {
                 let badges = '';
                 if(isThisWeek(c.dob)) badges += `<span class="badge b-gold" style="color:var(--gold)">🎂 BDAY WK</span>`;
                 if(isThisWeek(c.start)) badges += `<span class="badge b-blue" style="color:var(--blue)">🎉 ${getYears(c.start)}YR ANNI</span>`;
-                if(c.ltv > 500) badges += `<span class="badge b-green" style="color:var(--green)">💎 VIP ($${c.ltv})</span>`;
+                if(c.ltv && c.ltv > 0) badges += `<span class="badge b-green" style="color:var(--green)">💎 $${c.ltv} LTV</span>`;
 
                 const due = getDueDate(c);
                 const daysTill = due ? Math.ceil((due - today) / (86400000)) : 999;
                 let dueTxt = due ? (daysTill < 0 ? `Overdue ${Math.abs(daysTill)}d` : `Due in ${daysTill}d`) : '';
                 let dueColor = daysTill < 0 ? 'var(--red)' : 'var(--subtext)';
-                
-                // Show LAST CUT DATE explicitly
                 let lastCutTxt = c.lastVisit ? `Last: ${c.lastVisit.slice(5)}` : 'New';
 
                 const div = document.createElement('div');
@@ -290,7 +278,7 @@
                         <div class="action-grid">
                             <button class="btn-act" onclick="window.location='tel:${c.phone}'">📞 Call</button>
                             <button class="btn-act" onclick="openText('${c.id}')">💬 Text</button>
-                            <button class="btn-act" onclick="addToCal('${c.id}')">📅 Sched</button>
+                            <button class="btn-act" onclick="openSchedule('${c.id}')">📅 Sched</button>
                             <button class="btn-act" onclick="downloadVCard('${c.id}')">👤 Save</button>
                             <button class="btn-act" style="grid-column:span 2" onclick="openClientModal('${c.id}')">✏️ Edit Profile</button>
                             <button class="btn-act" style="grid-column:span 2;color:var(--red);border-color:var(--red)" onclick="delClient('${c.id}')">🗑️ Delete</button>
@@ -316,14 +304,19 @@
         // --- ACTIONS ---
         function recordCut(id) {
             const c = clients.find(x=>x.id==id);
-            const price = prompt(`Price paid today? (Enter number only)`, c.price || 0);
+            const price = prompt(`Price paid today?`, c.price || 0);
             if(price === null) return;
             const paid = parseFloat(price) || 0;
             
+            // Formula Check
+            if(confirm("Did the haircut style change? Click OK to update formula, Cancel to keep same.")) {
+                openClientModal(id);
+            }
+
             c.lastVisit = new Date().toISOString().split('T')[0];
             c.cuts++;
             c.ltv = (c.ltv || 0) + paid;
-            if(c.cuts % 6 === 0) { c.free++; alert("🎉 6th Cut! Free cut added to bank."); }
+            if(c.cuts % 6 === 0) { c.free++; alert("🎉 6th Cut! Free cut added."); }
             save(); render();
         }
 
@@ -335,9 +328,9 @@
                 const use = prompt("How much credit to use?", c.credit);
                 if(use) c.credit -= Math.min(parseFloat(use)||0, c.credit);
             }});
-            if(isThisWeek(c.dob)) opts.push({lbl: "Apply Birthday Deal", fn: ()=>{alert("Birthday deal applied to ticket.");}});
+            if(isThisWeek(c.dob)) opts.push({lbl: "Apply Birthday Deal", fn: ()=>{alert("Birthday deal applied.");}});
             
-            if(opts.length === 0) return alert("No rewards available to redeem.");
+            if(opts.length === 0) return alert("No rewards available.");
             openListModal("Redeem Reward", opts);
         }
 
@@ -346,48 +339,77 @@
             if(!c.phone) return alert("No phone needed.");
             const name = c.name.split(' ')[0];
             const opts = [
-                {lbl:"Running Late", txt:`Hey ${name}, running a bit behind schedule. Thanks for patience!`},
+                {lbl:"Running Late", txt:`Hey ${name}, running a bit behind schedule. Thanks!`},
                 {lbl:"Confirming", txt:`Hey ${name}, confirming our cut tomorrow. We still on?`},
-                {lbl:"Follow Up", txt:`Hey ${name}, just checking in on that fresh cut. All good?`},
+                {lbl:"Follow Up", txt:`Hey ${name}, checking in on that fresh cut. All good?`},
                 {lbl:"Due Soon", txt:`Yo ${name}, getting scruffy. Time to book?`}
             ];
             const separator = navigator.userAgent.match(/iPhone|iPad/i) ? '&' : '?';
-            
             openListModal("Send Text", opts.map(o => ({
                 lbl: o.lbl, 
                 fn: () => window.location = `sms:${c.phone}${separator}body=${encodeURIComponent(o.txt)}`
             })));
         }
 
-        function addToCal(id) {
+        // --- CALENDAR & VCARD ---
+        function openSchedule(id) {
             const c = clients.find(x=>x.id==id);
-            const now = new Date();
-            const start = now.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-            const end = new Date(now.getTime() + 60*60000).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-            const icsMsg = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Cut w/ ${c.name}\nDTSTART:${start}\nDTEND:${end}\nLOCATION:${c.addr||'Shop'}\nDESCRIPTION:Notes: ${c.notes||''}\nEND:VEVENT\nEND:VCALENDAR`;
-            downloadBlob(icsMsg, 'text/calendar', 'appt.ics');
+            document.getElementById('cal-id').value = id;
+            document.getElementById('cal-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('cal-loc').value = c.addr || 'Shop';
+            document.getElementById('cal-modal').style.display = 'flex';
+        }
+
+        function generateICS() {
+            const id = document.getElementById('cal-id').value;
+            const c = clients.find(x=>x.id==id);
+            const dateStr = document.getElementById('cal-date').value;
+            const timeStr = document.getElementById('cal-time').value;
+            const loc = document.getElementById('cal-loc').value;
+
+            if(!dateStr || !timeStr) return alert("Date and Time required");
+
+            const start = new Date(`${dateStr}T${timeStr}`);
+            const end = new Date(start.getTime() + 60*60000);
+            
+            const fmt = d => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+            
+            const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Cut w/ ${c.name}\nDTSTART:${fmt(start)}\nDTEND:${fmt(end)}\nLOCATION:${loc}\nDESCRIPTION:${c.notes||''}\nEND:VEVENT\nEND:VCALENDAR`;
+            
+            downloadBlob(ics, 'text/calendar', 'appt.ics');
+            closeModals();
         }
 
         function downloadVCard(id) {
             const c = clients.find(x=>x.id==id);
-            const vcf = `BEGIN:VCARD\nVERSION:3.0\nFN:${c.name}\nTEL;TYPE=CELL:${c.phone||''}\nADR;TYPE=HOME:;;${c.addr||''}\nNOTE:Black Book Notes: ${c.notes||''}\nEND:VCARD`;
-            downloadBlob(vcf, 'text/vcard', `${c.name.replace(' ','_')}.vcf`);
+            // VCF 3.0 Standard
+            const vcf = `BEGIN:VCARD\nVERSION:3.0\nFN:${c.name}\nTEL;TYPE=CELL:${c.phone||''}\nADR;TYPE=HOME:;;${c.addr||''};;;\nNOTE:Black Book Notes: ${c.notes||''}\nEND:VCARD`;
+            const blob = new Blob([vcf], { type: 'text/vcard' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${c.name.replace(/\s/g,'_')}.vcf`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
 
         // --- EDIT MODAL ---
         function openClientModal(id) {
             const c = id ? clients.find(x=>x.id==id) : {id:'',name:'',phone:'',price:'',addr:'',social:'',dob:'',start:new Date().toISOString().split('T')[0],ref:'',freq:'',last:'',sides:'',top:'',notes:''};
-            
             for(let k in c) {
                 const el = document.getElementById('c-'+k);
                 if(el) el.value = c[k];
             }
-            
-            // Populate referral datalist
-            const dl = document.getElementById('ref-list'); dl.innerHTML = '';
-            clients.forEach(cl => { if(cl.id !== c.id) dl.innerHTML += `<option value="${cl.name}">`; });
-            
+            // Populate Datalist
+            updateRefList('');
             document.getElementById('client-modal').style.display = 'flex';
+        }
+
+        function updateRefList(val) {
+            const dl = document.getElementById('ref-list'); 
+            dl.innerHTML = '';
+            clients.forEach(cl => { dl.innerHTML += `<option value="${cl.name}">`; });
         }
 
         function saveClient() {
@@ -437,11 +459,9 @@
         function isThisWeek(dStr) {
             if(!dStr) return false; 
             const d=new Date(dStr); const now=new Date(); now.setHours(0,0,0,0);
-            
             const thisYear = new Date(now.getFullYear(), d.getMonth(), d.getDate()+1);
             const diff = Math.ceil((thisYear - now) / 86400000);
             if(diff >= 0 && diff <= 7) return true;
-            
             const nextYear = new Date(now.getFullYear()+1, d.getMonth(), d.getDate()+1);
             const diffNext = Math.ceil((nextYear - now) / 86400000);
             return diffNext >= 0 && diffNext <= 7;
@@ -450,7 +470,6 @@
             if(!dStr) return false; 
             const d = new Date(dStr); d.setHours(0,0,0,0);
             const yest = new Date(); yest.setDate(yest.getDate()-1); yest.setHours(0,0,0,0);
-            // Fix timezone issue by comparing strings
             return d.toISOString().split('T')[0] === yest.toISOString().split('T')[0];
         }
         function getYears(dStr) { if(!dStr) return 0; return new Date().getFullYear() - new Date(dStr).getFullYear(); }
