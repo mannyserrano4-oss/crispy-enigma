@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Black Book Ops</title>
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
+
+    <style>
+        :root {
+            --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --subtext: #94a3b8;
+            --border: #334155; --input-bg: #020617;
+            --accent: #818cf8; --red: #f87171; --gold: #fbbf24; --green: #4ade80; --blue: #60a5fa; --purple: #c084fc;
+        }
+        body.light-mode {
+            --bg: #f8fafc; --card: #ffffff; --text: #334155; --subtext: #64748b;
+            --border: #e2e8f0; --input-bg: #f1f5f9;
+            --accent: #4f46e5; --red: #ef4444; --gold: #d97706; --green: #16a34a; --blue: #2563eb; --purple: #9333ea;
+        }
+        body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif; margin:0; display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+
+        /* UTILS */
+        .flex { display: flex; gap: 10px; }
+        .grow { flex-grow: 1; }
+        .hidden { display: none !important; }
+        .btn-today { padding: 12px 5px; background: var(--border); color: var(--subtext); border: 1px solid var(--border); border-radius: 0 8px 8px 0; cursor: pointer; font-size: 0.8rem;}
+        .input-group-date { display: flex; }
+        .input-group-date .form-input { border-radius: 8px 0 0 8px; }
+
+        /* HEADER & NAV */
+        .header { padding: 15px; background: var(--card); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        h1 { margin: 0; font-size: 1.1rem; text-transform: uppercase; color: var(--accent); font-weight: 800; }
+        .icon-btn { font-size: 1.4rem; cursor: pointer; opacity: 0.8; background:none; border:none; padding:0 5px; }
+        
+        /* DASHBOARD */
+        .dashboard { padding: 15px; background: var(--bg); display: flex; gap: 10px; overflow-x: auto; flex-shrink: 0; border-bottom: 1px solid var(--border); scrollbar-width: none; }
+        .dashboard::-webkit-scrollbar { display: none; }
+        .dash-card { background: var(--card); min-width: 100px; padding: 10px; border-radius: 12px; border: 1px solid var(--border); text-align: center; cursor: pointer; }
+        .dash-card.active { border-color: var(--accent); background: var(--input-bg); }
+        .dash-count { font-size: 1.4rem; font-weight: bold; }
+        .dash-lbl { font-size: 0.65rem; text-transform: uppercase; color: var(--subtext); margin-top: 5px; }
+
+        /* MAIN LIST */
+        .search-deck { padding: 10px 15px; background: var(--bg); }
+        .search-input { width: 100%; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); padding: 10px 15px; border-radius: 10px; font-size: 1rem; box-sizing: border-box; }
+        #client-list { flex-grow: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; -webkit-overflow-scrolling: touch; }
+
+        /* CLIENT CARD */
+        .client-card { background: var(--card); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
+        .card-header { padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .client-name { font-size: 1.1rem; font-weight: bold; }
+        .badges { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
+        .badge { font-size: 0.6rem; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; font-weight: bold; border: 1px solid currentColor; }
+        .b-red { color: var(--red); bg: rgba(248,113,113,0.1); } .b-gold { color: var(--gold); bg: rgba(251,191,36,0.1); } .b-blue { color: var(--blue); bg: rgba(96,165,250,0.1); } .b-green { color: var(--green); bg: rgba(74,222,128,0.1); }
+        
+        /* SCROLL FIX: Ensure details section handles its own overflow if needed, though main list scroll is usually enough */
+        .client-details { display: none; padding: 15px; border-top: 1px solid var(--border); background: var(--input-bg); }
+        .client-card.open .client-details { display: block; }
+
+        /* DETAILS SECTIONS */
+        .bank-box { display: flex; gap: 10px; margin-bottom: 15px; background: var(--card); padding: 10px; border-radius: 8px; border: 1px solid var(--border); }
+        .bank-item { flex: 1; text-align: center; }
+        .bank-val { font-size: 1.2rem; font-weight: bold; color: var(--gold); }
+        .bank-lbl { font-size: 0.6rem; color: var(--subtext); text-transform: uppercase; }
+        
+        .detail-box { background: var(--card); padding: 10px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px; }
+        .detail-lbl { font-size: 0.65rem; color: var(--accent); margin-bottom: 5px; font-weight: bold; letter-spacing: 1px; }
+        .detail-txt { font-size: 0.95rem; white-space: pre-wrap; }
+
+        /* ACTIONS */
+        .action-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
+        .btn-act { padding: 10px 5px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 0.8rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .btn-main { background: var(--green); color: #000; border:none; font-weight:bold; padding: 12px; width:100%; border-radius: 8px; font-size:1rem; margin-bottom: 10px; cursor: pointer;}
+        .btn-redeem { background: var(--gold); color: black; font-size: 0.7rem; padding: 4px 10px; border-radius: 4px; border:none; cursor: pointer; font-weight: bold;}
+
+        /* MODALS */
+        .fab { position: absolute; bottom: 30px; right: 20px; background: var(--accent); color: white; width: 55px; height: 55px; border-radius: 30px; display: flex; align-items: center; justify-content: center; font-size: 2rem; box-shadow: 0 5px 20px rgba(0,0,0,0.3); cursor: pointer; border: none; z-index: 50; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(2px); z-index: 100; display: none; justify-content: center; align-items: flex-start; overflow-y: auto; padding: 20px 0; }
+        .modal-content { background: var(--card); width: 90%; max-width: 400px; padding: 20px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.5); margin-bottom: 50px;}
+        .form-group { margin-bottom: 12px; }
+        .form-lbl { display: block; margin-bottom: 5px; color: var(--subtext); font-size: 0.8rem; }
+        .form-input { width: 100%; padding: 12px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
+        
+        /* CHIPS & LISTS */
+        .chip-container { display: flex; gap: 5px; overflow-x: auto; margin-bottom: 5px; padding-bottom: 5px; }
+        .chip { padding: 5px 10px; background: var(--border); color: var(--subtext); border-radius: 15px; font-size: 0.7rem; white-space: nowrap; cursor: pointer; }
+        .list-option { padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; font-size: 1rem; }
+
+        /* SAVE MENU */
+        .dropdown { position: absolute; top: 50px; right: 10px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; display: none; flex-direction: column; width: 160px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); z-index: 200; }
+        .dropdown.show { display: flex; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Black Book Ops</h1>
+        <div style="display:flex; gap:10px; align-items:center;">
+            <button class="icon-btn" onclick="toggleTheme()">◑</button>
+            <button class="icon-btn" onclick="openGiftModal()">🎁</button>
+            <button class="icon-btn" onclick="toggleMenu()">💾</button>
+        </div>
+    </div>
+
+    <div id="save-menu" class="dropdown">
+        <div class="list-option" onclick="exportData('json')">Backup File</div>
+        <div class="list-option" onclick="exportData('csv')">Export CSV</div>
+        <div class="list-option" onclick="document.getElementById('file-input').click()">Restore</div>
+    </div>
+    <input type="file" id="file-input" hidden onchange="importData(this)">
+
+    <div class="dashboard">
+        <div class="dash-card d-red" onclick="filter('due', this)">
+            <div class="dash-count" id="d-due">0</div><div class="dash-lbl">Due</div>
+        </div>
+        <div class="dash-card d-gold" onclick="filter('bday', this)">
+            <div class="dash-count" id="d-bday">0</div><div class="dash-lbl">B-Day Wk</div>
+        </div>
+        <div class="dash-card d-blue" onclick="filter('anni', this)">
+            <div class="dash-count" id="d-anni">0</div><div class="dash-lbl">Anni Wk</div>
+        </div>
+        <div class="dash-card d-purple" onclick="filter('followup', this)">
+            <div class="dash-count" id="d-follow">0</div><div class="dash-lbl">Follow-Up</div>
+        </div>
+         <div class="dash-card active" onclick="filter('all', this)">
+            <div class="dash-count" id="d-all">0</div><div class="dash-lbl">All</div>
+        </div>
+    </div>
+
+    <div class="search-deck">
+        <input type="search" id="search" class="search-input" placeholder="Search..." onkeyup="render()">
+    </div>
+
+    <div id="client-list"></div>
+    <button class="fab" onclick="openClientModal()">+</button>
+
+    <div id="client-modal" class="modal">
+        <div class="modal-content">
+            <h3>Client Profile</h3>
+            <input type="hidden" id="c-id">
+            <div class="form-group"><label class="form-lbl">Name</label><input id="c-name" class="form-input"></div>
+            <div class="flex"><div class="grow form-group"><label class="form-lbl">Phone</label><input type="tel" id="c-phone" class="form-input"></div>
+            <div class="grow form-group"><label class="form-lbl">Default Price</label><input type="number" id="c-price" class="form-input"></div></div>
+            <div class="form-group"><label class="form-lbl">Address (Mobile)</label><input id="c-addr" class="form-input" placeholder="123 Main St..."></div>
+            
+            <div class="flex">
+                <div class="grow form-group"><label class="form-lbl">Birthday</label><div class="input-group-date"><input type="date" id="c-dob" class="form-input"><button class="btn-today" onclick="setToday('c-dob')">Today</button></div></div>
+                <div class="grow form-group"><label class="form-lbl">Start Date</label><div class="input-group-date"><input type="date" id="c-start" class="form-input"><button class="btn-today" onclick="setToday('c-start')">Today</button></div></div>
+            </div>
+            
+            <div class="form-group"><label class="form-lbl">Referred By (Type for suggestions)</label>
+                <input id="c-ref" class="form-input" list="ref-list" placeholder="Start typing name...">
+                <datalist id="ref-list"></datalist>
+            </div>
+
+             <div class="flex">
+                <div class="grow form-group"><label class="form-lbl">Freq (Weeks)</label><input type="number" id="c-freq" class="form-input"></div>
+                <div class="grow form-group"><label class="form-lbl">Last Visit</label><div class="input-group-date"><input type="date" id="c-last" class="form-input"><button class="btn-today" onclick="setToday('c-last')">Today</button></div></div>
+            </div>
+
+            <div class="form-group"><label class="form-lbl">SIDES Formula</label>
+                <div class="chip-container"><span class="chip" onclick="fill('c-sides','Skin Fade')">Skin Fade</span><span class="chip" onclick="fill('c-sides','Taper')">Taper</span><span class="chip" onclick="fill('c-sides','#1')">#1</span><span class="chip" onclick="fill('c-sides','#2')">#2</span></div>
+                <input id="c-sides" class="form-input">
+            </div>
+            <div class="form-group"><label class="form-lbl">TOP Formula</label>
+                 <div class="chip-container"><span class="chip" onclick="fill('c-top','Crop')">Crop</span><span class="chip" onclick="fill('c-top','Trim')">Trim</span><span class="chip" onclick="fill('c-top','Texture')">Texture</span></div>
+                <input id="c-top" class="form-input">
+            </div>
+             <div class="form-group"><label class="form-lbl">Notes</label><textarea id="c-notes" class="form-input" rows="3"></textarea></div>
+
+            <button class="btn-main" onclick="saveClient()">SAVE PROFILE</button>
+            <button class="list-option" style="width:100%;text-align:center;border:none;" onclick="closeModals()">Cancel</button>
+        </div>
+    </div>
+
+    <div id="list-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="list-title">Select</h3>
+            <div id="list-options"></div>
+            <button class="list-option" style="width:100%;text-align:center;border:none; color:var(--red);" onclick="closeModals()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA & STATE ---
+        let clients = JSON.parse(localStorage.getItem('bb_clients_v2') || '[]');
+        let filterType = 'all';
+
+        // --- INIT ---
+        if(localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
+        render();
+
+        // --- CORE RENDER ---
+        function render() {
+            updateDash();
+            const list = document.getElementById('client-list');
+            const query = document.getElementById('search').value.toLowerCase();
+            list.innerHTML = '';
+
+            let visible = clients.filter(c => c.name.toLowerCase().includes(query));
+            
+            // Filtering
+            const today = new Date(); today.setHours(0,0,0,0);
+            if(filterType === 'due') visible = visible.filter(c => getDueDate(c) <= today);
+            if(filterType === 'bday') visible = visible.filter(c => isThisWeek(c.dob));
+            if(filterType === 'anni') visible = visible.filter(c => isThisWeek(c.start));
+            if(filterType === 'followup') visible = visible.filter(c => wasYesterday(c.lastVisit));
+            
+            visible.sort((a,b) => a.name.localeCompare(b.name));
+
+            visible.forEach(c => {
+                // Badges & Labels
+                let badges = '';
+                if(isThisWeek(c.dob)) badges += `<span class="badge b-gold" style="color:var(--gold)">🎂 BDAY WK</span>`;
+                if(isThisWeek(c.start)) badges += `<span class="badge b-blue" style="color:var(--blue)">🎉 ${getYears(c.start)}YR ANNI</span>`;
+                if(c.ltv > 500) badges += `<span class="badge b-green" style="color:var(--green)">💎 VIP ($${c.ltv})</span>`;
+
+                const due = getDueDate(c);
+                const daysTill = Math.ceil((due - today) / (86400000));
+                let dueTxt = due ? (daysTill < 0 ? `Overdue ${Math.abs(daysTill)}d` : `Due in ${daysTill}d`) : '';
+                let dueColor = daysTill < 0 ? 'var(--red)' : 'var(--subtext)';
+
+                const div = document.createElement('div');
+                div.className = 'client-card';
+                div.innerHTML = `
+                    <div class="card-header" onclick="this.parentElement.classList.toggle('open')">
+                        <div><div class="client-name">${c.name}</div><div class="badges">${badges}</div></div>
+                        <div style="text-align:right">
+                            <div style="font-size:0.8rem;font-weight:bold;color:var(--gold)">${(c.free>0?`${c.free} FREE CUTS` : (c.credit>0?`$${c.credit} CR`:''))}</div>
+                            <div style="font-size:0.7rem;color:${dueColor}">${dueTxt}</div>
+                        </div>
+                    </div>
+                    <div class="client-details">
+                         <div class="bank-box">
+                            <div class="bank-item"><div class="bank-val">${c.cuts%6}/6</div><div class="bank-lbl">Progress</div></div>
+                            <div class="bank-item"><div class="bank-val">${c.free}</div><div class="bank-lbl">Free Cuts</div></div>
+                            <div class="bank-item"><div class="bank-val">$${c.credit}</div><div class="bank-lbl">Credit</div></div>
+                            <button class="btn-redeem" onclick="openRedeem('${c.id}')">REDEEM</button>
+                        </div>
+                        <div class="detail-box"><div class="detail-lbl">SIDES</div><div>${c.sides||'-'}</div></div>
+                        <div class="detail-box"><div class="detail-lbl">TOP</div><div>${c.top||'-'}</div></div>
+                        <div class="detail-box"><div class="detail-lbl">NOTES</div><div class="detail-txt">${c.notes||'-'}</div></div>
+                        ${c.addr ? `<div class="detail-box"><div class="detail-lbl">📍 ADDRESS</div><div style="font-size:0.9rem">${c.addr}</div></div>` : ''}
+
+                        <button class="btn-main" onclick="recordCut('${c.id}')">✂️ RECORD CUT TODAY</button>
+                        <div class="action-grid">
+                            <button class="btn-act" onclick="window.location='tel:${c.phone}'">📞 Call</button>
+                            <button class="btn-act" onclick="openText('${c.id}')">💬 Text</button>
+                            <button class="btn-act" onclick="addToCal('${c.id}')">📅 Schedule</button>
+                            <button class="btn-act" onclick="downloadVCard('${c.id}')">👤 Contact</button>
+                            <button class="btn-act" style="grid-column:span 2" onclick="openClientModal('${c.id}')">✏️ Edit Profile</button>
+                            <button class="btn-act" style="grid-column:span 2;color:var(--red)" onclick="delClient('${c.id}')">🗑️ Delete</button>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function updateDash() {
+            const today = new Date(); today.setHours(0,0,0,0);
+            let counts = { due:0, bday:0, anni:0, follow:0, all: clients.length };
+            clients.forEach(c => {
+                if(getDueDate(c) <= today) counts.due++;
+                if(isThisWeek(c.dob)) counts.bday++;
+                if(isThisWeek(c.start)) counts.anni++;
+                if(wasYesterday(c.lastVisit)) counts.follow++;
+            });
+            for(let k in counts) document.getElementById('d-'+k).innerText = counts[k];
+        }
+
+        // --- ACTIONS ---
+        function recordCut(id) {
+            const c = clients.find(x=>x.id==id);
+            const price = prompt(`Price paid today? (Enter number only)`, c.price || 0);
+            if(price === null) return; // Cancelled
+            const paid = parseFloat(price) || 0;
+            
+            c.lastVisit = new Date().toISOString().split('T')[0];
+            c.cuts++;
+            c.ltv += paid;
+            if(c.cuts % 6 === 0) { c.free++; alert("🎉 6th Cut! Free cut added to bank."); }
+            save(); render();
+        }
+
+        function openRedeem(id) {
+            const c = clients.find(x=>x.id==id);
+            const opts = [];
+            if(c.free > 0) opts.push({lbl: `Use 1 Free Cut (${c.free} left)`, fn: ()=>{c.free--;}});
+            if(c.credit > 0) opts.push({lbl: `Use Credit ($${c.credit} available)`, fn: ()=>{
+                const use = prompt("How much credit to use?", c.credit);
+                if(use) c.credit -= Math.min(parseFloat(use)||0, c.credit);
+            }});
+            if(isThisWeek(c.dob)) opts.push({lbl: "Apply Birthday Deal", fn: ()=>{alert("Birthday deal applied to ticket.");}});
+            
+            if(opts.length === 0) return alert("No rewards available to redeem.");
+            openListModal("Redeem Reward", opts);
+        }
+
+         function openText(id) {
+            const c = clients.find(x=>x.id==id);
+            if(!c.phone) return alert("No phone needed.");
+            const name = c.name.split(' ')[0];
+            const opts = [
+                {lbl:"Running Late", txt:`Hey ${name}, running a bit behind schedule. Thanks for patience!`},
+                {lbl:"Confirming", txt:`Hey ${name}, confirming our cut tomorrow. We still on?`},
+                {lbl:"Follow Up", txt:`Hey ${name}, just checking in on that fresh cut. All good?`},
+                {lbl:"Due Soon", txt:`Yo ${name}, getting scruffy. Time to book?`}
+            ];
+            openListModal("Send Text", opts.map(o => ({
+                lbl: o.lbl, fn: () => window.location = `sms:${c.phone}${navigator.userAgent.match(/iPhone|iPad/i)?'&': উদ্দেশ্যে'}body=${encodeURIComponent(o.txt)}`
+            })));
+        }
+
+        function addToCal(id) {
+            const c = clients.find(x=>x.id==id);
+            const now = new Date();
+            const start = now.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+            const end = new Date(now.getTime() + 60*60000).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+            const icsMsg = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Cut w/ ${c.name}\nDTSTART:${start}\nDTEND:${end}\nLOCATION:${c.addr||'Shop'}\nDESCRIPTION:Notes: ${c.notes||''}\nEND:VEVENT\nEND:VCALENDAR`;
+            downloadBlob(icsMsg, 'text/calendar', 'appt.ics');
+        }
+
+        function downloadVCard(id) {
+            const c = clients.find(x=>x.id==id);
+            const vcf = `BEGIN:VCARD\nVERSION:3.0\nFN:${c.name}\nTEL;TYPE=CELL:${c.phone||''}\nADR;TYPE=HOME:;;${c.addr||''}\nNOTE:Black Book Notes: ${c.notes||''}\nEND:VCARD`;
+            downloadBlob(vcf, 'text/vcard', `${c.name.replace(' ','_')}.vcf`);
+        }
+
+        // --- EDIT MODAL ---
+        function openClientModal(id) {
+            const c = id ? clients.find(x=>x.id==id) : {id:'',name:'',phone:'',price:'',addr:'',dob:'',start:new Date().toISOString().split('T')[0],ref:'',freq:'',last:'',sides:'',top:'',notes:''};
+            for(let k in c) if(document.getElementById('c-'+k)) document.getElementById('c-'+k).value = c[k];
+            
+            // Populate referral datalist
+            const dl = document.getElementById('ref-list'); dl.innerHTML = '';
+            clients.forEach(cl => { if(cl.id !== c.id) dl.innerHTML += `<option value="${cl.name}">`; });
+            
+            document.getElementById('client-modal').style.display = 'flex';
+        }
+
+        function saveClient() {
+            const id = document.getElementById('c-id').value;
+            const name = document.getElementById('c-name').value;
+            if(!name) return alert("Name required");
+            
+            const refName = document.getElementById('c-ref').value;
+            let clientData = {
+                name, phone: document.getElementById('c-phone').value,
+                price: parseFloat(document.getElementById('c-price').value)||0,
+                addr: document.getElementById('c-addr').value,
+                dob: document.getElementById('c-dob').value,
+                start: document.getElementById('c-start').value,
+                ref: refName,
+                freq: parseInt(document.getElementById('c-freq').value)||0,
+                lastVisit: document.getElementById('c-last').value,
+                sides: document.getElementById('c-sides').value,
+                top: document.getElementById('c-top').value,
+                notes: document.getElementById('c-notes').value,
+            };
+
+            if(id) {
+                const idx = clients.findIndex(x=>x.id==id);
+                clients[idx] = {...clients[idx], ...clientData}; // Merge updates
+            } else {
+                // New Client
+                clientData.id = Date.now().toString();
+                clientData.cuts=0; clientData.free=0; clientData.credit=0; clientData.ltv=0;
+                clients.push(clientData);
+                // Check Referral
+                if(refName) {
+                    const referrer = clients.find(c => c.name.toLowerCase() === refName.toLowerCase() && c.id !== clientData.id);
+                    if(referrer) { referrer.credit+=5; clientData.credit+=5; alert("Referral linked! $5 credit applied to both."); }
+                }
+            }
+            save(); closeModals(); render();
+        }
+
+        function delClient(id) { if(confirm("Delete permanently?")) { clients = clients.filter(x=>x.id!=id); save(); render(); }}
+
+        // --- HELPERS ---
+        function getDueDate(c) {
+            if(!c.lastVisit || !c.freq) return null;
+            const d = new Date(c.lastVisit); d.setDate(d.getDate() + (c.freq*7)); d.setHours(0,0,0,0); return d;
+        }
+        function isThisWeek(dStr) {
+            if(!dStr) return false; const d=new Date(dStr); const now=new Date(); d.setFullYear(now.getFullYear());
+            const diff = (d - now) / 86400000; return diff >= -1 && diff <= 7; // -1 handles yesterday for birthdays
+        }
+        function wasYesterday(dStr) {
+            if(!dStr) return false; const d=new Date(dStr); const now=new Date();
+            return new Date(now.setDate(now.getDate()-1)).toISOString().split('T')[0] === dStr;
+        }
+        function getYears(dStr) { return new Date().getFullYear() - new Date(dStr).getFullYear(); }
+        function setToday(id) { document.getElementById(id).value = new Date().toISOString().split('T')[0]; }
+        function fill(id,v) { document.getElementById(id).value = v; }
+        function filter(t, el) { filterType=t; document.querySelectorAll('.dash-card').forEach(d=>d.classList.remove('active')); el.classList.add('active'); render(); }
+        function toggleMenu() { document.getElementById('save-menu').classList.toggle('show'); }
+        function toggleTheme() { document.body.classList.toggle('light-mode'); localStorage.setItem('theme', document.body.classList.contains('light-mode')?'light':'dark'); }
+        function closeModals() { document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); }
+        function save() { localStorage.setItem('bb_clients_v2', JSON.stringify(clients)); }
+        
+        // --- MODAL UTILS ---
+        function openListModal(title, options) {
+            document.getElementById('list-title').innerText = title;
+            const container = document.getElementById('list-options'); container.innerHTML = '';
+            options.forEach(o => {
+                const btn = document.createElement('button'); btn.className = 'list-option'; btn.style.width='100%'; btn.style.textAlign='left'; btn.style.border='none'; btn.style.borderBottom='1px solid var(--border)';
+                btn.innerText = o.lbl; btn.onclick = () => { o.fn(); closeModals(); save(); render(); };
+                container.appendChild(btn);
+            });
+            document.getElementById('list-modal').style.display = 'flex';
+        }
+        
+        function downloadBlob(content, type, filename) {
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([content], {type})); a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        }
+        
+        function openGiftModal() {
+             const name = prompt("Manual $5 Referral Credit. Enter Client Name:");
+             if(name) { const c=clients.find(x=>x.name.toLowerCase().includes(name.toLowerCase())); if(c){c.credit+=5;save();render();alert(`$5 added to ${c.name}`);} else alert("Not found");}
+        }
+
+        function exportData(type) {
+            toggleMenu();
+            if(type==='json') downloadBlob(JSON.stringify(clients,null,2), 'application/json', `bb_backup_${Date.now()}.json`);
+            else {
+                let csv = "Name,Phone,LTV,Cuts,Free,Credit,Last,Next Due\n" + clients.map(c => {
+                    const due = getDueDate(c); return `"${c.name}","${c.phone||''}",${c.ltv},${c.cuts},${c.free},${c.credit},${c.lastVisit||''},${due?due.toISOString().split('T')[0]:''}`
+                }).join('\n');
+                downloadBlob(csv, 'text/csv', `bb_export_${Date.now()}.csv`);
+            }
+        }
+        function importData(el) {
+            toggleMenu(); if(!el.files[0])return;
+            const fr = new FileReader(); fr.onload=e=>{ try{const d=JSON.parse(e.target.result); if(confirm(`Restore ${d.length} clients? WARN: Overwrites current data.`)){clients=d;save();render();}}catch(e){alert("Bad file");}};
+            fr.readAsText(el.files[0]);
+        }
+    </script>
+</body>
+</html>
