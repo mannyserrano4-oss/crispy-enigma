@@ -32,8 +32,7 @@
             display: flex; justify-content: space-between; align-items: center; z-index: 20;
         }
         h1 { margin: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); font-weight: 900; }
-        .icon-btn { font-size: 1.4rem; background: none; border: none; cursor: pointer; padding: 5px; transition: transform 0.2s; }
-        .icon-btn:active { transform: scale(0.9); }
+        .icon-btn { font-size: 1.4rem; background: none; border: none; cursor: pointer; padding: 5px; }
 
         /* DASHBOARD */
         .dashboard { 
@@ -141,6 +140,11 @@
         .ro-val { flex: 1; color: var(--text); font-weight: 700; font-size: 0.95rem; }
         .stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
         .stat-val { font-weight: bold; color: var(--accent); }
+
+        /* CHECKBOX TOGGLE */
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 10px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; border: 1px solid var(--green); }
+        .toggle-lbl { font-size: 0.9rem; font-weight: bold; color: var(--green); }
+        .toggle-input { width: 20px; height: 20px; }
     </style>
 </head>
 <body>
@@ -291,6 +295,10 @@
                     <div class="form-group"><label class="form-lbl">Freq (Wks)</label><input type="number" id="c-freq" class="form-input" placeholder="4"></div>
                     <div class="form-group"><label class="form-lbl">Last Cut</label><div class="input-group-date"><input type="date" id="c-last" class="form-input"><button class="btn-today" onclick="setToday('c-last')">Today</button></div></div>
                 </div>
+                <div class="toggle-row">
+                    <span class="toggle-lbl">Count Last Cut as Cut #1?</span>
+                    <input type="checkbox" id="c-count-first" class="toggle-input">
+                </div>
             </div>
 
             <div class="zone z-green">
@@ -308,7 +316,6 @@
         let shopSettings = JSON.parse(localStorage.getItem('bb_settings') || '{"addr":""}');
         let filterType = 'all';
         let tempId = null;
-        let pendingCutId = null; 
 
         if(localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
         render();
@@ -418,15 +425,15 @@
             });
         }
 
-        // --- SAVE CLIENT REWORKED (ASYNC FIX) ---
+        // --- LINEAR SAVE (NO POPUPS) ---
         function saveClient() {
             const id = document.getElementById('c-id').value;
             const name = document.getElementById('c-name').value;
             if(!name) return alert("Name required");
             const ref = document.getElementById('c-ref').value;
             const lastVal = document.getElementById('c-last').value;
+            const countFirst = document.getElementById('c-count-first').checked;
             
-            // Collect Data
             let data = {
                 name, phone: document.getElementById('c-phone').value,
                 price: parseFloat(document.getElementById('c-price').value)||35,
@@ -436,58 +443,35 @@
                 notes: document.getElementById('c-notes').value
             };
 
-            // Logic Split
-            if (id) {
-                // UPDATE EXISTING
+            if(id) {
                 const idx = clients.findIndex(x=>x.id==id);
                 clients[idx] = {...clients[idx], ...data};
-                commitSave(false);
             } else {
-                // CREATE NEW
-                data.id = Date.now().toString(); 
-                data.cuts=0; data.free=0; data.credit=0; data.ltv=0; data.loyalty=0; data.redeemedVal=0;
-                data.isNew = true;
-
-                // Handle Referrals
+                data.id = Date.now().toString(); data.cuts=0; data.free=0; data.credit=0; data.ltv=0; data.loyalty=0; data.redeemedVal=0;
+                
+                // LINEAR LOGIC: Checkbox decides
+                if(lastVal && countFirst) {
+                    data.cuts = 1; 
+                    data.loyalty = 1;
+                }
+                
+                clients.push(data);
+                data.isNew = true; 
+                
                 if(ref) {
-                    const referrer = clients.find(c => c.name.toLowerCase() === ref.toLowerCase());
-                    if(referrer && referrer.id !== data.id) { 
-                        referrer.credit+=5; data.credit+=5; alert("Referral linked! $5 credits."); 
-                    }
-                }
-
-                // Handle First Cut Logic (ASYNC)
-                if(lastVal) {
-                    customConfirm("Count the 'Last Cut' date as their 1st cut?", 
-                        () => { // YES
-                            data.cuts = 1; data.loyalty = 1;
-                            clients.push(data);
-                            commitSave(true);
-                        },
-                        () => { // NO
-                            clients.push(data);
-                            commitSave(true);
-                        }
-                    );
-                } else {
-                    clients.push(data);
-                    commitSave(true);
+                    const referrer = clients.find(c => c.name.toLowerCase() === ref.toLowerCase() && c.id !== data.id);
+                    if(referrer) { referrer.credit+=5; data.credit+=5; alert("Referral linked! $5 credits."); }
                 }
             }
-        }
-
-        function commitSave(isNew) {
             save(); 
-            closeModals();
-            if(isNew) {
-                // Force Reset UI to Show New Client
-                document.getElementById('search').value = '';
-                filterType = 'all';
-                document.querySelectorAll('.dash-card').forEach(d => d.classList.remove('active'));
-                document.getElementById('btn-all').classList.add('active');
-            }
+            closeModals(); 
+            
+            // RESET EVERYTHING
+            document.getElementById('search').value = '';
+            filterType = 'all';
+            document.querySelectorAll('.dash-card').forEach(d => d.classList.remove('active'));
+            document.getElementById('btn-all').classList.add('active');
             render();
-            if(pendingCutId) pendingCutId = null;
         }
 
         // --- CUT LOGIC ---
@@ -541,7 +525,7 @@
             save(); render();
         }
 
-        // --- ANNIVERSARY REDEEM ---
+        // --- REDEEM ---
         function openRedeem(id) {
             const c=clients.find(x=>x.id==id);
             const opts=[];
@@ -562,40 +546,15 @@
             openListModal("Redeem", opts);
         }
 
-        // --- SCHEDULING ---
-        function openSchedule(id) {
-            const c=clients.find(x=>x.id==id); document.getElementById('cal-id').value=id;
-            document.getElementById('cal-date').value=getLocalToday();
-            selLoc('shop'); document.getElementById('cal-modal').style.display='flex';
-        }
-        function selLoc(type) {
-            const c=clients.find(x=>x.id==document.getElementById('cal-id').value);
-            document.getElementById('cal-addr').value = type==='shop' ? (shopSettings.addr||'') : (c.addr||'');
-        }
-        function generateICS() {
-            const c=clients.find(x=>x.id==document.getElementById('cal-id').value);
-            const d=document.getElementById('cal-date').value; const t=document.getElementById('cal-time').value;
-            const loc=document.getElementById('cal-addr').value;
-            if(!d||!t) return alert("Date/Time needed");
-            
-            const startRaw = d.replace(/-/g, '') + 'T' + t.replace(/:/g, '') + '00';
-            let h = parseInt(t.split(':')[0]) + 2; let m = parseInt(t.split(':')[1]);
-            if(h>=24) h-=24;
-            const endRaw = d.replace(/-/g, '') + 'T' + (h<10?'0':'')+h + (m<10?'0':'')+m + '00';
-
-            const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Cut: ${c.name}\nDTSTART:${startRaw}\nDTEND:${endRaw}\nLOCATION:${loc}\nDESCRIPTION:${c.notes||'Haircut'}\nEND:VEVENT\nEND:VCALENDAR`;
-            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([ics], {type: 'text/calendar'}));
-            a.download = 'appointment.ics'; document.body.appendChild(a); a.click(); document.body.removeChild(a); closeModals();
-        }
-
         // --- UTILS ---
         function updateRefList() { const dl=document.getElementById('ref-list'); dl.innerHTML=''; clients.forEach(cl=>{dl.innerHTML+=`<option value="${cl.name}">`}); }
         function openClientModal(id) {
             const c = id ? clients.find(x=>x.id==id) : {id:'',name:'',phone:'',price:35,addr:'',social:'',dob:'',start:getLocalToday(),ref:'',freq:4,last:'',notes:''};
             for(let k in c) if(document.getElementById('c-'+k)) document.getElementById('c-'+k).value = c[k];
+            // Reset toggle
+            document.getElementById('c-count-first').checked = false;
             updateRefList(); document.getElementById('client-modal').style.display = 'flex';
         }
-        
         function viewFull(id) {
             const c = clients.find(x=>x.id==id); tempId=id;
             document.getElementById('ro-title').innerText = c.name;
@@ -631,6 +590,9 @@
         function saveSettings() { shopSettings.addr=document.getElementById('s-shop-addr').value; localStorage.setItem('bb_settings', JSON.stringify(shopSettings)); closeModals(); }
         function exportData(type) { toggleMenu(); if(type==='json'){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(clients)],{type:'application/json'})); a.download=`bb_${Date.now()}.json`; a.click();} else { let csv="Name,Phone,LTV\n"+clients.map(c=>`"${c.name}","${c.phone}",${c.ltv}`).join('\n'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=`bb.csv`; a.click(); }}
         function importData(el) { if(!el.files[0])return; const fr=new FileReader(); fr.onload=e=>{clients=JSON.parse(e.target.result); save(); render(); alert("Restored!");}; fr.readAsText(el.files[0]); }
+        function openSchedule(id) { const c=clients.find(x=>x.id==id); document.getElementById('cal-id').value=id; document.getElementById('cal-date').value=getLocalToday(); selLoc('shop'); document.getElementById('cal-modal').style.display='flex'; }
+        function selLoc(type) { const c=clients.find(x=>x.id==document.getElementById('cal-id').value); document.getElementById('cal-addr').value = type==='shop' ? (shopSettings.addr||'') : (c.addr||''); }
+        function generateICS() { const c=clients.find(x=>x.id==document.getElementById('cal-id').value); const d=document.getElementById('cal-date').value; const t=document.getElementById('cal-time').value; const loc=document.getElementById('cal-addr').value; if(!d||!t) return alert("Date/Time needed"); const startRaw = d.replace(/-/g, '') + 'T' + t.replace(/:/g, '') + '00'; let h = parseInt(t.split(':')[0]) + 2; let m = parseInt(t.split(':')[1]); if(h>=24) h-=24; const endRaw = d.replace(/-/g, '') + 'T' + (h<10?'0':'')+h + (m<10?'0':'')+m + '00'; const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Cut: ${c.name}\nDTSTART:${startRaw}\nDTEND:${endRaw}\nLOCATION:${loc}\nDESCRIPTION:${c.notes||'Haircut'}\nEND:VEVENT\nEND:VCALENDAR`; const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([ics], {type: 'text/calendar'})); a.download = 'appointment.ics'; document.body.appendChild(a); a.click(); document.body.removeChild(a); closeModals(); }
     </script>
 </body>
 </html>
