@@ -91,14 +91,14 @@
         .bank-val { font-size: 1.3rem; font-weight: 900; }
         .bank-lbl { font-size: 0.6rem; font-weight: 700; color: var(--subtext); text-transform: uppercase; }
         
-        /* NOTES AREA - FIXED */
+        /* NOTES AREA */
         .detail-box { flex: 1; background: var(--card); padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px; }
         .detail-lbl { font-size: 0.65rem; color: var(--accent); font-weight: 800; margin-bottom: 6px; letter-spacing: 1px; }
         .detail-txt { 
             font-size: 0.95rem; 
             line-height: 1.5; 
-            white-space: pre-wrap; /* Respects Enter key */
-            word-wrap: break-word; /* Prevents overflow */
+            white-space: pre-wrap; 
+            word-wrap: break-word; 
             overflow-wrap: break-word;
             color: var(--text);
         }
@@ -115,7 +115,7 @@
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: flex-start; overflow-y: auto; padding: 20px 0; }
         .modal-content { background: var(--card); width: 90%; max-width: 400px; padding: 20px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.5); margin-bottom: 80px; }
 
-        /* ZONES & FORMS */
+        /* ZONES */
         .zone { border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid transparent; }
         .z-blue { background: rgba(59, 130, 246, 0.05); border-color: rgba(59, 130, 246, 0.2); } .z-blue .z-title { color: var(--blue); }
         .z-gold { background: rgba(245, 158, 11, 0.05); border-color: rgba(245, 158, 11, 0.2); } .z-gold .z-title { color: var(--gold); }
@@ -135,9 +135,6 @@
         
         /* LIST OPTIONS */
         .list-option { width: 100%; padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; font-size: 1rem; background: var(--card); color: var(--text); text-align: left; border:none; }
-        .list-option:last-child { border-bottom: none; }
-
-        /* DROPDOWN */
         .dropdown { position: absolute; top: 60px; right: 15px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; display: none; flex-direction: column; width: 180px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 200; }
         .dropdown.show { display: flex; }
 
@@ -296,7 +293,7 @@
                     <div class="form-group"><label class="form-lbl">Referred By</label><input id="c-ref" class="form-input" list="ref-list" oninput="updateRefList()"></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label class="form-lbl">Freq (Wks)</label><input type="number" id="c-freq" class="form-input" placeholder="2"></div>
+                    <div class="form-group"><label class="form-lbl">Freq (Wks)</label><input type="number" id="c-freq" class="form-input" placeholder="4"></div>
                     <div class="form-group"><label class="form-lbl">Last Cut</label><div class="input-group-date"><input type="date" id="c-last" class="form-input"><button class="btn-today" onclick="setToday('c-last')">Today</button></div></div>
                 </div>
             </div>
@@ -320,6 +317,13 @@
         if(localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
         render();
 
+        // DATE HELPER to prevent offset issues
+        function dateToLocal(dateStr) {
+            if(!dateStr) return null;
+            const parts = dateStr.split('-');
+            return new Date(parts[0], parts[1] - 1, parts[2]); 
+        }
+
         function render() {
             updateDash();
             const list = document.getElementById('client-list');
@@ -336,7 +340,7 @@
 
             if(filterType === 'due') visible = visible.filter(c => getDueDate(c) <= today);
             if(filterType === 'bday') visible = visible.filter(c => isThisWeek(c.dob));
-            if(filterType === 'ghosts') visible = visible.filter(c => c.lastVisit && Math.ceil((today - new Date(c.lastVisit))/86400000) > 90);
+            if(filterType === 'ghosts') visible = visible.filter(c => c.lastVisit && Math.ceil((today - dateToLocal(c.lastVisit))/86400000) > 90);
 
             visible.sort((a,b) => a.name.localeCompare(b.name));
 
@@ -356,8 +360,10 @@
                 
                 let lastCutTxt = 'New';
                 if(c.lastVisit) {
-                    const d = new Date(c.lastVisit);
-                    lastCutTxt = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    // Force display of string without timezone conversion
+                    const [y, m, d] = c.lastVisit.split('-');
+                    const dateObj = new Date(y, m-1, d);
+                    lastCutTxt = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                 }
                 
                 let cardClass = daysTill < 0 ? 'card-header due' : 'card-header';
@@ -404,34 +410,18 @@
             });
         }
 
-        // --- CUT LOGIC (STREAMLINED + BIRTHDAY) ---
+        // --- CUT LOGIC ---
         function startCutFlow(id) {
             const c = clients.find(x=>x.id==id);
-            
-            // 1. Birthday Check (Priority)
-            if(isThisWeek(c.dob)) {
-                customConfirm("🎂 Birthday Week!\nRedeem 1/2 OFF Cut?",
-                    () => { // YES 1/2 OFF
-                        proceedToPaid(c, true); 
-                    },
-                    () => { // NO, Check Free
-                        checkFreeCut(c);
-                    }
-                );
-            } else {
-                checkFreeCut(c);
-            }
-        }
-
-        function checkFreeCut(c) {
             if(c.free > 0) {
                 customConfirm(`🌟 Client has ${c.free} FREE CUT available.\nRedeem it now?`, 
-                    () => { 
-                        c.free--;
-                        c.redeemedVal = (c.redeemedVal || 0) + (c.price || 35); 
-                        processStats(c, 0); 
-                    },
+                    () => { c.free--; c.redeemedVal=(c.redeemedVal||0)+(c.price||35); processStats(c, 0); },
                     () => { proceedToPaid(c, false); } 
+                );
+            } else if (isThisWeek(c.dob)) {
+                customConfirm("🎂 Birthday Week!\nRedeem 1/2 OFF Cut?",
+                    () => { proceedToPaid(c, true); },
+                    () => { proceedToPaid(c, false); }
                 );
             } else {
                 proceedToPaid(c, false);
@@ -473,36 +463,7 @@
             save(); render();
         }
 
-        // --- CREDIT MANAGER ---
-        function openCreditModal() {
-            updateRefList();
-            document.getElementById('credit-input').value = '';
-            document.getElementById('credit-modal').style.display = 'flex';
-        }
-        function applyCredit() {
-            const name = document.getElementById('credit-input').value;
-            const c = clients.find(x => x.name.toLowerCase() === name.toLowerCase());
-            if(c) { c.credit += 5; save(); render(); alert(`$5 added to ${c.name}`); closeModals(); }
-            else { alert("Client not found."); }
-        }
-
-        // --- GLOBAL STATS ---
-        function openSettings() {
-            let rev = clients.reduce((a,b)=>a+(b.ltv||0),0);
-            let cuts = clients.reduce((a,b)=>a+(b.cuts||0),0);
-            let refs = clients.filter(c=>c.ref && c.ref.length>0).length;
-            let red = clients.reduce((a,b)=>a+(b.redeemedVal||0),0);
-
-            document.getElementById('st-rev').innerText = `$${rev}`;
-            document.getElementById('st-cuts').innerText = cuts;
-            document.getElementById('st-ref').innerText = refs;
-            document.getElementById('st-red').innerText = `$${red}`;
-
-            document.getElementById('s-shop-addr').value = shopSettings.addr;
-            document.getElementById('settings-modal').style.display = 'flex';
-        }
-
-        // --- SCHEDULING (BLOB FIX) ---
+        // --- SCHEDULING (BLOB) ---
         function openSchedule(id) {
             const c=clients.find(x=>x.id==id); document.getElementById('cal-id').value=id;
             document.getElementById('cal-date').value=new Date().toISOString().split('T')[0];
@@ -519,16 +480,12 @@
             if(!d||!t) return alert("Date/Time needed");
             
             const startRaw = d.replace(/-/g, '') + 'T' + t.replace(/:/g, '') + '00';
-            
-            // 2 HOURS
-            let h = parseInt(t.split(':')[0]) + 2; 
-            let m = parseInt(t.split(':')[1]);
+            let h = parseInt(t.split(':')[0]) + 2; let m = parseInt(t.split(':')[1]);
             if(h>=24) h-=24;
             const endRaw = d.replace(/-/g, '') + 'T' + (h<10?'0':'')+h + (m<10?'0':'')+m + '00';
 
             const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Cut: ${c.name}\nDTSTART:${startRaw}\nDTEND:${endRaw}\nLOCATION:${loc}\nDESCRIPTION:${c.notes||'Haircut'}\nEND:VEVENT\nEND:VCALENDAR`;
             
-            // BLOB DOWNLOAD METHOD
             const a = document.createElement('a');
             a.href = URL.createObjectURL(new Blob([ics], {type: 'text/calendar'}));
             a.download = 'appointment.ics';
@@ -537,29 +494,26 @@
         }
 
         // --- UTILS ---
-        function updateRefList() {
-            const dl = document.getElementById('ref-list'); dl.innerHTML = '';
-            clients.forEach(cl => { dl.innerHTML += `<option value="${cl.name}">`; });
-        }
         function openClientModal(id) {
-            const c = id ? clients.find(x=>x.id==id) : {id:'',name:'',phone:'',price:35,addr:'',social:'',dob:'',start:new Date().toISOString().split('T')[0],ref:'',freq:'',last:'',notes:''};
+            const c = id ? clients.find(x=>x.id==id) : {id:'',name:'',phone:'',price:35,addr:'',social:'',dob:'',start:new Date().toISOString().split('T')[0],ref:'',freq:4,last:'',notes:''};
             for(let k in c) if(document.getElementById('c-'+k)) document.getElementById('c-'+k).value = c[k];
-            updateRefList();
-            document.getElementById('client-modal').style.display = 'flex';
+            updateRefList(); document.getElementById('client-modal').style.display = 'flex';
         }
         
         function saveClient() {
             const id = document.getElementById('c-id').value;
             const name = document.getElementById('c-name').value;
             if(!name) return alert("Name required");
-            const ref = document.getElementById('c-ref').value;
             
+            const lastVal = document.getElementById('c-last').value;
             let data = {
                 name, phone: document.getElementById('c-phone').value,
                 price: parseFloat(document.getElementById('c-price').value)||35,
                 addr: document.getElementById('c-addr').value, social: document.getElementById('c-social').value,
-                dob: document.getElementById('c-dob').value, start: document.getElementById('c-start').value, ref,
-                freq: parseInt(document.getElementById('c-freq').value)||0, lastVisit: document.getElementById('c-last').value,
+                dob: document.getElementById('c-dob').value, start: document.getElementById('c-start').value, 
+                ref: document.getElementById('c-ref').value,
+                freq: parseInt(document.getElementById('c-freq').value)||4, 
+                lastVisit: lastVal,
                 notes: document.getElementById('c-notes').value
             };
 
@@ -568,88 +522,69 @@
                 clients[idx] = {...clients[idx], ...data};
             } else {
                 data.id = Date.now().toString(); data.cuts=0; data.free=0; data.credit=0; data.ltv=0; data.loyalty=0; data.redeemedVal=0;
-                clients.push(data);
-                if(ref) {
-                    const referrer = clients.find(c => c.name.toLowerCase() === ref.toLowerCase() && c.id !== data.id);
-                    if(referrer) { referrer.credit+=5; data.credit+=5; alert("Referral linked! $5 credits."); }
+                // If new client has a last cut date, count it as first cut?
+                if(lastVal) {
+                    if(confirm("Count the 'Last Cut' date as their 1st cut?")) {
+                        data.cuts = 1; data.loyalty = 1;
+                    }
                 }
+                clients.push(data);
+                const referrer = clients.find(c => c.name.toLowerCase() === data.ref.toLowerCase() && c.id !== data.id);
+                if(referrer) { referrer.credit+=5; data.credit+=5; alert("Referral linked! $5 credits."); }
             }
             save(); closeModals(); render();
         }
 
-        function viewFull(id) {
-            const c = clients.find(x=>x.id==id); tempId=id;
-            document.getElementById('ro-title').innerText = c.name;
-            const fmt = (d) => d ? new Date(d).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) : '-';
-            let html = `<div class="ro-row"><div class="ro-lbl">Phone</div><div class="ro-val">${c.phone||'-'}</div></div>
-                        <div class="ro-row"><div class="ro-lbl">Address</div><div class="ro-val">${c.addr||'-'}</div></div>
-                        <div class="ro-row"><div class="ro-lbl">Social</div><div class="ro-val">${c.social||'-'}</div></div>
-                        <div class="ro-row"><div class="ro-lbl">Birthday</div><div class="ro-val">${fmt(c.dob)}</div></div>
-                        <div class="ro-row"><div class="ro-lbl">First Cut</div><div class="ro-val">${fmt(c.start)}</div></div>
-                        <div class="ro-row"><div class="ro-lbl">Last Cut</div><div class="ro-val">${fmt(c.lastVisit)}</div></div>
-                        <div class="ro-row"><div class="ro-lbl">Referred By</div><div class="ro-val">${c.ref||'-'}</div></div>
-                        <div class="ro-row"><div class="ro-lbl">Default $</div><div class="ro-val">$${c.price||35}</div></div>`;
-            document.getElementById('ro-content').innerHTML = html;
-            document.getElementById('profile-modal').style.display = 'flex';
-        }
-        function editFromProfile() { closeModals(); openClientModal(tempId); }
-
-        function openText(id) {
-            const c = clients.find(x=>x.id==id);
-            if(!c.phone) return alert("No phone.");
-            const n = c.name.split(' ')[0];
-            const opts = [
-                {lbl:"Running Late", txt:`Hey ${n}, running a bit behind schedule. Thanks!`},
-                {lbl:"Confirm Cut", txt:`Hey ${n}, confirming our cut tomorrow. Still good?`},
-                {lbl:"Follow Up", txt:`Hey ${n}, checking in on the fresh cut. All good?`},
-                {lbl:"Custom", txt:''}
-            ];
-            const sep = navigator.userAgent.match(/iPhone|iPad/i) ? '&' : '?';
-            openListModal("Send Text", opts.map(o=>({
-                lbl: o.lbl, fn: ()=>{ window.location = `sms:${c.phone}${sep}body=${encodeURIComponent(o.txt)}`; }
-            })));
+        // --- REDEEM ANNIVERSARY ---
+        function openRedeem(id) {
+            const c=clients.find(x=>x.id==id);
+            const opts=[];
+            if(isThisWeek(c.start)) opts.push({lbl:"🎉 Redeem Anniversary Cut", fn:()=>{
+                const price = prompt("Enter Tip Amount (or 0):", 0);
+                const tip = parseFloat(price)||0;
+                c.redeemedVal=(c.redeemedVal||0)+(c.price||35);
+                c.lastVisit = new Date().toISOString().split('T')[0];
+                c.cuts++;
+                c.ltv+=tip; // Only tip counts to revenue
+                save(); render();
+            }});
+            if(c.free>0) opts.push({lbl:`Use Free Cut (${c.free})`, fn:()=>{ c.free--; c.redeemedVal=(c.redeemedVal||0)+(c.price||35); save(); render(); }});
+            if(c.credit>0) opts.push({lbl:`Use Credit ($${c.credit})`, fn:()=>{
+               const u=prompt("Amt:",c.credit); if(u) { c.credit-=Math.min(parseFloat(u),c.credit); save(); render(); }
+            }});
+            if(opts.length===0) return alert("No rewards.");
+            openListModal("Redeem", opts);
         }
 
-        // --- CORE ---
-        function updateDash() {
-            const today=new Date(); today.setHours(0,0,0,0);
-            let counts={due:0, bday:0, ghost:0, all:clients.length};
-            clients.forEach(c=>{
-                if(getDueDate(c)<=today) counts.due++;
-                if(isThisWeek(c.dob)) counts.bday++;
-                if(c.lastVisit && Math.ceil((today-new Date(c.lastVisit))/86400000)>90) counts.ghost++;
-            });
-            document.getElementById('d-due').innerText=counts.due; document.getElementById('d-bday').innerText=counts.bday;
-            document.getElementById('d-ghost').innerText=counts.ghost; document.getElementById('d-all').innerText=counts.all;
-        }
-        function customConfirm(msg,yes,no) {
-            document.getElementById('confirm-msg').innerText=msg; document.getElementById('confirm-modal').style.display='flex';
-            document.getElementById('btn-yes').onclick=()=>{document.getElementById('confirm-modal').style.display='none';yes();};
-            document.getElementById('btn-no').onclick=()=>{document.getElementById('confirm-modal').style.display='none';if(no)no();};
-        }
-        function openListModal(title, options, callback) {
+        // --- HELPERS ---
+        function updateRefList() { const dl=document.getElementById('ref-list'); dl.innerHTML=''; clients.forEach(cl=>{dl.innerHTML+=`<option value="${cl.name}">`}); }
+        function openCreditModal() { updateRefList(); document.getElementById('credit-input').value=''; document.getElementById('credit-modal').style.display='flex'; }
+        function applyCredit() { const n=document.getElementById('credit-input').value; const c=clients.find(x=>x.name.toLowerCase()===n.toLowerCase()); if(c){c.credit+=5;save();render();alert("Credit Added");closeModals();}else alert("Not found"); }
+        function getDueDate(c) { if(!c.lastVisit||!c.freq)return null; const d=dateToLocal(c.lastVisit); d.setDate(d.getDate()+(c.freq*7)); return d; }
+        function isThisWeek(dStr) { if(!dStr)return false; const d=dateToLocal(dStr); const n=new Date(); n.setHours(0,0,0,0); const ty=new Date(n.getFullYear(),d.getMonth(),d.getDate()); const diff=(ty-n)/86400000; return diff>=-7 && diff<=7; }
+        function getYears(dStr) { if(!dStr)return 0; return new Date().getFullYear()-dateToLocal(dStr).getFullYear(); }
+        function setToday(id) { document.getElementById(id).value=new Date().toISOString().split('T')[0]; }
+        function filter(t,el) { filterType=t; document.querySelectorAll('.dash-card').forEach(d=>d.classList.remove('active')); el.classList.add('active'); render(); }
+        function save() { localStorage.setItem('bb_clients_v3', JSON.stringify(clients)); }
+        function toggleMenu() { document.getElementById('save-menu').classList.toggle('show'); }
+        function closeModals() { document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); }
+        function openText(id) { const c=clients.find(x=>x.id==id); window.location=`sms:${c.phone}`; }
+        function openSettings() { document.getElementById('s-shop-addr').value=shopSettings.addr; document.getElementById('settings-modal').style.display='flex'; }
+        function saveSettings() { shopSettings.addr=document.getElementById('s-shop-addr').value; localStorage.setItem('bb_settings', JSON.stringify(shopSettings)); closeModals(); }
+        
+        function openListModal(title, options) {
             document.getElementById('list-title').innerText = title;
             const container = document.getElementById('list-options'); container.innerHTML = '';
             options.forEach(o => {
                 const btn = document.createElement('button'); btn.className = 'list-option';
-                btn.innerText = o.lbl; btn.onclick = () => { o.fn(); closeModals(); if(callback) callback(); };
+                btn.innerText = o.lbl; btn.onclick = () => { o.fn(); closeModals(); };
                 container.appendChild(btn);
             });
             document.getElementById('list-modal').style.display = 'flex';
         }
-        function getDueDate(c) { if(!c.lastVisit||!c.freq)return null; const d=new Date(c.lastVisit); d.setDate(d.getDate()+(c.freq*7)); d.setHours(0,0,0,0); return d; }
-        function isThisWeek(dStr) { if(!dStr)return false; const d=new Date(dStr); const n=new Date(); n.setHours(0,0,0,0); const ty=new Date(n.getFullYear(),d.getMonth(),d.getDate()+1); const diff=Math.ceil((ty-n)/86400000); return diff>=0&&diff<=7; }
-        function getYears(dStr) { if(!dStr)return 0; return new Date().getFullYear()-new Date(dStr).getFullYear(); }
-        function setToday(id) { document.getElementById(id).value = new Date().toISOString().split('T')[0]; }
-        function fill(id,v) { document.getElementById(id).value=v; }
-        function filter(t,el) { filterType=t; document.querySelectorAll('.dash-card').forEach(d=>d.classList.remove('active')); el.classList.add('active'); render(); }
-        function toggleMenu() { document.getElementById('save-menu').classList.toggle('show'); }
-        function toggleTheme() { document.body.classList.toggle('light-mode'); localStorage.setItem('theme', document.body.classList.contains('light-mode')?'light':'dark'); }
-        function closeModals() { document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); }
-        function save() { localStorage.setItem('bb_clients_v3', JSON.stringify(clients)); }
-        function saveSettings() { shopSettings.addr=document.getElementById('s-shop-addr').value; localStorage.setItem('bb_settings', JSON.stringify(shopSettings)); closeModals(); }
-        function exportData(type) { toggleMenu(); if(type==='json'){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(clients)],{type:'application/json'})); a.download=`bb_${Date.now()}.json`; a.click();} else { let csv="Name,Phone,LTV\n"+clients.map(c=>`"${c.name}","${c.phone}",${c.ltv}`).join('\n'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=`bb.csv`; a.click(); }}
-        function importData(el) { if(!el.files[0])return; const fr=new FileReader(); fr.onload=e=>{clients=JSON.parse(e.target.result); save(); render(); alert("Restored!");}; fr.readAsText(el.files[0]); }
+        function toggleTheme() { document.body.classList.toggle('light-mode'); }
+        function exportData(type) { toggleMenu(); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(clients)],{type:'application/json'})); a.download='backup.json'; a.click(); }
+        function importData(el) { if(!el.files[0])return; const fr=new FileReader(); fr.onload=e=>{clients=JSON.parse(e.target.result);save();render();alert("Done");}; fr.readAsText(el.files[0]); }
     </script>
 </body>
 </html>
