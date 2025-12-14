@@ -92,10 +92,9 @@
         .h-0 { color: var(--subtext); } .h-1 { color: var(--p-purple); } .h-2 { color: var(--p-green); }
         .task-list { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 12px; }
         
-        /* EMPTY STATE */
         .empty-msg { text-align: center; color: var(--subtext); font-style: italic; font-size: 0.8rem; margin-top: 50px; opacity: 0.5; }
 
-        /* CARDS & ANIMATIONS */
+        /* CARDS */
         .card { 
             background: var(--card-bg); padding: 16px; border-radius: var(--radius); 
             box-shadow: var(--shadow); transition: transform 0.2s, opacity 0.2s; 
@@ -103,11 +102,14 @@
         }
         .card:active { transform: scale(0.98); }
         
-        /* Slide Animations */
+        /* Quick Move Arrows */
+        .card-actions { display:flex; gap:10px; margin-top:10px; justify-content:space-between; align-items:center;}
+        .btn-quick { background: var(--col-bg); border:1px solid var(--border); color:var(--text); width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+
+        /* Animations */
         @keyframes slideOutRight { to { transform: translateX(100%); opacity: 0; } }
         @keyframes slideOutLeft { to { transform: translateX(-100%); opacity: 0; } }
         @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
         .slide-right { animation: slideOutRight 0.3s forwards; }
         .slide-left { animation: slideOutLeft 0.3s forwards; }
         .slide-enter { animation: slideIn 0.3s forwards; }
@@ -117,7 +119,6 @@
         .card-date { font-size: 0.7rem; background: var(--border); padding: 4px 8px; border-radius: 6px; color: var(--subtext); height: fit-content; font-weight: 600; }
         .card-date.overdue { background: var(--p-red); color: #000; }
         
-        /* Priority Badge Pills */
         .prio-pill { font-size: 0.65rem; padding: 3px 8px; border-radius: 10px; font-weight: 800; text-transform: uppercase; margin-right: 5px; color:#000; }
         .pill-High { background: var(--p-red); }
         .pill-Med { background: var(--p-orange); }
@@ -140,9 +141,11 @@
 
         .form-label { display: block; font-size: 0.75rem; color: var(--subtext); font-weight: 800; margin-bottom: 8px; letter-spacing: 1px; }
         .form-input { width: 100%; padding: 14px; background: var(--col-bg); border: 1px solid var(--border); color: var(--text); border-radius: 12px; font-size: 1.1rem; box-sizing: border-box; margin-bottom: 18px; }
-        .form-row { display: flex; gap: 12px; margin-bottom: 18px; }
-        .prio-select { display: flex; gap: 6px; background: var(--col-bg); padding: 6px; border-radius: 14px; height: 100%; box-sizing: border-box; }
-        .prio-opt { flex: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 0.85rem; font-weight: bold; cursor: pointer; color: var(--subtext); transition: 0.2s; }
+        
+        /* FIXED ALIGNMENT FOR DATE/PRIORITY */
+        .form-row { display: flex; gap: 12px; margin-bottom: 18px; align-items: stretch; }
+        .prio-select { display: flex; gap: 6px; background: var(--col-bg); padding: 6px; border-radius: 14px; box-sizing: border-box; flex:1; border:1px solid var(--border); align-items: center; justify-content: center; }
+        .prio-opt { flex: 1; padding: 10px 0; text-align: center; border-radius: 10px; font-size: 0.85rem; font-weight: bold; cursor: pointer; color: var(--subtext); transition: 0.2s; }
         .prio-opt.active[data-val="Low"] { background: var(--p-blue); color: #000; }
         .prio-opt.active[data-val="Med"] { background: var(--p-orange); color: #000; }
         .prio-opt.active[data-val="High"] { background: var(--p-red); color: #000; }
@@ -159,17 +162,9 @@
         .btn-sec { width: 100%; padding: 14px; background: transparent; border: 1px solid var(--border); color: var(--subtext); border-radius: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 0.95rem; }
         .btn-cal { background: var(--col-bg); color: var(--text); border: 1px solid var(--border); padding: 10px; border-radius: 10px; font-size: 0.85rem; cursor: pointer; margin-top: 5px; width: 100%; text-align: center;}
 
-        /* TOAST & UNDO */
-        #xp-toast {
-            position: fixed; top: 90px; left: 50%; transform: translateX(-50%);
-            background: var(--p-green); color: black; font-weight: 900;
-            padding: 10px 20px; border-radius: 20px; opacity: 0; pointer-events: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: opacity 0.3s, transform 0.3s;
-            z-index: 2000; font-size: 1.1rem; display: flex; align-items: center; gap: 10px;
-        }
+        #xp-toast { position: fixed; top: 90px; left: 50%; transform: translateX(-50%); background: var(--p-green); color: black; font-weight: 900; padding: 10px 20px; border-radius: 20px; opacity: 0; pointer-events: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: opacity 0.3s, transform 0.3s; z-index: 2000; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
         #xp-toast.loss { background: var(--p-red); }
         #xp-toast.crit { background: var(--gold); border: 2px solid white; transform: translateX(-50%) scale(1.2); }
-        
         .btn-undo { background: black; color: white; padding: 5px 10px; border-radius: 10px; border: 1px solid white; font-size: 0.8rem; cursor: pointer; pointer-events: auto; }
 
         .confetti { position: fixed; width: 20px; height: 20px; top: -20px; z-index: 3000; font-size:20px; text-align:center; }
@@ -180,14 +175,7 @@
         .dd-badge { font-size: 0.65rem; background: var(--border); padding: 2px 6px; border-radius: 4px; color: var(--subtext); font-weight: bold; }
         .dd-sect { padding:10px; font-size:0.7rem; color:var(--subtext); font-weight:bold; background:var(--col-bg); letter-spacing:1px; }
         
-        /* CODEX */
-        #codex-popup { 
-            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); 
-            background: var(--card-bg); border: 1px solid var(--p-purple); 
-            padding: 15px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            max-width: 90%; width: 300px; z-index: 2000; opacity: 0; pointer-events: none;
-            transition: 0.5s; text-align: center;
-        }
+        #codex-popup { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--card-bg); border: 1px solid var(--p-purple); padding: 15px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); max-width: 90%; width: 300px; z-index: 2000; opacity: 0; pointer-events: none; transition: 0.5s; text-align: center; }
         #codex-popup.active { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
         .codex-text { font-style: italic; font-size: 0.9rem; color: var(--text); margin-bottom: 5px; }
         .codex-src { font-size: 0.7rem; color: var(--p-purple); font-weight: bold; text-transform: uppercase; }
@@ -221,37 +209,37 @@
 
     <div id="save-menu" class="dropdown">
         <div class="dd-sect">AUDIO & FX</div>
-        <button class="dd-item" onclick="toggleSound()">🔊 Sound FX <span class="dd-badge" id="snd-stat">ON</span></button>
-        <button class="dd-item" onclick="setConfetti('square')">◼️ Classic</button>
-        <button class="dd-item" id="fx-star" onclick="setConfetti('star')">⭐ Stars <span class="dd-badge">LVL 10</span></button>
-        <button class="dd-item" id="fx-coin" onclick="setConfetti('coin')">🪙 Coins <span class="dd-badge">LVL 20</span></button>
-        <button class="dd-item" id="fx-gem" onclick="setConfetti('gem')">💎 Gems <span class="dd-badge">LVL 30</span></button>
+        <button class="dd-item" onclick="toggleSound(); closeMenu()">🔊 Sound FX <span class="dd-badge" id="snd-stat">ON</span></button>
+        <button class="dd-item" onclick="setConfetti('square'); closeMenu()">🎉 Paper</button>
+        <button class="dd-item" id="fx-star" onclick="setConfetti('star'); closeMenu()">⭐ Stars <span class="dd-badge">LVL 10</span></button>
+        <button class="dd-item" id="fx-coin" onclick="setConfetti('coin'); closeMenu()">🪙 Coins <span class="dd-badge">LVL 20</span></button>
+        <button class="dd-item" id="fx-gem" onclick="setConfetti('gem'); closeMenu()">💎 Gems <span class="dd-badge">LVL 30</span></button>
 
         <div class="dd-sect">THEME LOCKER</div>
-        <button class="dd-item" onclick="setTheme('default')">Tactical Dark</button>
-        <button class="dd-item" onclick="setTheme('light')">Clean Light</button>
-        <button class="dd-item" id="theme-wolf" onclick="setTheme('wolf')">The Wolf <span class="dd-badge">LVL 5</span></button>
-        <button class="dd-item" id="theme-neon" onclick="setTheme('neon')">Neon City <span class="dd-badge">LVL 10</span></button>
-        <button class="dd-item" id="theme-aperture" onclick="setTheme('aperture')">Aperture <span class="dd-badge">LVL 12</span></button>
-        <button class="dd-item" id="theme-horror" onclick="setTheme('horror')">Eldritch <span class="dd-badge">LVL 15</span></button>
-        <button class="dd-item" id="theme-vapor" onclick="setTheme('vapor')">Vaporwave <span class="dd-badge">LVL 18</span></button>
-        <button class="dd-item" id="theme-blueprint" onclick="setTheme('blueprint')">Blueprint <span class="dd-badge">LVL 20</span></button>
-        <button class="dd-item" id="theme-terminal" onclick="setTheme('terminal')">Terminal <span class="dd-badge">LVL 25</span></button>
-        <button class="dd-item" id="theme-gold" onclick="setTheme('gold')">Gold Standard <span class="dd-badge">LVL 30</span></button>
+        <button class="dd-item" onclick="setTheme('default'); closeMenu()">Tactical Dark</button>
+        <button class="dd-item" onclick="setTheme('light'); closeMenu()">Clean Light</button>
+        <button class="dd-item" id="theme-wolf" onclick="setTheme('wolf'); closeMenu()">The Wolf <span class="dd-badge">LVL 5</span></button>
+        <button class="dd-item" id="theme-neon" onclick="setTheme('neon'); closeMenu()">Neon City <span class="dd-badge">LVL 10</span></button>
+        <button class="dd-item" id="theme-aperture" onclick="setTheme('aperture'); closeMenu()">Aperture <span class="dd-badge">LVL 12</span></button>
+        <button class="dd-item" id="theme-horror" onclick="setTheme('horror'); closeMenu()">Eldritch <span class="dd-badge">LVL 15</span></button>
+        <button class="dd-item" id="theme-vapor" onclick="setTheme('vapor'); closeMenu()">Vaporwave <span class="dd-badge">LVL 18</span></button>
+        <button class="dd-item" id="theme-blueprint" onclick="setTheme('blueprint'); closeMenu()">Blueprint <span class="dd-badge">LVL 20</span></button>
+        <button class="dd-item" id="theme-terminal" onclick="setTheme('terminal'); closeMenu()">Terminal <span class="dd-badge">LVL 25</span></button>
+        <button class="dd-item" id="theme-gold" onclick="setTheme('gold'); closeMenu()">Gold Standard <span class="dd-badge">LVL 30</span></button>
         
         <div class="dd-sect" style="color:var(--p-orange)">PRESTIGE TIERS</div>
-        <button class="dd-item" id="theme-nebula" onclick="setTheme('nebula')">Nebula <span class="dd-badge" style="background:var(--p-purple);color:#000">P 1</span></button>
-        <button class="dd-item" id="theme-midas" onclick="setTheme('midas')">Midas <span class="dd-badge" style="background:var(--p-orange);color:#000">P 2</span></button>
-        <button class="dd-item" id="theme-glitch" onclick="setTheme('glitch')">The Glitch <span class="dd-badge" style="background:var(--p-red);color:#000">P 3</span></button>
+        <button class="dd-item" id="theme-nebula" onclick="setTheme('nebula'); closeMenu()">Nebula <span class="dd-badge" style="background:var(--p-purple);color:#000">P 1</span></button>
+        <button class="dd-item" id="theme-midas" onclick="setTheme('midas'); closeMenu()">Midas <span class="dd-badge" style="background:var(--p-orange);color:#000">P 2</span></button>
+        <button class="dd-item" id="theme-glitch" onclick="setTheme('glitch'); closeMenu()">The Glitch <span class="dd-badge" style="background:var(--p-red);color:#000">P 3</span></button>
 
         <div class="dd-sect">UPGRADES</div>
-        <button class="dd-item" id="feat-status" onclick="showStatusReport()">📊 Status Report <span class="dd-badge">LVL 2</span></button>
-        <button class="dd-item" id="feat-zen" onclick="toggleZen()">🧘 Zen Mode <span class="dd-badge">LVL 8</span></button>
-        <button class="dd-item" id="feat-prestige" onclick="doPrestige()" style="color:var(--p-orange)">🎖️ PRESTIGE <span class="dd-badge">LVL 50</span></button>
+        <button class="dd-item" id="feat-status" onclick="showStatusReport(); closeMenu()">📊 Status Report <span class="dd-badge">LVL 2</span></button>
+        <button class="dd-item" id="feat-zen" onclick="toggleZen(); closeMenu()">🧘 Zen Mode <span class="dd-badge">LVL 8</span></button>
+        <button class="dd-item" id="feat-prestige" onclick="doPrestige(); closeMenu()" style="color:var(--p-orange)">🎖️ PRESTIGE <span class="dd-badge">LVL 50</span></button>
 
         <div class="dd-sect">DATA</div>
-        <button class="dd-item" onclick="exportData()">Backup</button>
-        <button class="dd-item" onclick="document.getElementById('file-input').click()">Restore</button>
+        <button class="dd-item" onclick="exportData(); closeMenu()">Backup</button>
+        <button class="dd-item" onclick="document.getElementById('file-input').click(); closeMenu()">Restore</button>
     </div>
     <input type="file" id="file-input" hidden onchange="importData(this)">
 
@@ -272,8 +260,8 @@
             <div class="form-row">
                 <div style="flex:1">
                     <span class="form-label">DEADLINE</span>
-                    <input type="date" id="t-date" class="form-input" style="margin-bottom:0;">
-                    <button class="btn-cal" onclick="addToCalendar()" id="btn-cal-sync" style="display:none;">📅 Sync Calendar</button>
+                    <input type="date" id="t-date" class="form-input" style="margin-bottom:0; height:45px;">
+                    <button class="btn-cal" onclick="addToCalendar()" id="btn-cal-sync" style="display:none;">📅 Sync</button>
                 </div>
                 <div style="flex:1">
                     <span class="form-label">PRIORITY</span>
@@ -287,11 +275,10 @@
             </div>
             <span class="form-label">TACTICAL CHECKLIST (+10 XP)</span>
             <div id="checklist-container"></div>
-            <button class="btn-sec" onclick="addCheckItem()" style="border-style:dashed; color:var(--p-purple); border-color:var(--p-purple);">+ Add Step</button>
-            <div class="form-row" id="move-controls" style="margin-top:20px; display:none;">
-                <button class="btn-sec" onclick="moveCardAnim(-1)">⬅️ Back</button>
-                <button class="btn-sec" onclick="moveCardAnim(1)">Advance ➡️</button>
+            <div class="form-row" style="margin-top:10px;">
+                <input id="new-step-input" class="form-input" placeholder="+ Add Step (Press Enter)" style="margin-bottom:0;" onkeypress="handleStepEnter(event)">
             </div>
+            
             <button class="btn-main" onclick="saveCard()">SAVE MISSION</button>
             <div class="form-row" style="margin-top:10px;">
                 <button class="btn-sec" id="btn-archive-toggle" onclick="toggleArchive()">🧊 Cryo-Sleep</button>
@@ -390,7 +377,6 @@
             localStorage.setItem('mc_xp', userXP);
             localStorage.setItem('mc_prestige', prestige);
             const stats = getLevel(userXP);
-            
             const range = stats.nextReq - stats.prevReq;
             const current = userXP - stats.prevReq;
             const pct = Math.max(0, Math.min(100, (current / range) * 100));
@@ -427,7 +413,7 @@
             if(confirm("WARNING: Resets Level to 1. Keeps Themes & Unlocks Story Chapter. Do it?")) {
                 userXP = 0; prestige++; updateXP(); sfx('lvlup');
                 alert(`PRESTIGE ${prestige} UNLOCKED! Story Chapter ${prestige} Available.`);
-                toggleMenu();
+                closeMenu();
             }
         }
 
@@ -530,7 +516,6 @@
             if(name !== 'default') document.body.classList.add(`theme-${name}`);
             currentTheme = name;
             localStorage.setItem('theme', name);
-            toggleMenu(); 
         }
 
         function setConfetti(type) {
@@ -540,7 +525,6 @@
             confettiStyle = type;
             localStorage.setItem('mc_fx', type);
             alert(`Effect Set: ${type.toUpperCase()}`);
-            toggleMenu();
         }
 
         function launchConfetti() {
@@ -581,13 +565,20 @@
                 const div = document.createElement('div');
                 div.className = `card slide-enter p-${t.prio||'Med'}`;
                 div.id = `card-${t.id}`;
+                // Quick actions
+                const actions = `
+                    <div class="card-actions">
+                        <div class="btn-quick" onclick="event.stopPropagation(); moveCardLogic(${tasks.indexOf(t)}, -1)">←</div>
+                        <div class="btn-quick" onclick="event.stopPropagation(); moveCardLogic(${tasks.indexOf(t)}, 1)">→</div>
+                    </div>
+                `;
                 div.onclick = () => openModal(t.id);
                 div.innerHTML = `<div class="card-top"><span class="card-title">${t.title}</span>${dateHtml}</div>
                                  <span class="prio-pill pill-${t.prio}">${t.prio}</span>
                                  <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
-                                 <div class="card-meta"><span>${done}/${total} Steps</span><span>${pct.toFixed(0)}%</span></div>`;
+                                 <div class="card-meta"><span>${done}/${total} Steps</span><span>${pct.toFixed(0)}%</span></div>
+                                 ${actions}`;
                 const colId = t.col !== undefined ? t.col : 0;
-                // Empty State Logic
                 document.getElementById(`col-${colId}`).appendChild(div);
             });
             [0, 1, 2].forEach(i => { 
@@ -616,8 +607,13 @@
                 if(newCol < 0) newCol = 0; if(newCol > 2) newCol = 2;
                 const today = new Date().toISOString().split('T')[0];
                 const isLate = tasks[idx].date && tasks[idx].date < today;
+                
+                // Penalty Logic
+                const prio = tasks[idx].prio || 'Med';
+                const penalty = prio === 'High' ? -50 : (prio === 'Med' ? -30 : -10);
+
                 if(tasks[idx].col !== 2 && newCol === 2) { 
-                    if(isLate) { showToast("⚠️ LATE (+50 XP)", true); updateLiveXP(50); }
+                    if(isLate) { showToast(`⚠️ LATE (${penalty} XP)`, true); updateLiveXP(penalty); }
                     else { showToast("VICTORY! (+100 XP)", false); updateLiveXP(100); launchConfetti(); sfx('win'); }
                 }
                 if(tasks[idx].col === 2 && newCol !== 2) { showToast("RETREAT (-100 XP)", true); updateLiveXP(-100); }
@@ -672,6 +668,21 @@
             div.innerHTML = `<div class="check-box ${done?'checked':''}" onclick="toggleCheck(this)"></div><input type="text" class="check-text" value="${text}" placeholder="New Step..."><span class="check-del" onclick="this.parentElement.remove(); showToast('-10 XP', true); updateLiveXP(-10);">✕</span>`;
             document.getElementById('checklist-container').appendChild(div);
         }
+        
+        function handleStepEnter(e) {
+            if(e.key === 'Enter') {
+                const val = document.getElementById('new-step-input').value.trim();
+                if(val) {
+                    addCheckItem(val);
+                    document.getElementById('new-step-input').value = '';
+                    // Keep focus
+                    setTimeout(() => {
+                        const inputs = document.querySelectorAll('.check-text');
+                        if(inputs.length > 0) inputs[inputs.length-1].focus();
+                    }, 50);
+                }
+            }
+        }
 
         function saveCard() {
             const id = document.getElementById('t-id').value;
@@ -700,6 +711,7 @@
         function save() { localStorage.setItem('mc_tasks', JSON.stringify(tasks)); }
         function closeModal() { document.getElementById('task-modal').style.display = 'none'; }
         function toggleMenu() { document.getElementById('save-menu').classList.toggle('show'); }
+        function closeMenu() { document.getElementById('save-menu').classList.remove('show'); }
         function showStatusReport() {
             const stats = getLevel(userXP);
             if(stats.level < 2 && prestige === 0) return alert("Unlock this at Level 2.");
