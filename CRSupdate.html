@@ -72,7 +72,7 @@
             overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); flex-shrink: 0;
             transition: background 0.3s;
         }
-        .client-card.new-item { background: rgba(99, 102, 241, 0.2); border: 1px solid var(--accent); }
+        .client-card.new-item { background: rgba(99, 102, 241, 0.2); }
 
         .card-header { padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .card-header.due { border-left: 4px solid var(--red); }
@@ -172,7 +172,7 @@
         <div class="dash-card d-purple" onclick="filter('ghosts', this)">
             <div class="dash-count" id="d-ghost">0</div><div class="dash-lbl">Ghosts</div>
         </div>
-        <div class="dash-card active" onclick="filter('all', this)" id="dash-all">
+        <div class="dash-card active" onclick="filter('all', this)" id="btn-all">
             <div class="dash-count" id="d-all">0</div><div class="dash-lbl">All</div>
         </div>
     </div>
@@ -313,7 +313,6 @@
         if(localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
         render();
 
-        // 1. GET LOCAL DATE (FIXED "TOMORROW" BUG)
         function getLocalToday() {
             const d = new Date();
             const year = d.getFullYear();
@@ -322,7 +321,6 @@
             return `${year}-${month}-${day}`;
         }
 
-        // 2. PARSE LOCAL DATE (FIXED "GHOST" BUG)
         function dateToLocal(dateStr) {
             if(!dateStr || dateStr.length < 10) return null;
             const parts = dateStr.split('-');
@@ -337,7 +335,6 @@
 
             const today = new Date(); today.setHours(0,0,0,0);
 
-            // Safer filtering
             let visible = clients.filter(c => {
                 const nameMatch = (c.name || '').toLowerCase().includes(query);
                 const noteMatch = (c.notes || '').toLowerCase().includes(query);
@@ -368,7 +365,10 @@
                 let lastCutTxt = 'New';
                 if(c.lastVisit && c.lastVisit.includes('-')) {
                     const [y, m, d] = c.lastVisit.split('-');
-                    lastCutTxt = `${m}/${d}/${y}`; // Simple US Format
+                    const dateObj = new Date(y, m-1, d);
+                    if(!isNaN(dateObj)) {
+                        lastCutTxt = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    }
                 }
                 
                 let cardClass = daysTill < 0 ? 'card-header due' : 'card-header';
@@ -418,6 +418,78 @@
             });
         }
 
+        // --- SAVE CLIENT REWORKED (ASYNC FIX) ---
+        function saveClient() {
+            const id = document.getElementById('c-id').value;
+            const name = document.getElementById('c-name').value;
+            if(!name) return alert("Name required");
+            const ref = document.getElementById('c-ref').value;
+            const lastVal = document.getElementById('c-last').value;
+            
+            // Collect Data
+            let data = {
+                name, phone: document.getElementById('c-phone').value,
+                price: parseFloat(document.getElementById('c-price').value)||35,
+                addr: document.getElementById('c-addr').value, social: document.getElementById('c-social').value,
+                dob: document.getElementById('c-dob').value, start: document.getElementById('c-start').value, ref,
+                freq: parseInt(document.getElementById('c-freq').value)||4, lastVisit: lastVal,
+                notes: document.getElementById('c-notes').value
+            };
+
+            // Logic Split
+            if (id) {
+                // UPDATE EXISTING
+                const idx = clients.findIndex(x=>x.id==id);
+                clients[idx] = {...clients[idx], ...data};
+                commitSave(false);
+            } else {
+                // CREATE NEW
+                data.id = Date.now().toString(); 
+                data.cuts=0; data.free=0; data.credit=0; data.ltv=0; data.loyalty=0; data.redeemedVal=0;
+                data.isNew = true;
+
+                // Handle Referrals
+                if(ref) {
+                    const referrer = clients.find(c => c.name.toLowerCase() === ref.toLowerCase());
+                    if(referrer && referrer.id !== data.id) { 
+                        referrer.credit+=5; data.credit+=5; alert("Referral linked! $5 credits."); 
+                    }
+                }
+
+                // Handle First Cut Logic (ASYNC)
+                if(lastVal) {
+                    customConfirm("Count the 'Last Cut' date as their 1st cut?", 
+                        () => { // YES
+                            data.cuts = 1; data.loyalty = 1;
+                            clients.push(data);
+                            commitSave(true);
+                        },
+                        () => { // NO
+                            clients.push(data);
+                            commitSave(true);
+                        }
+                    );
+                } else {
+                    clients.push(data);
+                    commitSave(true);
+                }
+            }
+        }
+
+        function commitSave(isNew) {
+            save(); 
+            closeModals();
+            if(isNew) {
+                // Force Reset UI to Show New Client
+                document.getElementById('search').value = '';
+                filterType = 'all';
+                document.querySelectorAll('.dash-card').forEach(d => d.classList.remove('active'));
+                document.getElementById('btn-all').classList.add('active');
+            }
+            render();
+            if(pendingCutId) pendingCutId = null;
+        }
+
         // --- CUT LOGIC ---
         function startCutFlow(id) {
             const c = clients.find(x=>x.id==id);
@@ -457,7 +529,7 @@
         }
 
         function processStats(c, paid) {
-            c.lastVisit = getLocalToday(); // USE LOCAL TIME
+            c.lastVisit = getLocalToday();
             c.cuts = (c.cuts || 0) + 1;
             c.ltv = (c.ltv || 0) + paid;
             c.loyalty = (c.loyalty || 0) + 1;
@@ -469,7 +541,7 @@
             save(); render();
         }
 
-        // --- REDEEM ---
+        // --- ANNIVERSARY REDEEM ---
         function openRedeem(id) {
             const c=clients.find(x=>x.id==id);
             const opts=[];
@@ -488,60 +560,6 @@
             }});
             if(opts.length===0) return alert("No rewards.");
             openListModal("Redeem", opts);
-        }
-
-        // --- UTILS ---
-        function openClientModal(id) {
-            const c = id ? clients.find(x=>x.id==id) : {id:'',name:'',phone:'',price:35,addr:'',social:'',dob:'',start:getLocalToday(),ref:'',freq:4,last:'',notes:''};
-            for(let k in c) if(document.getElementById('c-'+k)) document.getElementById('c-'+k).value = c[k];
-            updateRefList(); document.getElementById('client-modal').style.display = 'flex';
-        }
-        
-        function saveClient() {
-            const id = document.getElementById('c-id').value;
-            const name = document.getElementById('c-name').value;
-            if(!name) return alert("Name required");
-            const ref = document.getElementById('c-ref').value;
-            const lastVal = document.getElementById('c-last').value;
-            
-            let data = {
-                name, phone: document.getElementById('c-phone').value,
-                price: parseFloat(document.getElementById('c-price').value)||35,
-                addr: document.getElementById('c-addr').value, social: document.getElementById('c-social').value,
-                dob: document.getElementById('c-dob').value, start: document.getElementById('c-start').value, ref,
-                freq: parseInt(document.getElementById('c-freq').value)||4, lastVisit: lastVal,
-                notes: document.getElementById('c-notes').value
-            };
-
-            if(id) {
-                const idx = clients.findIndex(x=>x.id==id);
-                clients[idx] = {...clients[idx], ...data};
-            } else {
-                data.id = Date.now().toString(); data.cuts=0; data.free=0; data.credit=0; data.ltv=0; data.loyalty=0; data.redeemedVal=0;
-                
-                if(lastVal) {
-                    if(confirm("Count the 'Last Cut' date as their 1st cut?")) {
-                        data.cuts = 1; data.loyalty = 1;
-                    }
-                }
-                
-                clients.push(data);
-                data.isNew = true; 
-                
-                if(ref) {
-                    const referrer = clients.find(c => c.name.toLowerCase() === ref.toLowerCase() && c.id !== data.id);
-                    if(referrer) { referrer.credit+=5; data.credit+=5; alert("Referral linked! $5 credits."); }
-                }
-            }
-            save(); 
-            closeModals(); 
-            
-            // RESET EVERYTHING SO NEW CLIENT APPEARS
-            document.getElementById('search').value = '';
-            filterType = 'all';
-            document.querySelectorAll('.dash-card').forEach(d => d.classList.remove('active'));
-            document.getElementById('dash-all').classList.add('active');
-            render();
         }
 
         // --- SCHEDULING ---
@@ -572,6 +590,12 @@
 
         // --- UTILS ---
         function updateRefList() { const dl=document.getElementById('ref-list'); dl.innerHTML=''; clients.forEach(cl=>{dl.innerHTML+=`<option value="${cl.name}">`}); }
+        function openClientModal(id) {
+            const c = id ? clients.find(x=>x.id==id) : {id:'',name:'',phone:'',price:35,addr:'',social:'',dob:'',start:getLocalToday(),ref:'',freq:4,last:'',notes:''};
+            for(let k in c) if(document.getElementById('c-'+k)) document.getElementById('c-'+k).value = c[k];
+            updateRefList(); document.getElementById('client-modal').style.display = 'flex';
+        }
+        
         function viewFull(id) {
             const c = clients.find(x=>x.id==id); tempId=id;
             document.getElementById('ro-title').innerText = c.name;
@@ -605,7 +629,6 @@
         function closeModals() { document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); }
         function save(skipRender) { localStorage.setItem('bb_clients_v3', JSON.stringify(clients)); if(!skipRender) render(); }
         function saveSettings() { shopSettings.addr=document.getElementById('s-shop-addr').value; localStorage.setItem('bb_settings', JSON.stringify(shopSettings)); closeModals(); }
-        function delClient(id) { customConfirm("Delete?", ()=>{clients=clients.filter(x=>x.id!=id); save(); render();}); }
         function exportData(type) { toggleMenu(); if(type==='json'){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(clients)],{type:'application/json'})); a.download=`bb_${Date.now()}.json`; a.click();} else { let csv="Name,Phone,LTV\n"+clients.map(c=>`"${c.name}","${c.phone}",${c.ltv}`).join('\n'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=`bb.csv`; a.click(); }}
         function importData(el) { if(!el.files[0])return; const fr=new FileReader(); fr.onload=e=>{clients=JSON.parse(e.target.result); save(); render(); alert("Restored!");}; fr.readAsText(el.files[0]); }
     </script>
