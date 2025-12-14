@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+    <title>Comedy Vault</title>
+    
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
+
+    <style>
+        :root {
+            --bg: #000000;
+            --card: #121212;
+            --text: #ffffff;
+            --subtext: #888888;
+            --accent: #ff9f43;
+            --border: #333333;
+            --input-bg: #1c1c1c;
+            --danger: #ff4757;
+            --success: #2ed573;
+            --pin-color: #feca57;
+            --warning: #f1c40f;
+            --vault: #747d8c; /* Grey for archive */
+        }
+
+        body.light-mode {
+            --bg: #f8f9fa;
+            --card: #ffffff;
+            --text: #2d3436;
+            --subtext: #636e72;
+            --accent: #8e44ad;
+            --border: #dfe6e9;
+            --input-bg: #f1f2f6;
+            --pin-color: #f1c40f;
+        }
+
+        body {
+            background-color: var(--bg); color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0; padding: 0; display: flex; flex-direction: column;
+            height: 100vh; overflow: hidden;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* --- HEADER --- */
+        .header {
+            padding: 15px; background: var(--card); border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center; z-index: 10;
+        }
+        h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-weight: 900;}
+        .btn-icon { background: none; border: none; font-size: 1.4rem; cursor: pointer; text-decoration: none; padding: 5px; opacity: 0.8; }
+
+        /* --- STAGE TIMER DISPLAY (Hidden by default) --- */
+        #stage-timer {
+            display: none; background: #000; padding: 15px; text-align: center;
+            border-bottom: 2px solid #333; position: relative;
+        }
+        #timer-digits { font-size: 3.5rem; font-weight: 900; font-variant-numeric: tabular-nums; line-height: 1; }
+        #timer-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; margin-top: 5px; opacity: 0.7; }
+        
+        /* Timer States */
+        .t-green { color: var(--success); }
+        .t-yellow { color: var(--warning); }
+        .t-red { color: var(--danger); }
+        .t-flash { color: var(--danger); animation: flash 1s infinite; background: rgba(255, 71, 87, 0.1); }
+        
+        @keyframes flash { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        /* --- SETUP MODAL (Green Room) --- */
+        #timer-setup {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 2000;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            padding: 20px; box-sizing: border-box;
+        }
+        .setup-title { font-size: 2rem; font-weight: 900; color: var(--text); margin-bottom: 30px; }
+        .time-presets { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; width: 100%; max-width: 400px; margin-bottom: 20px; }
+        .preset-btn { 
+            background: var(--card); border: 1px solid var(--border); color: var(--text); 
+            padding: 15px; border-radius: 12px; font-size: 1.2rem; font-weight: bold; cursor: pointer;
+        }
+        .preset-btn.selected { background: var(--accent); color: black; border-color: var(--accent); }
+        
+        .setup-row { display: flex; gap: 10px; width: 100%; max-width: 400px; margin-bottom: 20px; align-items: center; color: var(--subtext); }
+        .setup-input { 
+            background: var(--input-bg); border: 1px solid var(--border); color: var(--text);
+            padding: 10px; border-radius: 8px; font-size: 1.2rem; width: 80px; text-align: center;
+        }
+        
+        .start-btn { 
+            background: var(--success); color: black; width: 100%; max-width: 400px;
+            padding: 20px; border-radius: 15px; font-size: 1.5rem; font-weight: 900; 
+            border: none; text-transform: uppercase; cursor: pointer; margin-top: 20px;
+        }
+        .close-setup { margin-top: 20px; background: none; border: none; color: var(--subtext); font-size: 1rem; text-decoration: underline; cursor: pointer; }
+
+        /* --- STANDARD UI --- */
+        .filter-scroll {
+            display: flex; gap: 8px; padding: 10px 15px;
+            overflow-x: auto; background: var(--bg);
+            border-bottom: 1px solid var(--border); flex-shrink: 0;
+            scrollbar-width: none; -ms-overflow-style: none;
+        }
+        .filter-scroll::-webkit-scrollbar { display: none; }
+        
+        .filter-chip {
+            background: var(--card); padding: 6px 14px;
+            border-radius: 20px; font-size: 0.85rem; color: var(--subtext);
+            border: 1px solid var(--border); white-space: nowrap; cursor: pointer;
+            transition: all 0.2s; font-weight: 600;
+        }
+        .filter-chip.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+        .filter-chip[data-tag="New"] { border-color: var(--success); color: var(--success); }
+        .filter-chip[data-tag="New"].active { background: var(--success); color: white; }
+        /* Vault Chip Style */
+        .filter-chip[data-tag="Archive"] { border-color: var(--vault); color: var(--vault); }
+        .filter-chip[data-tag="Archive"].active { background: var(--vault); color: white; border-color: var(--vault); }
+
+        #bit-list { flex-grow: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; -webkit-overflow-scrolling: touch; }
+
+        .bottom-deck {
+            background: var(--card); border-top: 1px solid var(--border);
+            display: flex; flex-direction: column;
+            padding-bottom: max(15px, env(safe-area-inset-bottom));
+        }
+        .search-container { padding: 10px 15px 5px 15px; }
+        .search-input {
+            width: 100%; background: var(--input-bg); border: 1px solid var(--border);
+            color: var(--text); padding: 8px 15px 8px 35px; border-radius: 10px;
+            font-size: 0.95rem; box-sizing: border-box;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%23888' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: left 12px center;
+        }
+        .search-input:focus { outline: 2px solid var(--accent); border-color: transparent; }
+
+        .input-area { padding: 5px 15px 15px 15px; display: flex; flex-direction: column; gap: 10px; }
+        .input-main { background: var(--input-bg); border: 1px solid var(--border); color: var(--text); padding: 12px; border-radius: 8px; resize: none; height: 50px; font-family: inherit; font-size: 1rem; }
+        .input-main:focus { outline: 2px solid var(--accent); border-color: transparent; }
+        .input-row { display: flex; gap: 10px; }
+        select { background: var(--input-bg); color: var(--text); border: 1px solid var(--border); padding: 0 10px; border-radius: 8px; flex-grow: 1; height: 45px; font-size: 1rem; }
+        .btn-add { background: var(--accent); color: var(--bg); border: none; padding: 0 20px; border-radius: 8px; font-weight: bold; text-transform: uppercase; cursor: pointer; }
+
+        .bit-card { background: var(--card); padding: 15px; border-radius: 12px; border-left: 4px solid var(--subtext); position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .bit-card.pinned { border: 2px solid var(--pin-color); background: rgba(254, 202, 87, 0.05); }
+        
+        /* Tag Colors */
+        .bit-card[data-tag="Premise"] { border-left-color: var(--subtext); } 
+        .bit-card[data-tag="Clean"] { border-left-color: #54a0ff; }        
+        .bit-card[data-tag="Roast"] { border-left-color: #ff6b6b; }        
+        .bit-card[data-tag="Crowd"] { border-left-color: #1dd1a1; }        
+        .bit-card[data-tag="Opener"] { border-left-color: var(--accent); }
+        .bit-card[data-tag="Dark"] { border-left-color: #a55eea; }        
+        .bit-card[data-tag="Closer"] { border-left-color: #eb3b5a; }      
+        
+        /* Archive Card Style */
+        .bit-card.archived { border-left-color: var(--vault); opacity: 0.7; }
+
+        .bit-content { font-size: 1.1rem; line-height: 1.4; white-space: pre-wrap; margin-bottom: 8px; color: var(--text); font-weight: 500;}
+        .notes-preview { font-size: 0.85rem; color: var(--subtext); margin-bottom: 8px; font-style: italic; display: flex; align-items: center; gap: 5px; padding: 5px; background: rgba(125,125,125,0.05); border-radius: 4px; }
+        .bit-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--subtext); margin-top: 10px; }
+        .tag-badge { background: var(--input-bg); padding: 3px 8px; border-radius: 4px; color: var(--subtext); text-transform: uppercase; font-size: 0.65rem; letter-spacing: 1px; font-weight: bold; border: 1px solid var(--border); }
+        .action-btn { cursor: pointer; font-size: 1.1rem; opacity: 0.6; }
+        .pin-active { opacity: 1; transform: scale(1.1); filter: drop-shadow(0 0 5px var(--pin-color)); }
+
+        .edit-area { background: var(--input-bg); border: 1px solid var(--accent); color: var(--text); padding: 10px; border-radius: 6px; font-size: 1rem; width: 100%; min-height: 60px; margin-bottom: 10px; resize: vertical; box-sizing: border-box; font-family: inherit; }
+        .edit-notes { background: var(--bg); border: 1px dashed var(--subtext); color: var(--text); padding: 10px; border-radius: 6px; font-size: 0.9rem; width: 100%; min-height: 40px; margin-bottom: 10px; resize: vertical; box-sizing: border-box; font-family: inherit; }
+        .edit-controls { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-save { background: var(--success); color: white; border: none; padding: 10px; border-radius: 5px; flex-grow: 2; font-weight: bold;}
+        .btn-cancel { background: var(--input-bg); color: var(--text); border: 1px solid var(--border); padding: 10px; border-radius: 5px; flex-grow: 1; }
+        
+        /* Archive Button Style */
+        .btn-archive { background: var(--vault); color: white; border: none; padding: 10px; border-radius: 5px; font-weight: bold; flex-grow: 1; }
+
+        /* FOCUS MODE OVERRIDES */
+        body.focus-mode .header, 
+        body.focus-mode .filter-scroll, 
+        body.focus-mode .bottom-deck, 
+        body.focus-mode .action-btn, 
+        body.focus-mode .bit-meta span:first-child { display: none !important; }
+        
+        body.focus-mode #stage-timer { display: block; } /* Show Timer */
+        
+        #exit-focus-btn {
+            position: fixed; top: 10px; right: 10px; z-index: 1000;
+            background: #333; color: white; border: 1px solid #555;
+            padding: 5px 12px; border-radius: 20px; font-size: 0.8rem;
+            display: none; opacity: 0.5;
+        }
+        body.focus-mode #exit-focus-btn { display: block; }
+
+        /* SETTINGS MENU */
+        #settings-menu { position: absolute; top: 60px; left: 15px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 10px; display: none; flex-direction: column; gap: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 100; min-width: 220px; }
+        #settings-menu.visible { display: flex; }
+        .menu-btn { background: var(--input-bg); color: var(--text); border: none; padding: 12px; border-radius: 5px; cursor: pointer; text-align: left; font-size: 0.9rem; font-weight: 500; display: flex; align-items: center; gap: 10px; }
+    </style>
+</head>
+<body>
+
+    <div id="timer-setup">
+        <div class="setup-title">Green Room</div>
+        <div class="time-presets">
+            <button class="preset-btn" onclick="selectTime(5, this)">5m</button>
+            <button class="preset-btn" onclick="selectTime(10, this)">10m</button>
+            <button class="preset-btn" onclick="selectTime(15, this)">15m</button>
+        </div>
+        <div class="setup-row">
+            <span>Custom Mins:</span>
+            <input type="number" id="custom-min" class="setup-input" placeholder="0">
+        </div>
+        <div class="setup-row">
+            <span>Warning Light (Mins Left):</span>
+            <input type="number" id="warning-min" class="setup-input" value="1">
+        </div>
+        <button class="start-btn" onclick="enterStageMode()">START SET</button>
+        <button class="close-setup" onclick="closeSetup()">Cancel</button>
+    </div>
+
+    <button id="exit-focus-btn" onclick="exitFocusMode()">Exit</button>
+
+    <div class="header">
+        <button class="btn-icon" onclick="toggleMenu()">⚙️</button>
+        <h1>Comedy Vault</h1>
+        <div style="display:flex; gap:10px;">
+            <button class="btn-icon" onclick="openSetup()" title="Stage Mode">👁️</button>
+            <button class="btn-icon" onclick="toggleTheme()" id="theme-icon">☀️</button>
+        </div>
+    </div>
+
+    <div id="settings-menu">
+        <div style="font-size:0.7rem; color:var(--subtext); text-transform:uppercase; letter-spacing:1px; margin-bottom:5px;">Data Safety</div>
+        <button class="menu-btn" onclick="shareToNotes()" style="border-left: 3px solid var(--success);"><span>☁️</span> Save to Notes</button>
+        <button class="menu-btn" onclick="exportData()"><span>💾</span> Download Backup</button>
+        <button class="menu-btn" onclick="document.getElementById('file-input').click()"><span>📂</span> Restore File</button>
+    </div>
+    <input type="file" id="file-input" style="display:none" onchange="importData(this)">
+
+    <div id="stage-timer">
+        <div id="timer-digits" class="t-green">00:00</div>
+        <div id="timer-label">On Stage</div>
+    </div>
+
+    <div class="filter-scroll">
+        <div class="filter-chip active" onclick="filterBits('all', this)">All</div>
+        <div class="filter-chip" data-tag="New" onclick="filterBits('New', this)">★ New</div>
+        <div class="filter-chip" onclick="filterBits('Pinned', this)">📌 Pinned</div>
+        <div class="filter-chip" onclick="filterBits('Premise', this)">Premise</div>
+        <div class="filter-chip" onclick="filterBits('Clean', this)">Clean</div>
+        <div class="filter-chip" onclick="filterBits('Roast', this)">Roast</div>
+        <div class="filter-chip" onclick="filterBits('Crowd', this)">Crowd</div>
+        <div class="filter-chip" onclick="filterBits('Dark', this)">Dark</div>
+        <div class="filter-chip" data-tag="Archive" onclick="filterBits('Archive', this)">📦 Vault</div>
+    </div>
+
+    <div id="bit-list" ontouchstart="dismissKeyboard()"></div>
+
+    <div class="bottom-deck">
+        <div class="search-container">
+            <input type="search" id="search-bar" class="search-input" placeholder="Search jokes..." onkeyup="render()" onsearch="render()">
+        </div>
+        <div class="input-area">
+            <textarea class="input-main" id="new-text" placeholder="Quick Premise..."></textarea>
+            <div class="input-row">
+                <select id="new-tag">
+                    <option value="Premise">Premise (Idea)</option>
+                    <option value="Clean">Clean</option>
+                    <option value="Roast">Roast</option>
+                    <option value="Crowd">Crowd Work</option>
+                    <option value="Dark">Dark</option>
+                    <option value="Opener">Opener</option>
+                    <option value="Closer">Closer</option>
+                </select>
+                <button class="btn-add" onclick="addBit()">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let bits = JSON.parse(localStorage.getItem('comedy_bits') || '[]');
+        let currentFilter = 'all';
+        let editingId = null;
+
+        // --- TIMER VARIABLES ---
+        let timerInterval = null;
+        let setDurationSecs = 0;
+        let warningSecs = 60;
+        let startTime = 0;
+        let selectedPreset = 0;
+
+        if(localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-mode');
+            document.getElementById('theme-icon').innerText = '🌙';
+        }
+
+        // --- SETUP LOGIC ---
+        function openSetup() {
+            document.getElementById('timer-setup').style.display = 'flex';
+        }
+        function closeSetup() {
+            document.getElementById('timer-setup').style.display = 'none';
+        }
+        function selectTime(mins, btn) {
+            selectedPreset = mins;
+            document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            document.getElementById('custom-min').value = '';
+        }
+        
+        function enterStageMode() {
+            // Calculate Time
+            let mins = parseInt(document.getElementById('custom-min').value) || selectedPreset;
+            let warnMins = parseInt(document.getElementById('warning-min').value) || 1;
+            
+            if(mins <= 0) { alert("Pick a time!"); return; }
+            
+            setDurationSecs = mins * 60;
+            warningSecs = warnMins * 60;
+            startTime = Date.now();
+            
+            closeSetup();
+            document.body.classList.add('focus-mode');
+            
+            // Start Clock
+            clearInterval(timerInterval);
+            updateTimerDisplay(); // Immediate update
+            timerInterval = setInterval(updateTimerDisplay, 1000);
+            
+            // Auto filter to Pinned if available, else all
+            const hasPinned = bits.some(b => b.pinned);
+            if(hasPinned) {
+                // Find Pinned Chip and Simulate Click
+                const chips = document.querySelectorAll('.filter-chip');
+                let pinChip;
+                chips.forEach(c => { if(c.innerText.includes('Pinned')) pinChip = c; });
+                if(pinChip) filterBits('Pinned', pinChip);
+            }
+        }
+
+        function exitFocusMode() {
+            clearInterval(timerInterval);
+            document.body.classList.remove('focus-mode');
+        }
+
+        function updateTimerDisplay() {
+            const now = Date.now();
+            const elapsed = Math.floor((now - startTime) / 1000);
+            const remaining = setDurationSecs - elapsed;
+            
+            const display = document.getElementById('timer-digits');
+            const label = document.getElementById('timer-label');
+            
+            // FORMATTING
+            let absSeconds = Math.abs(remaining);
+            let m = Math.floor(absSeconds / 60).toString().padStart(2, '0');
+            let s = (absSeconds % 60).toString().padStart(2, '0');
+            
+            display.innerText = `${m}:${s}`;
+            display.className = ''; // Reset classes
+
+            if (remaining > warningSecs) {
+                display.classList.add('t-green');
+                label.innerText = "ON TIME";
+            } else if (remaining > 0) {
+                display.classList.add('t-yellow');
+                label.innerText = "WRAP IT UP";
+            } else if (remaining > -10) {
+                display.classList.add('t-red');
+                label.innerText = "TIME'S UP";
+            } else {
+                display.classList.add('t-flash');
+                label.innerText = `OVER TIME (+${m}:${s})`;
+            }
+        }
+
+        // --- STANDARD APP LOGIC ---
+        function dismissKeyboard() {
+            if (document.activeElement && (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "TEXTAREA")) {
+                document.activeElement.blur();
+            }
+        }
+
+        function render() {
+            const list = document.getElementById('bit-list');
+            const searchInput = document.getElementById('search-bar');
+            const searchQuery = searchInput.value.toLowerCase();
+            list.innerHTML = '';
+            
+            let visibleBits = bits;
+
+            // --- FILTER LOGIC (UPDATED FOR ARCHIVE) ---
+            if (currentFilter === 'Archive') {
+                // Only show archived bits
+                visibleBits = bits.filter(b => b.archived === true);
+            } else {
+                // First, EXCLUDE archived bits from normal views
+                visibleBits = bits.filter(b => !b.archived);
+
+                // Then apply normal filters
+                if (currentFilter === 'New') {
+                    visibleBits = visibleBits.slice(0, 5);
+                } else if (currentFilter === 'Pinned') {
+                    visibleBits = visibleBits.filter(b => b.pinned);
+                } else if (currentFilter !== 'all') {
+                    visibleBits = visibleBits.filter(b => b.tag === currentFilter);
+                }
+            }
+
+            if (searchQuery) {
+                visibleBits = visibleBits.filter(b => 
+                    b.text.toLowerCase().includes(searchQuery) || (b.notes && b.notes.toLowerCase().includes(searchQuery))
+                );
+            }
+
+            if (currentFilter !== 'New') {
+                visibleBits.sort((a, b) => (b.pinned === true ? 1 : 0) - (a.pinned === true ? 1 : 0));
+            }
+
+            if (visibleBits.length === 0) {
+                list.innerHTML = '<div style="text-align:center; color:var(--subtext); margin-top:50px; font-style:italic;">Nothing here.</div>';
+                return;
+            }
+
+            visibleBits.forEach(bit => {
+                const div = document.createElement('div');
+                div.className = `bit-card ${bit.pinned ? 'pinned' : ''} ${bit.archived ? 'archived' : ''}`;
+                div.setAttribute('data-tag', bit.tag);
+                div.id = `card-${bit.id}`;
+
+                if (editingId === bit.id) {
+                    // EDIT MODE
+                    const archiveBtnText = bit.archived ? "♻️ Unarchive" : "📦 Archive";
+                    
+                    div.innerHTML = `
+                        <div style="font-size:0.7rem; color:var(--accent); margin-bottom:5px; font-weight:bold;">PREMISE</div>
+                        <textarea class="edit-area" id="edit-text-${bit.id}">${bit.text}</textarea>
+                        <div style="font-size:0.7rem; color:var(--accent); margin-bottom:5px; font-weight:bold;">NOTES</div>
+                        <textarea class="edit-notes" id="edit-notes-${bit.id}" placeholder="Tags, punchlines...">${bit.notes || ''}</textarea>
+                        <div class="edit-controls">
+                            <select id="edit-tag-${bit.id}">${getOptionsHtml(bit.tag)}</select>
+                            <button class="btn-save" onclick="saveEdit(${bit.id})">SAVE</button>
+                        </div>
+                        <div class="edit-controls" style="margin-top:10px;">
+                            <button class="btn-archive" onclick="toggleArchive(${bit.id})">${archiveBtnText}</button>
+                            <button class="btn-cancel" onclick="cancelEdit()">CANCEL</button>
+                        </div>
+                    `;
+                } else {
+                    // READ MODE
+                    const hasNotes = bit.notes && bit.notes.trim().length > 0;
+                    const noteIndicator = hasNotes ? `<div class="notes-preview">📝 ${escapeHtml(bit.notes.substring(0, 40))}...</div>` : '';
+                    const pinIcon = bit.pinned ? '📌' : '📍';
+                    const pinClass = bit.pinned ? 'pin-active' : '';
+                    
+                    // Specific actions for Archive View vs Normal View
+                    let restoreAction = '';
+                    if(bit.archived) {
+                        restoreAction = `<span class="action-btn" title="Unarchive" onclick="toggleArchive(${bit.id})">♻️</span>`;
+                    }
+
+                    div.innerHTML = `
+                        <div class="bit-content">${escapeHtml(bit.text)}</div>
+                        ${noteIndicator}
+                        <div class="bit-meta">
+                            <span class="tag-badge">${bit.tag}</span>
+                            <div class="action-row">
+                                ${restoreAction}
+                                <span class="action-btn ${pinClass}" onclick="togglePin(${bit.id})">${pinIcon}</span>
+                                <span class="action-btn" onclick="startEdit(${bit.id})">✏️</span>
+                                <span class="action-btn" style="color:var(--danger)" onclick="deleteBit(${bit.id})">🗑️</span>
+                            </div>
+                        </div>
+                    `;
+                }
+                list.appendChild(div);
+            });
+        }
+
+        function addBit() {
+            const input = document.getElementById('new-text');
+            const tagSelect = document.getElementById('new-tag');
+            const text = input.value.trim();
+            if (!text) return;
+            const newBit = { id: Date.now(), text: text, tag: tagSelect.value, notes: "", date: Date.now(), pinned: false, archived: false };
+            bits.unshift(newBit); save(); input.value = '';
+            document.getElementById('search-bar').value = ""; 
+            if(currentFilter !== 'New' && currentFilter !== 'all' && currentFilter !== tagSelect.value) {
+                filterBits('all', document.querySelector('.filter-chip'));
+            } else { render(); }
+        }
+
+        function togglePin(id) {
+            const index = bits.findIndex(b => b.id === id);
+            if(index !== -1) { bits[index].pinned = !bits[index].pinned; save(); render(); }
+        }
+        
+        function toggleArchive(id) {
+            const index = bits.findIndex(b => b.id === id);
+            if(index !== -1) {
+                // Toggle status
+                bits[index].archived = !bits[index].archived;
+                save();
+                editingId = null; // Exit edit mode if active
+                render();
+            }
+        }
+
+        function startEdit(id) { editingId = id; render(); }
+
+        function saveEdit(id) {
+            const newText = document.getElementById(`edit-text-${id}`).value.trim();
+            const newNotes = document.getElementById(`edit-notes-${id}`).value.trim();
+            const newTag = document.getElementById(`edit-tag-${id}`).value;
+            if (!newText) return cancelEdit();
+            const index = bits.findIndex(b => b.id === id);
+            if (index !== -1) {
+                bits[index].text = newText; bits[index].notes = newNotes; bits[index].tag = newTag;
+                save();
+            }
+            editingId = null; render();
+        }
+
+        function cancelEdit() { editingId = null; render(); }
+
+        function deleteBit(id) {
+            if(confirm("Delete this joke permanently?")) { bits = bits.filter(b => b.id !== id); save(); render(); }
+        }
+
+        function filterBits(tag, element) {
+            currentFilter = tag;
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            element.classList.add('active');
+            render();
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            document.getElementById('theme-icon').innerText = isLight ? '🌙' : '☀️';
+        }
+        
+        function toggleMenu() { document.getElementById('settings-menu').classList.toggle('visible'); }
+
+        function getOptionsHtml(selected) {
+            const opts = ["Premise", "Clean", "Roast", "Crowd", "Dark", "Opener", "Closer"];
+            return opts.map(o => `<option value="${o}" ${o===selected?'selected':''}>${o}</option>`).join('');
+        }
+
+        function save() { localStorage.setItem('comedy_bits', JSON.stringify(bits)); }
+        function escapeHtml(text) { return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : ""; }
+
+        function shareToNotes() {
+            if (!navigator.share) { alert("Use Safari on iPhone."); return; }
+            let txt = "🎤 COMEDY VAULT \n\n";
+            bits.forEach(b => {
+                if(!b.archived) {
+                    const pin = b.pinned ? "📌 " : "";
+                    txt += `${pin}[${b.tag}] ${b.text}\n`;
+                    if(b.notes) txt += `   >>> ${b.notes}\n`;
+                    txt += `-------------------\n`;
+                }
+            });
+            navigator.share({ title: 'Comedy Backup', text: txt }).catch(console.error);
+            toggleMenu();
+        }
+
+        function exportData() {
+            const blob = new Blob([JSON.stringify(bits, null, 2)], { type: "application/json" });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `comedy_backup_${Date.now()}.json`;
+            a.click();
+            toggleMenu();
+        }
+
+        function importData(input) {
+            const file = input.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if(Array.isArray(data)) {
+                        if(confirm(`Restore ${data.length} jokes?`)) { bits = data; save(); render(); }
+                    }
+                } catch(err) { alert("Error reading file"); }
+            };
+            reader.readAsText(file);
+            toggleMenu();
+        }
+
+        render();
+    </script>
+</body>
+</html>
