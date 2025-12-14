@@ -8,7 +8,6 @@
     <title>The Black Book</title>
     
     <link rel="apple-touch-icon" href="icon.png">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -381,15 +380,6 @@
         <div class="sheet">
             <h3>Checkout</h3>
             
-            <label>Service Type</label>
-            <select id="payService">
-                <option value="Haircut">Haircut</option>
-                <option value="Beard Trim">Beard Trim</option>
-                <option value="Line Up">Line Up</option>
-                <option value="Full Service">Full Service</option>
-                <option value="Product">Product Only</option>
-            </select>
-
             <label>Base Price ($)</label>
             <input type="number" id="payPrice" onchange="calcTotal()" inputmode="decimal">
 
@@ -648,7 +638,6 @@
 
         function openCheckout() {
             const c = getClient(activeId);
-            document.getElementById('payService').value = "Haircut"; // Reset service
             document.getElementById('payPrice').value = c.price || 35;
             document.getElementById('payTip').value = 0;
             document.getElementById('customDiscBox').style.display = 'none';
@@ -706,7 +695,6 @@
 
         async function finalizeCut() {
             const c = getClient(activeId);
-            const service = document.getElementById('payService').value;
             
             if(selectedDisc === 'free') c.banked = (c.banked || 0) - 1;
             if(selectedDisc === 'credit') c.credit = Math.max(0, (c.credit || 0) - 5);
@@ -720,8 +708,7 @@
             history.push({
                 clientId: c.id,
                 date: c.last,
-                amount: checkoutTotal,
-                service: service
+                amount: checkoutTotal
             });
             localStorage.setItem('bbHistory', JSON.stringify(history));
 
