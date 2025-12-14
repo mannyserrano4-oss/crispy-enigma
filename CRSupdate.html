@@ -8,6 +8,7 @@
     <link rel="icon" type="image/png" href="icon.png">
 
     <style>
+        /* --- THEME & COLORS --- */
         :root {
             --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --subtext: #94a3b8;
             --border: #334155; --input-bg: #020617;
@@ -19,6 +20,7 @@
             --border: #cbd5e1; --input-bg: #f8fafc;
         }
 
+        /* --- LAYOUT --- */
         body { 
             background: var(--bg); color: var(--text); 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -26,7 +28,7 @@
             overflow: hidden;
         }
 
-        /* HEADER */
+        /* --- HEADER --- */
         .header { 
             padding: 15px 20px; background: var(--card); border-bottom: 1px solid var(--border); 
             display: flex; justify-content: space-between; align-items: center; z-index: 20;
@@ -34,7 +36,7 @@
         h1 { margin: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); font-weight: 900; }
         .icon-btn { font-size: 1.4rem; background: none; border: none; cursor: pointer; padding: 5px; }
 
-        /* DASHBOARD */
+        /* --- DASHBOARD --- */
         .dashboard { 
             padding: 12px; background: var(--bg); display: flex; gap: 10px; 
             overflow-x: auto; border-bottom: 1px solid var(--border); 
@@ -51,13 +53,13 @@
         .d-red .dash-count { color: var(--red); } .d-gold .dash-count { color: var(--gold); }
         .d-blue .dash-count { color: var(--blue); } .d-purple .dash-count { color: var(--purple); }
 
-        /* SCROLL AREA */
+        /* --- MAIN LIST AREA --- */
         #main-area {
             position: relative; overflow-y: auto; -webkit-overflow-scrolling: touch;
             padding: 15px; padding-bottom: 100px; display: flex; flex-direction: column; gap: 15px;
         }
 
-        /* SEARCH */
+        /* --- COMPONENTS --- */
         .search-input { 
             width: 100%; background: var(--input-bg); border: 1px solid var(--border); 
             color: var(--text); padding: 12px 15px; border-radius: 10px; 
@@ -65,7 +67,6 @@
         }
         .search-input:focus { border-color: var(--accent); }
 
-        /* CARDS */
         .client-card { 
             background: var(--card); border-radius: 16px; border: 1px solid var(--border); 
             overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); flex-shrink: 0;
@@ -87,21 +88,15 @@
         .client-details { display: none; padding: 15px; background: var(--input-bg); border-top: 1px solid var(--border); }
         .client-card.open .client-details { display: block; }
 
-        /* BANK */
         .bank-box { display: flex; gap: 8px; margin-bottom: 15px; background: var(--card); padding: 12px; border-radius: 12px; border: 1px solid var(--border); }
         .bank-item { flex: 1; text-align: center; }
         .bank-val { font-size: 1.3rem; font-weight: 900; }
         .bank-lbl { font-size: 0.6rem; font-weight: 700; color: var(--subtext); text-transform: uppercase; }
         
-        /* NOTES AREA */
         .detail-box { flex: 1; background: var(--card); padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px; }
         .detail-lbl { font-size: 0.65rem; color: var(--accent); font-weight: 800; margin-bottom: 6px; letter-spacing: 1px; }
-        .detail-txt { 
-            font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; 
-            word-wrap: break-word; overflow-wrap: break-word; color: var(--text);
-        }
+        .detail-txt { font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; color: var(--text); }
 
-        /* BUTTONS */
         .btn-main { width: 100%; padding: 16px; background: var(--green); color: #000; border: none; border-radius: 12px; font-size: 1rem; font-weight: 800; text-transform: uppercase; cursor: pointer; margin-bottom: 12px; }
         .btn-full { width: 100%; padding: 12px; background: var(--card); border: 1px solid var(--border); color: var(--text); font-weight: 600; border-radius: 10px; margin-bottom: 12px; cursor: pointer; }
         
@@ -109,11 +104,10 @@
         .btn-act { background: var(--card); border: 1px solid var(--border); color: var(--subtext); padding: 10px 5px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; text-decoration: none;}
         .btn-act span { font-size: 1.2rem; }
 
-        /* MODALS */
+        /* --- MODALS & ZONES --- */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: flex-start; overflow-y: auto; padding: 20px 0; }
         .modal-content { background: var(--card); width: 90%; max-width: 400px; padding: 20px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.5); margin-bottom: 80px; }
 
-        /* ZONES */
         .zone { border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid transparent; }
         .z-blue { background: rgba(59, 130, 246, 0.05); border-color: rgba(59, 130, 246, 0.2); } .z-blue .z-title { color: var(--blue); }
         .z-gold { background: rgba(245, 158, 11, 0.05); border-color: rgba(245, 158, 11, 0.2); } .z-gold .z-title { color: var(--gold); }
@@ -141,7 +135,6 @@
         .stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
         .stat-val { font-weight: bold; color: var(--accent); }
 
-        /* CHECKBOX TOGGLE */
         .toggle-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 10px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; border: 1px solid var(--green); }
         .toggle-lbl { font-size: 0.9rem; font-weight: bold; color: var(--green); }
         .toggle-input { width: 20px; height: 20px; }
@@ -312,14 +305,20 @@
     </div>
 
     <script>
+        // INIT DATA
         let clients = JSON.parse(localStorage.getItem('bb_clients_v3') || '[]');
         let shopSettings = JSON.parse(localStorage.getItem('bb_settings') || '{"addr":""}');
         let filterType = 'all';
         let tempId = null;
+        let pendingCutId = null;
 
+        // LOAD THEME
         if(localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
+        
+        // START APP
         render();
 
+        // --- HELPER: GET LOCAL TODAY YYYY-MM-DD ---
         function getLocalToday() {
             const d = new Date();
             const year = d.getFullYear();
@@ -328,20 +327,24 @@
             return `${year}-${month}-${day}`;
         }
 
+        // --- HELPER: PARSE LOCAL DATE ---
         function dateToLocal(dateStr) {
             if(!dateStr || dateStr.length < 10) return null;
             const parts = dateStr.split('-');
             return new Date(parts[0], parts[1] - 1, parts[2]); 
         }
 
+        // --- RENDER LIST ---
         function render() {
             updateDash();
             const list = document.getElementById('client-list');
+            if(!list) return; // Safety check
             const query = document.getElementById('search').value.toLowerCase();
             list.innerHTML = '';
 
             const today = new Date(); today.setHours(0,0,0,0);
 
+            // Safer filtering that checks for null properties
             let visible = clients.filter(c => {
                 const nameMatch = (c.name || '').toLowerCase().includes(query);
                 const noteMatch = (c.notes || '').toLowerCase().includes(query);
@@ -369,13 +372,12 @@
                 let dueTxt = due ? (daysTill < 0 ? `Overdue ${Math.abs(daysTill)}d` : `Due ${daysTill}d`) : '';
                 let dueCol = daysTill < 0 ? 'var(--red)' : 'var(--subtext)';
                 
+                // CRASH PROOF DATE DISPLAY
                 let lastCutTxt = 'New';
                 if(c.lastVisit && c.lastVisit.includes('-')) {
-                    const [y, m, d] = c.lastVisit.split('-');
-                    const dateObj = new Date(y, m-1, d);
-                    if(!isNaN(dateObj)) {
-                        lastCutTxt = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                    }
+                    const parts = c.lastVisit.split('-');
+                    // Simple string manipulation is safer than Date object for display
+                    lastCutTxt = `${parts[1]}/${parts[2]}/${parts[0]}`; 
                 }
                 
                 let cardClass = daysTill < 0 ? 'card-header due' : 'card-header';
@@ -425,53 +427,87 @@
             });
         }
 
-        // --- LINEAR SAVE (NO POPUPS) ---
+        // --- SAVE CLIENT (SAFE MODE) ---
         function saveClient() {
-            const id = document.getElementById('c-id').value;
-            const name = document.getElementById('c-name').value;
-            if(!name) return alert("Name required");
-            const ref = document.getElementById('c-ref').value;
-            const lastVal = document.getElementById('c-last').value;
-            const countFirst = document.getElementById('c-count-first').checked;
-            
-            let data = {
-                name, phone: document.getElementById('c-phone').value,
-                price: parseFloat(document.getElementById('c-price').value)||35,
-                addr: document.getElementById('c-addr').value, social: document.getElementById('c-social').value,
-                dob: document.getElementById('c-dob').value, start: document.getElementById('c-start').value, ref,
-                freq: parseInt(document.getElementById('c-freq').value)||4, lastVisit: lastVal,
-                notes: document.getElementById('c-notes').value
-            };
+            try {
+                const idEl = document.getElementById('c-id');
+                const nameEl = document.getElementById('c-name');
+                
+                if (!nameEl || !nameEl.value) {
+                    alert("Name is required!");
+                    return;
+                }
 
-            if(id) {
-                const idx = clients.findIndex(x=>x.id==id);
-                clients[idx] = {...clients[idx], ...data};
-            } else {
-                data.id = Date.now().toString(); data.cuts=0; data.free=0; data.credit=0; data.ltv=0; data.loyalty=0; data.redeemedVal=0;
+                const id = idEl.value;
+                const ref = document.getElementById('c-ref').value;
+                const lastVal = document.getElementById('c-last').value;
                 
-                // LINEAR LOGIC: Checkbox decides
-                if(lastVal && countFirst) {
-                    data.cuts = 1; 
-                    data.loyalty = 1;
+                // Safe Checkbox Access
+                const toggleEl = document.getElementById('c-count-first');
+                const countFirst = toggleEl ? toggleEl.checked : false;
+                
+                let data = {
+                    name: nameEl.value, 
+                    phone: document.getElementById('c-phone').value,
+                    price: parseFloat(document.getElementById('c-price').value)||35,
+                    addr: document.getElementById('c-addr').value, 
+                    social: document.getElementById('c-social').value,
+                    dob: document.getElementById('c-dob').value, 
+                    start: document.getElementById('c-start').value, 
+                    ref: ref,
+                    freq: parseInt(document.getElementById('c-freq').value)||4, 
+                    lastVisit: lastVal,
+                    notes: document.getElementById('c-notes').value
+                };
+
+                if (id) {
+                    // Update Existing
+                    const idx = clients.findIndex(x => x.id == id);
+                    if (idx > -1) {
+                        clients[idx] = {...clients[idx], ...data};
+                    }
+                } else {
+                    // Create New
+                    data.id = Date.now().toString(); 
+                    data.cuts = 0; data.free = 0; data.credit = 0; 
+                    data.ltv = 0; data.loyalty = 0; data.redeemedVal = 0;
+                    
+                    // Logic from checkbox
+                    if (lastVal && countFirst) {
+                        data.cuts = 1; 
+                        data.loyalty = 1;
+                    }
+                    
+                    clients.push(data);
+                    data.isNew = true; // Trigger highlight
+                    
+                    // Referral Logic
+                    if (ref) {
+                        const referrer = clients.find(c => c.name.toLowerCase() === ref.toLowerCase() && c.id !== data.id);
+                        if (referrer) { 
+                            referrer.credit += 5; 
+                            data.credit += 5; 
+                            alert("Referral matched! $5 credits applied."); 
+                        }
+                    }
                 }
+
+                save(); 
+                closeModals(); 
                 
-                clients.push(data);
-                data.isNew = true; 
+                // RESET UI STATE TO SHOW NEW CLIENT
+                document.getElementById('search').value = '';
+                filterType = 'all';
+                document.querySelectorAll('.dash-card').forEach(d => d.classList.remove('active'));
+                const allBtn = document.getElementById('btn-all');
+                if(allBtn) allBtn.classList.add('active');
                 
-                if(ref) {
-                    const referrer = clients.find(c => c.name.toLowerCase() === ref.toLowerCase() && c.id !== data.id);
-                    if(referrer) { referrer.credit+=5; data.credit+=5; alert("Referral linked! $5 credits."); }
-                }
+                render();
+
+            } catch (err) {
+                alert("Error Saving: " + err.message);
+                console.error(err);
             }
-            save(); 
-            closeModals(); 
-            
-            // RESET EVERYTHING
-            document.getElementById('search').value = '';
-            filterType = 'all';
-            document.querySelectorAll('.dash-card').forEach(d => d.classList.remove('active'));
-            document.getElementById('btn-all').classList.add('active');
-            render();
         }
 
         // --- CUT LOGIC ---
@@ -516,6 +552,8 @@
             c.lastVisit = getLocalToday();
             c.cuts = (c.cuts || 0) + 1;
             c.ltv = (c.ltv || 0) + paid;
+            
+            // Loyalty Logic
             c.loyalty = (c.loyalty || 0) + 1;
             if(c.loyalty >= 5) {
                 c.free = (c.free || 0) + 1;
@@ -525,7 +563,7 @@
             save(); render();
         }
 
-        // --- REDEEM ---
+        // --- ANNIVERSARY REDEEM ---
         function openRedeem(id) {
             const c=clients.find(x=>x.id==id);
             const opts=[];
@@ -542,23 +580,82 @@
             if(c.credit>0) opts.push({lbl:`Use Credit ($${c.credit})`, fn:()=>{
                const u=prompt("Amt:",c.credit); if(u) { c.credit-=Math.min(parseFloat(u),c.credit); save(); render(); }
             }});
-            if(opts.length===0) return alert("No rewards.");
+            if(opts.length===0) return alert("No rewards available.");
             openListModal("Redeem", opts);
         }
 
-        // --- UTILS ---
-        function updateRefList() { const dl=document.getElementById('ref-list'); dl.innerHTML=''; clients.forEach(cl=>{dl.innerHTML+=`<option value="${cl.name}">`}); }
-        function openClientModal(id) {
-            const c = id ? clients.find(x=>x.id==id) : {id:'',name:'',phone:'',price:35,addr:'',social:'',dob:'',start:getLocalToday(),ref:'',freq:4,last:'',notes:''};
-            for(let k in c) if(document.getElementById('c-'+k)) document.getElementById('c-'+k).value = c[k];
-            // Reset toggle
-            document.getElementById('c-count-first').checked = false;
-            updateRefList(); document.getElementById('client-modal').style.display = 'flex';
+        // --- SCHEDULING (BLOB) ---
+        function openSchedule(id) {
+            const c=clients.find(x=>x.id==id); 
+            document.getElementById('cal-id').value=id;
+            document.getElementById('cal-date').value=getLocalToday();
+            selLoc('shop'); 
+            document.getElementById('cal-modal').style.display='flex';
         }
+        function selLoc(type) {
+            const c=clients.find(x=>x.id==document.getElementById('cal-id').value);
+            document.getElementById('cal-addr').value = type==='shop' ? (shopSettings.addr||'') : (c.addr||'');
+        }
+        function generateICS() {
+            const c=clients.find(x=>x.id==document.getElementById('cal-id').value);
+            const d=document.getElementById('cal-date').value; 
+            const t=document.getElementById('cal-time').value;
+            const loc=document.getElementById('cal-addr').value;
+            if(!d||!t) return alert("Date/Time needed");
+            
+            const startRaw = d.replace(/-/g, '') + 'T' + t.replace(/:/g, '') + '00';
+            let h = parseInt(t.split(':')[0]) + 2; 
+            let m = parseInt(t.split(':')[1]);
+            if(h>=24) h-=24;
+            const endRaw = d.replace(/-/g, '') + 'T' + (h<10?'0':'')+h + (m<10?'0':'')+m + '00';
+
+            const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Cut: ${c.name}\nDTSTART:${startRaw}\nDTEND:${endRaw}\nLOCATION:${loc}\nDESCRIPTION:${c.notes||'Haircut'}\nEND:VEVENT\nEND:VCALENDAR`;
+            
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([ics], {type: 'text/calendar'}));
+            a.download = 'appointment.ics';
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            closeModals();
+        }
+
+        // --- UTILS ---
+        function updateRefList() { 
+            const dl=document.getElementById('ref-list'); 
+            if(!dl) return;
+            dl.innerHTML=''; 
+            clients.forEach(cl=>{dl.innerHTML+=`<option value="${cl.name}">`}); 
+        }
+        
+        function openClientModal(id) {
+            // Default Values
+            let c = {id:'',name:'',phone:'',price:35,addr:'',social:'',dob:'',start:getLocalToday(),ref:'',freq:4,last:'',notes:''};
+            
+            if (id) {
+                const found = clients.find(x=>x.id==id);
+                if(found) c = found;
+            }
+
+            for(let k in c) {
+                const el = document.getElementById('c-'+k);
+                if(el) el.value = c[k];
+            }
+            
+            // Uncheck the toggle by default
+            const toggle = document.getElementById('c-count-first');
+            if(toggle) toggle.checked = false;
+
+            updateRefList(); 
+            document.getElementById('client-modal').style.display = 'flex';
+        }
+        
         function viewFull(id) {
             const c = clients.find(x=>x.id==id); tempId=id;
             document.getElementById('ro-title').innerText = c.name;
-            const fmt = (d) => { if(!d) return '-'; const [y, m, day] = d.split('-'); return `${m}/${day}/${y}`; };
+            const fmt = (d) => { 
+                if(!d || d.length < 10) return '-'; 
+                const parts = d.split('-');
+                return `${parts[1]}/${parts[2]}/${parts[0]}`; 
+            };
             let html = `<div class="ro-row"><div class="ro-lbl">Phone</div><div class="ro-val">${c.phone||'-'}</div></div>
                         <div class="ro-row"><div class="ro-lbl">Address</div><div class="ro-val">${c.addr||'-'}</div></div>
                         <div class="ro-row"><div class="ro-lbl">Social</div><div class="ro-val">${c.social||'-'}</div></div>
@@ -570,29 +667,122 @@
             document.getElementById('ro-content').innerHTML = html;
             document.getElementById('profile-modal').style.display = 'flex';
         }
+        
         function editFromProfile() { closeModals(); openClientModal(tempId); }
-        function openText(id) { const c = clients.find(x=>x.id==id); if(!c.phone) return alert("No phone."); const n = c.name.split(' ')[0]; const opts = [{lbl:"Running Late", txt:`Hey ${n}, running a bit behind schedule. Thanks!`}, {lbl:"Confirm Cut", txt:`Hey ${n}, confirming our cut tomorrow. Still good?`}, {lbl:"Follow Up", txt:`Hey ${n}, checking in on the fresh cut. All good?`}, {lbl:"Custom", txt:''}]; const sep = navigator.userAgent.match(/iPhone|iPad/i) ? '&' : '?'; openListModal("Send Text", opts.map(o=>({lbl: o.lbl, fn: ()=>{ window.location = `sms:${c.phone}${sep}body=${encodeURIComponent(o.txt)}`; }}))); }
+        
+        function openText(id) {
+            const c = clients.find(x=>x.id==id); 
+            if(!c.phone) return alert("No phone."); 
+            const n = c.name.split(' ')[0]; 
+            const opts = [{lbl:"Running Late", txt:`Hey ${n}, running a bit behind schedule. Thanks!`}, {lbl:"Confirm Cut", txt:`Hey ${n}, confirming our cut tomorrow. Still good?`}, {lbl:"Follow Up", txt:`Hey ${n}, checking in on the fresh cut. All good?`}, {lbl:"Custom", txt:''}]; 
+            const sep = navigator.userAgent.match(/iPhone|iPad/i) ? '&' : '?'; 
+            openListModal("Send Text", opts.map(o=>({lbl: o.lbl, fn: ()=>{ window.location = `sms:${c.phone}${sep}body=${encodeURIComponent(o.txt)}`; }}))); 
+        }
+        
         function openCreditModal() { updateRefList(); document.getElementById('credit-input').value=''; document.getElementById('credit-modal').style.display='flex'; }
-        function applyCredit() { const n=document.getElementById('credit-input').value; const c=clients.find(x=>x.name.toLowerCase()===n.toLowerCase()); if(c){c.credit+=5;save();render();alert("Credit Added");closeModals();}else alert("Not found"); }
-        function openSettings() { let rev=clients.reduce((a,b)=>a+(b.ltv||0),0); let cuts=clients.reduce((a,b)=>a+(b.cuts||0),0); let refs=clients.filter(c=>c.ref&&c.ref.length>0).length; let red=clients.reduce((a,b)=>a+(b.redeemedVal||0),0); document.getElementById('st-rev').innerText=`$${rev}`; document.getElementById('st-cuts').innerText=cuts; document.getElementById('st-ref').innerText=refs; document.getElementById('st-red').innerText=`$${red}`; document.getElementById('s-shop-addr').value=shopSettings.addr; document.getElementById('settings-modal').style.display='flex'; }
-        function customConfirm(msg,yes,no) { document.getElementById('confirm-msg').innerText=msg; document.getElementById('confirm-modal').style.display='flex'; document.getElementById('btn-yes').onclick=()=>{document.getElementById('confirm-modal').style.display='none';yes();}; document.getElementById('btn-no').onclick=()=>{document.getElementById('confirm-modal').style.display='none';if(no)no();}; }
-        function openListModal(title, options, callback) { document.getElementById('list-title').innerText=title; const c=document.getElementById('list-options'); c.innerHTML=''; options.forEach(o=>{const b=document.createElement('button'); b.className='list-option'; b.innerText=o.lbl; b.onclick=()=>{o.fn(); closeModals(); if(callback)callback();}; c.appendChild(b);}); document.getElementById('list-modal').style.display='flex'; }
+        
+        function applyCredit() { 
+            const n=document.getElementById('credit-input').value; 
+            const c=clients.find(x=>x.name.toLowerCase()===n.toLowerCase()); 
+            if(c){c.credit+=5;save();render();alert("Credit Added");closeModals();}
+            else alert("Not found"); 
+        }
+        
+        function openSettings() {
+            let rev=clients.reduce((a,b)=>a+(b.ltv||0),0); 
+            let cuts=clients.reduce((a,b)=>a+(b.cuts||0),0); 
+            let refs=clients.filter(c=>c.ref&&c.ref.length>0).length; 
+            let red=clients.reduce((a,b)=>a+(b.redeemedVal||0),0); 
+            document.getElementById('st-rev').innerText=`$${rev}`; 
+            document.getElementById('st-cuts').innerText=cuts; 
+            document.getElementById('st-ref').innerText=refs; 
+            document.getElementById('st-red').innerText=`$${red}`; 
+            document.getElementById('s-shop-addr').value=shopSettings.addr; 
+            document.getElementById('settings-modal').style.display='flex'; 
+        }
+        
+        function customConfirm(msg,yes,no) { 
+            document.getElementById('confirm-msg').innerText=msg; 
+            document.getElementById('confirm-modal').style.display='flex'; 
+            document.getElementById('btn-yes').onclick=()=>{document.getElementById('confirm-modal').style.display='none';yes();}; 
+            document.getElementById('btn-no').onclick=()=>{document.getElementById('confirm-modal').style.display='none';if(no)no();}; 
+        }
+        
+        function openListModal(title, options, callback) { 
+            document.getElementById('list-title').innerText=title; 
+            const c=document.getElementById('list-options'); c.innerHTML=''; 
+            options.forEach(o=>{
+                const b=document.createElement('button'); b.className='list-option'; b.innerText=o.lbl; 
+                b.onclick=()=>{o.fn(); closeModals(); if(callback)callback();}; 
+                c.appendChild(b);
+            }); 
+            document.getElementById('list-modal').style.display='flex'; 
+        }
+        
         function getDueDate(c) { if(!c.lastVisit||!c.freq)return null; const d=dateToLocal(c.lastVisit); d.setDate(d.getDate()+(c.freq*7)); return d; }
-        function isThisWeek(dStr) { if(!dStr)return false; const d=dateToLocal(dStr); const n=new Date(); n.setHours(0,0,0,0); const ty=new Date(n.getFullYear(),d.getMonth(),d.getDate()); const diff=(ty-n)/86400000; return diff>=-7 && diff<=7; }
+        
+        function isThisWeek(dStr) { 
+            if(!dStr)return false; const d=dateToLocal(dStr); const n=new Date(); n.setHours(0,0,0,0); 
+            const ty=new Date(n.getFullYear(),d.getMonth(),d.getDate()); 
+            const diff=(ty-n)/86400000; return diff>=-7 && diff<=7; 
+        }
+        
         function getYears(dStr) { if(!dStr)return 0; return new Date().getFullYear()-dateToLocal(dStr).getFullYear(); }
+        
         function setToday(id) { document.getElementById(id).value=getLocalToday(); }
+        
         function fill(id,v) { document.getElementById(id).value=v; }
-        function filter(t,el) { filterType=t; document.querySelectorAll('.dash-card').forEach(d=>d.classList.remove('active')); el.classList.add('active'); render(); }
+        
+        function filter(t,el) { 
+            filterType=t; 
+            document.querySelectorAll('.dash-card').forEach(d=>d.classList.remove('active')); 
+            el.classList.add('active'); 
+            render(); 
+        }
+        
         function toggleMenu() { document.getElementById('save-menu').classList.toggle('show'); }
-        function toggleTheme() { document.body.classList.toggle('light-mode'); localStorage.setItem('theme', document.body.classList.contains('light-mode')?'light':'dark'); }
+        
+        function toggleTheme() { 
+            document.body.classList.toggle('light-mode'); 
+            localStorage.setItem('theme', document.body.classList.contains('light-mode')?'light':'dark'); 
+        }
+        
         function closeModals() { document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); }
-        function save(skipRender) { localStorage.setItem('bb_clients_v3', JSON.stringify(clients)); if(!skipRender) render(); }
-        function saveSettings() { shopSettings.addr=document.getElementById('s-shop-addr').value; localStorage.setItem('bb_settings', JSON.stringify(shopSettings)); closeModals(); }
-        function exportData(type) { toggleMenu(); if(type==='json'){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(clients)],{type:'application/json'})); a.download=`bb_${Date.now()}.json`; a.click();} else { let csv="Name,Phone,LTV\n"+clients.map(c=>`"${c.name}","${c.phone}",${c.ltv}`).join('\n'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=`bb.csv`; a.click(); }}
-        function importData(el) { if(!el.files[0])return; const fr=new FileReader(); fr.onload=e=>{clients=JSON.parse(e.target.result); save(); render(); alert("Restored!");}; fr.readAsText(el.files[0]); }
-        function openSchedule(id) { const c=clients.find(x=>x.id==id); document.getElementById('cal-id').value=id; document.getElementById('cal-date').value=getLocalToday(); selLoc('shop'); document.getElementById('cal-modal').style.display='flex'; }
-        function selLoc(type) { const c=clients.find(x=>x.id==document.getElementById('cal-id').value); document.getElementById('cal-addr').value = type==='shop' ? (shopSettings.addr||'') : (c.addr||''); }
-        function generateICS() { const c=clients.find(x=>x.id==document.getElementById('cal-id').value); const d=document.getElementById('cal-date').value; const t=document.getElementById('cal-time').value; const loc=document.getElementById('cal-addr').value; if(!d||!t) return alert("Date/Time needed"); const startRaw = d.replace(/-/g, '') + 'T' + t.replace(/:/g, '') + '00'; let h = parseInt(t.split(':')[0]) + 2; let m = parseInt(t.split(':')[1]); if(h>=24) h-=24; const endRaw = d.replace(/-/g, '') + 'T' + (h<10?'0':'')+h + (m<10?'0':'')+m + '00'; const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Cut: ${c.name}\nDTSTART:${startRaw}\nDTEND:${endRaw}\nLOCATION:${loc}\nDESCRIPTION:${c.notes||'Haircut'}\nEND:VEVENT\nEND:VCALENDAR`; const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([ics], {type: 'text/calendar'})); a.download = 'appointment.ics'; document.body.appendChild(a); a.click(); document.body.removeChild(a); closeModals(); }
+        
+        function save(skipRender) { 
+            localStorage.setItem('bb_clients_v3', JSON.stringify(clients)); 
+            if(!skipRender) render(); 
+        }
+        
+        function saveSettings() { 
+            shopSettings.addr=document.getElementById('s-shop-addr').value; 
+            localStorage.setItem('bb_settings', JSON.stringify(shopSettings)); 
+            closeModals(); 
+        }
+        
+        function exportData(type) { 
+            toggleMenu(); 
+            if(type==='json'){ 
+                const a=document.createElement('a'); 
+                a.href=URL.createObjectURL(new Blob([JSON.stringify(clients)],{type:'application/json'})); 
+                a.download=`bb_${Date.now()}.json`; a.click();
+            } else { 
+                let csv="Name,Phone,LTV\n"+clients.map(c=>`"${c.name}","${c.phone}",${c.ltv}`).join('\n'); 
+                const a=document.createElement('a'); 
+                a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); 
+                a.download=`bb.csv`; a.click(); 
+            }
+        }
+        
+        function importData(el) { 
+            if(!el.files[0])return; 
+            const fr=new FileReader(); 
+            fr.onload=e=>{
+                clients=JSON.parse(e.target.result); 
+                save(); render(); alert("Restored!");
+            }; 
+            fr.readAsText(el.files[0]); 
+        }
     </script>
 </body>
 </html>
