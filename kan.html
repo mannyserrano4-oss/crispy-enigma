@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mission Control</title>
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
+
+    <style>
+        :root {
+            --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --subtext: #94a3b8;
+            --border: #334155; --input-bg: #020617;
+            --accent: #38bdf8; /* Sky Blue */
+            --green: #10b981; --gold: #fbbf24;
+        }
+        body { 
+            background: var(--bg); color: var(--text); 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0; height: 100dvh; display: flex; flex-direction: column; overflow: hidden;
+        }
+
+        /* HEADER */
+        .header { 
+            padding: 15px; background: var(--card); border-bottom: 1px solid var(--border); 
+            display: flex; justify-content: space-between; align-items: center; z-index: 20;
+        }
+        h1 { margin: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); font-weight: 900; }
+        .icon-btn { font-size: 1.4rem; background: none; border: none; cursor: pointer; padding: 5px; }
+
+        /* BOARD LAYOUT */
+        .board { 
+            flex: 1; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; 
+            padding: 10px; gap: 15px;
+        }
+        .column { 
+            min-width: 85vw; /* Mobile focus */
+            background: rgba(30, 41, 59, 0.5); 
+            border: 1px solid var(--border); 
+            border-radius: 12px; 
+            display: flex; flex-direction: column;
+            scroll-snap-align: center;
+        }
+        @media (min-width: 600px) { .column { min-width: 300px; } }
+
+        .col-header { 
+            padding: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; 
+            border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;
+        }
+        .col-staging { color: var(--subtext); border-top: 4px solid var(--subtext); }
+        .col-active { color: var(--accent); border-top: 4px solid var(--accent); }
+        .col-victory { color: var(--green); border-top: 4px solid var(--green); }
+
+        .task-list { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 10px; }
+
+        /* CARDS */
+        .card { 
+            background: var(--card); padding: 15px; border-radius: 8px; border: 1px solid var(--border); 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: transform 0.2s;
+        }
+        .card:active { transform: scale(0.98); }
+        .card-title { font-weight: bold; font-size: 1rem; margin-bottom: 5px; }
+        
+        /* PROGRESS BAR */
+        .progress-track { background: var(--input-bg); height: 6px; border-radius: 3px; overflow: hidden; margin-top: 10px; }
+        .progress-fill { height: 100%; background: var(--green); width: 0%; transition: width 0.3s; }
+        .card-meta { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--subtext); margin-top: 5px; }
+
+        /* FAB */
+        .fab { 
+            position: fixed; bottom: 30px; right: 20px; 
+            background: var(--accent); color: #000; 
+            width: 65px; height: 65px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 2.5rem; box-shadow: 0 5px 20px rgba(56, 189, 248, 0.4); 
+            cursor: pointer; border: none; z-index: 500; 
+        }
+
+        /* MODALS */
+        .modal { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.9); z-index: 1000; display: none; 
+            justify-content: center; align-items: flex-start; overflow-y: auto; padding: 20px 0; 
+        }
+        .modal-content { 
+            background: var(--card); width: 90%; max-width: 400px; 
+            padding: 20px; border-radius: 20px; border: 1px solid var(--border); 
+            margin-bottom: 80px; 
+        }
+
+        .form-input { 
+            width: 100%; padding: 12px; background: var(--input-bg); 
+            border: 1px solid var(--border); color: var(--text); 
+            border-radius: 8px; font-size: 1rem; box-sizing: border-box; margin-bottom: 15px; 
+        }
+        
+        /* CHECKLIST */
+        .check-item { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
+        .check-box { width: 20px; height: 20px; cursor: pointer; }
+        .check-text { flex: 1; background: transparent; border: none; color: var(--text); font-size: 1rem; border-bottom: 1px solid transparent; }
+        .check-text:focus { border-bottom: 1px solid var(--accent); outline: none; }
+        .check-del { color: var(--red); cursor: pointer; padding: 5px; }
+
+        .btn-main { width: 100%; padding: 15px; background: var(--accent); color: #000; border: none; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 10px; }
+        .btn-move { flex: 1; padding: 10px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .move-row { display: flex; gap: 10px; margin-top: 15px; }
+
+        /* DROPDOWN */
+        .dropdown { position: absolute; top: 60px; right: 15px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; display: none; flex-direction: column; width: 180px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 200; }
+        .dropdown.show { display: flex; }
+        .dd-item { padding: 15px; text-align: left; background: none; border: none; border-bottom: 1px solid var(--border); color: var(--text); font-size: 1rem; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Mission Control 🚀</h1>
+        <button class="icon-btn" onclick="toggleMenu()">💾</button>
+    </div>
+
+    <div id="save-menu" class="dropdown">
+        <button class="dd-item" onclick="exportData()">Backup (iCloud)</button>
+        <button class="dd-item" onclick="document.getElementById('file-input').click()">Restore File</button>
+    </div>
+    <input type="file" id="file-input" hidden onchange="importData(this)">
+
+    <div class="board">
+        <div class="column">
+            <div class="col-header col-staging">Staging <span id="count-0">0</span></div>
+            <div class="task-list" id="col-0"></div>
+        </div>
+        <div class="column">
+            <div class="col-header col-active">Active <span id="count-1">0</span></div>
+            <div class="task-list" id="col-1"></div>
+        </div>
+        <div class="column">
+            <div class="col-header col-victory">Victory <span id="count-2">0</span></div>
+            <div class="task-list" id="col-2"></div>
+        </div>
+    </div>
+
+    <button class="fab" onclick="openModal()">+</button>
+
+    <div id="task-modal" class="modal">
+        <div class="modal-content">
+            <h2 style="margin-top:0;">Mission Details</h2>
+            <input type="hidden" id="t-id">
+            <label style="color:var(--subtext); font-size:0.8rem; font-weight:bold;">MISSION TITLE</label>
+            <input id="t-title" class="form-input" placeholder="e.g. Learn Python">
+            
+            <label style="color:var(--subtext); font-size:0.8rem; font-weight:bold;">TACTICAL CHECKLIST</label>
+            <div id="checklist-container"></div>
+            <button class="btn-move" onclick="addCheckItem()" style="width:100%; margin-bottom:15px;">+ Add Step</button>
+
+            <div class="move-row" id="move-controls" style="display:none;">
+                <button class="btn-move" onclick="moveCard(-1)">⬅️ Move Back</button>
+                <button class="btn-move" onclick="moveCard(1)">Move Forward ➡️</button>
+            </div>
+
+            <button class="btn-main" onclick="saveCard()">SAVE MISSION</button>
+            <button class="btn-move" style="width:100%; margin-top:10px; color:var(--subtext);" onclick="closeModal()">Cancel</button>
+            <button class="btn-move" style="width:100%; margin-top:10px; color:var(--red); border-color:var(--red);" onclick="deleteCard()">Delete</button>
+        </div>
+    </div>
+
+    <script>
+        let tasks = JSON.parse(localStorage.getItem('mc_tasks') || '[]');
+        
+        render();
+
+        function render() {
+            // Clear Columns
+            [0, 1, 2].forEach(i => {
+                document.getElementById(`col-${i}`).innerHTML = '';
+                document.getElementById(`count-${i}`).innerText = '0';
+            });
+
+            tasks.forEach(t => {
+                const total = t.steps.length;
+                const done = t.steps.filter(s => s.done).length;
+                const pct = total === 0 ? 0 : (done / total) * 100;
+
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.onclick = () => openModal(t.id);
+                div.innerHTML = `
+                    <div class="card-title">${t.title}</div>
+                    <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+                    <div class="card-meta"><span>${done}/${total} Steps</span><span>${pct.toFixed(0)}%</span></div>
+                `;
+                
+                // Add to appropriate column (default to 0 if undefined)
+                const colId = t.col !== undefined ? t.col : 0;
+                document.getElementById(`col-${colId}`).appendChild(div);
+            });
+
+            // Update Counts
+            [0, 1, 2].forEach(i => {
+                document.getElementById(`count-${i}`).innerText = tasks.filter(t => (t.col||0) === i).length;
+            });
+        }
+
+        function openModal(id) {
+            const t = id ? tasks.find(x => x.id === id) : { id: '', title: '', steps: [], col: 0 };
+            document.getElementById('t-id').value = t.id;
+            document.getElementById('t-title').value = t.title;
+            
+            // Render Steps
+            const container = document.getElementById('checklist-container');
+            container.innerHTML = '';
+            t.steps.forEach(s => addCheckItem(s.text, s.done));
+            if(t.steps.length === 0) addCheckItem(); // Add one empty by default
+
+            // Show Move Controls only if existing
+            document.getElementById('move-controls').style.display = id ? 'flex' : 'none';
+            
+            document.getElementById('task-modal').style.display = 'flex';
+        }
+
+        function addCheckItem(text = '', done = false) {
+            const div = document.createElement('div');
+            div.className = 'check-item';
+            div.innerHTML = `
+                <input type="checkbox" class="check-box" ${done ? 'checked' : ''}>
+                <input type="text" class="check-text" value="${text}" placeholder="Step...">
+                <span class="check-del" onclick="this.parentElement.remove()">✕</span>
+            `;
+            document.getElementById('checklist-container').appendChild(div);
+        }
+
+        function saveCard() {
+            const id = document.getElementById('t-id').value;
+            const title = document.getElementById('t-title').value;
+            if(!title) return alert("Title required");
+
+            // Scrape Checklist
+            const steps = [];
+            document.querySelectorAll('.check-item').forEach(el => {
+                const txt = el.querySelector('.check-text').value.trim();
+                const chk = el.querySelector('.check-box').checked;
+                if(txt) steps.push({ text: txt, done: chk });
+            });
+
+            if(id) {
+                const idx = tasks.findIndex(x => x.id === id);
+                tasks[idx].title = title;
+                tasks[idx].steps = steps;
+            } else {
+                tasks.push({ id: Date.now().toString(), title, steps, col: 0 }); // Default to Staging
+            }
+            
+            save(); closeModal(); render();
+        }
+
+        function moveCard(dir) {
+            const id = document.getElementById('t-id').value;
+            const idx = tasks.findIndex(x => x.id === id);
+            if(idx > -1) {
+                let newCol = (tasks[idx].col || 0) + dir;
+                if(newCol < 0) newCol = 0;
+                if(newCol > 2) newCol = 2;
+                tasks[idx].col = newCol;
+                save(); closeModal(); render();
+            }
+        }
+
+        function deleteCard() {
+            const id = document.getElementById('t-id').value;
+            if(!id) return;
+            if(confirm("Abort Mission? (Delete Card)")) {
+                tasks = tasks.filter(x => x.id !== id);
+                save(); closeModal(); render();
+            }
+        }
+
+        // --- UTILS ---
+        function save() { localStorage.setItem('mc_tasks', JSON.stringify(tasks)); }
+        function closeModal() { document.getElementById('task-modal').style.display = 'none'; }
+        function toggleMenu() { document.getElementById('save-menu').classList.toggle('show'); }
+        
+        function exportData() {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([JSON.stringify(tasks)], {type:'application/json'}));
+            a.download = `mission_backup_${Date.now()}.json`;
+            a.click();
+            toggleMenu();
+        }
+
+        function importData(el) {
+            if(!el.files[0]) return;
+            const fr = new FileReader();
+            fr.onload = e => {
+                tasks = JSON.parse(e.target.result);
+                save(); render(); alert("Mission Data Restored");
+            };
+            fr.readAsText(el.files[0]);
+            toggleMenu();
+        }
+    </script>
+</body>
+</html>
