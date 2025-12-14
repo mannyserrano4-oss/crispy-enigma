@@ -77,7 +77,7 @@
             padding-bottom: 140px;
             transition: background-color 0.3s ease;
             -webkit-tap-highlight-color: transparent;
-            user-select: none; /* App feel */
+            user-select: none;
         }
 
         /* --- HEADER --- */
@@ -510,7 +510,7 @@
     <script>
         // --- DATA ---
         let clients = JSON.parse(localStorage.getItem('bbClients')) || [];
-        let history = JSON.parse(localStorage.getItem('bbHistory')) || []; // New: Transaction History
+        let history = JSON.parse(localStorage.getItem('bbHistory')) || []; // Transaction History
         let settings = JSON.parse(localStorage.getItem('bbSettings')) || { location: '' };
         let activeId = null;
         let activeFilter = 'all';
@@ -727,11 +727,11 @@
 
             if(selectedDisc !== 'free') {
                 c.loyalty = (c.loyalty || 0) + 1;
-                if(c.loyalty >= 6) { 
-                     if(await customConfirm("Client reached 6th cut! Bank a free cut?")) {
-                        c.banked = (c.banked || 0) + 1;
-                        c.loyalty = 0;
-                    }
+                // CHANGED LOGIC: Check if they just hit 5. If so, bank it.
+                if(c.loyalty >= 5) {
+                    c.banked = (c.banked || 0) + 1;
+                    c.loyalty = 0;
+                    await customConfirm("🎉 High Five! Client reached 5 cuts. A Free Cut has been banked for next time.");
                 }
             }
 
