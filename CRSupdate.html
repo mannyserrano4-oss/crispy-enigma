@@ -19,6 +19,7 @@
             --border: #cbd5e1; --input-bg: #f8fafc;
         }
 
+        /* LAYOUT - GRID SYSTEM FOR SCROLLING */
         body { 
             background: var(--bg); color: var(--text); 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -70,9 +71,9 @@
         .client-card { 
             background: var(--card); border-radius: 16px; border: 1px solid var(--border); 
             overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); flex-shrink: 0;
-            transition: background 0.5s;
+            transition: background 0.3s;
         }
-        .client-card.new-item { background: rgba(99, 102, 241, 0.2); } /* Highlight effect */
+        .client-card.new-item { background: rgba(99, 102, 241, 0.2); }
 
         .card-header { padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .card-header.due { border-left: 4px solid var(--red); }
@@ -98,19 +99,15 @@
         .detail-box { flex: 1; background: var(--card); padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px; }
         .detail-lbl { font-size: 0.65rem; color: var(--accent); font-weight: 800; margin-bottom: 6px; letter-spacing: 1px; }
         .detail-txt { 
-            font-size: 0.95rem; 
-            line-height: 1.5; 
-            white-space: pre-wrap; 
-            word-wrap: break-word; 
-            overflow-wrap: break-word;
-            color: var(--text);
+            font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; 
+            word-wrap: break-word; overflow-wrap: break-word; color: var(--text);
         }
 
         /* BUTTONS */
         .btn-main { width: 100%; padding: 16px; background: var(--green); color: #000; border: none; border-radius: 12px; font-size: 1rem; font-weight: 800; text-transform: uppercase; cursor: pointer; margin-bottom: 12px; }
         .btn-full { width: 100%; padding: 12px; background: var(--card); border: 1px solid var(--border); color: var(--text); font-weight: 600; border-radius: 10px; margin-bottom: 12px; cursor: pointer; }
         
-        .action-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
         .btn-act { background: var(--card); border: 1px solid var(--border); color: var(--subtext); padding: 10px 5px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; text-decoration: none;}
         .btn-act span { font-size: 1.2rem; }
 
@@ -312,12 +309,14 @@
         let shopSettings = JSON.parse(localStorage.getItem('bb_settings') || '{"addr":""}');
         let filterType = 'all';
         let tempId = null;
+        let pendingCutId = null; 
 
         if(localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
         render();
 
+        // DATE HELPER: Safely handles empty or missing dates
         function dateToLocal(dateStr) {
-            if(!dateStr) return null;
+            if(!dateStr || dateStr.length < 10) return null;
             const parts = dateStr.split('-');
             return new Date(parts[0], parts[1] - 1, parts[2]); 
         }
@@ -330,17 +329,19 @@
 
             const today = new Date(); today.setHours(0,0,0,0);
 
-            let visible = clients.filter(c => 
-                c.name.toLowerCase().includes(query) || 
-                (c.notes && c.notes.toLowerCase().includes(query)) || 
-                (c.phone && c.phone.includes(query))
-            );
+            // Safer filtering that checks for null properties
+            let visible = clients.filter(c => {
+                const nameMatch = (c.name || '').toLowerCase().includes(query);
+                const noteMatch = (c.notes || '').toLowerCase().includes(query);
+                const phoneMatch = (c.phone || '').includes(query);
+                return nameMatch || noteMatch || phoneMatch;
+            });
 
             if(filterType === 'due') visible = visible.filter(c => getDueDate(c) <= today);
             if(filterType === 'bday') visible = visible.filter(c => isThisWeek(c.dob));
             if(filterType === 'ghosts') visible = visible.filter(c => c.lastVisit && Math.ceil((today - dateToLocal(c.lastVisit))/86400000) > 90);
 
-            visible.sort((a,b) => a.name.localeCompare(b.name));
+            visible.sort((a,b) => (a.name || '').localeCompare(b.name || ''));
 
             visible.forEach(c => {
                 let badges = '';
@@ -356,11 +357,14 @@
                 let dueTxt = due ? (daysTill < 0 ? `Overdue ${Math.abs(daysTill)}d` : `Due ${daysTill}d`) : '';
                 let dueCol = daysTill < 0 ? 'var(--red)' : 'var(--subtext)';
                 
+                // CRASH PROOF DATE DISPLAY
                 let lastCutTxt = 'New';
-                if(c.lastVisit) {
+                if(c.lastVisit && c.lastVisit.includes('-')) {
                     const [y, m, d] = c.lastVisit.split('-');
                     const dateObj = new Date(y, m-1, d);
-                    lastCutTxt = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    if(!isNaN(dateObj)) {
+                        lastCutTxt = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    }
                 }
                 
                 let cardClass = daysTill < 0 ? 'card-header due' : 'card-header';
@@ -395,8 +399,8 @@
                             <div class="bank-item"><div class="bank-val">${loyaltyText}</div><div class="bank-lbl">Loyalty</div></div>
                             <div class="bank-item"><div class="bank-val" style="color:var(--gold)">$${c.credit||0}</div><div class="bank-lbl">Credit</div></div>
                         </div>
-                        <div class="bank-item"><button class="btn-act" style="width:100%; border:1px solid var(--gold); color:var(--gold);" onclick="openRedeem('${c.id}')">🏆 REDEEM</button></div>
-                        <div class="detail-box" style="margin-top:10px;"><div class="detail-lbl">NOTES</div><div class="detail-txt">${c.notes||'-'}</div></div>
+                        <div class="bank-item"><button class="btn-act" style="width:100%; border:1px solid var(--gold); color:var(--gold); margin-bottom:10px;" onclick="openRedeem('${c.id}')">🏆 REDEEM</button></div>
+                        <div class="detail-box" style="margin-bottom:10px;"><div class="detail-lbl">NOTES</div><div class="detail-txt">${c.notes||'-'}</div></div>
                         <button class="btn-full" onclick="viewFull('${c.id}')">📄 View Full Profile</button>
                         <button class="btn-main" onclick="startCutFlow('${c.id}')">✂️ RECORD CUT</button>
                         <div class="action-grid">
@@ -483,7 +487,7 @@
             openListModal("Redeem", opts);
         }
 
-        // --- SCHEDULING ---
+        // --- SCHEDULING (BLOB) ---
         function openSchedule(id) {
             const c=clients.find(x=>x.id==id); document.getElementById('cal-id').value=id;
             document.getElementById('cal-date').value=new Date().toISOString().split('T')[0];
@@ -544,7 +548,6 @@
             } else {
                 data.id = Date.now().toString(); data.cuts=0; data.free=0; data.credit=0; data.ltv=0; data.loyalty=0; data.redeemedVal=0;
                 
-                // NEW CLIENT LOGIC
                 if(lastVal) {
                     if(confirm("Count the 'Last Cut' date as their 1st cut?")) {
                         data.cuts = 1; data.loyalty = 1;
@@ -552,7 +555,7 @@
                 }
                 
                 clients.push(data);
-                data.isNew = true; // Mark for highlight
+                data.isNew = true; 
                 
                 if(ref) {
                     const referrer = clients.find(c => c.name.toLowerCase() === ref.toLowerCase() && c.id !== data.id);
@@ -561,7 +564,7 @@
             }
             save(); closeModals(); 
             
-            // FORCE RESET SEARCH & FILTER TO SHOW NEW CLIENT
+            // FORCE RESET
             document.getElementById('search').value = '';
             filter('all', document.getElementById('btn-all'));
         }
