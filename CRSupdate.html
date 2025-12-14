@@ -12,7 +12,7 @@
         /* --- THEME VARIABLES --- */
         :root {
             /* Light Mode (Pastel Default) */
-            --bg-body: #FFFDF7; /* Creamy White */
+            --bg-body: #FFFDF7;
             --bg-card: #FFFFFF;
             --bg-modal: #FFFFFF;
             --text-main: #4A4A4A;
@@ -22,7 +22,7 @@
             /* Pastel Palette */
             --p-blue: #A2D2FF;
             --p-blue-dark: #6495ED;
-            --p-green: #B7E4C7; /* Mint */
+            --p-green: #B7E4C7;
             --p-green-dark: #52B788;
             --p-pink: #FFC8DD;
             --p-pink-dark: #FF8FAB;
@@ -30,9 +30,9 @@
             --p-yellow: #FDE2E4;
             
             /* Logic Colors */
-            --status-due: #FFD6A5; /* Pastel Orange */
-            --status-overdue: #FFA69E; /* Pastel Red */
-            --status-good: #B7E4C7; /* Pastel Green */
+            --status-due: #FFD6A5;
+            --status-overdue: #FFA69E;
+            --status-good: #B7E4C7;
             
             --input-bg: #F7F9FC;
             --input-border: #DDE2E8;
@@ -48,7 +48,6 @@
             --text-sub: #A0A0A5;
             --border: #3A3A42;
             
-            /* Deeper Pastels for contrast */
             --p-blue: #4D96FF;
             --p-blue-dark: #82C2F2;
             --p-green: #06D6A0;
@@ -167,9 +166,6 @@
         .cc-due { font-size: 0.8rem; font-weight: 600; padding: 4px 8px; border-radius: 6px; background: var(--input-bg); color: var(--text-sub); }
         .cc-info { color: var(--text-sub); font-size: 0.9rem; margin-top: 5px; }
         
-        .badges { display: flex; gap: 5px; margin-top: 8px; }
-        .badge { font-size: 0.8rem; }
-
         /* --- STICKY FOOTER --- */
         .footer-bar {
             position: fixed; bottom: 0; left: 0; width: 100%;
@@ -247,7 +243,14 @@
             padding: 15px; border-radius: 14px; background: var(--input-bg);
             border: 2px solid var(--p-blue); color: var(--p-blue-dark);
             font-weight: 700; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px;
-            text-decoration: none;
+            text-decoration: none; cursor: pointer;
+        }
+
+        /* SMS MENU */
+        .sms-opt {
+            padding: 15px; background: var(--input-bg); border-radius: 12px;
+            margin-bottom: 10px; font-weight: 600; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
         }
 
         /* CHECKOUT DISCOUNT LIST */
@@ -258,7 +261,7 @@
         }
         .discount-opt.selected { border-color: var(--p-green-dark); background: rgba(183, 228, 199, 0.2); }
 
-        /* CUSTOM CONFIRM MODAL */
+        /* CONFIRM MODAL */
         .confirm-box {
             background: var(--bg-card); padding: 30px; border-radius: 20px;
             text-align: center; width: 80%; max-width: 350px;
@@ -282,11 +285,11 @@
         <div class="metrics-scroll">
             <div class="metric-pill">
                 <span class="m-lbl">Revenue</span>
-                <span class="m-val" id="mRev">$0</span>
+                <span class="m-val" id="mRev">$0.00</span>
             </div>
             <div class="metric-pill">
                 <span class="m-lbl">Giveback</span>
-                <span class="m-val" id="mGive">$0</span>
+                <span class="m-val" id="mGive">$0.00</span>
             </div>
             <div class="metric-pill">
                 <span class="m-lbl">Cuts</span>
@@ -324,7 +327,7 @@
 
             <div class="contact-grid">
                 <a id="btnCall" href="#" class="c-btn"><i class="fas fa-phone"></i> Call</a>
-                <a id="btnText" href="#" class="c-btn"><i class="fas fa-comment"></i> Text</a>
+                <div class="c-btn" onclick="openSmsMenu()"><i class="fas fa-comment"></i> Text</div>
             </div>
 
             <div class="v-grid">
@@ -333,7 +336,7 @@
                     <span style="font-size:0.7rem; text-transform:uppercase;">Loyalty</span>
                 </div>
                 <div class="v-box">
-                    <span class="v-big" style="color:var(--p-green-dark)" id="vCredit">$0</span>
+                    <span class="v-big" style="color:var(--p-green-dark)" id="vCredit">$0.00</span>
                     <span style="font-size:0.7rem; text-transform:uppercase;">Ref Credit</span>
                 </div>
                 <div class="v-box">
@@ -341,7 +344,7 @@
                     <span style="font-size:0.7rem; text-transform:uppercase;">Total Cuts</span>
                 </div>
                 <div class="v-box">
-                    <span class="v-big" id="vLTV">$0</span>
+                    <span class="v-big" id="vLTV">$0.00</span>
                     <span style="font-size:0.7rem; text-transform:uppercase;">LTV</span>
                 </div>
             </div>
@@ -357,28 +360,39 @@
         </div>
     </div>
 
+    <div id="smsModal" class="overlay" style="z-index: 600;">
+        <div class="sheet">
+            <h3>Send Text</h3>
+            <div class="sms-opt" onclick="sendSms('late')">🏃 Running Late (15m) <i class="fas fa-chevron-right"></i></div>
+            <div class="sms-opt" onclick="sendSms('confirm')">📅 Confirm Appointment <i class="fas fa-chevron-right"></i></div>
+            <div class="sms-opt" onclick="sendSms('longtime')">👋 Long Time No See <i class="fas fa-chevron-right"></i></div>
+            <div class="sms-opt" onclick="sendSms('followup')">✂️ Follow Up / Feedback <i class="fas fa-chevron-right"></i></div>
+            <div class="sms-opt" onclick="sendSms('custom')">💬 Custom Message <i class="fas fa-chevron-right"></i></div>
+            <button class="btn btn-red" onclick="closeModal('smsModal')">Cancel</button>
+        </div>
+    </div>
+
     <div id="checkoutModal" class="overlay" style="z-index:600;">
         <div class="sheet">
             <h3>Checkout</h3>
             
             <label>Base Price ($)</label>
-            <input type="number" id="payPrice" onchange="calcTotal()">
+            <input type="number" id="payPrice" onchange="calcTotal()" inputmode="decimal">
 
             <label>Discounts & Redemptions</label>
-            <div id="discountList">
-                </div>
+            <div id="discountList"></div>
             <div id="customDiscBox" style="display:none;">
                 <label>Custom Discount (%)</label>
-                <input type="number" id="payCustomPct" placeholder="e.g. 50" oninput="calcTotal()">
+                <input type="number" id="payCustomPct" placeholder="e.g. 50" oninput="calcTotal()" inputmode="decimal">
             </div>
 
             <label>Tip ($)</label>
-            <input type="number" id="payTip" value="0" onchange="calcTotal()">
+            <input type="number" id="payTip" value="0" onchange="calcTotal()" inputmode="decimal">
 
             <div style="background:var(--input-bg); padding:15px; border-radius:12px; margin:20px 0; text-align:center;">
                 <span style="color:var(--text-sub); font-size:0.8rem;">TOTAL REVENUE TO TRACK</span><br>
-                <span id="payTotal" style="font-size:2rem; font-weight:800; color:var(--p-green-dark);">$35</span>
-                <div id="givebackDisplay" style="color:var(--p-pink-dark); font-size:0.9rem; font-weight:700;">Giveback: $0</div>
+                <span id="payTotal" style="font-size:2rem; font-weight:800; color:var(--p-green-dark);">$35.00</span>
+                <div id="givebackDisplay" style="color:var(--p-pink-dark); font-size:0.9rem; font-weight:700;">Giveback: $0.00</div>
             </div>
 
             <button class="btn btn-green" onclick="finalizeCut()">Confirm & Save</button>
@@ -491,7 +505,6 @@
         window.onload = () => {
             render();
             document.getElementById('setLoc').value = settings.location;
-            // Check theme pref
             if(localStorage.getItem('theme') === 'dark') toggleTheme();
         };
 
@@ -506,11 +519,12 @@
             const list = document.getElementById('list');
             list.innerHTML = '';
 
-            // Metrics
+            // Metrics - Fixed Precision
             const totalRev = clients.reduce((s,c) => s + (c.spent || 0), 0);
             const totalGive = clients.reduce((s,c) => s + (c.giveback || 0), 0);
-            document.getElementById('mRev').innerText = '$' + Math.floor(totalRev);
-            document.getElementById('mGive').innerText = '$' + Math.floor(totalGive);
+            
+            document.getElementById('mRev').innerText = '$' + totalRev.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('mGive').innerText = '$' + totalGive.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
             document.getElementById('mCuts').innerText = clients.reduce((s,c) => s + (c.cuts || 0), 0);
 
             let filtered = clients.filter(c => {
@@ -576,24 +590,42 @@
             if(c.first && isAnniversary(c.first)) b += `<span style="background:var(--p-purple); color:black; padding:5px 10px; border-radius:10px; font-size:0.8rem; font-weight:bold;">🏅 Anniversary Month</span>`;
             document.getElementById('vBadges').innerHTML = b;
 
-            // Stats
+            // Stats with Precision
             document.getElementById('vLoyalty').innerText = `${c.loyalty||0}/5`;
-            document.getElementById('vCredit').innerText = `$${c.credit||0}`;
+            document.getElementById('vCredit').innerText = `$${(c.credit||0).toFixed(2)}`;
             document.getElementById('vTotalCuts').innerText = c.cuts||0;
-            document.getElementById('vLTV').innerText = `$${Math.floor(c.spent||0)}`;
+            document.getElementById('vLTV').innerText = `$${(c.spent||0).toFixed(2)}`;
 
             // Contact
             document.getElementById('btnCall').href = `tel:${c.phone}`;
-            document.getElementById('btnText').href = `sms:${c.phone}`;
             document.getElementById('btnInsta').style.display = c.insta ? 'block' : 'none';
 
             openModal('viewModal');
         }
 
+        // --- SMS LOGIC ---
+        function openSmsMenu() { openModal('smsModal'); }
+        
+        function sendSms(type) {
+            const c = getClient(activeId);
+            if(!c || !c.phone) return alert('No phone number saved.');
+            
+            const first = c.name.split(' ')[0];
+            let msg = '';
+            
+            if(type === 'late') msg = `Hey ${first}, running about 15 mins late for our appointment. So sorry!`;
+            if(type === 'confirm') msg = `Yo ${first}, just confirming our cut. You still good?`;
+            if(type === 'longtime') msg = `Hey ${first}, been a while! Time to clean up that cut?`;
+            if(type === 'followup') msg = `Appreciate you coming through ${first}! How's the cut treating you?`;
+            
+            window.location.href = `sms:${c.phone}&body=${encodeURIComponent(msg)}`;
+            closeModal('smsModal');
+        }
+
         // --- CHECKOUT LOGIC ---
         let checkoutTotal = 0;
         let checkoutGiveback = 0;
-        let selectedDisc = 'none'; // none, credit, free, half, custom
+        let selectedDisc = 'none';
 
         function openCheckout() {
             const c = getClient(activeId);
@@ -602,20 +634,16 @@
             document.getElementById('customDiscBox').style.display = 'none';
             selectedDisc = 'none';
 
-            // Build Options
             const opts = document.getElementById('discountList');
             opts.innerHTML = '';
-
             addOpt(opts, 'none', 'No Discount', true);
             
             if((c.banked || 0) > 0) addOpt(opts, 'free', `Redeem 1 Free Cut (Banked: ${c.banked})`);
             if((c.credit || 0) > 0) addOpt(opts, 'credit', `Redeem $5 Credit (Bal: $${c.credit})`);
             
-            // Birthday/Anniversary Logic
             if( (c.dob && isMonth(c.dob)) || (c.first && isAnniversary(c.first)) ) {
                 addOpt(opts, 'half', `Redeem 50% Off (Special Month)`);
             }
-
             addOpt(opts, 'custom', 'Custom % Discount');
 
             openModal('checkoutModal');
@@ -640,11 +668,10 @@
             const base = parseFloat(document.getElementById('payPrice').value) || 0;
             const tip = parseFloat(document.getElementById('payTip').value) || 0;
             let discount = 0;
-            const c = getClient(activeId);
-
-            if(selectedDisc === 'free') discount = base; // 100% off base
+            
+            if(selectedDisc === 'free') discount = base; 
             if(selectedDisc === 'half') discount = base * 0.5;
-            if(selectedDisc === 'credit') discount = Math.min(base, 5); // Max $5
+            if(selectedDisc === 'credit') discount = Math.min(base, 5);
             if(selectedDisc === 'custom') {
                 const pct = parseFloat(document.getElementById('payCustomPct').value) || 0;
                 discount = base * (pct / 100);
@@ -653,6 +680,7 @@
             checkoutGiveback = discount;
             checkoutTotal = (base - discount) + tip;
 
+            // Fixed Precision Display
             document.getElementById('payTotal').innerText = `$${checkoutTotal.toFixed(2)}`;
             document.getElementById('givebackDisplay').innerText = `Giveback: $${checkoutGiveback.toFixed(2)}`;
         }
@@ -660,26 +688,17 @@
         async function finalizeCut() {
             const c = getClient(activeId);
             
-            // Consume Banked/Credits
-            if(selectedDisc === 'free') {
-                c.banked = (c.banked || 0) - 1;
-            }
-            if(selectedDisc === 'credit') {
-                c.credit = Math.max(0, (c.credit || 0) - 5);
-            }
+            if(selectedDisc === 'free') c.banked = (c.banked || 0) - 1;
+            if(selectedDisc === 'credit') c.credit = Math.max(0, (c.credit || 0) - 5);
 
-            // Update Client Stats
             c.spent = (c.spent || 0) + checkoutTotal;
             c.giveback = (c.giveback || 0) + checkoutGiveback;
             c.cuts = (c.cuts || 0) + 1;
             c.last = new Date().toISOString().split('T')[0];
 
-            // Loyalty Logic (If not a free cut redemption)
             if(selectedDisc !== 'free') {
                 c.loyalty = (c.loyalty || 0) + 1;
-                if(c.loyalty >= 6) { // 6th cut is free logic: 1..5 then 6th free? Or 1..6? 
-                    // User said: "1/5, 2/5... then bank". So after 5 cuts, they get a bank.
-                    // Let's assume hitting 6 triggers the bank.
+                if(c.loyalty >= 6) { 
                      if(await customConfirm("Client reached 6th cut! Bank a free cut?")) {
                         c.banked = (c.banked || 0) + 1;
                         c.loyalty = 0;
@@ -694,6 +713,24 @@
         }
 
         // --- EDIT/SAVE CLIENT ---
+        function openAddModal() {
+            // FIX: Reset Form
+            document.getElementById('eTitle').innerText = 'New Client';
+            document.getElementById('eId').value = ''; 
+            document.getElementById('eName').value = '';
+            document.getElementById('ePhone').value = '';
+            document.getElementById('eInsta').value = '';
+            document.getElementById('eAddr').value = '';
+            document.getElementById('eRef').value = '';
+            document.getElementById('eNotes').value = '';
+            document.getElementById('ePrice').value = 35;
+            document.getElementById('eFreq').value = 4;
+            document.getElementById('eDob').value = '';
+            document.getElementById('eFirst').value = new Date().toISOString().split('T')[0];
+            
+            openModal('editModal');
+        }
+
         function editClient() {
             closeModal('viewModal');
             const c = getClient(activeId);
@@ -712,21 +749,10 @@
             openModal('editModal');
         }
 
-        function openAddModal() {
-            document.getElementById('eTitle').innerText = 'New Client';
-            document.getElementById('eId').value = '';
-            document.getElementById('eName').value = '';
-            document.getElementById('ePrice').value = 35;
-            document.getElementById('eFreq').value = 4;
-            document.getElementById('eFirst').value = new Date().toISOString().split('T')[0];
-            openModal('editModal');
-        }
-
         async function saveClient() {
             const id = document.getElementById('eId').value || Date.now().toString();
             const isNew = !document.getElementById('eId').value;
             
-            // Ref Logic
             const refName = document.getElementById('eRef').value;
             let creditAdd = 0;
             if(isNew && refName) {
@@ -750,7 +776,6 @@
                 dob: document.getElementById('eDob').value,
                 refBy: refName,
                 notes: document.getElementById('eNotes').value,
-                // Stats persist
                 credit: isNew ? creditAdd : getClient(id).credit,
                 banked: isNew ? 0 : getClient(id).banked,
                 loyalty: isNew ? 0 : getClient(id).loyalty,
@@ -804,7 +829,6 @@
             if(c.insta) window.open(`https://instagram.com/${c.insta.replace('@','')}`);
         }
 
-        // --- CUSTOM CONFIRM ---
         function customConfirm(msg) {
             return new Promise((resolve) => {
                 document.getElementById('cMsg').innerText = msg;
