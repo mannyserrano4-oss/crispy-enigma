@@ -6,6 +6,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>The Black Book</title>
+    
+    <link rel="apple-touch-icon" href="icon.png">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -74,6 +77,7 @@
             padding-bottom: 140px;
             transition: background-color 0.3s ease;
             -webkit-tap-highlight-color: transparent;
+            user-select: none; /* App feel */
         }
 
         /* --- HEADER --- */
@@ -129,6 +133,7 @@
         }
         .m-lbl { font-size: 0.7rem; text-transform: uppercase; color: var(--text-sub); font-weight: 700; }
         .m-val { font-size: 1.1rem; font-weight: 800; color: var(--p-blue-dark); }
+        .m-val.today { color: var(--p-green-dark); }
 
         /* Filter Tabs */
         .tabs {
@@ -216,7 +221,7 @@
             width: 100%; padding: 14px; border-radius: 12px;
             border: 2px solid var(--input-border); background: var(--input-bg);
             color: var(--text-main); font-size: 1rem; margin-bottom: 15px;
-            box-sizing: border-box; transition: border-color 0.2s;
+            box-sizing: border-box; transition: border-color 0.2s; appearance: none;
         }
         input:focus { border-color: var(--p-blue-dark); outline: none; background: var(--bg-card); }
 
@@ -284,16 +289,16 @@
 
         <div class="metrics-scroll">
             <div class="metric-pill">
-                <span class="m-lbl">Revenue</span>
+                <span class="m-lbl">Today's Take</span>
+                <span class="m-val today" id="mToday">$0.00</span>
+            </div>
+            <div class="metric-pill">
+                <span class="m-lbl">Total Rev</span>
                 <span class="m-val" id="mRev">$0.00</span>
             </div>
             <div class="metric-pill">
                 <span class="m-lbl">Giveback</span>
                 <span class="m-val" id="mGive">$0.00</span>
-            </div>
-            <div class="metric-pill">
-                <span class="m-lbl">Cuts</span>
-                <span class="m-val" id="mCuts">0</span>
             </div>
         </div>
 
@@ -376,6 +381,15 @@
         <div class="sheet">
             <h3>Checkout</h3>
             
+            <label>Service Type</label>
+            <select id="payService">
+                <option value="Haircut">Haircut</option>
+                <option value="Beard Trim">Beard Trim</option>
+                <option value="Line Up">Line Up</option>
+                <option value="Full Service">Full Service</option>
+                <option value="Product">Product Only</option>
+            </select>
+
             <label>Base Price ($)</label>
             <input type="number" id="payPrice" onchange="calcTotal()" inputmode="decimal">
 
@@ -496,6 +510,7 @@
     <script>
         // --- DATA ---
         let clients = JSON.parse(localStorage.getItem('bbClients')) || [];
+        let history = JSON.parse(localStorage.getItem('bbHistory')) || []; // New: Transaction History
         let settings = JSON.parse(localStorage.getItem('bbSettings')) || { location: '' };
         let activeId = null;
         let activeFilter = 'all';
@@ -519,17 +534,21 @@
             const list = document.getElementById('list');
             list.innerHTML = '';
 
-            // Metrics - Fixed Precision
+            // Metrics
             const totalRev = clients.reduce((s,c) => s + (c.spent || 0), 0);
             const totalGive = clients.reduce((s,c) => s + (c.giveback || 0), 0);
             
+            // Calculate Today's Take
+            const todayStr = new Date().toISOString().split('T')[0];
+            const todayRev = history.filter(h => h.date === todayStr).reduce((s,h) => s + h.amount, 0);
+
+            document.getElementById('mToday').innerText = '$' + todayRev.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
             document.getElementById('mRev').innerText = '$' + totalRev.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
             document.getElementById('mGive').innerText = '$' + totalGive.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            document.getElementById('mCuts').innerText = clients.reduce((s,c) => s + (c.cuts || 0), 0);
 
             let filtered = clients.filter(c => {
                 if(search && !c.name.toLowerCase().includes(search.toLowerCase())) return false;
-                if(search) return true; // Skip status filter if searching
+                if(search) return true; 
 
                 const stat = getStatus(c);
                 if(activeFilter === 'due') return stat === 'due';
@@ -590,7 +609,7 @@
             if(c.first && isAnniversary(c.first)) b += `<span style="background:var(--p-purple); color:black; padding:5px 10px; border-radius:10px; font-size:0.8rem; font-weight:bold;">🏅 Anniversary Month</span>`;
             document.getElementById('vBadges').innerHTML = b;
 
-            // Stats with Precision
+            // Stats
             document.getElementById('vLoyalty').innerText = `${c.loyalty||0}/5`;
             document.getElementById('vCredit').innerText = `$${(c.credit||0).toFixed(2)}`;
             document.getElementById('vTotalCuts').innerText = c.cuts||0;
@@ -613,7 +632,7 @@
             const first = c.name.split(' ')[0];
             let msg = '';
             
-            if(type === 'late') msg = `Hey ${first}, running about 15 mins late for our appointment. So sorry!`;
+            if(type === 'late') msg = `Hey ${first}, running about 15 mins late. So sorry!`;
             if(type === 'confirm') msg = `Yo ${first}, just confirming our cut. You still good?`;
             if(type === 'longtime') msg = `Hey ${first}, been a while! Time to clean up that cut?`;
             if(type === 'followup') msg = `Appreciate you coming through ${first}! How's the cut treating you?`;
@@ -629,6 +648,7 @@
 
         function openCheckout() {
             const c = getClient(activeId);
+            document.getElementById('payService').value = "Haircut"; // Reset service
             document.getElementById('payPrice').value = c.price || 35;
             document.getElementById('payTip').value = 0;
             document.getElementById('customDiscBox').style.display = 'none';
@@ -680,13 +700,13 @@
             checkoutGiveback = discount;
             checkoutTotal = (base - discount) + tip;
 
-            // Fixed Precision Display
             document.getElementById('payTotal').innerText = `$${checkoutTotal.toFixed(2)}`;
             document.getElementById('givebackDisplay').innerText = `Giveback: $${checkoutGiveback.toFixed(2)}`;
         }
 
         async function finalizeCut() {
             const c = getClient(activeId);
+            const service = document.getElementById('payService').value;
             
             if(selectedDisc === 'free') c.banked = (c.banked || 0) - 1;
             if(selectedDisc === 'credit') c.credit = Math.max(0, (c.credit || 0) - 5);
@@ -695,6 +715,15 @@
             c.giveback = (c.giveback || 0) + checkoutGiveback;
             c.cuts = (c.cuts || 0) + 1;
             c.last = new Date().toISOString().split('T')[0];
+
+            // Record History
+            history.push({
+                clientId: c.id,
+                date: c.last,
+                amount: checkoutTotal,
+                service: service
+            });
+            localStorage.setItem('bbHistory', JSON.stringify(history));
 
             if(selectedDisc !== 'free') {
                 c.loyalty = (c.loyalty || 0) + 1;
@@ -714,7 +743,7 @@
 
         // --- EDIT/SAVE CLIENT ---
         function openAddModal() {
-            // FIX: Reset Form
+            // Reset Form Logic
             document.getElementById('eTitle').innerText = 'New Client';
             document.getElementById('eId').value = ''; 
             document.getElementById('eName').value = '';
