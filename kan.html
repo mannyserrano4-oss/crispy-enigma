@@ -9,113 +9,198 @@
 
     <style>
         :root {
-            --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --subtext: #94a3b8;
-            --border: #334155; --input-bg: #020617;
-            --accent: #38bdf8; /* Sky Blue */
-            --green: #10b981; --gold: #fbbf24;
+            /* DARK MODE (Default) */
+            --bg: #1e1e2e; 
+            --card-bg: #2a2a3c; 
+            --col-bg: #232334;
+            --text: #cdd6f4;
+            --subtext: #a6adc8;
+            --border: #313244;
+            
+            /* PASTEL ACCENTS */
+            --p-red: #ffb8b8;    /* High Priority */
+            --p-orange: #f9ccac; /* Med Priority */
+            --p-blue: #9ae4e8;   /* Low Priority */
+            --p-green: #a7f3d0;  /* Victory/XP */
+            --p-purple: #c4b5fd; /* Active */
+            --p-grey: #6c757d;
+            
+            --radius: 16px;
         }
+
+        body.light-mode {
+            --bg: #f3f4f6; 
+            --card-bg: #ffffff; 
+            --col-bg: #e5e7eb;
+            --text: #1f2937;
+            --subtext: #6b7280;
+            --border: #d1d5db;
+        }
+
         body { 
             background: var(--bg); color: var(--text); 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             margin: 0; height: 100dvh; display: flex; flex-direction: column; overflow: hidden;
+            transition: background 0.3s;
         }
 
-        /* HEADER */
+        /* --- LEVEL BAR (GAMIFICATION) --- */
+        .xp-bar-container {
+            background: var(--col-bg); padding: 10px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 15px;
+        }
+        .level-badge {
+            background: linear-gradient(135deg, var(--p-purple), var(--p-blue));
+            color: #000; font-weight: 900; padding: 5px 12px; border-radius: 20px;
+            font-size: 0.8rem; box-shadow: 0 2px 10px rgba(154, 228, 232, 0.3);
+        }
+        .xp-track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+        .xp-fill { height: 100%; background: var(--p-green); width: 0%; transition: width 0.5s ease-out; }
+        .xp-text { font-size: 0.75rem; color: var(--subtext); font-weight: bold; width: 60px; text-align: right; }
+
+        /* --- HEADER --- */
         .header { 
-            padding: 15px; background: var(--card); border-bottom: 1px solid var(--border); 
-            display: flex; justify-content: space-between; align-items: center; z-index: 20;
+            padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; 
         }
-        h1 { margin: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); font-weight: 900; }
-        .icon-btn { font-size: 1.4rem; background: none; border: none; cursor: pointer; padding: 5px; }
+        h1 { margin: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; color: var(--p-blue); font-weight: 900; }
+        .icon-btn { font-size: 1.3rem; background: none; border: none; cursor: pointer; padding: 5px; opacity: 0.7; transition: 0.2s; }
+        .icon-btn:active { transform: scale(0.9); }
 
-        /* BOARD LAYOUT */
+        /* --- BOARD --- */
         .board { 
             flex: 1; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; 
             padding: 10px; gap: 15px;
         }
         .column { 
-            min-width: 85vw; /* Mobile focus */
-            background: rgba(30, 41, 59, 0.5); 
-            border: 1px solid var(--border); 
-            border-radius: 12px; 
+            min-width: 85vw; 
+            background: var(--col-bg); 
+            border-radius: var(--radius); 
             display: flex; flex-direction: column;
             scroll-snap-align: center;
+            border: 1px solid var(--border);
         }
-        @media (min-width: 600px) { .column { min-width: 300px; } }
+        @media (min-width: 600px) { .column { min-width: 320px; } }
 
         .col-header { 
-            padding: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; 
-            border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;
+            padding: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem;
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .col-staging { color: var(--subtext); border-top: 4px solid var(--subtext); }
-        .col-active { color: var(--accent); border-top: 4px solid var(--accent); }
-        .col-victory { color: var(--green); border-top: 4px solid var(--green); }
+        /* Pastel Column Accents */
+        .h-0 { color: var(--subtext); }
+        .h-1 { color: var(--p-purple); }
+        .h-2 { color: var(--p-green); }
 
         .task-list { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 10px; }
 
-        /* CARDS */
+        /* --- CARDS --- */
         .card { 
-            background: var(--card); padding: 15px; border-radius: 8px; border: 1px solid var(--border); 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: transform 0.2s;
+            background: var(--card-bg); padding: 15px; border-radius: var(--radius); 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.2s;
+            border-left: 5px solid transparent;
+            position: relative;
         }
         .card:active { transform: scale(0.98); }
-        .card-title { font-weight: bold; font-size: 1rem; margin-bottom: 5px; }
         
-        /* PROGRESS BAR */
-        .progress-track { background: var(--input-bg); height: 6px; border-radius: 3px; overflow: hidden; margin-top: 10px; }
-        .progress-fill { height: 100%; background: var(--green); width: 0%; transition: width 0.3s; }
-        .card-meta { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--subtext); margin-top: 5px; }
+        /* Priority Borders */
+        .p-High { border-left-color: var(--p-red); }
+        .p-Med { border-left-color: var(--p-orange); }
+        .p-Low { border-left-color: var(--p-blue); }
 
-        /* FAB */
+        .card-top { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .card-title { font-weight: bold; font-size: 1rem; color: var(--text); }
+        .card-date { font-size: 0.7rem; background: var(--border); padding: 2px 6px; border-radius: 4px; color: var(--subtext); height: fit-content; }
+        .card-date.overdue { background: var(--p-red); color: #000; font-weight: bold; }
+
+        .progress-track { background: var(--border); height: 6px; border-radius: 3px; overflow: hidden; margin-top: 10px; }
+        .progress-fill { height: 100%; background: var(--p-green); width: 0%; transition: width 0.3s; }
+        .card-meta { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--subtext); margin-top: 5px; font-weight: 600; }
+
+        /* --- FAB --- */
         .fab { 
             position: fixed; bottom: 30px; right: 20px; 
-            background: var(--accent); color: #000; 
-            width: 65px; height: 65px; border-radius: 50%; 
+            background: var(--p-purple); color: #000; 
+            width: 60px; height: 60px; border-radius: 50%; 
             display: flex; align-items: center; justify-content: center; 
-            font-size: 2.5rem; box-shadow: 0 5px 20px rgba(56, 189, 248, 0.4); 
-            cursor: pointer; border: none; z-index: 500; 
+            font-size: 2rem; box-shadow: 0 5px 20px rgba(196, 181, 253, 0.5); 
+            cursor: pointer; border: none; z-index: 500; transition: transform 0.2s;
         }
+        .fab:active { transform: rotate(90deg); }
 
-        /* MODALS */
+        /* --- MODALS --- */
         .modal { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.9); z-index: 1000; display: none; 
-            justify-content: center; align-items: flex-start; overflow-y: auto; padding: 20px 0; 
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 1000; 
+            display: none; justify-content: center; align-items: flex-start; 
+            overflow-y: auto; padding: 20px 0; 
         }
         .modal-content { 
-            background: var(--card); width: 90%; max-width: 400px; 
-            padding: 20px; border-radius: 20px; border: 1px solid var(--border); 
-            margin-bottom: 80px; 
+            background: var(--card-bg); width: 90%; max-width: 400px; 
+            padding: 20px; border-radius: 24px; border: 1px solid var(--border); 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); margin-bottom: 80px; 
         }
 
+        .form-label { display: block; font-size: 0.7rem; color: var(--subtext); font-weight: bold; margin-bottom: 5px; letter-spacing: 1px; }
         .form-input { 
-            width: 100%; padding: 12px; background: var(--input-bg); 
+            width: 100%; padding: 12px; background: var(--col-bg); 
             border: 1px solid var(--border); color: var(--text); 
-            border-radius: 8px; font-size: 1rem; box-sizing: border-box; margin-bottom: 15px; 
+            border-radius: 12px; font-size: 1rem; box-sizing: border-box; margin-bottom: 15px; 
         }
-        
-        /* CHECKLIST */
-        .check-item { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
-        .check-box { width: 20px; height: 20px; cursor: pointer; }
-        .check-text { flex: 1; background: transparent; border: none; color: var(--text); font-size: 1rem; border-bottom: 1px solid transparent; }
-        .check-text:focus { border-bottom: 1px solid var(--accent); outline: none; }
-        .check-del { color: var(--red); cursor: pointer; padding: 5px; }
+        .form-row { display: flex; gap: 10px; margin-bottom: 15px; }
 
-        .btn-main { width: 100%; padding: 15px; background: var(--accent); color: #000; border: none; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 10px; }
-        .btn-move { flex: 1; padding: 10px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .move-row { display: flex; gap: 10px; margin-top: 15px; }
+        /* PRIORITY SELECTOR */
+        .prio-select { display: flex; gap: 5px; background: var(--col-bg); padding: 5px; border-radius: 12px; }
+        .prio-opt { flex: 1; padding: 8px; text-align: center; border-radius: 8px; font-size: 0.8rem; font-weight: bold; cursor: pointer; color: var(--subtext); transition: 0.2s; }
+        .prio-opt.active[data-val="Low"] { background: var(--p-blue); color: #000; }
+        .prio-opt.active[data-val="Med"] { background: var(--p-orange); color: #000; }
+        .prio-opt.active[data-val="High"] { background: var(--p-red); color: #000; }
+
+        /* CHECKLIST */
+        .check-item { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; animation: fadeIn 0.2s; }
+        .check-box { 
+            width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--subtext); 
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+        }
+        .check-box.checked { background: var(--p-green); border-color: var(--p-green); }
+        .check-box.checked::after { content:'✓'; color:black; font-weight:900; font-size:0.8rem; }
+        
+        .check-text { flex: 1; background: transparent; border: none; color: var(--text); font-size: 1rem; border-bottom: 1px solid transparent; }
+        .check-text:focus { border-bottom: 1px solid var(--p-purple); outline: none; }
+        .check-del { color: var(--p-red); cursor: pointer; padding: 5px; opacity: 0.5; }
+
+        .btn-main { width: 100%; padding: 15px; background: var(--p-purple); color: #000; border: none; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; margin-top: 15px; letter-spacing: 1px; }
+        .btn-sec { width: 100%; padding: 12px; background: transparent; border: 1px solid var(--border); color: var(--subtext); border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        
+        /* CALENDAR BUTTON */
+        .btn-cal { 
+            background: var(--col-bg); color: var(--text); border: 1px solid var(--border); 
+            padding: 8px 12px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; 
+            display: flex; align-items: center; gap: 5px; margin-top: 5px;
+        }
 
         /* DROPDOWN */
-        .dropdown { position: absolute; top: 60px; right: 15px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; display: none; flex-direction: column; width: 180px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 200; }
+        .dropdown { position: absolute; top: 60px; right: 15px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; display: none; flex-direction: column; width: 200px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 200; }
         .dropdown.show { display: flex; }
         .dd-item { padding: 15px; text-align: left; background: none; border: none; border-bottom: 1px solid var(--border); color: var(--text); font-size: 1rem; cursor: pointer; }
+
+        @keyframes fadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
     </style>
 </head>
 <body>
 
+    <div class="xp-bar-container">
+        <div class="level-badge" id="lvl-badge">LVL 1</div>
+        <div class="xp-track"><div class="xp-fill" id="xp-fill"></div></div>
+        <div class="xp-text"><span id="xp-val">0</span> XP</div>
+    </div>
+
     <div class="header">
-        <h1>Mission Control 🚀</h1>
-        <button class="icon-btn" onclick="toggleMenu()">💾</button>
+        <h1>Mission Control</h1>
+        <div style="display:flex; gap:10px;">
+            <button class="icon-btn" onclick="toggleArchiveView()" id="btn-archive">📦</button>
+            <button class="icon-btn" onclick="toggleTheme()">◑</button>
+            <button class="icon-btn" onclick="toggleMenu()">💾</button>
+        </div>
     </div>
 
     <div id="save-menu" class="dropdown">
@@ -124,17 +209,17 @@
     </div>
     <input type="file" id="file-input" hidden onchange="importData(this)">
 
-    <div class="board">
+    <div class="board" id="main-board">
         <div class="column">
-            <div class="col-header col-staging">Staging <span id="count-0">0</span></div>
+            <div class="col-header h-0">Staging <span id="count-0">0</span></div>
             <div class="task-list" id="col-0"></div>
         </div>
         <div class="column">
-            <div class="col-header col-active">Active <span id="count-1">0</span></div>
+            <div class="col-header h-1">Active <span id="count-1">0</span></div>
             <div class="task-list" id="col-1"></div>
         </div>
         <div class="column">
-            <div class="col-header col-victory">Victory <span id="count-2">0</span></div>
+            <div class="col-header h-2">Victory <span id="count-2">0</span></div>
             <div class="task-list" id="col-2"></div>
         </div>
     </div>
@@ -143,30 +228,56 @@
 
     <div id="task-modal" class="modal">
         <div class="modal-content">
-            <h2 style="margin-top:0;">Mission Details</h2>
+            <h2 style="margin-top:0; text-align:center;">Mission Brief</h2>
             <input type="hidden" id="t-id">
-            <label style="color:var(--subtext); font-size:0.8rem; font-weight:bold;">MISSION TITLE</label>
-            <input id="t-title" class="form-input" placeholder="e.g. Learn Python">
             
-            <label style="color:var(--subtext); font-size:0.8rem; font-weight:bold;">TACTICAL CHECKLIST</label>
-            <div id="checklist-container"></div>
-            <button class="btn-move" onclick="addCheckItem()" style="width:100%; margin-bottom:15px;">+ Add Step</button>
+            <span class="form-label">MISSION OBJECTIVE</span>
+            <input id="t-title" class="form-input" placeholder="e.g. Campaign Launch">
+            
+            <div class="form-row">
+                <div style="flex:1">
+                    <span class="form-label">DEADLINE</span>
+                    <input type="date" id="t-date" class="form-input" style="margin-bottom:0;">
+                    <button class="btn-cal" onclick="addToCalendar()" id="btn-cal-sync" style="display:none;">📅 Sync to Calendar</button>
+                </div>
+                <div style="flex:1">
+                    <span class="form-label">PRIORITY</span>
+                    <div class="prio-select">
+                        <div class="prio-opt" onclick="setPrio('Low')" data-val="Low">Low</div>
+                        <div class="prio-opt" onclick="setPrio('Med')" data-val="Med">Med</div>
+                        <div class="prio-opt" onclick="setPrio('High')" data-val="High">High</div>
+                    </div>
+                    <input type="hidden" id="t-prio" value="Med">
+                </div>
+            </div>
 
-            <div class="move-row" id="move-controls" style="display:none;">
-                <button class="btn-move" onclick="moveCard(-1)">⬅️ Move Back</button>
-                <button class="btn-move" onclick="moveCard(1)">Move Forward ➡️</button>
+            <span class="form-label">TACTICAL CHECKLIST (+10 XP ea)</span>
+            <div id="checklist-container"></div>
+            <button class="btn-sec" onclick="addCheckItem()" style="border-style:dashed; color:var(--p-purple); border-color:var(--p-purple);">+ Add Step</button>
+
+            <div class="form-row" id="move-controls" style="margin-top:20px; display:none;">
+                <button class="btn-sec" onclick="moveCard(-1)">⬅️ Back</button>
+                <button class="btn-sec" onclick="moveCard(1)">Advance ➡️</button>
             </div>
 
             <button class="btn-main" onclick="saveCard()">SAVE MISSION</button>
-            <button class="btn-move" style="width:100%; margin-top:10px; color:var(--subtext);" onclick="closeModal()">Cancel</button>
-            <button class="btn-move" style="width:100%; margin-top:10px; color:var(--red); border-color:var(--red);" onclick="deleteCard()">Delete</button>
+            
+            <div class="form-row" style="margin-top:10px;">
+                <button class="btn-sec" id="btn-archive-toggle" onclick="toggleArchive()">🧊 Cryo-Sleep (Archive)</button>
+                <button class="btn-sec" onclick="deleteCard()" style="color:var(--p-red); border-color:var(--p-red);">Delete</button>
+            </div>
+            <button class="btn-sec" onclick="closeModal()" style="border:none;">Close</button>
         </div>
     </div>
 
     <script>
         let tasks = JSON.parse(localStorage.getItem('mc_tasks') || '[]');
+        let userXP = parseInt(localStorage.getItem('mc_xp') || '0');
+        let showArchive = false;
         
+        if(localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
         render();
+        updateXP();
 
         function render() {
             // Clear Columns
@@ -175,45 +286,68 @@
                 document.getElementById(`count-${i}`).innerText = '0';
             });
 
+            const today = new Date().toISOString().split('T')[0];
+
             tasks.forEach(t => {
+                // Filter Archive
+                if (showArchive && !t.archived) return;
+                if (!showArchive && t.archived) return;
+
                 const total = t.steps.length;
                 const done = t.steps.filter(s => s.done).length;
                 const pct = total === 0 ? 0 : (done / total) * 100;
+                
+                // Date Logic
+                let dateHtml = '';
+                if(t.date) {
+                    const isOverdue = t.date < today && t.col !== 2;
+                    dateHtml = `<span class="card-date ${isOverdue?'overdue':''}">${t.date}</span>`;
+                }
 
                 const div = document.createElement('div');
-                div.className = 'card';
+                div.className = `card p-${t.prio||'Med'}`;
                 div.onclick = () => openModal(t.id);
                 div.innerHTML = `
-                    <div class="card-title">${t.title}</div>
+                    <div class="card-top"><span class="card-title">${t.title}</span>${dateHtml}</div>
                     <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
                     <div class="card-meta"><span>${done}/${total} Steps</span><span>${pct.toFixed(0)}%</span></div>
                 `;
                 
-                // Add to appropriate column (default to 0 if undefined)
                 const colId = t.col !== undefined ? t.col : 0;
                 document.getElementById(`col-${colId}`).appendChild(div);
             });
 
             // Update Counts
             [0, 1, 2].forEach(i => {
-                document.getElementById(`count-${i}`).innerText = tasks.filter(t => (t.col||0) === i).length;
+                document.getElementById(`count-${i}`).innerText = tasks.filter(t => (t.col||0) === i && !t.archived).length;
             });
+            
+            // Header Title Change
+            document.querySelector('h1').innerText = showArchive ? "Cryo-Storage 🧊" : "Mission Control 🚀";
         }
 
         function openModal(id) {
-            const t = id ? tasks.find(x => x.id === id) : { id: '', title: '', steps: [], col: 0 };
+            const t = id ? tasks.find(x => x.id === id) : { id: '', title: '', steps: [], col: 0, prio:'Med', date:'', archived:false };
             document.getElementById('t-id').value = t.id;
             document.getElementById('t-title').value = t.title;
+            document.getElementById('t-date').value = t.date;
+            setPrio(t.prio || 'Med');
             
+            // Calendar Button Logic
+            const calBtn = document.getElementById('btn-cal-sync');
+            calBtn.style.display = (t.date && t.id) ? 'flex' : 'none';
+
+            // Archive Button Logic
+            const archBtn = document.getElementById('btn-archive-toggle');
+            archBtn.innerText = t.archived ? "🔥 Thaw (Unarchive)" : "🧊 Cryo-Sleep (Archive)";
+
             // Render Steps
             const container = document.getElementById('checklist-container');
             container.innerHTML = '';
             t.steps.forEach(s => addCheckItem(s.text, s.done));
-            if(t.steps.length === 0) addCheckItem(); // Add one empty by default
+            if(t.steps.length === 0) addCheckItem(); 
 
-            // Show Move Controls only if existing
             document.getElementById('move-controls').style.display = id ? 'flex' : 'none';
-            
             document.getElementById('task-modal').style.display = 'flex';
         }
 
@@ -221,11 +355,24 @@
             const div = document.createElement('div');
             div.className = 'check-item';
             div.innerHTML = `
-                <input type="checkbox" class="check-box" ${done ? 'checked' : ''}>
-                <input type="text" class="check-text" value="${text}" placeholder="Step...">
+                <div class="check-box ${done?'checked':''}" onclick="toggleCheck(this)"></div>
+                <input type="text" class="check-text" value="${text}" placeholder="New Step...">
                 <span class="check-del" onclick="this.parentElement.remove()">✕</span>
             `;
             document.getElementById('checklist-container').appendChild(div);
+        }
+
+        function toggleCheck(el) {
+            el.classList.toggle('checked');
+            // XP Feedback could go here
+        }
+
+        function setPrio(val) {
+            document.getElementById('t-prio').value = val;
+            document.querySelectorAll('.prio-opt').forEach(el => {
+                el.classList.remove('active');
+                if(el.dataset.val === val) el.classList.add('active');
+            });
         }
 
         function saveCard() {
@@ -233,23 +380,57 @@
             const title = document.getElementById('t-title').value;
             if(!title) return alert("Title required");
 
-            // Scrape Checklist
+            const prio = document.getElementById('t-prio').value;
+            const date = document.getElementById('t-date').value;
+
+            // Scrape Checklist & Calc XP
             const steps = [];
+            let newXP = 0;
             document.querySelectorAll('.check-item').forEach(el => {
                 const txt = el.querySelector('.check-text').value.trim();
-                const chk = el.querySelector('.check-box').checked;
-                if(txt) steps.push({ text: txt, done: chk });
+                const chk = el.querySelector('.check-box').classList.contains('checked');
+                if(txt) {
+                    steps.push({ text: txt, done: chk });
+                    if(chk) newXP += 10;
+                }
             });
 
             if(id) {
                 const idx = tasks.findIndex(x => x.id === id);
-                tasks[idx].title = title;
-                tasks[idx].steps = steps;
+                // Delta XP Logic could be added here, simplified for now
+                tasks[idx] = { ...tasks[idx], title, steps, prio, date };
             } else {
-                tasks.push({ id: Date.now().toString(), title, steps, col: 0 }); // Default to Staging
+                tasks.push({ id: Date.now().toString(), title, steps, col: 0, prio, date, archived:false });
             }
             
+            // Simplified XP add (just add active checks)
+            // Real gamification would track delta, but let's just save total checked items ever? 
+            // For now, let's just accumulate XP on save for simplicity/fun.
+            // Better logic: Recalculate total XP from scratch based on all 'done' items.
+            recalcTotalXP();
+            
             save(); closeModal(); render();
+        }
+
+        function recalcTotalXP() {
+            let total = 0;
+            tasks.forEach(t => {
+                t.steps.forEach(s => { if(s.done) total += 10; });
+                if(t.col === 2) total += 100; // Bonus for Victory column
+            });
+            userXP = total;
+            updateXP();
+        }
+
+        function updateXP() {
+            localStorage.setItem('mc_xp', userXP);
+            // Level = XP / 500
+            const level = Math.floor(userXP / 500) + 1;
+            const progress = (userXP % 500) / 500 * 100;
+            
+            document.getElementById('lvl-badge').innerText = `LVL ${level}`;
+            document.getElementById('xp-fill').style.width = `${progress}%`;
+            document.getElementById('xp-val').innerText = userXP;
         }
 
         function moveCard(dir) {
@@ -260,23 +441,59 @@
                 if(newCol < 0) newCol = 0;
                 if(newCol > 2) newCol = 2;
                 tasks[idx].col = newCol;
+                recalcTotalXP(); // Update XP for column move
                 save(); closeModal(); render();
             }
+        }
+
+        function toggleArchive() {
+            const id = document.getElementById('t-id').value;
+            const idx = tasks.findIndex(x => x.id === id);
+            if(idx > -1) {
+                tasks[idx].archived = !tasks[idx].archived;
+                save(); closeModal(); render();
+            }
+        }
+        
+        function toggleArchiveView() {
+            showArchive = !showArchive;
+            render();
         }
 
         function deleteCard() {
             const id = document.getElementById('t-id').value;
             if(!id) return;
-            if(confirm("Abort Mission? (Delete Card)")) {
+            if(confirm("Abort Mission?")) {
                 tasks = tasks.filter(x => x.id !== id);
+                recalcTotalXP();
                 save(); closeModal(); render();
             }
+        }
+
+        function addToCalendar() {
+            const title = document.getElementById('t-title').value;
+            const date = document.getElementById('t-date').value;
+            if(!date) return alert("Set a date first");
+            
+            const startRaw = date.replace(/-/g, '') + 'T090000';
+            const endRaw = date.replace(/-/g, '') + 'T100000';
+            
+            const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Mission: ${title}\nDTSTART:${startRaw}\nDTEND:${endRaw}\nDESCRIPTION:Goal from Mission Control\nEND:VEVENT\nEND:VCALENDAR`;
+            
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([ics], {type: 'text/calendar'}));
+            a.download = 'mission.ics';
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
         }
 
         // --- UTILS ---
         function save() { localStorage.setItem('mc_tasks', JSON.stringify(tasks)); }
         function closeModal() { document.getElementById('task-modal').style.display = 'none'; }
         function toggleMenu() { document.getElementById('save-menu').classList.toggle('show'); }
+        function toggleTheme() { 
+            document.body.classList.toggle('light-mode'); 
+            localStorage.setItem('theme', document.body.classList.contains('light-mode')?'light':'dark'); 
+        }
         
         function exportData() {
             const a = document.createElement('a');
@@ -291,7 +508,8 @@
             const fr = new FileReader();
             fr.onload = e => {
                 tasks = JSON.parse(e.target.result);
-                save(); render(); alert("Mission Data Restored");
+                recalcTotalXP();
+                save(); render(); alert("Data Restored");
             };
             fr.readAsText(el.files[0]);
             toggleMenu();
