@@ -2,191 +2,200 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Mission Control</title>
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" type="image/png" href="icon.png">
 
     <style>
         :root {
-            /* DARK MODE (Default) */
-            --bg: #1e1e2e; 
-            --card-bg: #2a2a3c; 
-            --col-bg: #232334;
-            --text: #cdd6f4;
-            --subtext: #a6adc8;
-            --border: #313244;
-            
-            /* PASTEL ACCENTS */
-            --p-red: #ffb8b8;    /* High Priority */
-            --p-orange: #f9ccac; /* Med Priority */
-            --p-blue: #9ae4e8;   /* Low Priority */
-            --p-green: #a7f3d0;  /* Victory/XP */
-            --p-purple: #c4b5fd; /* Active */
-            --p-grey: #6c757d;
-            
-            --radius: 16px;
+            /* DEFAULT (Tactical Dark) */
+            --bg: #1e1e2e; --card-bg: #2a2a3c; --col-bg: #232334;
+            --text: #cdd6f4; --subtext: #a6adc8; --border: #313244;
+            --p-red: #ffb8b8; --p-orange: #f9ccac; --p-blue: #9ae4e8;   
+            --p-green: #a7f3d0; --p-purple: #c4b5fd;
+            --radius: 16px; --shadow: 0 4px 10px rgba(0,0,0,0.1);
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-head: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
-        body.light-mode {
-            --bg: #f3f4f6; 
-            --card-bg: #ffffff; 
-            --col-bg: #e5e7eb;
-            --text: #1f2937;
-            --subtext: #6b7280;
-            --border: #d1d5db;
-        }
+        /* --- THEME PACKS --- */
+        body.theme-light { --bg: #f3f4f6; --card-bg: #ffffff; --col-bg: #e5e7eb; --text: #1f2937; --subtext: #6b7280; --border: #d1d5db; }
+        body.theme-wolf { --bg: #1c1917; --card-bg: #292524; --col-bg: #0c0a09; --text: #e7e5e4; --subtext: #a8a29e; --border: #44403c; --p-red: #7f1d1d; --p-orange: #b45309; --p-blue: #3b82f6; --p-green: #15803d; --p-purple: #a21caf; --font-main: Georgia, serif; --radius: 4px; --shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        body.theme-neon { --bg: #050505; --card-bg: #111; --col-bg: #0a0a0a; --text: #fff; --subtext: #888; --border: #333; --p-red: #ff0055; --p-orange: #ff9900; --p-blue: #00f3ff; --p-green: #00ff66; --p-purple: #bc13fe; --font-main: 'Courier New', monospace; --radius: 0px; --shadow: 0 0 10px var(--p-blue); }
+        body.theme-neon .card { border: 1px solid var(--p-blue); }
+        body.theme-aperture { --bg: #e0e0e0; --card-bg: #ffffff; --col-bg: #d1d1d1; --text: #333; --subtext: #666; --border: #999; --p-red: #e74c3c; --p-orange: #ffa500; --p-blue: #00a5ff; --p-green: #00a5ff; --p-purple: #333; --font-main: Helvetica, Arial, sans-serif; --radius: 20px; --shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff; }
+        body.theme-aperture .col-active { color: #00a5ff; } body.theme-aperture .col-victory { color: #ffa500; } 
+        body.theme-horror { --bg: #0a0505; --card-bg: #1a0505; --col-bg: #110000; --text: #ffcccc; --subtext: #804040; --border: #4d0000; --p-red: #ff0000; --p-green: #225522; --p-purple: #330033; --font-main: Helvetica, sans-serif; --radius: 2px; }
+        body.theme-vapor { --bg: #2d1b4e; --card-bg: #1b1030; --col-bg: #432c7a; --text: #ffd166; --subtext: #ef476f; --border: #118ab2; --p-red: #ef476f; --p-orange: #ffd166; --p-blue: #118ab2; --p-green: #06d6a0; --p-purple: #d783ff; --font-main: 'Verdana', sans-serif; --radius: 0px; background: linear-gradient(180deg, #2d1b4e 0%, #000 100%); }
+        body.theme-blueprint { --bg: #1e3a8a; --card-bg: #172554; --col-bg: #1e40af; --text: #bfdbfe; --subtext: #60a5fa; --border: #93c5fd; --p-red: #fff; --p-green: #fff; --p-purple: #fff; --p-blue: #fff; --font-main: 'Courier New', monospace; --radius: 0px; background-image: linear-gradient(#3b82f6 1px, transparent 1px), linear-gradient(90deg, #3b82f6 1px, transparent 1px); background-size: 20px 20px; }
+        body.theme-blueprint .card { border: 2px solid var(--border); box-shadow: none; }
+        body.theme-terminal { --bg: #000; --card-bg: #000; --col-bg: #000; --text: #22c55e; --subtext: #15803d; --border: #22c55e; --p-red: #22c55e; --p-orange: #22c55e; --p-blue: #22c55e; --p-green: #22c55e; --p-purple: #22c55e; --font-main: 'Courier New', monospace; --radius: 0px; }
+        body.theme-terminal .card, body.theme-terminal .column { border: 1px dashed var(--border); }
+        body.theme-gold { --bg: #0f0f0f; --card-bg: #1c1c1c; --col-bg: #141414; --text: #fcd34d; --subtext: #b45309; --border: #78350f; --p-red: #991b1b; --p-green: #f59e0b; --p-purple: #d97706; --p-blue: #fcd34d; --font-main: Georgia, serif; --radius: 8px; --shadow: 0 10px 30px rgba(251, 191, 36, 0.1); }
+        body.theme-gold .level-badge { background: linear-gradient(to right, #fcd34d, #b45309); color: black; }
 
+        /* PRESTIGE THEMES */
+        body.theme-nebula { --bg: #0b0014; --card-bg: #1a0b2e; --col-bg: #11051f; --text: #e0ccff; --subtext: #8a64b5; --border: #4a2b6b; --p-red: #ff3366; --p-green: #00ffcc; --p-purple: #bb00ff; --p-blue: #00ccff; background: radial-gradient(circle at 50% 50%, #1a0b2e 0%, #000000 100%); --font-head: 'Verdana', sans-serif; }
+        body.theme-nebula .level-badge { background: linear-gradient(90deg, #ff00cc, #3333ff); box-shadow: 0 0 15px #bb00ff; }
+        body.theme-midas { --bg: #080808; --card-bg: #141414; --col-bg: #0d0d0d; --text: #d4af37; --subtext: #8a7324; --border: #d4af37; --p-red: #ff4444; --p-green: #d4af37; --p-purple: #ffd700; --p-blue: #c5a028; --radius: 2px; --font-main: 'Times New Roman', serif; }
+        body.theme-midas .card { border: 1px solid #d4af37; box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
+        body.theme-glitch { --bg: #121212; --card-bg: #000000; --col-bg: #1a1a1a; --text: #ffffff; --subtext: #555555; --border: #333333; --p-red: #ff003c; --p-green: #05ffa1; --p-blue: #00f0ff; --p-purple: #ff003c; --font-main: 'Courier New', monospace; }
+        body.theme-glitch .card-title { text-shadow: 2px 0 var(--p-red), -2px 0 var(--p-blue); }
+
+        /* --- BASE STYLES --- */
         body { 
-            background: var(--bg); color: var(--text); 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg); color: var(--text); 
+            font-family: var(--font-main);
             margin: 0; height: 100dvh; display: flex; flex-direction: column; overflow: hidden;
-            transition: background 0.3s;
+            transition: background 0.5s, color 0.5s;
         }
 
-        /* --- LEVEL BAR (GAMIFICATION) --- */
+        body.zen-mode .header, body.zen-mode .xp-bar-container, body.zen-mode .fab { display: none !important; }
+        body.zen-mode .board { height: 100vh; padding-top: max(20px, env(safe-area-inset-top)); }
+        #exit-zen { position: fixed; top: 10px; right: 10px; z-index: 1000; opacity: 0.3; display: none; }
+        body.zen-mode #exit-zen { display: block; }
+
         .xp-bar-container {
-            background: var(--col-bg); padding: 10px 20px;
+            background: var(--col-bg); padding: 15px 20px;
+            padding-top: max(15px, env(safe-area-inset-top)); 
             border-bottom: 1px solid var(--border);
             display: flex; align-items: center; gap: 15px;
         }
         .level-badge {
             background: linear-gradient(135deg, var(--p-purple), var(--p-blue));
-            color: #000; font-weight: 900; padding: 5px 12px; border-radius: 20px;
-            font-size: 0.8rem; box-shadow: 0 2px 10px rgba(154, 228, 232, 0.3);
+            color: #000; font-weight: 900; padding: 6px 14px; border-radius: 20px;
+            font-size: 0.8rem; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            white-space: nowrap; font-family: var(--font-head);
         }
-        .xp-track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
-        .xp-fill { height: 100%; background: var(--p-green); width: 0%; transition: width 0.5s ease-out; }
-        .xp-text { font-size: 0.75rem; color: var(--subtext); font-weight: bold; width: 60px; text-align: right; }
+        .xp-track { flex: 1; height: 10px; background: var(--border); border-radius: 5px; overflow: hidden; position: relative; }
+        .xp-fill { 
+            height: 100%; background: var(--p-green); width: 0%; 
+            transition: width 0.5s ease-out, background 0.2s; 
+        }
+        .xp-fill.damage { background: var(--p-red); } 
+        .xp-text { font-size: 0.7rem; color: var(--subtext); font-weight: bold; width: 80px; text-align: right; }
 
-        /* --- HEADER --- */
-        .header { 
-            padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; 
-        }
-        h1 { margin: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; color: var(--p-blue); font-weight: 900; }
-        .icon-btn { font-size: 1.3rem; background: none; border: none; cursor: pointer; padding: 5px; opacity: 0.7; transition: 0.2s; }
-        .icon-btn:active { transform: scale(0.9); }
+        .header { padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+        h1 { margin: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; color: var(--p-blue); font-weight: 900; font-family: var(--font-head); }
+        .icon-btn { font-size: 1.4rem; background: none; border: none; cursor: pointer; padding: 8px; opacity: 0.8; color: var(--text); }
 
-        /* --- BOARD --- */
-        .board { 
-            flex: 1; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; 
-            padding: 10px; gap: 15px;
-        }
+        .board { flex: 1; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding: 10px; gap: 15px; }
         .column { 
-            min-width: 85vw; 
-            background: var(--col-bg); 
-            border-radius: var(--radius); 
-            display: flex; flex-direction: column;
-            scroll-snap-align: center;
-            border: 1px solid var(--border);
+            min-width: 88vw; background: var(--col-bg); 
+            border-radius: var(--radius); display: flex; flex-direction: column;
+            scroll-snap-align: center; border: 1px solid var(--border);
         }
-        @media (min-width: 600px) { .column { min-width: 320px; } }
+        @media (min-width: 600px) { .column { min-width: 340px; } }
 
-        .col-header { 
-            padding: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        /* Pastel Column Accents */
-        .h-0 { color: var(--subtext); }
-        .h-1 { color: var(--p-purple); }
-        .h-2 { color: var(--p-green); }
+        .col-header { padding: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; font-family: var(--font-head); }
+        .h-0 { color: var(--subtext); } .h-1 { color: var(--p-purple); } .h-2 { color: var(--p-green); }
+        .task-list { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 12px; }
+        
+        /* EMPTY STATE */
+        .empty-msg { text-align: center; color: var(--subtext); font-style: italic; font-size: 0.8rem; margin-top: 50px; opacity: 0.5; }
 
-        .task-list { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 10px; }
-
-        /* --- CARDS --- */
+        /* CARDS & ANIMATIONS */
         .card { 
-            background: var(--card-bg); padding: 15px; border-radius: var(--radius); 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.2s;
-            border-left: 5px solid transparent;
-            position: relative;
+            background: var(--card-bg); padding: 16px; border-radius: var(--radius); 
+            box-shadow: var(--shadow); transition: transform 0.2s, opacity 0.2s; 
+            border-left: 0; position: relative; overflow: hidden;
         }
         .card:active { transform: scale(0.98); }
         
-        /* Priority Borders */
-        .p-High { border-left-color: var(--p-red); }
-        .p-Med { border-left-color: var(--p-orange); }
-        .p-Low { border-left-color: var(--p-blue); }
+        /* Slide Animations */
+        @keyframes slideOutRight { to { transform: translateX(100%); opacity: 0; } }
+        @keyframes slideOutLeft { to { transform: translateX(-100%); opacity: 0; } }
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .slide-right { animation: slideOutRight 0.3s forwards; }
+        .slide-left { animation: slideOutLeft 0.3s forwards; }
+        .slide-enter { animation: slideIn 0.3s forwards; }
 
-        .card-top { display: flex; justify-content: space-between; margin-bottom: 5px; }
-        .card-title { font-weight: bold; font-size: 1rem; color: var(--text); }
-        .card-date { font-size: 0.7rem; background: var(--border); padding: 2px 6px; border-radius: 4px; color: var(--subtext); height: fit-content; }
-        .card-date.overdue { background: var(--p-red); color: #000; font-weight: bold; }
+        .card-top { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center; }
+        .card-title { font-weight: bold; font-size: 1.05rem; color: var(--text); }
+        .card-date { font-size: 0.7rem; background: var(--border); padding: 4px 8px; border-radius: 6px; color: var(--subtext); height: fit-content; font-weight: 600; }
+        .card-date.overdue { background: var(--p-red); color: #000; }
+        
+        /* Priority Badge Pills */
+        .prio-pill { font-size: 0.65rem; padding: 3px 8px; border-radius: 10px; font-weight: 800; text-transform: uppercase; margin-right: 5px; color:#000; }
+        .pill-High { background: var(--p-red); }
+        .pill-Med { background: var(--p-orange); }
+        .pill-Low { background: var(--p-blue); }
 
-        .progress-track { background: var(--border); height: 6px; border-radius: 3px; overflow: hidden; margin-top: 10px; }
+        .progress-track { background: var(--border); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 12px; }
         .progress-fill { height: 100%; background: var(--p-green); width: 0%; transition: width 0.3s; }
-        .card-meta { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--subtext); margin-top: 5px; font-weight: 600; }
+        .card-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--subtext); margin-top: 8px; font-weight: 600; }
 
-        /* --- FAB --- */
-        .fab { 
-            position: fixed; bottom: 30px; right: 20px; 
-            background: var(--p-purple); color: #000; 
-            width: 60px; height: 60px; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 2rem; box-shadow: 0 5px 20px rgba(196, 181, 253, 0.5); 
-            cursor: pointer; border: none; z-index: 500; transition: transform 0.2s;
-        }
+        .fab { position: fixed; bottom: 30px; right: 20px; background: var(--p-purple); color: #000; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; box-shadow: 0 8px 30px rgba(0,0,0,0.4); cursor: pointer; border: none; z-index: 500; transition: transform 0.2s; }
         .fab:active { transform: rotate(90deg); }
 
-        /* --- MODALS --- */
-        .modal { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 1000; 
-            display: none; justify-content: center; align-items: flex-start; 
-            overflow-y: auto; padding: 20px 0; 
-        }
-        .modal-content { 
-            background: var(--card-bg); width: 90%; max-width: 400px; 
-            padding: 20px; border-radius: 24px; border: 1px solid var(--border); 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5); margin-bottom: 80px; 
-        }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: flex-start; overflow-y: auto; padding: 20px 0; }
+        .modal-content { background: var(--card-bg); width: 90%; max-width: 450px; padding: 25px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: 0 20px 60px rgba(0,0,0,0.6); margin-bottom: 80px; }
+        
+        #story-modal .modal-content { background: #1a1a1a; border: 2px solid #b45309; }
+        .story-header { font-family: Georgia, serif; text-align: center; color: #fcd34d; font-size: 1.5rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
+        .story-body { font-family: Georgia, serif; color: #e7e5e4; line-height: 1.6; font-size: 1.1rem; white-space: pre-wrap; height: 60vh; overflow-y: auto; padding-right: 10px; }
+        .story-lock { text-align: center; color: #666; padding: 50px 0; font-style: italic; }
 
-        .form-label { display: block; font-size: 0.7rem; color: var(--subtext); font-weight: bold; margin-bottom: 5px; letter-spacing: 1px; }
-        .form-input { 
-            width: 100%; padding: 12px; background: var(--col-bg); 
-            border: 1px solid var(--border); color: var(--text); 
-            border-radius: 12px; font-size: 1rem; box-sizing: border-box; margin-bottom: 15px; 
-        }
-        .form-row { display: flex; gap: 10px; margin-bottom: 15px; }
-
-        /* PRIORITY SELECTOR */
-        .prio-select { display: flex; gap: 5px; background: var(--col-bg); padding: 5px; border-radius: 12px; }
-        .prio-opt { flex: 1; padding: 8px; text-align: center; border-radius: 8px; font-size: 0.8rem; font-weight: bold; cursor: pointer; color: var(--subtext); transition: 0.2s; }
+        .form-label { display: block; font-size: 0.75rem; color: var(--subtext); font-weight: 800; margin-bottom: 8px; letter-spacing: 1px; }
+        .form-input { width: 100%; padding: 14px; background: var(--col-bg); border: 1px solid var(--border); color: var(--text); border-radius: 12px; font-size: 1.1rem; box-sizing: border-box; margin-bottom: 18px; }
+        .form-row { display: flex; gap: 12px; margin-bottom: 18px; }
+        .prio-select { display: flex; gap: 6px; background: var(--col-bg); padding: 6px; border-radius: 14px; height: 100%; box-sizing: border-box; }
+        .prio-opt { flex: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 0.85rem; font-weight: bold; cursor: pointer; color: var(--subtext); transition: 0.2s; }
         .prio-opt.active[data-val="Low"] { background: var(--p-blue); color: #000; }
         .prio-opt.active[data-val="Med"] { background: var(--p-orange); color: #000; }
         .prio-opt.active[data-val="High"] { background: var(--p-red); color: #000; }
 
-        /* CHECKLIST */
-        .check-item { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; animation: fadeIn 0.2s; }
-        .check-box { 
-            width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--subtext); 
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-        }
+        .check-item { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; padding: 5px 0; }
+        .check-box { width: 28px; height: 28px; border-radius: 8px; border: 2px solid var(--subtext); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
         .check-box.checked { background: var(--p-green); border-color: var(--p-green); }
-        .check-box.checked::after { content:'✓'; color:black; font-weight:900; font-size:0.8rem; }
-        
-        .check-text { flex: 1; background: transparent; border: none; color: var(--text); font-size: 1rem; border-bottom: 1px solid transparent; }
+        .check-box.checked::after { content:'✓'; color:black; font-weight:900; font-size:1rem; }
+        .check-text { flex: 1; background: transparent; border: none; color: var(--text); font-size: 1.1rem; border-bottom: 1px solid transparent; }
         .check-text:focus { border-bottom: 1px solid var(--p-purple); outline: none; }
-        .check-del { color: var(--p-red); cursor: pointer; padding: 5px; opacity: 0.5; }
+        .check-del { color: var(--p-red); cursor: pointer; padding: 8px; font-weight: bold; font-size: 1.2rem; opacity: 0.5; }
 
-        .btn-main { width: 100%; padding: 15px; background: var(--p-purple); color: #000; border: none; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; margin-top: 15px; letter-spacing: 1px; }
-        .btn-sec { width: 100%; padding: 12px; background: transparent; border: 1px solid var(--border); color: var(--subtext); border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        
-        /* CALENDAR BUTTON */
-        .btn-cal { 
-            background: var(--col-bg); color: var(--text); border: 1px solid var(--border); 
-            padding: 8px 12px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; 
-            display: flex; align-items: center; gap: 5px; margin-top: 5px;
+        .btn-main { width: 100%; padding: 18px; background: var(--p-purple); color: #000; border: none; border-radius: 16px; font-weight: 800; font-size: 1.1rem; cursor: pointer; margin-top: 20px; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(196, 181, 253, 0.3); }
+        .btn-sec { width: 100%; padding: 14px; background: transparent; border: 1px solid var(--border); color: var(--subtext); border-radius: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 0.95rem; }
+        .btn-cal { background: var(--col-bg); color: var(--text); border: 1px solid var(--border); padding: 10px; border-radius: 10px; font-size: 0.85rem; cursor: pointer; margin-top: 5px; width: 100%; text-align: center;}
+
+        /* TOAST & UNDO */
+        #xp-toast {
+            position: fixed; top: 90px; left: 50%; transform: translateX(-50%);
+            background: var(--p-green); color: black; font-weight: 900;
+            padding: 10px 20px; border-radius: 20px; opacity: 0; pointer-events: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: opacity 0.3s, transform 0.3s;
+            z-index: 2000; font-size: 1.1rem; display: flex; align-items: center; gap: 10px;
         }
+        #xp-toast.loss { background: var(--p-red); }
+        #xp-toast.crit { background: var(--gold); border: 2px solid white; transform: translateX(-50%) scale(1.2); }
+        
+        .btn-undo { background: black; color: white; padding: 5px 10px; border-radius: 10px; border: 1px solid white; font-size: 0.8rem; cursor: pointer; pointer-events: auto; }
 
-        /* DROPDOWN */
-        .dropdown { position: absolute; top: 60px; right: 15px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; display: none; flex-direction: column; width: 200px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 200; }
+        .confetti { position: fixed; width: 20px; height: 20px; top: -20px; z-index: 3000; font-size:20px; text-align:center; }
+        .dropdown { position: absolute; top: 60px; right: 15px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; display: none; flex-direction: column; width: 240px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 200; overflow: hidden; max-height: 80vh; overflow-y: auto;}
         .dropdown.show { display: flex; }
-        .dd-item { padding: 15px; text-align: left; background: none; border: none; border-bottom: 1px solid var(--border); color: var(--text); font-size: 1rem; cursor: pointer; }
-
-        @keyframes fadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+        .dd-item { padding: 15px; text-align: left; background: none; border: none; border-bottom: 1px solid var(--border); color: var(--text); font-size: 1rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .dd-locked { opacity: 0.5; pointer-events: none; }
+        .dd-badge { font-size: 0.65rem; background: var(--border); padding: 2px 6px; border-radius: 4px; color: var(--subtext); font-weight: bold; }
+        .dd-sect { padding:10px; font-size:0.7rem; color:var(--subtext); font-weight:bold; background:var(--col-bg); letter-spacing:1px; }
+        
+        /* CODEX */
+        #codex-popup { 
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); 
+            background: var(--card-bg); border: 1px solid var(--p-purple); 
+            padding: 15px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            max-width: 90%; width: 300px; z-index: 2000; opacity: 0; pointer-events: none;
+            transition: 0.5s; text-align: center;
+        }
+        #codex-popup.active { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+        .codex-text { font-style: italic; font-size: 0.9rem; color: var(--text); margin-bottom: 5px; }
+        .codex-src { font-size: 0.7rem; color: var(--p-purple); font-weight: bold; text-transform: uppercase; }
     </style>
 </head>
 <body>
+
+    <button class="btn-sec" id="exit-zen" onclick="toggleZen()">Exit Zen</button>
 
     <div class="xp-bar-container">
         <div class="level-badge" id="lvl-badge">LVL 1</div>
@@ -194,34 +203,62 @@
         <div class="xp-text"><span id="xp-val">0</span> XP</div>
     </div>
 
+    <div id="xp-toast"><span>+10 XP</span></div>
+    
+    <div id="codex-popup">
+        <div class="codex-text" id="codex-text">"Quote"</div>
+        <div class="codex-src" id="codex-src">- Source</div>
+    </div>
+
     <div class="header">
         <h1>Mission Control</h1>
         <div style="display:flex; gap:10px;">
+            <button class="icon-btn" onclick="openStory()" id="btn-story">📖</button>
             <button class="icon-btn" onclick="toggleArchiveView()" id="btn-archive">📦</button>
-            <button class="icon-btn" onclick="toggleTheme()">◑</button>
-            <button class="icon-btn" onclick="toggleMenu()">💾</button>
+            <button class="icon-btn" onclick="toggleMenu()">🎨</button>
         </div>
     </div>
 
     <div id="save-menu" class="dropdown">
-        <button class="dd-item" onclick="exportData()">Backup (iCloud)</button>
-        <button class="dd-item" onclick="document.getElementById('file-input').click()">Restore File</button>
+        <div class="dd-sect">AUDIO & FX</div>
+        <button class="dd-item" onclick="toggleSound()">🔊 Sound FX <span class="dd-badge" id="snd-stat">ON</span></button>
+        <button class="dd-item" onclick="setConfetti('square')">◼️ Classic</button>
+        <button class="dd-item" id="fx-star" onclick="setConfetti('star')">⭐ Stars <span class="dd-badge">LVL 10</span></button>
+        <button class="dd-item" id="fx-coin" onclick="setConfetti('coin')">🪙 Coins <span class="dd-badge">LVL 20</span></button>
+        <button class="dd-item" id="fx-gem" onclick="setConfetti('gem')">💎 Gems <span class="dd-badge">LVL 30</span></button>
+
+        <div class="dd-sect">THEME LOCKER</div>
+        <button class="dd-item" onclick="setTheme('default')">Tactical Dark</button>
+        <button class="dd-item" onclick="setTheme('light')">Clean Light</button>
+        <button class="dd-item" id="theme-wolf" onclick="setTheme('wolf')">The Wolf <span class="dd-badge">LVL 5</span></button>
+        <button class="dd-item" id="theme-neon" onclick="setTheme('neon')">Neon City <span class="dd-badge">LVL 10</span></button>
+        <button class="dd-item" id="theme-aperture" onclick="setTheme('aperture')">Aperture <span class="dd-badge">LVL 12</span></button>
+        <button class="dd-item" id="theme-horror" onclick="setTheme('horror')">Eldritch <span class="dd-badge">LVL 15</span></button>
+        <button class="dd-item" id="theme-vapor" onclick="setTheme('vapor')">Vaporwave <span class="dd-badge">LVL 18</span></button>
+        <button class="dd-item" id="theme-blueprint" onclick="setTheme('blueprint')">Blueprint <span class="dd-badge">LVL 20</span></button>
+        <button class="dd-item" id="theme-terminal" onclick="setTheme('terminal')">Terminal <span class="dd-badge">LVL 25</span></button>
+        <button class="dd-item" id="theme-gold" onclick="setTheme('gold')">Gold Standard <span class="dd-badge">LVL 30</span></button>
+        
+        <div class="dd-sect" style="color:var(--p-orange)">PRESTIGE TIERS</div>
+        <button class="dd-item" id="theme-nebula" onclick="setTheme('nebula')">Nebula <span class="dd-badge" style="background:var(--p-purple);color:#000">P 1</span></button>
+        <button class="dd-item" id="theme-midas" onclick="setTheme('midas')">Midas <span class="dd-badge" style="background:var(--p-orange);color:#000">P 2</span></button>
+        <button class="dd-item" id="theme-glitch" onclick="setTheme('glitch')">The Glitch <span class="dd-badge" style="background:var(--p-red);color:#000">P 3</span></button>
+
+        <div class="dd-sect">UPGRADES</div>
+        <button class="dd-item" id="feat-status" onclick="showStatusReport()">📊 Status Report <span class="dd-badge">LVL 2</span></button>
+        <button class="dd-item" id="feat-zen" onclick="toggleZen()">🧘 Zen Mode <span class="dd-badge">LVL 8</span></button>
+        <button class="dd-item" id="feat-prestige" onclick="doPrestige()" style="color:var(--p-orange)">🎖️ PRESTIGE <span class="dd-badge">LVL 50</span></button>
+
+        <div class="dd-sect">DATA</div>
+        <button class="dd-item" onclick="exportData()">Backup</button>
+        <button class="dd-item" onclick="document.getElementById('file-input').click()">Restore</button>
     </div>
     <input type="file" id="file-input" hidden onchange="importData(this)">
 
     <div class="board" id="main-board">
-        <div class="column">
-            <div class="col-header h-0">Staging <span id="count-0">0</span></div>
-            <div class="task-list" id="col-0"></div>
-        </div>
-        <div class="column">
-            <div class="col-header h-1">Active <span id="count-1">0</span></div>
-            <div class="task-list" id="col-1"></div>
-        </div>
-        <div class="column">
-            <div class="col-header h-2">Victory <span id="count-2">0</span></div>
-            <div class="task-list" id="col-2"></div>
-        </div>
+        <div class="column"><div class="col-header h-0">Staging <span id="count-0">0</span></div><div class="task-list" id="col-0"></div></div>
+        <div class="column"><div class="col-header h-1">Active <span id="count-1">0</span></div><div class="task-list" id="col-1"></div></div>
+        <div class="column"><div class="col-header h-2">Victory <span id="count-2">0</span></div><div class="task-list" id="col-2"></div></div>
     </div>
 
     <button class="fab" onclick="openModal()">+</button>
@@ -230,15 +267,13 @@
         <div class="modal-content">
             <h2 style="margin-top:0; text-align:center;">Mission Brief</h2>
             <input type="hidden" id="t-id">
-            
             <span class="form-label">MISSION OBJECTIVE</span>
             <input id="t-title" class="form-input" placeholder="e.g. Campaign Launch">
-            
             <div class="form-row">
                 <div style="flex:1">
                     <span class="form-label">DEADLINE</span>
                     <input type="date" id="t-date" class="form-input" style="margin-bottom:0;">
-                    <button class="btn-cal" onclick="addToCalendar()" id="btn-cal-sync" style="display:none;">📅 Sync to Calendar</button>
+                    <button class="btn-cal" onclick="addToCalendar()" id="btn-cal-sync" style="display:none;">📅 Sync Calendar</button>
                 </div>
                 <div style="flex:1">
                     <span class="form-label">PRIORITY</span>
@@ -250,80 +285,369 @@
                     <input type="hidden" id="t-prio" value="Med">
                 </div>
             </div>
-
-            <span class="form-label">TACTICAL CHECKLIST (+10 XP ea)</span>
+            <span class="form-label">TACTICAL CHECKLIST (+10 XP)</span>
             <div id="checklist-container"></div>
             <button class="btn-sec" onclick="addCheckItem()" style="border-style:dashed; color:var(--p-purple); border-color:var(--p-purple);">+ Add Step</button>
-
             <div class="form-row" id="move-controls" style="margin-top:20px; display:none;">
-                <button class="btn-sec" onclick="moveCard(-1)">⬅️ Back</button>
-                <button class="btn-sec" onclick="moveCard(1)">Advance ➡️</button>
+                <button class="btn-sec" onclick="moveCardAnim(-1)">⬅️ Back</button>
+                <button class="btn-sec" onclick="moveCardAnim(1)">Advance ➡️</button>
             </div>
-
             <button class="btn-main" onclick="saveCard()">SAVE MISSION</button>
-            
             <div class="form-row" style="margin-top:10px;">
-                <button class="btn-sec" id="btn-archive-toggle" onclick="toggleArchive()">🧊 Cryo-Sleep (Archive)</button>
-                <button class="btn-sec" onclick="deleteCard()" style="color:var(--p-red); border-color:var(--p-red);">Delete</button>
+                <button class="btn-sec" id="btn-archive-toggle" onclick="toggleArchive()">🧊 Cryo-Sleep</button>
+                <button class="btn-sec" onclick="deleteCard()" style="color:var(--p-red); border-color:var(--p-red);">💀 Abort (-XP)</button>
             </div>
             <button class="btn-sec" onclick="closeModal()" style="border:none;">Close</button>
+        </div>
+    </div>
+
+    <div id="story-modal" class="modal">
+        <div class="modal-content">
+            <div class="story-header">THE SUNLESS AGE</div>
+            <div class="story-body" id="story-content"></div>
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn-sec" onclick="changeChapter(-1)">Prev</button>
+                <button class="btn-sec" onclick="changeChapter(1)">Next</button>
+            </div>
+            <button class="btn-sec" onclick="document.getElementById('story-modal').style.display='none'" style="width:100%; border:none; margin-top:10px;">Close Book</button>
         </div>
     </div>
 
     <script>
         let tasks = JSON.parse(localStorage.getItem('mc_tasks') || '[]');
         let userXP = parseInt(localStorage.getItem('mc_xp') || '0');
+        let prestige = parseInt(localStorage.getItem('mc_prestige') || '0');
+        let currentTheme = localStorage.getItem('theme') || 'default';
+        let confettiStyle = localStorage.getItem('mc_fx') || 'square';
+        let soundOn = localStorage.getItem('mc_sound') === 'true';
         let showArchive = false;
+        let currentChapter = 1;
+        let lastDeletedTask = null;
+        let undoTimeout = null;
         
-        if(localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
-        render();
-        updateXP();
+        const RANKS = ["Rookie", "Operative", "Specialist", "Tactician", "Mercenary", "Commander", "Warlord", "Vanguard", "Titan", "Legend"];
+        const CODEX = [
+            { t: "Life before death. Strength before weakness. Journey before destination.", s: "Stormlight" },
+            { t: "The most important step a man can take. It's not the first one, is it? It's the next one.", s: "Stormlight" },
+            { t: "It's the possibility of having a dream come true that makes life interesting.", s: "Alchemist" },
+            { t: "When you want something, all the universe conspires in helping you to achieve it.", s: "Alchemist" },
+            { t: "Chaos isn't a pit. Chaos is a ladder.", s: "GoT" },
+            { t: "A lion does not concern himself with the opinion of sheep.", s: "GoT" },
+            { t: "Winter is coming.", s: "GoT" },
+            { t: "Discipline is freedom.", s: "Codex" }
+        ];
+        const STORY = {
+            1: "CHAPTER I: THE EMBER\n\nThe endless frost began not with a bang, but a whisper. The sun simply... dimmed. Years turned to decades of twilight. Civilization crumbled into the snow.\n\nI am Kael, a scavenger of the Old World. Yesterday, digging through the ruins of a tech-spire, I found it. Not food, not fuel, but a sword. It wasn't cold steel. It hummed. A faint, golden heat radiated from the blade.\n\nThey say the Alchemists of old trapped sunlight in metal. If that's true, I'm holding the only warmth left in the world. And the Shadows are coming for it.",
+            2: "CHAPTER II: THE FROZEN COURT\n\nI traveled South, following the faint pull of the blade. The Capital still stands, a fortress of black ice and iron. The Lords play their games of thrones while the poor freeze outside the walls.\n\nI tried to barter entry, but the guards saw the sword. Now I am a prisoner, or a guest? The High Warden wants the weapon. He says it belongs to the 'Vanguard,' a mythical order of knights.\n\nI must choose. Give him the sword and live in luxury while the world dies? Or escape, and find the source of the blade's power? The whispers in my mind are getting louder. 'Protect the Light.'",
+            3: "CHAPTER III: THE ALCHEMIST'S MIRROR\n\nI chose the snow. I ran. The blade guided me to a mountain peak above the cloud layer. There was no temple, only a cave, and an old woman reflecting starlight with mirrors.\n\n'You look for a savior,' she laughed. 'But the sword is just a key.'\n\nShe showed me the truth. The sun didn't die. We blocked it. The 'Shield' meant to protect us from solar flares froze in place. The sword unlocks the atmospheric controls. But the climb to the Zenith Spire is a suicide mission. Vampiric creatures nest there. I am afraid. But the sword is burning hot now. It knows.",
+            4: "FINALE: THE ZENITH\n\nThe climb took everything. My gear, my strength, my blood. I stand at the Zenith controls. The Shadows surround me, screeching in the thin air.\n\nI plunge the blade into the console. Not a key, but a spark. The machine roars. The sky tears open. For the first time in a century, a beam of pure, unfiltered gold hits the snow.\n\nThe Shadows burn away. The ice weeps. I fall to my knees, blinded, weeping with it. The Sunless Age is over. I am the Vanguard. And I am warm."
+        };
+
+        initApp();
+
+        function initApp() {
+            setTheme(currentTheme, true); 
+            document.getElementById('snd-stat').innerText = soundOn ? "ON" : "OFF";
+            render();
+            updateXP();
+        }
+
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const ctx = new AudioContext();
+
+        function playTone(freq, type, duration) {
+            if(!soundOn) return;
+            if(ctx.state === 'suspended') ctx.resume();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = type; osc.frequency.setValueAtTime(freq, ctx.currentTime);
+            gain.gain.setValueAtTime(0.1, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.start(); osc.stop(ctx.currentTime + duration);
+        }
+
+        function sfx(type) {
+            if(type === 'check') playTone(880, 'sine', 0.1); 
+            if(type === 'uncheck') playTone(150, 'sawtooth', 0.2); 
+            if(type === 'win') { playTone(523.25,'triangle',0.1); setTimeout(()=>playTone(659.25,'triangle',0.1),100); setTimeout(()=>playTone(783.99,'triangle',0.2),200); setTimeout(()=>playTone(1046.50,'triangle',0.4),300); }
+            if(type === 'lvlup') { [440, 554, 659, 880].forEach((f, i) => setTimeout(() => playTone(f, 'square', 0.2), i*150)); }
+        }
+
+        function toggleSound() {
+            soundOn = !soundOn; localStorage.setItem('mc_sound', soundOn);
+            document.getElementById('snd-stat').innerText = soundOn ? "ON" : "OFF";
+            if(soundOn) sfx('check');
+        }
+
+        function getLevel(xp) {
+            let lvl = 1; let req = 500; let gap = 500;
+            while(xp >= req) { lvl++; gap += 50; req += gap; }
+            return { level: lvl, nextReq: req, prevReq: req - gap };
+        }
+
+        function updateXP() {
+            localStorage.setItem('mc_xp', userXP);
+            localStorage.setItem('mc_prestige', prestige);
+            const stats = getLevel(userXP);
+            
+            const range = stats.nextReq - stats.prevReq;
+            const current = userXP - stats.prevReq;
+            const pct = Math.max(0, Math.min(100, (current / range) * 100));
+            
+            let badgeText = `LVL ${stats.level}: ${RANKS[Math.min(stats.level-1, RANKS.length-1)]}`;
+            if(prestige > 0) badgeText += ` ${"✪".repeat(prestige)}`;
+            
+            document.getElementById('lvl-badge').innerText = badgeText;
+            document.getElementById('xp-fill').style.width = `${pct}%`;
+            document.getElementById('xp-val').innerText = `${userXP} / ${stats.nextReq}`;
+            
+            checkUnlocks(stats.level);
+        }
+
+        function updateLiveXP(amount) {
+            const mult = 1 + (prestige * 0.1);
+            const finalAmt = Math.floor(amount * mult);
+            const oldLvl = getLevel(userXP).level;
+            userXP += finalAmt;
+            if(userXP < 0) userXP = 0; 
+            
+            const newLvl = getLevel(userXP).level;
+            
+            if(amount > 0 && Math.random() < 0.05) { userXP += 50; showToast("CRITICAL SUCCESS! +50 XP", false, true); showCodex(); }
+            if(newLvl > oldLvl) { showToast("LEVEL UP!", false, true); sfx('lvlup'); showCodex(); }
+            if(newLvl < oldLvl) { showToast("LEVEL LOST", true); } 
+            
+            updateXP();
+        }
+
+        function doPrestige() {
+            const stats = getLevel(userXP);
+            if(stats.level < 50) return alert("MUST REACH LEVEL 50 TO PRESTIGE.");
+            if(confirm("WARNING: Resets Level to 1. Keeps Themes & Unlocks Story Chapter. Do it?")) {
+                userXP = 0; prestige++; updateXP(); sfx('lvlup');
+                alert(`PRESTIGE ${prestige} UNLOCKED! Story Chapter ${prestige} Available.`);
+                toggleMenu();
+            }
+        }
+
+        function showCodex() {
+            const quote = CODEX[Math.floor(Math.random() * CODEX.length)];
+            const el = document.getElementById('codex-popup');
+            document.getElementById('codex-text').innerText = `"${quote.t}"`;
+            document.getElementById('codex-src').innerText = quote.s;
+            el.classList.add('active');
+            setTimeout(() => el.classList.remove('active'), 5000);
+        }
+
+        function openStory() {
+            currentChapter = prestige === 0 ? 1 : prestige; 
+            renderChapter();
+            document.getElementById('story-modal').style.display = 'flex';
+        }
+
+        function changeChapter(dir) {
+            currentChapter += dir;
+            if(currentChapter < 1) currentChapter = 1;
+            if(currentChapter > 4) currentChapter = 4;
+            renderChapter();
+        }
+
+        function renderChapter() {
+            const content = document.getElementById('story-content');
+            if(prestige >= currentChapter) {
+                content.innerText = STORY[currentChapter];
+                content.classList.remove('story-lock');
+            } else {
+                content.innerHTML = `<div class="story-lock">🔒 LOCKED<br><br>Reach Prestige ${currentChapter} to decode this chronicle.</div>`;
+            }
+        }
+
+        function showToast(msg, isLoss, isCrit) {
+            const t = document.getElementById('xp-toast');
+            t.querySelector('span').innerText = msg;
+            t.className = isLoss ? 'loss' : (isCrit ? 'crit' : '');
+            
+            if(isLoss && lastDeletedTask && prestige >= 1) {
+                if(!t.querySelector('.btn-undo')) {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-undo';
+                    btn.innerText = 'TIME WARP (UNDO)';
+                    btn.onclick = undoDelete;
+                    t.appendChild(btn);
+                }
+            } else {
+                const existingBtn = t.querySelector('.btn-undo');
+                if(existingBtn) existingBtn.remove();
+            }
+
+            t.style.opacity = '1'; t.style.transform = 'translate(-50%, 0px) scale(1)';
+            const bar = document.getElementById('xp-fill');
+            if(isLoss) bar.classList.add('damage'); else bar.classList.remove('damage');
+            
+            if(undoTimeout) clearTimeout(undoTimeout);
+            undoTimeout = setTimeout(() => { 
+                t.style.opacity = '0'; t.style.transform = 'translate(-50%, 10px)'; bar.classList.remove('damage'); 
+                lastDeletedTask = null;
+            }, 5000);
+        }
+
+        function undoDelete() {
+            if(lastDeletedTask) {
+                tasks.push(lastDeletedTask);
+                updateLiveXP(lastDeletedTask.xpLost);
+                save(); render();
+                showToast("TIMELINE RESTORED", false);
+                lastDeletedTask = null;
+            }
+        }
+
+        function checkUnlocks(level) {
+            const locks = { 'feat-status': 2, 'feat-zen': 8, 'feat-prestige': 50, 'fx-star': 10, 'fx-coin': 20, 'fx-gem': 30, 'theme-wolf': 5, 'theme-neon': 10, 'theme-aperture': 12, 'theme-horror': 15, 'theme-vapor': 18, 'theme-blueprint': 20, 'theme-terminal': 25, 'theme-gold': 30, 'theme-nebula': 999, 'theme-midas': 999, 'theme-glitch': 999 };
+            const unlockAll = prestige > 0;
+            for(let id in locks) {
+                const btn = document.getElementById(id);
+                if(!btn) continue;
+                let isUnlocked = false;
+                if(id === 'theme-nebula') isUnlocked = prestige >= 1;
+                else if(id === 'theme-midas') isUnlocked = prestige >= 2;
+                else if(id === 'theme-glitch') isUnlocked = prestige >= 3;
+                else isUnlocked = unlockAll || level >= locks[id];
+                if(isUnlocked) { btn.classList.remove('dd-locked'); if(btn.innerHTML.includes('🔒')) btn.innerHTML = btn.innerHTML.replace(' 🔒', ''); } 
+                else { btn.classList.add('dd-locked'); if(!btn.innerHTML.includes('🔒')) btn.innerHTML += ' 🔒'; }
+            }
+        }
+
+        function setTheme(name, force) {
+            const stats = getLevel(userXP);
+            const reqs = { 'wolf': 5, 'neon': 10, 'aperture': 12, 'horror': 15, 'vapor': 18, 'blueprint': 20, 'terminal': 25, 'gold': 30 };
+            const pReqs = { 'nebula': 1, 'midas': 2, 'glitch': 3 };
+            if(!force) {
+                if(pReqs[name] && prestige < pReqs[name]) return alert(`LOCKED! Reach Prestige ${pReqs[name]} to unlock.`);
+                if(reqs[name] && prestige === 0 && stats.level < reqs[name]) return alert(`LOCKED! Reach Level ${reqs[name]} to unlock.`);
+            }
+            document.body.className = ''; 
+            if(name !== 'default') document.body.classList.add(`theme-${name}`);
+            currentTheme = name;
+            localStorage.setItem('theme', name);
+            toggleMenu(); 
+        }
+
+        function setConfetti(type) {
+            const stats = getLevel(userXP);
+            const reqs = { 'star': 10, 'coin': 20, 'gem': 30 };
+            if(prestige === 0 && reqs[type] && stats.level < reqs[type]) return alert(`Locked until Level ${reqs[type]}`);
+            confettiStyle = type;
+            localStorage.setItem('mc_fx', type);
+            alert(`Effect Set: ${type.toUpperCase()}`);
+            toggleMenu();
+        }
+
+        function launchConfetti() {
+            const emojis = { 'square': '', 'star': '⭐', 'coin': '🪙', 'gem': '💎' };
+            const icon = emojis[confettiStyle];
+            for(let i=0; i<30; i++) {
+                const c = document.createElement('div');
+                c.className = 'confetti';
+                c.innerText = icon;
+                c.style.left = Math.random()*100 + 'vw';
+                if(confettiStyle === 'square') {
+                    c.style.width = '10px'; c.style.height = '10px';
+                    c.style.background = `hsl(${Math.random()*360}, 100%, 50%)`;
+                }
+                c.style.animation = `fall ${Math.random()*1+1}s linear forwards`;
+                document.body.appendChild(c);
+                setTimeout(()=>c.remove(), 2000);
+            }
+        }
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = `@keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }`;
+        document.head.appendChild(styleSheet);
 
         function render() {
-            // Clear Columns
-            [0, 1, 2].forEach(i => {
-                document.getElementById(`col-${i}`).innerHTML = '';
-                document.getElementById(`count-${i}`).innerText = '0';
-            });
-
+            [0, 1, 2].forEach(i => { document.getElementById(`col-${i}`).innerHTML = ''; document.getElementById(`count-${i}`).innerText = '0'; });
             const today = new Date().toISOString().split('T')[0];
-
             tasks.forEach(t => {
-                // Filter Archive
                 if (showArchive && !t.archived) return;
                 if (!showArchive && t.archived) return;
-
                 const total = t.steps.length;
                 const done = t.steps.filter(s => s.done).length;
                 const pct = total === 0 ? 0 : (done / total) * 100;
-                
-                // Date Logic
                 let dateHtml = '';
                 if(t.date) {
                     const isOverdue = t.date < today && t.col !== 2;
                     dateHtml = `<span class="card-date ${isOverdue?'overdue':''}">${t.date}</span>`;
                 }
-
                 const div = document.createElement('div');
-                div.className = `card p-${t.prio||'Med'}`;
+                div.className = `card slide-enter p-${t.prio||'Med'}`;
+                div.id = `card-${t.id}`;
                 div.onclick = () => openModal(t.id);
-                div.innerHTML = `
-                    <div class="card-top"><span class="card-title">${t.title}</span>${dateHtml}</div>
-                    <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
-                    <div class="card-meta"><span>${done}/${total} Steps</span><span>${pct.toFixed(0)}%</span></div>
-                `;
-                
+                div.innerHTML = `<div class="card-top"><span class="card-title">${t.title}</span>${dateHtml}</div>
+                                 <span class="prio-pill pill-${t.prio}">${t.prio}</span>
+                                 <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+                                 <div class="card-meta"><span>${done}/${total} Steps</span><span>${pct.toFixed(0)}%</span></div>`;
                 const colId = t.col !== undefined ? t.col : 0;
+                // Empty State Logic
                 document.getElementById(`col-${colId}`).appendChild(div);
             });
-
-            // Update Counts
-            [0, 1, 2].forEach(i => {
-                document.getElementById(`count-${i}`).innerText = tasks.filter(t => (t.col||0) === i && !t.archived).length;
+            [0, 1, 2].forEach(i => { 
+                const col = document.getElementById(`col-${i}`);
+                if(col.innerHTML === '') col.innerHTML = `<div class="empty-msg">Awaiting Orders...</div>`;
+                document.getElementById(`count-${i}`).innerText = tasks.filter(t => (t.col||0) === i && !t.archived).length; 
             });
-            
-            // Header Title Change
             document.querySelector('h1').innerText = showArchive ? "Cryo-Storage 🧊" : "Mission Control 🚀";
+        }
+
+        // --- KINETIC LOGIC ---
+        function moveCardAnim(dir) {
+            const id = document.getElementById('t-id').value;
+            const idx = tasks.findIndex(x => x.id === id);
+            closeModal();
+            const cardEl = document.getElementById(`card-${id}`);
+            if(cardEl) {
+                cardEl.classList.add(dir === 1 ? 'slide-right' : 'slide-left');
+                setTimeout(() => { moveCardLogic(idx, dir); }, 300); 
+            } else { moveCardLogic(idx, dir); }
+        }
+
+        function moveCardLogic(idx, dir) {
+            if(idx > -1) {
+                let newCol = (tasks[idx].col || 0) + dir;
+                if(newCol < 0) newCol = 0; if(newCol > 2) newCol = 2;
+                const today = new Date().toISOString().split('T')[0];
+                const isLate = tasks[idx].date && tasks[idx].date < today;
+                if(tasks[idx].col !== 2 && newCol === 2) { 
+                    if(isLate) { showToast("⚠️ LATE (+50 XP)", true); updateLiveXP(50); }
+                    else { showToast("VICTORY! (+100 XP)", false); updateLiveXP(100); launchConfetti(); sfx('win'); }
+                }
+                if(tasks[idx].col === 2 && newCol !== 2) { showToast("RETREAT (-100 XP)", true); updateLiveXP(-100); }
+                tasks[idx].col = newCol;
+                save(); updateXP(); render();
+            }
+        }
+
+        function moveCard(dir) { moveCardAnim(dir); } 
+
+        function deleteCard() {
+            const id = document.getElementById('t-id').value;
+            if(!id) return;
+            if(confirm("ABORT MISSION? -50 XP Penalty")) {
+                const t = tasks.find(x => x.id === id);
+                let sunkXP = t.steps.filter(s=>s.done).length * 10;
+                if(t.col === 2) sunkXP += 100;
+                const totalLoss = sunkXP + 50;
+                lastDeletedTask = { ...t, xpLost: totalLoss };
+                updateLiveXP(-totalLoss);
+                tasks = tasks.filter(x => x.id !== id);
+                showToast(`FAILED (-${totalLoss} XP)`, true);
+                save(); closeModal(); render();
+            }
+        }
+
+        function toggleCheck(el) {
+            const isChecked = el.classList.toggle('checked');
+            if(isChecked) { showToast("+10 XP", false); updateLiveXP(10); sfx('check'); } 
+            else { showToast("-10 XP", true); updateLiveXP(-10); sfx('uncheck'); }
         }
 
         function openModal(id) {
@@ -332,21 +656,12 @@
             document.getElementById('t-title').value = t.title;
             document.getElementById('t-date').value = t.date;
             setPrio(t.prio || 'Med');
-            
-            // Calendar Button Logic
-            const calBtn = document.getElementById('btn-cal-sync');
-            calBtn.style.display = (t.date && t.id) ? 'flex' : 'none';
-
-            // Archive Button Logic
-            const archBtn = document.getElementById('btn-archive-toggle');
-            archBtn.innerText = t.archived ? "🔥 Thaw (Unarchive)" : "🧊 Cryo-Sleep (Archive)";
-
-            // Render Steps
+            document.getElementById('btn-cal-sync').style.display = (t.date && t.id) ? 'block' : 'none';
+            document.getElementById('btn-archive-toggle').innerText = t.archived ? "🔥 Thaw" : "🧊 Cryo-Sleep";
             const container = document.getElementById('checklist-container');
             container.innerHTML = '';
             t.steps.forEach(s => addCheckItem(s.text, s.done));
             if(t.steps.length === 0) addCheckItem(); 
-
             document.getElementById('move-controls').style.display = id ? 'flex' : 'none';
             document.getElementById('task-modal').style.display = 'flex';
         }
@@ -354,165 +669,59 @@
         function addCheckItem(text = '', done = false) {
             const div = document.createElement('div');
             div.className = 'check-item';
-            div.innerHTML = `
-                <div class="check-box ${done?'checked':''}" onclick="toggleCheck(this)"></div>
-                <input type="text" class="check-text" value="${text}" placeholder="New Step...">
-                <span class="check-del" onclick="this.parentElement.remove()">✕</span>
-            `;
+            div.innerHTML = `<div class="check-box ${done?'checked':''}" onclick="toggleCheck(this)"></div><input type="text" class="check-text" value="${text}" placeholder="New Step..."><span class="check-del" onclick="this.parentElement.remove(); showToast('-10 XP', true); updateLiveXP(-10);">✕</span>`;
             document.getElementById('checklist-container').appendChild(div);
-        }
-
-        function toggleCheck(el) {
-            el.classList.toggle('checked');
-            // XP Feedback could go here
-        }
-
-        function setPrio(val) {
-            document.getElementById('t-prio').value = val;
-            document.querySelectorAll('.prio-opt').forEach(el => {
-                el.classList.remove('active');
-                if(el.dataset.val === val) el.classList.add('active');
-            });
         }
 
         function saveCard() {
             const id = document.getElementById('t-id').value;
             const title = document.getElementById('t-title').value;
             if(!title) return alert("Title required");
-
             const prio = document.getElementById('t-prio').value;
             const date = document.getElementById('t-date').value;
-
-            // Scrape Checklist & Calc XP
             const steps = [];
-            let newXP = 0;
             document.querySelectorAll('.check-item').forEach(el => {
                 const txt = el.querySelector('.check-text').value.trim();
                 const chk = el.querySelector('.check-box').classList.contains('checked');
-                if(txt) {
-                    steps.push({ text: txt, done: chk });
-                    if(chk) newXP += 10;
-                }
+                if(txt) steps.push({ text: txt, done: chk });
             });
-
             if(id) {
                 const idx = tasks.findIndex(x => x.id === id);
-                // Delta XP Logic could be added here, simplified for now
                 tasks[idx] = { ...tasks[idx], title, steps, prio, date };
             } else {
                 tasks.push({ id: Date.now().toString(), title, steps, col: 0, prio, date, archived:false });
             }
-            
-            // Simplified XP add (just add active checks)
-            // Real gamification would track delta, but let's just save total checked items ever? 
-            // For now, let's just accumulate XP on save for simplicity/fun.
-            // Better logic: Recalculate total XP from scratch based on all 'done' items.
-            recalcTotalXP();
-            
             save(); closeModal(); render();
         }
 
-        function recalcTotalXP() {
-            let total = 0;
-            tasks.forEach(t => {
-                t.steps.forEach(s => { if(s.done) total += 10; });
-                if(t.col === 2) total += 100; // Bonus for Victory column
-            });
-            userXP = total;
-            updateXP();
-        }
-
-        function updateXP() {
-            localStorage.setItem('mc_xp', userXP);
-            // Level = XP / 500
-            const level = Math.floor(userXP / 500) + 1;
-            const progress = (userXP % 500) / 500 * 100;
-            
-            document.getElementById('lvl-badge').innerText = `LVL ${level}`;
-            document.getElementById('xp-fill').style.width = `${progress}%`;
-            document.getElementById('xp-val').innerText = userXP;
-        }
-
-        function moveCard(dir) {
-            const id = document.getElementById('t-id').value;
-            const idx = tasks.findIndex(x => x.id === id);
-            if(idx > -1) {
-                let newCol = (tasks[idx].col || 0) + dir;
-                if(newCol < 0) newCol = 0;
-                if(newCol > 2) newCol = 2;
-                tasks[idx].col = newCol;
-                recalcTotalXP(); // Update XP for column move
-                save(); closeModal(); render();
-            }
-        }
-
-        function toggleArchive() {
-            const id = document.getElementById('t-id').value;
-            const idx = tasks.findIndex(x => x.id === id);
-            if(idx > -1) {
-                tasks[idx].archived = !tasks[idx].archived;
-                save(); closeModal(); render();
-            }
-        }
-        
-        function toggleArchiveView() {
-            showArchive = !showArchive;
-            render();
-        }
-
-        function deleteCard() {
-            const id = document.getElementById('t-id').value;
-            if(!id) return;
-            if(confirm("Abort Mission?")) {
-                tasks = tasks.filter(x => x.id !== id);
-                recalcTotalXP();
-                save(); closeModal(); render();
-            }
-        }
-
-        function addToCalendar() {
-            const title = document.getElementById('t-title').value;
-            const date = document.getElementById('t-date').value;
-            if(!date) return alert("Set a date first");
-            
-            const startRaw = date.replace(/-/g, '') + 'T090000';
-            const endRaw = date.replace(/-/g, '') + 'T100000';
-            
-            const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Mission: ${title}\nDTSTART:${startRaw}\nDTEND:${endRaw}\nDESCRIPTION:Goal from Mission Control\nEND:VEVENT\nEND:VCALENDAR`;
-            
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(new Blob([ics], {type: 'text/calendar'}));
-            a.download = 'mission.ics';
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        }
-
-        // --- UTILS ---
+        function setPrio(val) { document.getElementById('t-prio').value = val; document.querySelectorAll('.prio-opt').forEach(el => { el.classList.remove('active'); if(el.dataset.val === val) el.classList.add('active'); }); }
+        function toggleArchive() { const id = document.getElementById('t-id').value; const idx = tasks.findIndex(x => x.id === id); if(idx > -1) { tasks[idx].archived = !tasks[idx].archived; save(); closeModal(); render(); } }
+        function toggleArchiveView() { showArchive = !showArchive; render(); }
         function save() { localStorage.setItem('mc_tasks', JSON.stringify(tasks)); }
         function closeModal() { document.getElementById('task-modal').style.display = 'none'; }
         function toggleMenu() { document.getElementById('save-menu').classList.toggle('show'); }
-        function toggleTheme() { 
-            document.body.classList.toggle('light-mode'); 
-            localStorage.setItem('theme', document.body.classList.contains('light-mode')?'light':'dark'); 
-        }
-        
-        function exportData() {
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(new Blob([JSON.stringify(tasks)], {type:'application/json'}));
-            a.download = `mission_backup_${Date.now()}.json`;
-            a.click();
+        function showStatusReport() {
+            const stats = getLevel(userXP);
+            if(stats.level < 2 && prestige === 0) return alert("Unlock this at Level 2.");
+            const total = tasks.length;
+            const wins = tasks.filter(t => t.col === 2).length;
+            const rate = total === 0 ? 0 : Math.round((wins/total)*100);
+            alert(`📊 STATUS REPORT\n\nRank: ${RANKS[Math.min(stats.level-1, RANKS.length-1)]}\nXP: ${userXP}\n\nMissions: ${total}\nVictories: ${wins}\nSuccess Rate: ${rate}%`);
             toggleMenu();
         }
-
-        function importData(el) {
-            if(!el.files[0]) return;
-            const fr = new FileReader();
-            fr.onload = e => {
-                tasks = JSON.parse(e.target.result);
-                recalcTotalXP();
-                save(); render(); alert("Data Restored");
-            };
-            fr.readAsText(el.files[0]);
-            toggleMenu();
+        function toggleZen() {
+            const stats = getLevel(userXP);
+            if(stats.level < 8 && prestige === 0) return alert("Unlock Zen Mode at Level 8.");
+            document.body.classList.toggle('zen-mode'); toggleMenu();
+        }
+        function exportData() { const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(tasks)],{type:'application/json'})); a.download=`mission_backup_${Date.now()}.json`; a.click(); toggleMenu(); }
+        function importData(el) { const fr=new FileReader(); fr.onload=e=>{tasks=JSON.parse(e.target.result); recalcTotalXP(); save(); render(); alert("Data Restored");}; fr.readAsText(el.files[0]); toggleMenu(); }
+        function recalcTotalXP() { let total = 0; tasks.forEach(t => { t.steps.forEach(s => { if(s.done) total += 10; }); if(t.col === 2) total += 100; }); userXP = total; updateXP(); }
+        function addToCalendar() {
+            const t = document.getElementById('t-title').value; const d = document.getElementById('t-date').value;
+            if(!d) return alert("Set a date first"); const s=d.replace(/-/g,'')+'T090000'; const e=d.replace(/-/g,'')+'T100000';
+            const ics=`BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:${t}\nDTSTART:${s}\nDTEND:${e}\nEND:VEVENT\nEND:VCALENDAR`;
+            const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar'})); a.download='mission.ics'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
         }
     </script>
 </body>
