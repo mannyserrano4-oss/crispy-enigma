@@ -91,16 +91,23 @@
         .bank-val { font-size: 1.3rem; font-weight: 900; }
         .bank-lbl { font-size: 0.6rem; font-weight: 700; color: var(--subtext); text-transform: uppercase; }
         
-        .detail-row { display: flex; gap: 10px; margin-bottom: 10px; }
-        .detail-box { flex: 1; background: var(--card); padding: 10px; border-radius: 8px; border: 1px solid var(--border); }
-        .detail-lbl { font-size: 0.65rem; color: var(--accent); font-weight: 800; margin-bottom: 4px; letter-spacing: 1px; }
-        .detail-txt { font-size: 0.95rem; line-height: 1.4; }
+        /* NOTES AREA - FIXED */
+        .detail-box { flex: 1; background: var(--card); padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px; }
+        .detail-lbl { font-size: 0.65rem; color: var(--accent); font-weight: 800; margin-bottom: 6px; letter-spacing: 1px; }
+        .detail-txt { 
+            font-size: 0.95rem; 
+            line-height: 1.5; 
+            white-space: pre-wrap; /* Respects Enter key */
+            word-wrap: break-word; /* Prevents overflow */
+            overflow-wrap: break-word;
+            color: var(--text);
+        }
 
         /* BUTTONS */
         .btn-main { width: 100%; padding: 16px; background: var(--green); color: #000; border: none; border-radius: 12px; font-size: 1rem; font-weight: 800; text-transform: uppercase; cursor: pointer; margin-bottom: 12px; }
         .btn-full { width: 100%; padding: 12px; background: var(--card); border: 1px solid var(--border); color: var(--text); font-weight: 600; border-radius: 10px; margin-bottom: 12px; cursor: pointer; }
         
-        .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .action-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
         .btn-act { background: var(--card); border: 1px solid var(--border); color: var(--subtext); padding: 10px 5px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; text-decoration: none;}
         .btn-act span { font-size: 1.2rem; }
 
@@ -124,9 +131,6 @@
         .input-group-date .form-input { border-radius: 8px 0 0 8px; flex: 1; min-width: 0; }
         .btn-today { padding: 0 10px; background: var(--border); color: var(--text); border: 1px solid var(--border); border-radius: 0 8px 8px 0; cursor: pointer; font-size: 0.8rem; font-weight:bold;}
 
-        .chip-box { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; margin-bottom: 8px; }
-        .chip { background: var(--input-bg); border: 1px solid var(--border); padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; white-space: nowrap; cursor: pointer; color: var(--subtext); font-weight: 600; }
-        
         .fab { position: fixed; bottom: 30px; right: 20px; background: var(--accent); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4); cursor: pointer; border: none; z-index: 500; }
         
         /* LIST OPTIONS */
@@ -276,7 +280,7 @@
                 <span class="z-title">🔵 Contact</span>
                 <div class="form-row">
                     <div class="form-group"><label class="form-lbl">Phone</label><input type="tel" id="c-phone" class="form-input"></div>
-                    <div class="form-group"><label class="form-lbl">Price $</label><input type="number" id="c-price" class="form-input" placeholder="40"></div>
+                    <div class="form-group"><label class="form-lbl">Price $</label><input type="number" id="c-price" class="form-input" placeholder="35"></div>
                 </div>
                 <div class="form-group"><label class="form-lbl">Social</label><input id="c-social" class="form-input"></div>
                 <div class="form-group"><label class="form-lbl">Address</label><input id="c-addr" class="form-input"></div>
@@ -299,9 +303,7 @@
 
             <div class="zone z-green">
                 <span class="z-title">🟢 The Cut</span>
-                <div class="form-group"><label class="form-lbl">Sides</label><div class="chip-box"><span class="chip" onclick="fill('c-sides','Skin Fade')">Skin Fade</span><span class="chip" onclick="fill('c-sides','Taper')">Taper</span><span class="chip" onclick="fill('c-sides','#1')">#1</span></div><input id="c-sides" class="form-input"></div>
-                <div class="form-group"><label class="form-lbl">Top</label><div class="chip-box"><span class="chip" onclick="fill('c-top','Crop')">Crop</span><span class="chip" onclick="fill('c-top','Trim')">Trim</span></div><input id="c-top" class="form-input"></div>
-                <div class="form-group"><label class="form-lbl">Notes</label><textarea id="c-notes" class="form-input" rows="3"></textarea></div>
+                <div class="form-group"><label class="form-lbl">Notes</label><textarea id="c-notes" class="form-input" rows="5"></textarea></div>
             </div>
 
             <button class="btn-main" onclick="saveClient()">SAVE PROFILE</button>
@@ -314,7 +316,6 @@
         let shopSettings = JSON.parse(localStorage.getItem('bb_settings') || '{"addr":""}');
         let filterType = 'all';
         let tempId = null;
-        let pendingCutId = null; 
 
         if(localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
         render();
@@ -367,10 +368,9 @@
                     socialBtn = `<button class="btn-act" onclick="window.open('https://instagram.com/${c.social.replace('@','')}')"><span>📸</span>IG</button>`;
                 }
 
-                // Loyalty Fix: Count 1-5. 5th cut (paid) triggers reset & free +1.
                 let punch = (c.loyalty || 0); 
                 let loyaltyText = `${punch}/5`;
-                if(punch >= 5) loyaltyText = "NEXT FREE!"; // Fallback
+                if(punch >= 5) loyaltyText = "EARNED FREE!";
 
                 const div = document.createElement('div');
                 div.className = 'client-card';
@@ -389,7 +389,6 @@
                             <div class="bank-item"><div class="bank-val">${loyaltyText}</div><div class="bank-lbl">Loyalty</div></div>
                             <div class="bank-item"><div class="bank-val" style="color:var(--gold)">$${c.credit||0}</div><div class="bank-lbl">Credit</div></div>
                         </div>
-                        <div class="detail-row"><div class="detail-box"><div class="detail-lbl">SIDES</div><div class="detail-txt">${c.sides||'-'}</div></div><div class="detail-box"><div class="detail-lbl">TOP</div><div class="detail-txt">${c.top||'-'}</div></div></div>
                         <div class="detail-box" style="margin-bottom:10px;"><div class="detail-lbl">NOTES</div><div class="detail-txt">${c.notes||'-'}</div></div>
                         <button class="btn-full" onclick="viewFull('${c.id}')">📄 View Full Profile</button>
                         <button class="btn-main" onclick="startCutFlow('${c.id}')">✂️ RECORD CUT</button>
@@ -405,25 +404,45 @@
             });
         }
 
-        // --- CUT LOGIC ---
+        // --- CUT LOGIC (STREAMLINED + BIRTHDAY) ---
         function startCutFlow(id) {
             const c = clients.find(x=>x.id==id);
+            
+            // 1. Birthday Check (Priority)
+            if(isThisWeek(c.dob)) {
+                customConfirm("🎂 Birthday Week!\nRedeem 1/2 OFF Cut?",
+                    () => { // YES 1/2 OFF
+                        proceedToPaid(c, true); 
+                    },
+                    () => { // NO, Check Free
+                        checkFreeCut(c);
+                    }
+                );
+            } else {
+                checkFreeCut(c);
+            }
+        }
+
+        function checkFreeCut(c) {
             if(c.free > 0) {
                 customConfirm(`🌟 Client has ${c.free} FREE CUT available.\nRedeem it now?`, 
                     () => { 
                         c.free--;
-                        c.redeemedVal = (c.redeemedVal || 0) + (c.price || 30); 
-                        confirmFormulaAndSave(c, 0); 
+                        c.redeemedVal = (c.redeemedVal || 0) + (c.price || 35); 
+                        processStats(c, 0); 
                     },
-                    () => { proceedToPaid(c); } 
+                    () => { proceedToPaid(c, false); } 
                 );
             } else {
-                proceedToPaid(c);
+                proceedToPaid(c, false);
             }
         }
 
-        function proceedToPaid(c) {
-            const price = prompt("Price paid today? (Enter 0 if unpaid)", c.price||0);
+        function proceedToPaid(c, isHalfOff) {
+            let defPrice = c.price || 35;
+            if(isHalfOff) defPrice = defPrice / 2;
+
+            const price = prompt("Price paid today? (Enter 0 if unpaid)", defPrice);
             if(price === null) return;
             let paid = parseFloat(price)||0;
 
@@ -436,39 +455,22 @@
                     c.redeemedVal = (c.redeemedVal || 0) + creditUsed; 
                 }
             }
-            confirmFormulaAndSave(c, paid);
-        }
-
-        function confirmFormulaAndSave(c, paid) {
-            customConfirm("Did the haircut style change?", 
-                () => { // YES -> Edit
-                    tempId = c.id; 
-                    pendingCutId = c.id; // FLAG TO RESUME
-                    openClientModal(c.id);
-                    // Temporarily store paid amt? simpler to re-ask or just apply now?
-                    // Safer to apply now, then edit formula.
-                    processStats(c, paid); 
-                    alert("Stats updated! Update style formula then Save.");
-                }, 
-                () => { 
-                    processStats(c, paid);
-                    save(); render();
-                }
-            );
+            processStats(c, paid);
         }
 
         function processStats(c, paid) {
             c.lastVisit = new Date().toISOString().split('T')[0];
             c.cuts = (c.cuts || 0) + 1;
             c.ltv = (c.ltv || 0) + paid;
-            
-            // Loyalty Logic: Increment. If 5, Reset and +1 Free.
-            c.loyalty = (c.loyalty || 0) + 1;
-            if(c.loyalty >= 5) {
+            let currentPoints = (c.loyalty || 0) + 1;
+            if(currentPoints >= 5) {
                 c.free = (c.free || 0) + 1;
                 c.loyalty = 0;
                 alert("🎉 5 Cuts Reached! Free Cut added to bank.");
+            } else {
+                c.loyalty = currentPoints;
             }
+            save(); render();
         }
 
         // --- CREDIT MANAGER ---
@@ -540,7 +542,7 @@
             clients.forEach(cl => { dl.innerHTML += `<option value="${cl.name}">`; });
         }
         function openClientModal(id) {
-            const c = id ? clients.find(x=>x.id==id) : {id:'',name:'',phone:'',price:'',addr:'',social:'',dob:'',start:new Date().toISOString().split('T')[0],ref:'',freq:'',last:'',sides:'',top:'',notes:''};
+            const c = id ? clients.find(x=>x.id==id) : {id:'',name:'',phone:'',price:35,addr:'',social:'',dob:'',start:new Date().toISOString().split('T')[0],ref:'',freq:'',last:'',notes:''};
             for(let k in c) if(document.getElementById('c-'+k)) document.getElementById('c-'+k).value = c[k];
             updateRefList();
             document.getElementById('client-modal').style.display = 'flex';
@@ -554,11 +556,11 @@
             
             let data = {
                 name, phone: document.getElementById('c-phone').value,
-                price: parseFloat(document.getElementById('c-price').value)||0,
+                price: parseFloat(document.getElementById('c-price').value)||35,
                 addr: document.getElementById('c-addr').value, social: document.getElementById('c-social').value,
                 dob: document.getElementById('c-dob').value, start: document.getElementById('c-start').value, ref,
                 freq: parseInt(document.getElementById('c-freq').value)||0, lastVisit: document.getElementById('c-last').value,
-                sides: document.getElementById('c-sides').value, top: document.getElementById('c-top').value, notes: document.getElementById('c-notes').value
+                notes: document.getElementById('c-notes').value
             };
 
             if(id) {
@@ -572,13 +574,7 @@
                     if(referrer) { referrer.credit+=5; data.credit+=5; alert("Referral linked! $5 credits."); }
                 }
             }
-            save(); closeModals(); 
-            // Important: Force reset filter so new client is visible
-            filter('all', document.querySelector('.dash-card.active'));
-            document.getElementById('search').value = '';
-            render();
-            
-            if(pendingCutId) { pendingCutId = null; } // Clear flag as stats were processed before edit
+            save(); closeModals(); render();
         }
 
         function viewFull(id) {
@@ -592,7 +588,7 @@
                         <div class="ro-row"><div class="ro-lbl">First Cut</div><div class="ro-val">${fmt(c.start)}</div></div>
                         <div class="ro-row"><div class="ro-lbl">Last Cut</div><div class="ro-val">${fmt(c.lastVisit)}</div></div>
                         <div class="ro-row"><div class="ro-lbl">Referred By</div><div class="ro-val">${c.ref||'-'}</div></div>
-                        <div class="ro-row"><div class="ro-lbl">Default $</div><div class="ro-val">$${c.price||'-'}</div></div>`;
+                        <div class="ro-row"><div class="ro-lbl">Default $</div><div class="ro-val">$${c.price||35}</div></div>`;
             document.getElementById('ro-content').innerHTML = html;
             document.getElementById('profile-modal').style.display = 'flex';
         }
