@@ -19,7 +19,6 @@
             --border: #cbd5e1; --input-bg: #f8fafc;
         }
 
-        /* LAYOUT - GRID SYSTEM FOR SCROLLING */
         body { 
             background: var(--bg); color: var(--text); 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -73,7 +72,7 @@
             overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); flex-shrink: 0;
             transition: background 0.3s;
         }
-        .client-card.new-item { background: rgba(99, 102, 241, 0.2); }
+        .client-card.new-item { background: rgba(99, 102, 241, 0.2); border: 1px solid var(--accent); }
 
         .card-header { padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .card-header.due { border-left: 4px solid var(--red); }
@@ -173,7 +172,7 @@
         <div class="dash-card d-purple" onclick="filter('ghosts', this)">
             <div class="dash-count" id="d-ghost">0</div><div class="dash-lbl">Ghosts</div>
         </div>
-        <div class="dash-card active" onclick="filter('all', this)" id="btn-all">
+        <div class="dash-card active" onclick="filter('all', this)" id="dash-all">
             <div class="dash-count" id="d-all">0</div><div class="dash-lbl">All</div>
         </div>
     </div>
@@ -314,7 +313,16 @@
         if(localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
         render();
 
-        // DATE HELPER: Safely handles empty or missing dates
+        // 1. GET LOCAL DATE (FIXED "TOMORROW" BUG)
+        function getLocalToday() {
+            const d = new Date();
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // 2. PARSE LOCAL DATE (FIXED "GHOST" BUG)
         function dateToLocal(dateStr) {
             if(!dateStr || dateStr.length < 10) return null;
             const parts = dateStr.split('-');
@@ -329,7 +337,7 @@
 
             const today = new Date(); today.setHours(0,0,0,0);
 
-            // Safer filtering that checks for null properties
+            // Safer filtering
             let visible = clients.filter(c => {
                 const nameMatch = (c.name || '').toLowerCase().includes(query);
                 const noteMatch = (c.notes || '').toLowerCase().includes(query);
@@ -357,14 +365,10 @@
                 let dueTxt = due ? (daysTill < 0 ? `Overdue ${Math.abs(daysTill)}d` : `Due ${daysTill}d`) : '';
                 let dueCol = daysTill < 0 ? 'var(--red)' : 'var(--subtext)';
                 
-                // CRASH PROOF DATE DISPLAY
                 let lastCutTxt = 'New';
                 if(c.lastVisit && c.lastVisit.includes('-')) {
                     const [y, m, d] = c.lastVisit.split('-');
-                    const dateObj = new Date(y, m-1, d);
-                    if(!isNaN(dateObj)) {
-                        lastCutTxt = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                    }
+                    lastCutTxt = `${m}/${d}/${y}`; // Simple US Format
                 }
                 
                 let cardClass = daysTill < 0 ? 'card-header due' : 'card-header';
@@ -381,8 +385,7 @@
 
                 const div = document.createElement('div');
                 div.className = 'client-card';
-                // Add highlight class if just added
-                if(c.isNew) { div.classList.add('new-item'); delete c.isNew; setTimeout(()=>save(), 2000); }
+                if(c.isNew) { div.classList.add('new-item'); delete c.isNew; setTimeout(()=>save(true), 2000); }
 
                 div.innerHTML = `
                     <div class="${cardClass}" onclick="this.parentElement.classList.toggle('open')">
@@ -454,7 +457,7 @@
         }
 
         function processStats(c, paid) {
-            c.lastVisit = new Date().toISOString().split('T')[0];
+            c.lastVisit = getLocalToday(); // USE LOCAL TIME
             c.cuts = (c.cuts || 0) + 1;
             c.ltv = (c.ltv || 0) + paid;
             c.loyalty = (c.loyalty || 0) + 1;
@@ -466,7 +469,7 @@
             save(); render();
         }
 
-        // --- ANNIVERSARY REDEEM ---
+        // --- REDEEM ---
         function openRedeem(id) {
             const c=clients.find(x=>x.id==id);
             const opts=[];
@@ -474,7 +477,7 @@
                 const price = prompt("Enter Tip Amount (or 0):", 0);
                 const tip = parseFloat(price)||0;
                 c.redeemedVal=(c.redeemedVal||0)+(c.price||35);
-                c.lastVisit = new Date().toISOString().split('T')[0];
+                c.lastVisit = getLocalToday();
                 c.cuts++;
                 c.ltv+=tip; 
                 save(); render();
@@ -487,40 +490,9 @@
             openListModal("Redeem", opts);
         }
 
-        // --- SCHEDULING (BLOB) ---
-        function openSchedule(id) {
-            const c=clients.find(x=>x.id==id); document.getElementById('cal-id').value=id;
-            document.getElementById('cal-date').value=new Date().toISOString().split('T')[0];
-            selLoc('shop'); document.getElementById('cal-modal').style.display='flex';
-        }
-        function selLoc(type) {
-            const c=clients.find(x=>x.id==document.getElementById('cal-id').value);
-            document.getElementById('cal-addr').value = type==='shop' ? (shopSettings.addr||'') : (c.addr||'');
-        }
-        function generateICS() {
-            const c=clients.find(x=>x.id==document.getElementById('cal-id').value);
-            const d=document.getElementById('cal-date').value; const t=document.getElementById('cal-time').value;
-            const loc=document.getElementById('cal-addr').value;
-            if(!d||!t) return alert("Date/Time needed");
-            
-            const startRaw = d.replace(/-/g, '') + 'T' + t.replace(/:/g, '') + '00';
-            let h = parseInt(t.split(':')[0]) + 2; let m = parseInt(t.split(':')[1]);
-            if(h>=24) h-=24;
-            const endRaw = d.replace(/-/g, '') + 'T' + (h<10?'0':'')+h + (m<10?'0':'')+m + '00';
-
-            const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Cut: ${c.name}\nDTSTART:${startRaw}\nDTEND:${endRaw}\nLOCATION:${loc}\nDESCRIPTION:${c.notes||'Haircut'}\nEND:VEVENT\nEND:VCALENDAR`;
-            
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(new Blob([ics], {type: 'text/calendar'}));
-            a.download = 'appointment.ics';
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
-            closeModals();
-        }
-
         // --- UTILS ---
-        function updateRefList() { const dl=document.getElementById('ref-list'); dl.innerHTML=''; clients.forEach(cl=>{dl.innerHTML+=`<option value="${cl.name}">`}); }
         function openClientModal(id) {
-            const c = id ? clients.find(x=>x.id==id) : {id:'',name:'',phone:'',price:35,addr:'',social:'',dob:'',start:new Date().toISOString().split('T')[0],ref:'',freq:4,last:'',notes:''};
+            const c = id ? clients.find(x=>x.id==id) : {id:'',name:'',phone:'',price:35,addr:'',social:'',dob:'',start:getLocalToday(),ref:'',freq:4,last:'',notes:''};
             for(let k in c) if(document.getElementById('c-'+k)) document.getElementById('c-'+k).value = c[k];
             updateRefList(); document.getElementById('client-modal').style.display = 'flex';
         }
@@ -530,7 +502,6 @@
             const name = document.getElementById('c-name').value;
             if(!name) return alert("Name required");
             const ref = document.getElementById('c-ref').value;
-            
             const lastVal = document.getElementById('c-last').value;
             
             let data = {
@@ -562,21 +533,49 @@
                     if(referrer) { referrer.credit+=5; data.credit+=5; alert("Referral linked! $5 credits."); }
                 }
             }
-            save(); closeModals(); 
+            save(); 
+            closeModals(); 
             
-            // FORCE RESET
+            // RESET EVERYTHING SO NEW CLIENT APPEARS
             document.getElementById('search').value = '';
-            filter('all', document.getElementById('btn-all'));
+            filterType = 'all';
+            document.querySelectorAll('.dash-card').forEach(d => d.classList.remove('active'));
+            document.getElementById('dash-all').classList.add('active');
+            render();
         }
 
+        // --- SCHEDULING ---
+        function openSchedule(id) {
+            const c=clients.find(x=>x.id==id); document.getElementById('cal-id').value=id;
+            document.getElementById('cal-date').value=getLocalToday();
+            selLoc('shop'); document.getElementById('cal-modal').style.display='flex';
+        }
+        function selLoc(type) {
+            const c=clients.find(x=>x.id==document.getElementById('cal-id').value);
+            document.getElementById('cal-addr').value = type==='shop' ? (shopSettings.addr||'') : (c.addr||'');
+        }
+        function generateICS() {
+            const c=clients.find(x=>x.id==document.getElementById('cal-id').value);
+            const d=document.getElementById('cal-date').value; const t=document.getElementById('cal-time').value;
+            const loc=document.getElementById('cal-addr').value;
+            if(!d||!t) return alert("Date/Time needed");
+            
+            const startRaw = d.replace(/-/g, '') + 'T' + t.replace(/:/g, '') + '00';
+            let h = parseInt(t.split(':')[0]) + 2; let m = parseInt(t.split(':')[1]);
+            if(h>=24) h-=24;
+            const endRaw = d.replace(/-/g, '') + 'T' + (h<10?'0':'')+h + (m<10?'0':'')+m + '00';
+
+            const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Cut: ${c.name}\nDTSTART:${startRaw}\nDTEND:${endRaw}\nLOCATION:${loc}\nDESCRIPTION:${c.notes||'Haircut'}\nEND:VEVENT\nEND:VCALENDAR`;
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([ics], {type: 'text/calendar'}));
+            a.download = 'appointment.ics'; document.body.appendChild(a); a.click(); document.body.removeChild(a); closeModals();
+        }
+
+        // --- UTILS ---
+        function updateRefList() { const dl=document.getElementById('ref-list'); dl.innerHTML=''; clients.forEach(cl=>{dl.innerHTML+=`<option value="${cl.name}">`}); }
         function viewFull(id) {
             const c = clients.find(x=>x.id==id); tempId=id;
             document.getElementById('ro-title').innerText = c.name;
-            const fmt = (d) => {
-                if(!d) return '-';
-                const [y, m, day] = d.split('-');
-                return new Date(y, m-1, day).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
-            };
+            const fmt = (d) => { if(!d) return '-'; const [y, m, day] = d.split('-'); return `${m}/${day}/${y}`; };
             let html = `<div class="ro-row"><div class="ro-lbl">Phone</div><div class="ro-val">${c.phone||'-'}</div></div>
                         <div class="ro-row"><div class="ro-lbl">Address</div><div class="ro-val">${c.addr||'-'}</div></div>
                         <div class="ro-row"><div class="ro-lbl">Social</div><div class="ro-val">${c.social||'-'}</div></div>
@@ -589,32 +588,22 @@
             document.getElementById('profile-modal').style.display = 'flex';
         }
         function editFromProfile() { closeModals(); openClientModal(tempId); }
-        function openText(id) {
-            const c = clients.find(x=>x.id==id); if(!c.phone) return alert("No phone.");
-            const n = c.name.split(' ')[0];
-            const opts = [{lbl:"Running Late", txt:`Hey ${n}, running a bit behind schedule. Thanks!`}, {lbl:"Confirm Cut", txt:`Hey ${n}, confirming our cut tomorrow. Still good?`}, {lbl:"Follow Up", txt:`Hey ${n}, checking in on the fresh cut. All good?`}, {lbl:"Custom", txt:''}];
-            const sep = navigator.userAgent.match(/iPhone|iPad/i) ? '&' : '?';
-            openListModal("Send Text", opts.map(o=>({lbl: o.lbl, fn: ()=>{ window.location = `sms:${c.phone}${sep}body=${encodeURIComponent(o.txt)}`; }})));
-        }
+        function openText(id) { const c = clients.find(x=>x.id==id); if(!c.phone) return alert("No phone."); const n = c.name.split(' ')[0]; const opts = [{lbl:"Running Late", txt:`Hey ${n}, running a bit behind schedule. Thanks!`}, {lbl:"Confirm Cut", txt:`Hey ${n}, confirming our cut tomorrow. Still good?`}, {lbl:"Follow Up", txt:`Hey ${n}, checking in on the fresh cut. All good?`}, {lbl:"Custom", txt:''}]; const sep = navigator.userAgent.match(/iPhone|iPad/i) ? '&' : '?'; openListModal("Send Text", opts.map(o=>({lbl: o.lbl, fn: ()=>{ window.location = `sms:${c.phone}${sep}body=${encodeURIComponent(o.txt)}`; }}))); }
         function openCreditModal() { updateRefList(); document.getElementById('credit-input').value=''; document.getElementById('credit-modal').style.display='flex'; }
         function applyCredit() { const n=document.getElementById('credit-input').value; const c=clients.find(x=>x.name.toLowerCase()===n.toLowerCase()); if(c){c.credit+=5;save();render();alert("Credit Added");closeModals();}else alert("Not found"); }
-        function openSettings() {
-            let rev=clients.reduce((a,b)=>a+(b.ltv||0),0); let cuts=clients.reduce((a,b)=>a+(b.cuts||0),0); let refs=clients.filter(c=>c.ref&&c.ref.length>0).length; let red=clients.reduce((a,b)=>a+(b.redeemedVal||0),0);
-            document.getElementById('st-rev').innerText=`$${rev}`; document.getElementById('st-cuts').innerText=cuts; document.getElementById('st-ref').innerText=refs; document.getElementById('st-red').innerText=`$${red}`;
-            document.getElementById('s-shop-addr').value=shopSettings.addr; document.getElementById('settings-modal').style.display='flex';
-        }
+        function openSettings() { let rev=clients.reduce((a,b)=>a+(b.ltv||0),0); let cuts=clients.reduce((a,b)=>a+(b.cuts||0),0); let refs=clients.filter(c=>c.ref&&c.ref.length>0).length; let red=clients.reduce((a,b)=>a+(b.redeemedVal||0),0); document.getElementById('st-rev').innerText=`$${rev}`; document.getElementById('st-cuts').innerText=cuts; document.getElementById('st-ref').innerText=refs; document.getElementById('st-red').innerText=`$${red}`; document.getElementById('s-shop-addr').value=shopSettings.addr; document.getElementById('settings-modal').style.display='flex'; }
         function customConfirm(msg,yes,no) { document.getElementById('confirm-msg').innerText=msg; document.getElementById('confirm-modal').style.display='flex'; document.getElementById('btn-yes').onclick=()=>{document.getElementById('confirm-modal').style.display='none';yes();}; document.getElementById('btn-no').onclick=()=>{document.getElementById('confirm-modal').style.display='none';if(no)no();}; }
         function openListModal(title, options, callback) { document.getElementById('list-title').innerText=title; const c=document.getElementById('list-options'); c.innerHTML=''; options.forEach(o=>{const b=document.createElement('button'); b.className='list-option'; b.innerText=o.lbl; b.onclick=()=>{o.fn(); closeModals(); if(callback)callback();}; c.appendChild(b);}); document.getElementById('list-modal').style.display='flex'; }
         function getDueDate(c) { if(!c.lastVisit||!c.freq)return null; const d=dateToLocal(c.lastVisit); d.setDate(d.getDate()+(c.freq*7)); return d; }
         function isThisWeek(dStr) { if(!dStr)return false; const d=dateToLocal(dStr); const n=new Date(); n.setHours(0,0,0,0); const ty=new Date(n.getFullYear(),d.getMonth(),d.getDate()); const diff=(ty-n)/86400000; return diff>=-7 && diff<=7; }
         function getYears(dStr) { if(!dStr)return 0; return new Date().getFullYear()-dateToLocal(dStr).getFullYear(); }
-        function setToday(id) { document.getElementById(id).value=new Date().toISOString().split('T')[0]; }
+        function setToday(id) { document.getElementById(id).value=getLocalToday(); }
         function fill(id,v) { document.getElementById(id).value=v; }
         function filter(t,el) { filterType=t; document.querySelectorAll('.dash-card').forEach(d=>d.classList.remove('active')); el.classList.add('active'); render(); }
         function toggleMenu() { document.getElementById('save-menu').classList.toggle('show'); }
         function toggleTheme() { document.body.classList.toggle('light-mode'); localStorage.setItem('theme', document.body.classList.contains('light-mode')?'light':'dark'); }
         function closeModals() { document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); }
-        function save() { localStorage.setItem('bb_clients_v3', JSON.stringify(clients)); }
+        function save(skipRender) { localStorage.setItem('bb_clients_v3', JSON.stringify(clients)); if(!skipRender) render(); }
         function saveSettings() { shopSettings.addr=document.getElementById('s-shop-addr').value; localStorage.setItem('bb_settings', JSON.stringify(shopSettings)); closeModals(); }
         function delClient(id) { customConfirm("Delete?", ()=>{clients=clients.filter(x=>x.id!=id); save(); render();}); }
         function exportData(type) { toggleMenu(); if(type==='json'){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(clients)],{type:'application/json'})); a.download=`bb_${Date.now()}.json`; a.click();} else { let csv="Name,Phone,LTV\n"+clients.map(c=>`"${c.name}","${c.phone}",${c.ltv}`).join('\n'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=`bb.csv`; a.click(); }}
