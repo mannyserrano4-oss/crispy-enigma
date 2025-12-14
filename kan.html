@@ -102,11 +102,9 @@
         }
         .card:active { transform: scale(0.98); }
         
-        /* Quick Move Arrows */
         .card-actions { display:flex; gap:10px; margin-top:10px; justify-content:space-between; align-items:center;}
-        .btn-quick { background: var(--col-bg); border:1px solid var(--border); color:var(--text); width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+        .btn-quick { background: var(--col-bg); border:1px solid var(--border); color:var(--text); width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold;}
 
-        /* Animations */
         @keyframes slideOutRight { to { transform: translateX(100%); opacity: 0; } }
         @keyframes slideOutLeft { to { transform: translateX(-100%); opacity: 0; } }
         @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -142,10 +140,12 @@
         .form-label { display: block; font-size: 0.75rem; color: var(--subtext); font-weight: 800; margin-bottom: 8px; letter-spacing: 1px; }
         .form-input { width: 100%; padding: 14px; background: var(--col-bg); border: 1px solid var(--border); color: var(--text); border-radius: 12px; font-size: 1.1rem; box-sizing: border-box; margin-bottom: 18px; }
         
-        /* FIXED ALIGNMENT FOR DATE/PRIORITY */
-        .form-row { display: flex; gap: 12px; margin-bottom: 18px; align-items: stretch; }
-        .prio-select { display: flex; gap: 6px; background: var(--col-bg); padding: 6px; border-radius: 14px; box-sizing: border-box; flex:1; border:1px solid var(--border); align-items: center; justify-content: center; }
-        .prio-opt { flex: 1; padding: 10px 0; text-align: center; border-radius: 10px; font-size: 0.85rem; font-weight: bold; cursor: pointer; color: var(--subtext); transition: 0.2s; }
+        /* ALIGNMENT FIX */
+        .form-row { display: flex; gap: 12px; margin-bottom: 18px; }
+        .fixed-height { height: 50px; box-sizing: border-box; } /* Force height match */
+        
+        .prio-select { display: flex; gap: 6px; background: var(--col-bg); padding: 6px; border-radius: 14px; flex: 1; border: 1px solid var(--border); }
+        .prio-opt { flex: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 0.85rem; font-weight: bold; cursor: pointer; color: var(--subtext); transition: 0.2s; }
         .prio-opt.active[data-val="Low"] { background: var(--p-blue); color: #000; }
         .prio-opt.active[data-val="Med"] { background: var(--p-orange); color: #000; }
         .prio-opt.active[data-val="High"] { background: var(--p-red); color: #000; }
@@ -210,7 +210,7 @@
     <div id="save-menu" class="dropdown">
         <div class="dd-sect">AUDIO & FX</div>
         <button class="dd-item" onclick="toggleSound(); closeMenu()">🔊 Sound FX <span class="dd-badge" id="snd-stat">ON</span></button>
-        <button class="dd-item" onclick="setConfetti('square'); closeMenu()">🎉 Paper</button>
+        <button class="dd-item" onclick="setConfetti('square'); closeMenu()">🎉 Confetti (Default)</button>
         <button class="dd-item" id="fx-star" onclick="setConfetti('star'); closeMenu()">⭐ Stars <span class="dd-badge">LVL 10</span></button>
         <button class="dd-item" id="fx-coin" onclick="setConfetti('coin'); closeMenu()">🪙 Coins <span class="dd-badge">LVL 20</span></button>
         <button class="dd-item" id="fx-gem" onclick="setConfetti('gem'); closeMenu()">💎 Gems <span class="dd-badge">LVL 30</span></button>
@@ -260,12 +260,12 @@
             <div class="form-row">
                 <div style="flex:1">
                     <span class="form-label">DEADLINE</span>
-                    <input type="date" id="t-date" class="form-input" style="margin-bottom:0; height:45px;">
+                    <input type="date" id="t-date" class="form-input fixed-height" style="margin-bottom:0;">
                     <button class="btn-cal" onclick="addToCalendar()" id="btn-cal-sync" style="display:none;">📅 Sync</button>
                 </div>
                 <div style="flex:1">
                     <span class="form-label">PRIORITY</span>
-                    <div class="prio-select">
+                    <div class="prio-select fixed-height">
                         <div class="prio-opt" onclick="setPrio('Low')" data-val="Low">Low</div>
                         <div class="prio-opt" onclick="setPrio('Med')" data-val="Med">Med</div>
                         <div class="prio-opt" onclick="setPrio('High')" data-val="High">High</div>
@@ -311,6 +311,7 @@
         let currentChapter = 1;
         let lastDeletedTask = null;
         let undoTimeout = null;
+        let audioCtx = null;
         
         const RANKS = ["Rookie", "Operative", "Specialist", "Tactician", "Mercenary", "Commander", "Warlord", "Vanguard", "Titan", "Legend"];
         const CODEX = [
@@ -330,6 +331,17 @@
             4: "FINALE: THE ZENITH\n\nThe climb took everything. My gear, my strength, my blood. I stand at the Zenith controls. The Shadows surround me, screeching in the thin air.\n\nI plunge the blade into the console. Not a key, but a spark. The machine roars. The sky tears open. For the first time in a century, a beam of pure, unfiltered gold hits the snow.\n\nThe Shadows burn away. The ice weeps. I fall to my knees, blinded, weeping with it. The Sunless Age is over. I am the Vanguard. And I am warm."
         };
 
+        // --- INIT & AUDIO ---
+        document.addEventListener('click', initAudio, { once: true });
+        
+        function initAudio() {
+            if(!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
         initApp();
 
         function initApp() {
@@ -339,19 +351,15 @@
             updateXP();
         }
 
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        const ctx = new AudioContext();
-
         function playTone(freq, type, duration) {
-            if(!soundOn) return;
-            if(ctx.state === 'suspended') ctx.resume();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = type; osc.frequency.setValueAtTime(freq, ctx.currentTime);
-            gain.gain.setValueAtTime(0.1, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-            osc.connect(gain); gain.connect(ctx.destination);
-            osc.start(); osc.stop(ctx.currentTime + duration);
+            if(!soundOn || !audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
         }
 
         function sfx(type) {
@@ -377,6 +385,7 @@
             localStorage.setItem('mc_xp', userXP);
             localStorage.setItem('mc_prestige', prestige);
             const stats = getLevel(userXP);
+            
             const range = stats.nextReq - stats.prevReq;
             const current = userXP - stats.prevReq;
             const pct = Math.max(0, Math.min(100, (current / range) * 100));
@@ -524,7 +533,7 @@
             if(prestige === 0 && reqs[type] && stats.level < reqs[type]) return alert(`Locked until Level ${reqs[type]}`);
             confettiStyle = type;
             localStorage.setItem('mc_fx', type);
-            alert(`Effect Set: ${type.toUpperCase()}`);
+            showToast(`Effect Set: ${type.toUpperCase()}`, false);
         }
 
         function launchConfetti() {
@@ -607,8 +616,6 @@
                 if(newCol < 0) newCol = 0; if(newCol > 2) newCol = 2;
                 const today = new Date().toISOString().split('T')[0];
                 const isLate = tasks[idx].date && tasks[idx].date < today;
-                
-                // Penalty Logic
                 const prio = tasks[idx].prio || 'Med';
                 const penalty = prio === 'High' ? -50 : (prio === 'Med' ? -30 : -10);
 
@@ -647,6 +654,7 @@
         }
 
         function openModal(id) {
+            initAudio(); // Late init fix for iOS
             const t = id ? tasks.find(x => x.id === id) : { id: '', title: '', steps: [], col: 0, prio:'Med', date:'', archived:false };
             document.getElementById('t-id').value = t.id;
             document.getElementById('t-title').value = t.title;
@@ -675,11 +683,7 @@
                 if(val) {
                     addCheckItem(val);
                     document.getElementById('new-step-input').value = '';
-                    // Keep focus
-                    setTimeout(() => {
-                        const inputs = document.querySelectorAll('.check-text');
-                        if(inputs.length > 0) inputs[inputs.length-1].focus();
-                    }, 50);
+                    setTimeout(() => { const inputs = document.querySelectorAll('.check-text'); if(inputs.length > 0) inputs[inputs.length-1].focus(); }, 50);
                 }
             }
         }
@@ -719,7 +723,6 @@
             const wins = tasks.filter(t => t.col === 2).length;
             const rate = total === 0 ? 0 : Math.round((wins/total)*100);
             alert(`📊 STATUS REPORT\n\nRank: ${RANKS[Math.min(stats.level-1, RANKS.length-1)]}\nXP: ${userXP}\n\nMissions: ${total}\nVictories: ${wins}\nSuccess Rate: ${rate}%`);
-            toggleMenu();
         }
         function toggleZen() {
             const stats = getLevel(userXP);
