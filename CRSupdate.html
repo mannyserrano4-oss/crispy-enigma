@@ -100,7 +100,7 @@
         .btn-main { width: 100%; padding: 16px; background: var(--green); color: #000; border: none; border-radius: 12px; font-size: 1rem; font-weight: 800; text-transform: uppercase; cursor: pointer; margin-bottom: 12px; }
         .btn-full { width: 100%; padding: 12px; background: var(--card); border: 1px solid var(--border); color: var(--text); font-weight: 600; border-radius: 10px; margin-bottom: 12px; cursor: pointer; }
         
-        .action-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
         .btn-act { background: var(--card); border: 1px solid var(--border); color: var(--subtext); padding: 10px 5px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; text-decoration: none;}
         .btn-act span { font-size: 1.2rem; }
 
@@ -108,7 +108,7 @@
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: flex-start; overflow-y: auto; padding: 20px 0; }
         .modal-content { background: var(--card); width: 90%; max-width: 400px; padding: 20px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.5); margin-bottom: 80px; }
 
-        /* ZONES */
+        /* ZONES & FORMS */
         .zone { border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid transparent; }
         .z-blue { background: rgba(59, 130, 246, 0.05); border-color: rgba(59, 130, 246, 0.2); } .z-blue .z-title { color: var(--blue); }
         .z-gold { background: rgba(245, 158, 11, 0.05); border-color: rgba(245, 158, 11, 0.2); } .z-gold .z-title { color: var(--gold); }
@@ -129,13 +129,20 @@
         
         .fab { position: fixed; bottom: 30px; right: 20px; background: var(--accent); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4); cursor: pointer; border: none; z-index: 500; }
         
+        /* LIST OPTIONS */
         .list-option { width: 100%; padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; font-size: 1rem; background: var(--card); color: var(--text); text-align: left; border:none; }
+        .list-option:last-child { border-bottom: none; }
+
+        /* DROPDOWN */
         .dropdown { position: absolute; top: 60px; right: 15px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; display: none; flex-direction: column; width: 180px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 200; }
         .dropdown.show { display: flex; }
 
+        /* READ ONLY PROFILE */
         .ro-row { display: flex; padding: 12px 0; border-bottom: 1px solid var(--border); }
         .ro-lbl { width: 120px; color: var(--subtext); font-size: 0.9rem; }
         .ro-val { flex: 1; color: var(--text); font-weight: 700; font-size: 0.95rem; }
+        
+        /* STATS */
         .stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
         .stat-val { font-weight: bold; color: var(--accent); }
     </style>
@@ -307,6 +314,7 @@
         let shopSettings = JSON.parse(localStorage.getItem('bb_settings') || '{"addr":""}');
         let filterType = 'all';
         let tempId = null;
+        let pendingCutId = null; 
 
         if(localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
         render();
@@ -359,9 +367,10 @@
                     socialBtn = `<button class="btn-act" onclick="window.open('https://instagram.com/${c.social.replace('@','')}')"><span>📸</span>IG</button>`;
                 }
 
+                // Loyalty Fix: Count 1-5. 5th cut (paid) triggers reset & free +1.
                 let punch = (c.loyalty || 0); 
                 let loyaltyText = `${punch}/5`;
-                if(punch >= 5) loyaltyText = "EARNED FREE!";
+                if(punch >= 5) loyaltyText = "NEXT FREE!"; // Fallback
 
                 const div = document.createElement('div');
                 div.className = 'client-card';
@@ -396,41 +405,25 @@
             });
         }
 
-        // --- CUT LOGIC (STREAMLINED) ---
+        // --- CUT LOGIC ---
         function startCutFlow(id) {
             const c = clients.find(x=>x.id==id);
-            
-            // 1. Birthday Check
-            if(isThisWeek(c.dob)) {
-                customConfirm("🎂 Birthday Week! Redeem 1/2 OFF Cut?", 
-                    () => { proceedToPaid(c, true); }, // YES -> Half Off
-                    () => { checkFreeCut(c); }         // NO -> Check Free
-                );
-            } else {
-                checkFreeCut(c);
-            }
-        }
-
-        function checkFreeCut(c) {
             if(c.free > 0) {
                 customConfirm(`🌟 Client has ${c.free} FREE CUT available.\nRedeem it now?`, 
-                    () => { // YES -> Redeem Free
+                    () => { 
                         c.free--;
-                        c.redeemedVal = (c.redeemedVal || 0) + (c.price || 30);
-                        processStats(c, 0); // Price 0
+                        c.redeemedVal = (c.redeemedVal || 0) + (c.price || 30); 
+                        confirmFormulaAndSave(c, 0); 
                     },
-                    () => { proceedToPaid(c, false); } // NO -> Paid
+                    () => { proceedToPaid(c); } 
                 );
             } else {
-                proceedToPaid(c, false);
+                proceedToPaid(c);
             }
         }
 
-        function proceedToPaid(c, isHalfOff) {
-            let defPrice = c.price || 0;
-            if(isHalfOff) defPrice = defPrice / 2;
-
-            const price = prompt("Price paid today?", defPrice);
+        function proceedToPaid(c) {
+            const price = prompt("Price paid today? (Enter 0 if unpaid)", c.price||0);
             if(price === null) return;
             let paid = parseFloat(price)||0;
 
@@ -440,28 +433,74 @@
                     let creditUsed = parseFloat(use)||0;
                     if(creditUsed > c.credit) creditUsed = c.credit;
                     c.credit -= creditUsed;
-                    c.redeemedVal = (c.redeemedVal || 0) + creditUsed;
+                    c.redeemedVal = (c.redeemedVal || 0) + creditUsed; 
                 }
             }
-            processStats(c, paid);
+            confirmFormulaAndSave(c, paid);
+        }
+
+        function confirmFormulaAndSave(c, paid) {
+            customConfirm("Did the haircut style change?", 
+                () => { // YES -> Edit
+                    tempId = c.id; 
+                    pendingCutId = c.id; // FLAG TO RESUME
+                    openClientModal(c.id);
+                    // Temporarily store paid amt? simpler to re-ask or just apply now?
+                    // Safer to apply now, then edit formula.
+                    processStats(c, paid); 
+                    alert("Stats updated! Update style formula then Save.");
+                }, 
+                () => { 
+                    processStats(c, paid);
+                    save(); render();
+                }
+            );
         }
 
         function processStats(c, paid) {
             c.lastVisit = new Date().toISOString().split('T')[0];
             c.cuts = (c.cuts || 0) + 1;
             c.ltv = (c.ltv || 0) + paid;
-            let currentPoints = (c.loyalty || 0) + 1;
-            if(currentPoints >= 5) {
+            
+            // Loyalty Logic: Increment. If 5, Reset and +1 Free.
+            c.loyalty = (c.loyalty || 0) + 1;
+            if(c.loyalty >= 5) {
                 c.free = (c.free || 0) + 1;
                 c.loyalty = 0;
                 alert("🎉 5 Cuts Reached! Free Cut added to bank.");
-            } else {
-                c.loyalty = currentPoints;
             }
-            save(); render();
         }
 
-        // --- SCHEDULING (2HR + IOS DATA URI) ---
+        // --- CREDIT MANAGER ---
+        function openCreditModal() {
+            updateRefList();
+            document.getElementById('credit-input').value = '';
+            document.getElementById('credit-modal').style.display = 'flex';
+        }
+        function applyCredit() {
+            const name = document.getElementById('credit-input').value;
+            const c = clients.find(x => x.name.toLowerCase() === name.toLowerCase());
+            if(c) { c.credit += 5; save(); render(); alert(`$5 added to ${c.name}`); closeModals(); }
+            else { alert("Client not found."); }
+        }
+
+        // --- GLOBAL STATS ---
+        function openSettings() {
+            let rev = clients.reduce((a,b)=>a+(b.ltv||0),0);
+            let cuts = clients.reduce((a,b)=>a+(b.cuts||0),0);
+            let refs = clients.filter(c=>c.ref && c.ref.length>0).length;
+            let red = clients.reduce((a,b)=>a+(b.redeemedVal||0),0);
+
+            document.getElementById('st-rev').innerText = `$${rev}`;
+            document.getElementById('st-cuts').innerText = cuts;
+            document.getElementById('st-ref').innerText = refs;
+            document.getElementById('st-red').innerText = `$${red}`;
+
+            document.getElementById('s-shop-addr').value = shopSettings.addr;
+            document.getElementById('settings-modal').style.display = 'flex';
+        }
+
+        // --- SCHEDULING (BLOB FIX) ---
         function openSchedule(id) {
             const c=clients.find(x=>x.id==id); document.getElementById('cal-id').value=id;
             document.getElementById('cal-date').value=new Date().toISOString().split('T')[0];
@@ -479,22 +518,23 @@
             
             const startRaw = d.replace(/-/g, '') + 'T' + t.replace(/:/g, '') + '00';
             
-            // 2 HOURS = 120 mins
+            // 2 HOURS
             let h = parseInt(t.split(':')[0]) + 2; 
             let m = parseInt(t.split(':')[1]);
-            if(h>=24) h-=24; // Simple wrap
-            
+            if(h>=24) h-=24;
             const endRaw = d.replace(/-/g, '') + 'T' + (h<10?'0':'')+h + (m<10?'0':'')+m + '00';
 
             const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Cut: ${c.name}\nDTSTART:${startRaw}\nDTEND:${endRaw}\nLOCATION:${loc}\nDESCRIPTION:${c.notes||'Haircut'}\nEND:VEVENT\nEND:VCALENDAR`;
             
-            // Data URI for iOS
-            const uri = "data:text/calendar;charset=utf8," + encodeURIComponent(ics);
-            window.location.href = uri;
+            // BLOB DOWNLOAD METHOD
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([ics], {type: 'text/calendar'}));
+            a.download = 'appointment.ics';
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
             closeModals();
         }
 
-        // --- UTILS & GLOBAL ---
+        // --- UTILS ---
         function updateRefList() {
             const dl = document.getElementById('ref-list'); dl.innerHTML = '';
             clients.forEach(cl => { dl.innerHTML += `<option value="${cl.name}">`; });
@@ -505,11 +545,13 @@
             updateRefList();
             document.getElementById('client-modal').style.display = 'flex';
         }
+        
         function saveClient() {
             const id = document.getElementById('c-id').value;
             const name = document.getElementById('c-name').value;
             if(!name) return alert("Name required");
             const ref = document.getElementById('c-ref').value;
+            
             let data = {
                 name, phone: document.getElementById('c-phone').value,
                 price: parseFloat(document.getElementById('c-price').value)||0,
@@ -518,12 +560,27 @@
                 freq: parseInt(document.getElementById('c-freq').value)||0, lastVisit: document.getElementById('c-last').value,
                 sides: document.getElementById('c-sides').value, top: document.getElementById('c-top').value, notes: document.getElementById('c-notes').value
             };
-            if(id) { const idx = clients.findIndex(x=>x.id==id); clients[idx] = {...clients[idx], ...data}; } 
-            else { data.id = Date.now().toString(); data.cuts=0; data.free=0; data.credit=0; data.ltv=0; data.loyalty=0; data.redeemedVal=0; clients.push(data); 
-                if(ref) { const referrer = clients.find(c => c.name.toLowerCase() === ref.toLowerCase() && c.id !== data.id); if(referrer) { referrer.credit+=5; data.credit+=5; alert("Referral linked! $5 credits."); }}
+
+            if(id) {
+                const idx = clients.findIndex(x=>x.id==id);
+                clients[idx] = {...clients[idx], ...data};
+            } else {
+                data.id = Date.now().toString(); data.cuts=0; data.free=0; data.credit=0; data.ltv=0; data.loyalty=0; data.redeemedVal=0;
+                clients.push(data);
+                if(ref) {
+                    const referrer = clients.find(c => c.name.toLowerCase() === ref.toLowerCase() && c.id !== data.id);
+                    if(referrer) { referrer.credit+=5; data.credit+=5; alert("Referral linked! $5 credits."); }
+                }
             }
-            save(); closeModals(); render();
+            save(); closeModals(); 
+            // Important: Force reset filter so new client is visible
+            filter('all', document.querySelector('.dash-card.active'));
+            document.getElementById('search').value = '';
+            render();
+            
+            if(pendingCutId) { pendingCutId = null; } // Clear flag as stats were processed before edit
         }
+
         function viewFull(id) {
             const c = clients.find(x=>x.id==id); tempId=id;
             document.getElementById('ro-title').innerText = c.name;
@@ -540,26 +597,54 @@
             document.getElementById('profile-modal').style.display = 'flex';
         }
         function editFromProfile() { closeModals(); openClientModal(tempId); }
+
         function openText(id) {
-            const c = clients.find(x=>x.id==id); if(!c.phone) return alert("No phone.");
+            const c = clients.find(x=>x.id==id);
+            if(!c.phone) return alert("No phone.");
             const n = c.name.split(' ')[0];
-            const opts = [{lbl:"Running Late", txt:`Hey ${n}, running a bit behind schedule. Thanks!`}, {lbl:"Confirm Cut", txt:`Hey ${n}, confirming our cut tomorrow. Still good?`}, {lbl:"Follow Up", txt:`Hey ${n}, checking in on the fresh cut. All good?`}, {lbl:"Custom", txt:''}];
+            const opts = [
+                {lbl:"Running Late", txt:`Hey ${n}, running a bit behind schedule. Thanks!`},
+                {lbl:"Confirm Cut", txt:`Hey ${n}, confirming our cut tomorrow. Still good?`},
+                {lbl:"Follow Up", txt:`Hey ${n}, checking in on the fresh cut. All good?`},
+                {lbl:"Custom", txt:''}
+            ];
             const sep = navigator.userAgent.match(/iPhone|iPad/i) ? '&' : '?';
-            openListModal("Send Text", opts.map(o=>({lbl: o.lbl, fn: ()=>{ window.location = `sms:${c.phone}${sep}body=${encodeURIComponent(o.txt)}`; }})));
+            openListModal("Send Text", opts.map(o=>({
+                lbl: o.lbl, fn: ()=>{ window.location = `sms:${c.phone}${sep}body=${encodeURIComponent(o.txt)}`; }
+            })));
         }
-        function openCreditModal() { updateRefList(); document.getElementById('credit-input').value=''; document.getElementById('credit-modal').style.display='flex'; }
-        function applyCredit() { const name=document.getElementById('credit-input').value; const c=clients.find(x=>x.name.toLowerCase()===name.toLowerCase()); if(c){c.credit+=5; save(); render(); alert(`$5 added to ${c.name}`); closeModals();}else{alert("Client not found.");} }
-        function openSettings() {
-            let rev=clients.reduce((a,b)=>a+(b.ltv||0),0); let cuts=clients.reduce((a,b)=>a+(b.cuts||0),0); let refs=clients.filter(c=>c.ref&&c.ref.length>0).length; let red=clients.reduce((a,b)=>a+(b.redeemedVal||0),0);
-            document.getElementById('st-rev').innerText=`$${rev}`; document.getElementById('st-cuts').innerText=cuts; document.getElementById('st-ref').innerText=refs; document.getElementById('st-red').innerText=`$${red}`;
-            document.getElementById('s-shop-addr').value=shopSettings.addr; document.getElementById('settings-modal').style.display='flex';
+
+        // --- CORE ---
+        function updateDash() {
+            const today=new Date(); today.setHours(0,0,0,0);
+            let counts={due:0, bday:0, ghost:0, all:clients.length};
+            clients.forEach(c=>{
+                if(getDueDate(c)<=today) counts.due++;
+                if(isThisWeek(c.dob)) counts.bday++;
+                if(c.lastVisit && Math.ceil((today-new Date(c.lastVisit))/86400000)>90) counts.ghost++;
+            });
+            document.getElementById('d-due').innerText=counts.due; document.getElementById('d-bday').innerText=counts.bday;
+            document.getElementById('d-ghost').innerText=counts.ghost; document.getElementById('d-all').innerText=counts.all;
         }
-        function customConfirm(msg,yes,no) { document.getElementById('confirm-msg').innerText=msg; document.getElementById('confirm-modal').style.display='flex'; document.getElementById('btn-yes').onclick=()=>{document.getElementById('confirm-modal').style.display='none';yes();}; document.getElementById('btn-no').onclick=()=>{document.getElementById('confirm-modal').style.display='none';if(no)no();}; }
-        function openListModal(title, options, callback) { document.getElementById('list-title').innerText=title; const c=document.getElementById('list-options'); c.innerHTML=''; options.forEach(o=>{const b=document.createElement('button'); b.className='list-option'; b.innerText=o.lbl; b.onclick=()=>{o.fn(); closeModals(); if(callback)callback();}; c.appendChild(b);}); document.getElementById('list-modal').style.display='flex'; }
+        function customConfirm(msg,yes,no) {
+            document.getElementById('confirm-msg').innerText=msg; document.getElementById('confirm-modal').style.display='flex';
+            document.getElementById('btn-yes').onclick=()=>{document.getElementById('confirm-modal').style.display='none';yes();};
+            document.getElementById('btn-no').onclick=()=>{document.getElementById('confirm-modal').style.display='none';if(no)no();};
+        }
+        function openListModal(title, options, callback) {
+            document.getElementById('list-title').innerText = title;
+            const container = document.getElementById('list-options'); container.innerHTML = '';
+            options.forEach(o => {
+                const btn = document.createElement('button'); btn.className = 'list-option';
+                btn.innerText = o.lbl; btn.onclick = () => { o.fn(); closeModals(); if(callback) callback(); };
+                container.appendChild(btn);
+            });
+            document.getElementById('list-modal').style.display = 'flex';
+        }
         function getDueDate(c) { if(!c.lastVisit||!c.freq)return null; const d=new Date(c.lastVisit); d.setDate(d.getDate()+(c.freq*7)); d.setHours(0,0,0,0); return d; }
         function isThisWeek(dStr) { if(!dStr)return false; const d=new Date(dStr); const n=new Date(); n.setHours(0,0,0,0); const ty=new Date(n.getFullYear(),d.getMonth(),d.getDate()+1); const diff=Math.ceil((ty-n)/86400000); return diff>=0&&diff<=7; }
         function getYears(dStr) { if(!dStr)return 0; return new Date().getFullYear()-new Date(dStr).getFullYear(); }
-        function setToday(id) { document.getElementById(id).value=new Date().toISOString().split('T')[0]; }
+        function setToday(id) { document.getElementById(id).value = new Date().toISOString().split('T')[0]; }
         function fill(id,v) { document.getElementById(id).value=v; }
         function filter(t,el) { filterType=t; document.querySelectorAll('.dash-card').forEach(d=>d.classList.remove('active')); el.classList.add('active'); render(); }
         function toggleMenu() { document.getElementById('save-menu').classList.toggle('show'); }
