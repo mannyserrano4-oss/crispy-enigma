@@ -40,6 +40,7 @@
             overflow-x: auto; border-bottom: 1px solid var(--border); 
             scrollbar-width: none; flex-shrink: 0;
         }
+        .dashboard::-webkit-scrollbar { display: none; }
         .dash-card { 
             background: var(--card); min-width: 100px; padding: 10px; border-radius: 12px; 
             border: 1px solid var(--border); text-align: center; cursor: pointer; 
@@ -307,15 +308,20 @@
     </div>
 
     <script>
+        // INIT DATA
         let clients = JSON.parse(localStorage.getItem('bb_clients_v3') || '[]');
         let shopSettings = JSON.parse(localStorage.getItem('bb_settings') || '{"addr":""}');
         let filterType = 'all';
         let tempId = null;
-        let pendingCutId = null; 
+        let pendingCutId = null;
 
+        // LOAD THEME
         if(localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
+        
+        // START APP
         render();
 
+        // --- HELPER: GET LOCAL TODAY YYYY-MM-DD ---
         function getLocalToday() {
             const d = new Date();
             const year = d.getFullYear();
@@ -324,16 +330,18 @@
             return `${year}-${month}-${day}`;
         }
 
+        // --- HELPER: PARSE LOCAL DATE ---
         function dateToLocal(dateStr) {
             if(!dateStr || dateStr.length < 10) return null;
             const parts = dateStr.split('-');
             return new Date(parts[0], parts[1] - 1, parts[2]); 
         }
 
+        // --- RENDER LIST ---
         function render() {
             updateDash();
             const list = document.getElementById('client-list');
-            if(!list) return;
+            if(!list) return; 
             const query = document.getElementById('search').value.toLowerCase();
             list.innerHTML = '';
 
@@ -412,7 +420,6 @@
                             <button class="btn-act" onclick="openText('${c.id}')"><span>💬</span>Text</button>
                             ${socialBtn}
                             <button class="btn-act" onclick="openSchedule('${c.id}')"><span>📅</span>Sched</button>
-                            <button class="btn-act" onclick="downloadVCard('${c.id}')"><span>👤</span>Save</button>
                         </div>
                     </div>
                 `;
@@ -420,7 +427,7 @@
             });
         }
 
-        // --- DASHBOARD UPDATE (RESTORED) ---
+        // --- DASHBOARD UPDATE ---
         function updateDash() {
             const today = new Date(); today.setHours(0,0,0,0);
             let counts = { due: 0, bday: 0, ghost: 0, all: clients.length };
@@ -437,6 +444,7 @@
             if(document.getElementById('d-all')) document.getElementById('d-all').innerText = counts.all;
         }
 
+        // --- SAVE CLIENT ---
         function saveClient() {
             try {
                 const idEl = document.getElementById('c-id');
@@ -484,11 +492,13 @@
 
                 save(); 
                 closeModals(); 
+                
                 document.getElementById('search').value = '';
                 filterType = 'all';
                 document.querySelectorAll('.dash-card').forEach(d => d.classList.remove('active'));
                 const allBtn = document.getElementById('btn-all');
                 if(allBtn) allBtn.classList.add('active');
+                
                 render();
 
             } catch (err) { alert("Error Saving: " + err.message); }
@@ -587,7 +597,11 @@
         function viewFull(id) {
             const c = clients.find(x=>x.id==id); tempId=id;
             document.getElementById('ro-title').innerText = c.name;
-            const fmt = (d) => { if(!d || d.length < 10) return '-'; const parts = d.split('-'); return `${parts[1]}/${parts[2]}/${parts[0]}`; };
+            const fmt = (d) => { 
+                if(!d || d.length < 10) return '-'; 
+                const parts = d.split('-');
+                return `${parts[1]}/${parts[2]}/${parts[0]}`; 
+            };
             let html = `<div class="ro-row"><div class="ro-lbl">Phone</div><div class="ro-val">${c.phone||'-'}</div></div>
                         <div class="ro-row"><div class="ro-lbl">Address</div><div class="ro-val">${c.addr||'-'}</div></div>
                         <div class="ro-row"><div class="ro-lbl">Social</div><div class="ro-val">${c.social||'-'}</div></div>
@@ -611,19 +625,6 @@
             openListModal("Send Text", opts.map(o=>({lbl: o.lbl, fn: ()=>{ window.location = `sms:${c.phone}${sep}body=${encodeURIComponent(o.txt)}`; }}))); 
         }
         
-        function downloadVCard(id) {
-            const c = clients.find(x=>x.id==id);
-            const vcf = `BEGIN:VCARD\nVERSION:3.0\nN:${c.name};;;;\nFN:${c.name}\nTEL;type=CELL;type=VOICE;type=pref:${c.phone||''}\nADR;type=HOME;type=pref:;;${c.addr||''};;;;\nNOTE:Black Book Notes: ${c.notes||''}\nEND:VCARD`;
-            const blob = new Blob([vcf], { type: 'text/vcard' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${c.name.replace(/\s/g,'_')}.vcf`;
-            document.body.appendChild(a);
-            a.click();
-            setTimeout(() => document.body.removeChild(a), 100);
-        }
-
         function openCreditModal() { updateRefList(); document.getElementById('credit-input').value=''; document.getElementById('credit-modal').style.display='flex'; }
         
         function applyCredit() { 
@@ -665,18 +666,70 @@
         }
         
         function getDueDate(c) { if(!c.lastVisit||!c.freq)return null; const d=dateToLocal(c.lastVisit); d.setDate(d.getDate()+(c.freq*7)); return d; }
-        function isThisWeek(dStr) { if(!dStr)return false; const d=dateToLocal(dStr); const n=new Date(); n.setHours(0,0,0,0); const ty=new Date(n.getFullYear(),d.getMonth(),d.getDate()); const diff=(ty-n)/86400000; return diff>=-7 && diff<=7; }
+        
+        function isThisWeek(dStr) { 
+            if(!dStr)return false; const d=dateToLocal(dStr); const n=new Date(); n.setHours(0,0,0,0); 
+            const ty=new Date(n.getFullYear(),d.getMonth(),d.getDate()); 
+            const diff=(ty-n)/86400000; return diff>=-7 && diff<=7; 
+        }
+        
         function getYears(dStr) { if(!dStr)return 0; return new Date().getFullYear()-dateToLocal(dStr).getFullYear(); }
+        
         function setToday(id) { document.getElementById(id).value=getLocalToday(); }
+        
         function fill(id,v) { document.getElementById(id).value=v; }
-        function filter(t,el) { filterType=t; document.querySelectorAll('.dash-card').forEach(d=>d.classList.remove('active')); el.classList.add('active'); render(); }
+        
+        function filter(t,el) { 
+            filterType=t; 
+            document.querySelectorAll('.dash-card').forEach(d=>d.classList.remove('active')); 
+            el.classList.add('active'); 
+            render(); 
+        }
+        
         function toggleMenu() { document.getElementById('save-menu').classList.toggle('show'); }
-        function toggleTheme() { document.body.classList.toggle('light-mode'); localStorage.setItem('theme', document.body.classList.contains('light-mode')?'light':'dark'); }
+        
+        function toggleTheme() { 
+            document.body.classList.toggle('light-mode'); 
+            localStorage.setItem('theme', document.body.classList.contains('light-mode')?'light':'dark'); 
+        }
+        
         function closeModals() { document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); }
-        function save(skipRender) { localStorage.setItem('bb_clients_v3', JSON.stringify(clients)); if(!skipRender) render(); }
-        function saveSettings() { shopSettings.addr=document.getElementById('s-shop-addr').value; localStorage.setItem('bb_settings', JSON.stringify(shopSettings)); closeModals(); }
-        function exportData(type) { toggleMenu(); if(type==='json'){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(clients)],{type:'application/json'})); a.download=`bb_${Date.now()}.json`; a.click();} else { let csv="Name,Phone,LTV\n"+clients.map(c=>`"${c.name}","${c.phone}",${c.ltv}`).join('\n'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=`bb.csv`; a.click(); }}
-        function importData(el) { if(!el.files[0])return; const fr=new FileReader(); fr.onload=e=>{clients=JSON.parse(e.target.result); save(); render(); alert("Restored!");}; fr.readAsText(el.files[0]); }
+        
+        function save(skipRender) { 
+            localStorage.setItem('bb_clients_v3', JSON.stringify(clients)); 
+            if(!skipRender) render(); 
+        }
+        
+        function saveSettings() { 
+            shopSettings.addr=document.getElementById('s-shop-addr').value; 
+            localStorage.setItem('bb_settings', JSON.stringify(shopSettings)); 
+            closeModals(); 
+        }
+        
+        function exportData(type) { 
+            toggleMenu(); 
+            if(type==='json'){ 
+                const a=document.createElement('a'); 
+                a.href=URL.createObjectURL(new Blob([JSON.stringify(clients)],{type:'application/json'})); 
+                a.download=`bb_${Date.now()}.json`; a.click();
+            } else { 
+                let csv="Name,Phone,LTV\n"+clients.map(c=>`"${c.name}","${c.phone}",${c.ltv}`).join('\n'); 
+                const a=document.createElement('a'); 
+                a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); 
+                a.download=`bb.csv`; a.click(); 
+            }
+        }
+        
+        function importData(el) { 
+            if(!el.files[0])return; 
+            const fr=new FileReader(); 
+            fr.onload=e=>{
+                clients=JSON.parse(e.target.result); 
+                save(); render(); alert("Restored!");
+            }; 
+            fr.readAsText(el.files[0]); 
+        }
+        
         function openSchedule(id) { const c=clients.find(x=>x.id==id); document.getElementById('cal-id').value=id; document.getElementById('cal-date').value=getLocalToday(); selLoc('shop'); document.getElementById('cal-modal').style.display='flex'; }
         function selLoc(type) { const c=clients.find(x=>x.id==document.getElementById('cal-id').value); document.getElementById('cal-addr').value = type==='shop' ? (shopSettings.addr||'') : (c.addr||''); }
         function generateICS() { const c=clients.find(x=>x.id==document.getElementById('cal-id').value); const d=document.getElementById('cal-date').value; const t=document.getElementById('cal-time').value; const loc=document.getElementById('cal-addr').value; if(!d||!t) return alert("Date/Time needed"); const startRaw = d.replace(/-/g, '') + 'T' + t.replace(/:/g, '') + '00'; let h = parseInt(t.split(':')[0]) + 2; let m = parseInt(t.split(':')[1]); if(h>=24) h-=24; const endRaw = d.replace(/-/g, '') + 'T' + (h<10?'0':'')+h + (m<10?'0':'')+m + '00'; const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Cut: ${c.name}\nDTSTART:${startRaw}\nDTEND:${endRaw}\nLOCATION:${loc}\nDESCRIPTION:${c.notes||'Haircut'}\nEND:VEVENT\nEND:VCALENDAR`; const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([ics], {type: 'text/calendar'})); a.download = 'appointment.ics'; document.body.appendChild(a); a.click(); document.body.removeChild(a); closeModals(); }
