@@ -9,840 +9,878 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        /* --- THEME VARIABLES --- */
         :root {
-            --bg: #000000;
-            --card-bg: #1c1c1e;
-            --modal-bg: #2c2c2e;
-            --text-main: #ffffff;
-            --text-sub: #8e8e93;
-            --separator: #38383a;
+            /* Light Mode (Pastel Default) */
+            --bg-body: #FFFDF7; /* Creamy White */
+            --bg-card: #FFFFFF;
+            --bg-modal: #FFFFFF;
+            --text-main: #4A4A4A;
+            --text-sub: #9AA0A6;
+            --border: #F0F0F0;
             
-            /* Branding */
-            --blue: #0A84FF;
-            --green: #30D158;
-            --red: #FF453A;
-            --orange: #FF9F0A;
-            --gold: #FFD60A;
-            --purple: #BF5AF2;
+            /* Pastel Palette */
+            --p-blue: #A2D2FF;
+            --p-blue-dark: #6495ED;
+            --p-green: #B7E4C7; /* Mint */
+            --p-green-dark: #52B788;
+            --p-pink: #FFC8DD;
+            --p-pink-dark: #FF8FAB;
+            --p-purple: #CDB4DB;
+            --p-yellow: #FDE2E4;
+            
+            /* Logic Colors */
+            --status-due: #FFD6A5; /* Pastel Orange */
+            --status-overdue: #FFA69E; /* Pastel Red */
+            --status-good: #B7E4C7; /* Pastel Green */
+            
+            --input-bg: #F7F9FC;
+            --input-border: #DDE2E8;
+            --shadow: 0 4px 15px rgba(200, 200, 200, 0.25);
+        }
+
+        body.dark-mode {
+            /* Dark Mode (Neon Pastels) */
+            --bg-body: #1F2026;
+            --bg-card: #2C2C35;
+            --bg-modal: #2C2C35;
+            --text-main: #FFFFFF;
+            --text-sub: #A0A0A5;
+            --border: #3A3A42;
+            
+            /* Deeper Pastels for contrast */
+            --p-blue: #4D96FF;
+            --p-blue-dark: #82C2F2;
+            --p-green: #06D6A0;
+            --p-green-dark: #06D6A0;
+            --p-pink: #FF758F;
+            --p-pink-dark: #FF4D6D;
+            --p-purple: #9D4EDD;
+            
+            --status-due: #FF9E00;
+            --status-overdue: #FF0054;
+            --status-good: #06D6A0;
+            
+            --input-bg: #18181B;
+            --input-border: #3F3F46;
+            --shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-body);
             color: var(--text-main);
             margin: 0;
             padding: 0;
-            padding-bottom: 140px; /* Space for Bottom Search */
+            padding-bottom: 140px;
+            transition: background-color 0.3s ease;
             -webkit-tap-highlight-color: transparent;
         }
 
         /* --- HEADER --- */
-        .glass-header {
+        .header {
             position: sticky;
             top: 0;
-            background: rgba(28, 28, 30, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--separator);
+            background: var(--bg-body);
             z-index: 100;
             padding-top: env(safe-area-inset-top);
+            border-bottom: 2px solid var(--border);
         }
 
-        .top-bar {
+        .top-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 15px 20px;
         }
 
-        .app-title { font-size: 1.4rem; font-weight: 800; }
-        .app-subtitle { font-weight: 400; font-size: 1rem; color: var(--text-sub); margin-left: 5px;}
+        .logo { font-size: 1.5rem; font-weight: 900; letter-spacing: -0.5px; }
+        .logo span { font-weight: 300; font-size: 1rem; color: var(--text-sub); }
+
+        .theme-toggle {
+            background: var(--input-bg);
+            border: 2px solid var(--input-border);
+            border-radius: 20px;
+            width: 50px; height: 26px;
+            position: relative;
+            cursor: pointer;
+        }
+        .toggle-dot {
+            width: 18px; height: 18px;
+            background: var(--p-blue-dark);
+            border-radius: 50%;
+            position: absolute; top: 2px; left: 2px;
+            transition: transform 0.3s;
+        }
+        body.dark-mode .toggle-dot { transform: translateX(24px); background: var(--p-pink); }
 
         /* Metrics */
-        .metrics-container {
-            display: flex;
-            overflow-x: auto;
-            padding: 0 15px 10px 15px;
-            gap: 12px;
+        .metrics-scroll {
+            display: flex; gap: 10px; overflow-x: auto; padding: 0 20px 10px 20px;
             scrollbar-width: none;
         }
-        .metrics-container::-webkit-scrollbar { display: none; }
+        .metric-pill {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 8px 15px;
+            min-width: 100px;
+            display: flex; flex-direction: column;
+            box-shadow: var(--shadow);
+        }
+        .m-lbl { font-size: 0.7rem; text-transform: uppercase; color: var(--text-sub); font-weight: 700; }
+        .m-val { font-size: 1.1rem; font-weight: 800; color: var(--p-blue-dark); }
 
-        .metric-card {
-            background: var(--modal-bg);
-            min-width: 90px;
-            padding: 8px 12px;
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
+        /* Filter Tabs */
+        .tabs {
+            display: flex; gap: 10px; padding: 10px 20px;
         }
-        .metric-label { font-size: 0.65rem; color: var(--text-sub); text-transform: uppercase; margin-bottom: 2px; }
-        .metric-value { font-size: 1rem; font-weight: 700; color: var(--text-main); }
-
-        /* Tabs */
-        .segment-control {
-            margin: 5px 15px 10px 15px;
-            background: rgba(118, 118, 128, 0.24);
-            border-radius: 9px;
-            padding: 2px;
-            display: flex;
+        .tab-btn {
+            flex: 1; padding: 10px; border: none;
+            background: var(--input-bg); border-radius: 10px;
+            color: var(--text-sub); font-weight: 700;
+            transition: all 0.2s;
         }
-        .segment-btn {
-            flex: 1;
-            background: none;
-            border: none;
-            color: var(--text-sub);
-            padding: 6px 0;
-            font-size: 13px;
-            font-weight: 600;
-            border-radius: 7px;
+        .tab-btn.active {
+            background: var(--p-blue); color: #000;
+            box-shadow: 0 2px 10px rgba(162, 210, 255, 0.4);
         }
-        .segment-btn.active { background: #636366; color: white; }
 
         /* --- CLIENT LIST --- */
-        .client-list { padding: 0 15px; }
+        .client-list { padding: 15px 20px; }
 
         .client-card {
-            background: var(--card-bg);
-            border-radius: 14px;
-            margin-bottom: 12px;
-            padding: 16px;
+            background: var(--bg-card);
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow);
+            border-left: 6px solid var(--status-good);
             position: relative;
-            border-left: 5px solid transparent;
         }
         
-        .client-card.status-due { border-left-color: var(--orange); }
-        .client-card.status-overdue { border-left-color: var(--red); }
-        .client-card.status-good { border-left-color: var(--green); }
+        .client-card.due { border-left-color: var(--status-due); }
+        .client-card.overdue { border-left-color: var(--status-overdue); }
 
-        .c-header { display: flex; justify-content: space-between; align-items: flex-start; }
-        .c-name { font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 8px;}
-        .c-meta { color: var(--text-sub); font-size: 0.85rem; margin-top: 4px; }
-        .c-stats { text-align: right; font-size: 0.8rem; color: var(--text-sub); }
+        .cc-top { display: flex; justify-content: space-between; align-items: center; }
+        .cc-name { font-size: 1.2rem; font-weight: 800; }
+        .cc-due { font-size: 0.8rem; font-weight: 600; padding: 4px 8px; border-radius: 6px; background: var(--input-bg); color: var(--text-sub); }
+        .cc-info { color: var(--text-sub); font-size: 0.9rem; margin-top: 5px; }
         
-        .icon-badge { font-size: 0.8rem; }
+        .badges { display: flex; gap: 5px; margin-top: 8px; }
+        .badge { font-size: 0.8rem; }
 
-        /* --- STICKY FOOTER (SEARCH + FAB) --- */
-        .bottom-bar {
-            position: fixed;
-            bottom: 0; left: 0; width: 100%;
-            background: rgba(28, 28, 30, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 15px;
-            padding-bottom: max(20px, env(safe-area-inset-bottom));
-            box-sizing: border-box;
-            border-top: 1px solid var(--separator);
+        /* --- STICKY FOOTER --- */
+        .footer-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            padding: 15px 20px;
+            padding-bottom: max(15px, env(safe-area-inset-bottom));
+            display: flex; gap: 15px; align-items: center;
             z-index: 200;
-            display: flex;
-            align-items: center;
-            gap: 15px;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+            box-sizing: border-box;
         }
-
-        .search-container {
-            flex: 1;
-            position: relative;
-        }
+        .search-wrap { flex: 1; position: relative; }
         .search-input {
-            width: 100%;
-            background: #3a3a3c;
-            border: none;
-            padding: 12px 12px 12px 40px;
-            border-radius: 12px;
-            color: white;
-            font-size: 1rem;
+            width: 100%; padding: 14px 14px 14px 45px;
+            border-radius: 14px; border: 2px solid var(--p-blue);
+            background: var(--input-bg); color: var(--text-main); font-size: 1rem;
+            outline: none; box-sizing: border-box;
         }
-        .search-icon { position: absolute; left: 12px; top: 12px; color: #888; }
-
-        .fab-mini {
-            width: 50px; height: 50px;
-            background: var(--blue);
+        .search-icon { position: absolute; left: 15px; top: 15px; color: var(--p-blue-dark); }
+        
+        .fab {
+            width: 56px; height: 56px;
+            background: var(--p-pink); color: #000;
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 20px;
-            box-shadow: 0 4px 15px rgba(10, 132, 255, 0.4);
-            flex-shrink: 0;
+            font-size: 24px; box-shadow: 0 4px 15px var(--p-pink);
+            flex-shrink: 0; cursor: pointer;
         }
 
         /* --- MODALS --- */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 1000;
-            backdrop-filter: blur(5px);
+        .overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 500; backdrop-filter: blur(4px);
             align-items: flex-end;
         }
-        .modal-sheet {
-            background: var(--card-bg);
-            width: 100%;
-            max-height: 90vh;
-            border-radius: 20px 20px 0 0;
-            padding: 20px;
-            box-sizing: border-box;
-            overflow-y: auto;
-            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        .sheet {
+            background: var(--bg-modal); width: 100%;
+            border-radius: 25px 25px 0 0; padding: 25px;
+            box-sizing: border-box; max-height: 90vh; overflow-y: auto;
+            animation: slideUp 0.3s cubic-bezier(0.19, 1, 0.22, 1);
         }
         @keyframes slideUp { from {transform: translateY(100%);} to {transform: translateY(0);} }
 
-        /* View Mode Styling */
-        .view-header { text-align: center; margin-bottom: 20px; }
-        .view-name { font-size: 2rem; font-weight: 800; margin-bottom: 5px; }
-        .view-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 20px;
+        /* Inputs & Buttons */
+        label { display: block; color: var(--text-sub); font-size: 0.8rem; margin-bottom: 6px; font-weight: 700; text-transform: uppercase;}
+        input, select, textarea {
+            width: 100%; padding: 14px; border-radius: 12px;
+            border: 2px solid var(--input-border); background: var(--input-bg);
+            color: var(--text-main); font-size: 1rem; margin-bottom: 15px;
+            box-sizing: border-box; transition: border-color 0.2s;
         }
-        .view-box {
-            background: var(--modal-bg);
-            padding: 15px;
-            border-radius: 12px;
-            text-align: center;
-        }
-        .vb-val { font-size: 1.2rem; font-weight: bold; display: block; }
-        .vb-label { font-size: 0.7rem; color: var(--text-sub); text-transform: uppercase; }
+        input:focus { border-color: var(--p-blue-dark); outline: none; background: var(--bg-card); }
 
-        /* Action Buttons */
-        .btn-action {
-            width: 100%; padding: 16px;
-            border-radius: 12px; border: none;
-            font-size: 1rem; font-weight: 600;
-            margin-bottom: 10px;
-            display: flex; justify-content: center; align-items: center; gap: 10px;
+        .btn {
+            width: 100%; padding: 18px; border-radius: 16px; border: none;
+            font-size: 1rem; font-weight: 700; cursor: pointer;
+            margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .btn-primary { background: var(--p-blue); color: #000; box-shadow: 0 4px 12px rgba(162, 210, 255, 0.4); }
+        .btn-green { background: var(--p-green); color: #000; box-shadow: 0 4px 12px rgba(183, 228, 199, 0.4); }
+        .btn-red { background: var(--p-pink); color: #000; }
+        .btn-ghost { background: transparent; border: 2px solid var(--border); color: var(--text-sub); }
+
+        /* VIEW CLIENT LAYOUT */
+        .v-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .v-box {
+            background: var(--input-bg); padding: 15px; border-radius: 14px; text-align: center;
+            border: 1px solid var(--border);
+        }
+        .v-big { font-size: 1.4rem; font-weight: 800; display: block; margin-bottom: 4px; }
+        
+        .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .c-btn {
+            padding: 15px; border-radius: 14px; background: var(--input-bg);
+            border: 2px solid var(--p-blue); color: var(--p-blue-dark);
+            font-weight: 700; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px;
+            text-decoration: none;
+        }
+
+        /* CHECKOUT DISCOUNT LIST */
+        .discount-opt {
+            padding: 12px; border: 2px solid var(--input-border); border-radius: 12px;
+            margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;
             cursor: pointer;
         }
-        .btn-primary { background: var(--blue); color: white; }
-        .btn-green { background: var(--green); color: black; }
-        .btn-outline { background: transparent; border: 1px solid var(--separator); color: white; }
-        
-        .insta-btn {
-            background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
-            color: white;
-        }
+        .discount-opt.selected { border-color: var(--p-green-dark); background: rgba(183, 228, 199, 0.2); }
 
-        /* Form Inputs */
-        input, textarea, select {
-            width: 100%; background: #2c2c2e; border: 1px solid #3a3a3c;
-            color: white; padding: 12px; border-radius: 10px;
-            font-size: 16px; box-sizing: border-box; margin-bottom: 15px;
+        /* CUSTOM CONFIRM MODAL */
+        .confirm-box {
+            background: var(--bg-card); padding: 30px; border-radius: 20px;
+            text-align: center; width: 80%; max-width: 350px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
         }
-        label { color: var(--text-sub); font-size: 0.8rem; display: block; margin-bottom: 5px; }
-        
-        .ref-result {
-            padding: 10px; border-bottom: 1px solid #444; background: #333;
-        }
+        .confirm-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 10px; }
+        .confirm-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
     </style>
 </head>
-<body>
+<body class="">
 
-    <header class="glass-header">
-        <div class="top-bar">
-            <div class="app-title">The Black Book <span class="app-subtitle">MAS Barbery</span></div>
-            <div onclick="openSettings()"><i class="fas fa-cog" style="font-size:1.2rem; color:var(--text-sub);"></i></div>
-        </div>
-
-        <div class="metrics-container">
-            <div class="metric-card">
-                <span class="metric-label">Global Revenue</span>
-                <span class="metric-value" style="color:var(--green);" id="mGlobalRev">$0</span>
-            </div>
-            <div class="metric-card">
-                <span class="metric-label">Giveback</span>
-                <span class="metric-value" id="mGivenBack">$0</span>
-            </div>
-            <div class="metric-card">
-                <span class="metric-label">Total Cuts</span>
-                <span class="metric-value" id="mTotalCuts">0</span>
+    <div class="header">
+        <div class="top-row">
+            <div class="logo">The Black Book <br><span>MAS Barbery</span></div>
+            <div style="display:flex; gap:15px; align-items:center;">
+                <div class="theme-toggle" onclick="toggleTheme()"><div class="toggle-dot"></div></div>
+                <div onclick="openSettings()"><i class="fas fa-cog" style="font-size:1.2rem; color:var(--text-sub);"></i></div>
             </div>
         </div>
 
-        <div class="segment-control">
-            <button class="segment-btn active" onclick="setTab('all', this)">All</button>
-            <button class="segment-btn" onclick="setTab('due', this)">Due</button>
-            <button class="segment-btn" onclick="setTab('overdue', this)">Overdue</button>
+        <div class="metrics-scroll">
+            <div class="metric-pill">
+                <span class="m-lbl">Revenue</span>
+                <span class="m-val" id="mRev">$0</span>
+            </div>
+            <div class="metric-pill">
+                <span class="m-lbl">Giveback</span>
+                <span class="m-val" id="mGive">$0</span>
+            </div>
+            <div class="metric-pill">
+                <span class="m-lbl">Cuts</span>
+                <span class="m-val" id="mCuts">0</span>
+            </div>
         </div>
-    </header>
 
-    <div id="clientList" class="client-list"></div>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="setTab('all', this)">All</button>
+            <button class="tab-btn" onclick="setTab('due', this)">Due</button>
+            <button class="tab-btn" onclick="setTab('overdue', this)">Overdue</button>
+        </div>
+    </div>
 
-    <div class="bottom-bar">
-        <div class="search-container">
+    <div id="list" class="client-list"></div>
+
+    <div class="footer-bar">
+        <div class="search-wrap">
             <i class="fas fa-search search-icon"></i>
-            <input type="text" class="search-input" placeholder="Search clients..." oninput="filterSearch(this.value)">
+            <input type="text" class="search-input" placeholder="Search..." oninput="render(this.value)">
         </div>
-        <div class="fab-mini" onclick="openAddModal()">
+        <div class="fab" onclick="openAddModal()">
             <i class="fas fa-plus"></i>
         </div>
     </div>
 
-    <div id="viewModal" class="modal-overlay">
-        <div class="modal-sheet">
-            <div style="display:flex; justify-content:flex-end;">
-                <button onclick="closeModal('viewModal')" style="background:none; border:none; color:var(--blue); font-weight:bold;">Close</button>
+    <div id="viewModal" class="overlay">
+        <div class="sheet">
+            <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+                <h2 style="margin:0; font-size:1.8rem;" id="vName">Name</h2>
+                <div style="font-weight:700; color:var(--p-blue-dark);" onclick="editClient()">EDIT</div>
+            </div>
+            <p id="vSub" style="color:var(--text-sub); margin-top:-15px;">Phone</p>
+            <div id="vBadges" style="margin-bottom:20px; display:flex; gap:5px;"></div>
+
+            <div class="contact-grid">
+                <a id="btnCall" href="#" class="c-btn"><i class="fas fa-phone"></i> Call</a>
+                <a id="btnText" href="#" class="c-btn"><i class="fas fa-comment"></i> Text</a>
+            </div>
+
+            <div class="v-grid">
+                <div class="v-box">
+                    <span class="v-big" id="vLoyalty">0/5</span>
+                    <span style="font-size:0.7rem; text-transform:uppercase;">Loyalty</span>
+                </div>
+                <div class="v-box">
+                    <span class="v-big" style="color:var(--p-green-dark)" id="vCredit">$0</span>
+                    <span style="font-size:0.7rem; text-transform:uppercase;">Ref Credit</span>
+                </div>
+                <div class="v-box">
+                    <span class="v-big" id="vTotalCuts">0</span>
+                    <span style="font-size:0.7rem; text-transform:uppercase;">Total Cuts</span>
+                </div>
+                <div class="v-box">
+                    <span class="v-big" id="vLTV">$0</span>
+                    <span style="font-size:0.7rem; text-transform:uppercase;">LTV</span>
+                </div>
+            </div>
+
+            <button class="btn btn-green" onclick="openCheckout()"><i class="fas fa-cash-register"></i> Record Cut / Checkout</button>
+            
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <button class="btn btn-primary" onclick="openSchedule()"><i class="fas fa-calendar"></i> Schedule</button>
+                <button class="btn btn-ghost" onclick="openInsta()" id="btnInsta"><i class="fab fa-instagram"></i> Instagram</button>
             </div>
             
-            <div class="view-header">
-                <div class="view-name" id="vName">Client Name</div>
-                <div style="color:var(--text-sub); font-size:0.9rem;" id="vIdInfo">ID info</div>
-                <div style="margin-top:10px;" id="vBadges"></div>
-            </div>
-
-            <div class="view-grid">
-                <div class="view-box">
-                    <span class="vb-val" id="vLoyalty">0/5</span>
-                    <span class="vb-label">Loyalty</span>
-                </div>
-                <div class="view-box">
-                    <span class="vb-val" style="color:var(--green)" id="vCredits">$0</span>
-                    <span class="vb-label">Referral Credits</span>
-                </div>
-                <div class="view-box">
-                    <span class="vb-val" id="vTotalCuts">0</span>
-                    <span class="vb-label">Total Cuts</span>
-                </div>
-                <div class="view-box">
-                    <span class="vb-val" style="color:var(--green)" id="vLTV">$0</span>
-                    <span class="vb-label">Lifetime Value</span>
-                </div>
-            </div>
-
-            <div style="background:var(--modal-bg); padding:15px; border-radius:12px; margin-bottom:20px; color:var(--text-sub); font-size:0.9rem; min-height:50px;" id="vNotes">
-                No notes.
-            </div>
-
-            <div id="bankedCutBanner" style="display:none; background:var(--gold); color:black; padding:10px; border-radius:10px; text-align:center; margin-bottom:10px; font-weight:bold;">
-                <i class="fas fa-star"></i> You have a Banked Free Cut!
-            </div>
-
-            <button class="btn-action btn-green" onclick="handleRecordCut()"><i class="fas fa-cut"></i> Record Cut</button>
-            <button class="btn-action btn-primary" style="display:none;" id="btnRedeemFree" onclick="handleRedeemFree()"><i class="fas fa-gift"></i> Redeem Banked Free Cut</button>
-            
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <button class="btn-action btn-outline" onclick="openSchedule()"><i class="fas fa-calendar"></i> Schedule</button>
-                <button class="btn-action btn-outline" onclick="openManualDiscount()"><i class="fas fa-tag"></i> Add Discount</button>
-            </div>
-            
-            <button class="btn-action insta-btn" id="btnInsta" style="display:none;" onclick="openInsta()"><i class="fab fa-instagram"></i> Open Instagram</button>
-
-            <button class="btn-action btn-outline" style="border:none; color:var(--text-sub); margin-top:20px;" onclick="switchToEdit()">Edit Profile / Delete</button>
-            <div style="height:50px;"></div>
+            <button class="btn btn-ghost" style="margin-top:20px; border:none; color:var(--text-sub);" onclick="closeModal('viewModal')">Close</button>
         </div>
     </div>
 
-    <div id="editModal" class="modal-overlay">
-        <div class="modal-sheet">
-            <h3 id="editTitle">New Client</h3>
+    <div id="checkoutModal" class="overlay" style="z-index:600;">
+        <div class="sheet">
+            <h3>Checkout</h3>
+            
+            <label>Base Price ($)</label>
+            <input type="number" id="payPrice" onchange="calcTotal()">
+
+            <label>Discounts & Redemptions</label>
+            <div id="discountList">
+                </div>
+            <div id="customDiscBox" style="display:none;">
+                <label>Custom Discount (%)</label>
+                <input type="number" id="payCustomPct" placeholder="e.g. 50" oninput="calcTotal()">
+            </div>
+
+            <label>Tip ($)</label>
+            <input type="number" id="payTip" value="0" onchange="calcTotal()">
+
+            <div style="background:var(--input-bg); padding:15px; border-radius:12px; margin:20px 0; text-align:center;">
+                <span style="color:var(--text-sub); font-size:0.8rem;">TOTAL REVENUE TO TRACK</span><br>
+                <span id="payTotal" style="font-size:2rem; font-weight:800; color:var(--p-green-dark);">$35</span>
+                <div id="givebackDisplay" style="color:var(--p-pink-dark); font-size:0.9rem; font-weight:700;">Giveback: $0</div>
+            </div>
+
+            <button class="btn btn-green" onclick="finalizeCut()">Confirm & Save</button>
+            <button class="btn btn-red" onclick="closeModal('checkoutModal')">Cancel</button>
+        </div>
+    </div>
+
+    <div id="editModal" class="overlay">
+        <div class="sheet">
+            <h3 id="eTitle">Client</h3>
             <form onsubmit="event.preventDefault(); saveClient();">
                 <input type="hidden" id="eId">
-                <label>Name</label>
-                <input type="text" id="eName" required>
                 
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <div><label>Phone</label><input type="tel" id="ePhone"></div>
-                    <div><label>Price ($)</label><input type="number" id="ePrice" value="35"></div>
-                </div>
-                
-                <label>Instagram (@handle)</label>
-                <input type="text" id="eInsta">
-
-                <label>Address</label>
-                <input type="text" id="eAddress">
-
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <div><label>Birthday</label><input type="date" id="eDob"></div>
-                    <div><label>First Cut</label><input type="date" id="eFirstCut"></div>
+                <div style="border:2px solid var(--p-blue); padding:15px; border-radius:15px; margin-bottom:15px; background:rgba(162,210,255,0.1);">
+                    <label style="color:var(--p-blue-dark)">Identity</label>
+                    <input type="text" id="eName" placeholder="Full Name" required style="border-color:var(--p-blue);">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                        <input type="tel" id="ePhone" placeholder="Phone">
+                        <input type="text" id="eInsta" placeholder="Insta @">
+                    </div>
+                    <input type="text" id="eAddr" placeholder="Address">
                 </div>
 
-                <label>Frequency (Weeks)</label>
-                <input type="number" id="eFreq" value="4">
+                <div style="border:2px solid var(--p-green); padding:15px; border-radius:15px; margin-bottom:15px; background:rgba(183,228,199,0.1);">
+                    <label style="color:var(--p-green-dark)">Service</label>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                        <div>
+                            <label>Price</label>
+                            <input type="number" id="ePrice" value="35">
+                        </div>
+                        <div>
+                            <label>Freq (Wks)</label>
+                            <input type="number" id="eFreq" value="4">
+                        </div>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                        <div>
+                            <label>First Cut</label>
+                            <input type="date" id="eFirst">
+                        </div>
+                        <div>
+                            <label>Birthday</label>
+                            <input type="date" id="eDob">
+                        </div>
+                    </div>
+                </div>
 
-                <label>Referred By (Search Name)</label>
-                <input type="text" id="eRef" oninput="searchRef(this.value)" placeholder="Start typing...">
-                <div id="refResults" style="display:none;"></div>
+                <div style="border:2px solid var(--p-purple); padding:15px; border-radius:15px; margin-bottom:15px; background:rgba(205,180,219,0.1);">
+                    <label style="color:var(--p-purple)">Connection</label>
+                    <input type="text" id="eRef" placeholder="Referred By..." oninput="searchRef(this.value)">
+                    <div id="refResults" style="background:var(--bg-card); display:none; border:1px solid var(--border); padding:10px;"></div>
+                    <textarea id="eNotes" rows="3" placeholder="Notes..."></textarea>
+                </div>
 
-                <label>Notes</label>
-                <textarea id="eNotes" rows="3"></textarea>
-
-                <button class="btn-action btn-primary">Save Changes</button>
-                <button type="button" class="btn-action" style="color:var(--red); background:none;" onclick="deleteClient()">Delete Client</button>
-                <button type="button" class="btn-action btn-outline" onclick="closeModal('editModal')">Cancel</button>
-                <div style="height:100px;"></div>
+                <button class="btn btn-primary">Save Client</button>
+                <button type="button" class="btn btn-red" onclick="deleteClient()">Delete</button>
+                <button type="button" class="btn btn-ghost" onclick="closeModal('editModal')">Cancel</button>
             </form>
         </div>
     </div>
 
-    <div id="schedModal" class="modal-overlay">
-        <div class="modal-sheet" style="height:auto;">
-            <h3>Add to Calendar</h3>
-            <label>Date & Time</label>
-            <input type="datetime-local" id="schedDate">
-            <label>Location</label>
-            <select id="schedLoc">
-                <option value="shop">My Shop</option>
-                <option value="client">Client's Home</option>
-            </select>
-            <button class="btn-action btn-primary" onclick="addToCalendar()">Add to iPhone Calendar</button>
-            <button class="btn-action btn-outline" onclick="closeModal('schedModal')">Cancel</button>
+    <div id="confirmModal" class="overlay" style="align-items:center; justify-content:center; z-index:999;">
+        <div class="confirm-box">
+            <div class="confirm-title" id="cMsg">Are you sure?</div>
+            <div class="confirm-btns">
+                <button class="btn btn-ghost" id="cNo">No</button>
+                <button class="btn btn-primary" id="cYes">Yes</button>
+            </div>
         </div>
     </div>
 
-    <div id="settingsModal" class="modal-overlay">
-        <div class="modal-sheet" style="height:auto;">
+    <div id="schedModal" class="overlay">
+        <div class="sheet">
+            <h3>Schedule</h3>
+            <label>When?</label>
+            <input type="datetime-local" id="schedDate">
+            <label>Where?</label>
+            <select id="schedLoc">
+                <option value="shop">My Shop</option>
+                <option value="client">Client Home</option>
+            </select>
+            <button class="btn btn-primary" onclick="addToCalendar()">Add to Calendar</button>
+            <button class="btn btn-ghost" onclick="closeModal('schedModal')">Cancel</button>
+        </div>
+    </div>
+
+    <div id="settingsModal" class="overlay">
+        <div class="sheet">
             <h3>Settings</h3>
-            <label>My Shop Location</label>
-            <input type="text" id="settingLoc" placeholder="Address">
-            <button class="btn-action btn-primary" onclick="saveSettings()">Save & Close</button>
-            <hr style="border-color:#444;">
-            <button class="btn-action btn-outline" onclick="backupData()">Export Backup</button>
+            <label>Shop Location</label>
+            <input type="text" id="setLoc" placeholder="Address">
+            <button class="btn btn-primary" onclick="saveSettings()">Save</button>
+            <hr style="border-color:var(--border); margin:20px 0;">
+            <button class="btn btn-ghost" onclick="exportData()">Backup Data</button>
             <input type="file" id="restoreFile" hidden onchange="restoreData(this)">
-            <button class="btn-action btn-outline" onclick="document.getElementById('restoreFile').click()">Restore Backup</button>
-            <button class="btn-action btn-outline" onclick="closeModal('settingsModal')">Close</button>
+            <button class="btn btn-ghost" onclick="document.getElementById('restoreFile').click()">Restore Data</button>
+            <button class="btn btn-red" onclick="closeModal('settingsModal')">Close</button>
         </div>
     </div>
 
     <script>
-        // --- DATA LAYER ---
+        // --- DATA ---
         let clients = JSON.parse(localStorage.getItem('bbClients')) || [];
         let settings = JSON.parse(localStorage.getItem('bbSettings')) || { location: '' };
         let activeId = null;
-        let currentTab = 'all';
+        let activeFilter = 'all';
+        let isDark = false;
 
+        // --- INIT ---
         window.onload = () => {
-            document.getElementById('settingLoc').value = settings.location;
-            renderList();
+            render();
+            document.getElementById('setLoc').value = settings.location;
+            // Check theme pref
+            if(localStorage.getItem('theme') === 'dark') toggleTheme();
         };
 
-        // --- RENDER ---
-        function renderList(filterText = '') {
-            const list = document.getElementById('clientList');
-            list.innerHTML = '';
-            
-            // Calc Metrics
-            const rev = clients.reduce((s,c) => s + (c.totalSpent || 0), 0);
-            const given = clients.reduce((s,c) => s + (c.giveback || 0), 0);
-            const cuts = clients.reduce((s,c) => s + (c.totalCuts || 0), 0);
-            
-            document.getElementById('mGlobalRev').innerText = '$' + Math.floor(rev);
-            document.getElementById('mGivenBack').innerText = '$' + Math.floor(given);
-            document.getElementById('mTotalCuts').innerText = cuts;
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            isDark = !isDark;
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        }
 
-            // Filter
-            const filtered = clients.filter(c => {
-                // Text Search
-                if (filterText && !c.name.toLowerCase().includes(filterText.toLowerCase())) return false;
-                
-                // Tabs
-                if (filterText) return true; // Ignore tabs if searching
-                const status = getStatus(c);
-                if (currentTab === 'due') return status === 'due';
-                if (currentTab === 'overdue') return status === 'overdue';
+        // --- RENDER ---
+        function render(search = '') {
+            const list = document.getElementById('list');
+            list.innerHTML = '';
+
+            // Metrics
+            const totalRev = clients.reduce((s,c) => s + (c.spent || 0), 0);
+            const totalGive = clients.reduce((s,c) => s + (c.giveback || 0), 0);
+            document.getElementById('mRev').innerText = '$' + Math.floor(totalRev);
+            document.getElementById('mGive').innerText = '$' + Math.floor(totalGive);
+            document.getElementById('mCuts').innerText = clients.reduce((s,c) => s + (c.cuts || 0), 0);
+
+            let filtered = clients.filter(c => {
+                if(search && !c.name.toLowerCase().includes(search.toLowerCase())) return false;
+                if(search) return true; // Skip status filter if searching
+
+                const stat = getStatus(c);
+                if(activeFilter === 'due') return stat === 'due';
+                if(activeFilter === 'overdue') return stat === 'overdue';
                 return true;
             });
 
-            // Sort
             filtered.sort((a,b) => a.name.localeCompare(b.name));
 
             filtered.forEach(c => {
-                const status = getStatus(c);
-                const nextDue = getNextDueDate(c);
-                
+                const stat = getStatus(c);
                 let badges = '';
-                if(c.dob && isSameMonth(c.dob)) badges += `<i class="fas fa-birthday-cake" style="color:var(--gold)"></i> `;
-                if(c.firstCut && isAnniversary(c.firstCut)) badges += `<i class="fas fa-medal" style="color:var(--purple)"></i> `;
+                if(c.dob && isMonth(c.dob)) badges += `<span class="badge" style="color:var(--p-pink-dark)"><i class="fas fa-birthday-cake"></i></span>`;
+                if(c.first && isAnniversary(c.first)) badges += `<span class="badge" style="color:var(--p-purple)"><i class="fas fa-medal"></i></span>`;
 
-                const card = document.createElement('div');
-                card.className = `client-card status-${status}`;
-                card.onclick = () => openView(c.id);
-                
-                card.innerHTML = `
-                    <div class="c-header">
-                        <div>
-                            <div class="c-name">${c.name} <span class="icon-badge" style="margin-left:8px;">${badges}</span></div>
-                            <div class="c-meta">Last: ${c.lastCut} | <span style="color:${status==='good'?'var(--text-sub)':'var(--text-main)'}">Due: ${nextDue}</span></div>
-                        </div>
-                        <div class="c-stats">
-                            <div>${c.totalCuts} Cuts</div>
-                            <div style="margin-top:2px;">${c.loyalty}/5</div>
-                        </div>
+                const div = document.createElement('div');
+                div.className = `client-card ${stat}`;
+                div.onclick = () => showClient(c.id);
+                div.innerHTML = `
+                    <div class="cc-top">
+                        <div class="cc-name">${c.name} ${badges}</div>
+                        <div class="cc-due">${getDueStr(c)}</div>
                     </div>
+                    <div class="cc-info">Last: ${c.last || 'Never'}</div>
                 `;
-                list.appendChild(card);
+                list.appendChild(div);
             });
-            
-            if(filtered.length === 0) list.innerHTML = '<div style="text-align:center; padding:30px; color:#555;">No clients found.</div>';
         }
 
-        // --- VIEW LOGIC ---
-        function openView(id) {
+        function getStatus(c) {
+            if(!c.last) return 'good';
+            const last = new Date(c.last);
+            const today = new Date();
+            const days = (today - last)/(1000*60*60*24);
+            const freqDays = (c.freq || 4) * 7;
+            if(days >= 56) return 'overdue';
+            if(days >= freqDays) return 'due';
+            return 'good';
+        }
+
+        function getDueStr(c) {
+            if(!c.last) return 'Today';
+            const last = new Date(c.last);
+            last.setDate(last.getDate() + ((c.freq||4)*7));
+            return last.toLocaleDateString(undefined, {month:'short', day:'numeric'});
+        }
+
+        // --- CLIENT VIEW ---
+        function showClient(id) {
             activeId = id;
             const c = getClient(id);
-            
             document.getElementById('vName').innerText = c.name;
-            document.getElementById('vIdInfo').innerText = c.phone + (c.address ? ` • ${c.address}` : '');
+            document.getElementById('vSub').innerText = c.phone || 'No Phone';
             
             // Badges
-            let badgeHtml = '';
-            if(c.dob && isSameMonth(c.dob)) badgeHtml += `<span style="color:var(--gold); margin-right:10px;"><i class="fas fa-birthday-cake"></i> B-Day Month</span>`;
-            if(c.firstCut && isAnniversary(c.firstCut)) badgeHtml += `<span style="color:var(--purple);"><i class="fas fa-medal"></i> Anniversary</span>`;
-            document.getElementById('vBadges').innerHTML = badgeHtml;
+            let b = '';
+            if(c.dob && isMonth(c.dob)) b += `<span style="background:var(--p-pink); color:black; padding:5px 10px; border-radius:10px; font-size:0.8rem; font-weight:bold;">🎂 Birthday Month</span>`;
+            if(c.first && isAnniversary(c.first)) b += `<span style="background:var(--p-purple); color:black; padding:5px 10px; border-radius:10px; font-size:0.8rem; font-weight:bold;">🏅 Anniversary Month</span>`;
+            document.getElementById('vBadges').innerHTML = b;
 
             // Stats
-            document.getElementById('vLoyalty').innerText = `${c.loyalty}/5`;
-            document.getElementById('vCredits').innerText = `$${c.referralCredit || 0}`;
-            document.getElementById('vTotalCuts').innerText = c.totalCuts || 0;
-            document.getElementById('vLTV').innerText = `$${Math.floor(c.totalSpent || 0)}`;
-            document.getElementById('vNotes').innerText = c.notes || 'No notes.';
+            document.getElementById('vLoyalty').innerText = `${c.loyalty||0}/5`;
+            document.getElementById('vCredit').innerText = `$${c.credit||0}`;
+            document.getElementById('vTotalCuts').innerText = c.cuts||0;
+            document.getElementById('vLTV').innerText = `$${Math.floor(c.spent||0)}`;
 
-            // Banked Cut Logic
-            const banked = c.bankedFreeCuts || 0;
-            const btnRedeem = document.getElementById('btnRedeemFree');
-            const banner = document.getElementById('bankedCutBanner');
-            
-            if (banked > 0) {
-                banner.style.display = 'block';
-                banner.innerHTML = `<i class="fas fa-star"></i> You have ${banked} Banked Free Cut(s)!`;
-                btnRedeem.style.display = 'flex';
-            } else {
-                banner.style.display = 'none';
-                btnRedeem.style.display = 'none';
-            }
+            // Contact
+            document.getElementById('btnCall').href = `tel:${c.phone}`;
+            document.getElementById('btnText').href = `sms:${c.phone}`;
+            document.getElementById('btnInsta').style.display = c.insta ? 'block' : 'none';
 
-            // Insta
-            const btnInsta = document.getElementById('btnInsta');
-            if(c.insta) {
-                btnInsta.style.display = 'flex';
-                btnInsta.onclick = () => {
-                    // Copy to clipboard logic or open
-                    window.open(`https://instagram.com/${c.insta.replace('@','')}`, '_blank');
-                };
-            } else {
-                btnInsta.style.display = 'none';
-            }
-
-            document.getElementById('viewModal').style.display = 'flex';
+            openModal('viewModal');
         }
 
-        function switchToEdit() {
-            closeModal('viewModal');
-            openEdit(activeId);
-        }
+        // --- CHECKOUT LOGIC ---
+        let checkoutTotal = 0;
+        let checkoutGiveback = 0;
+        let selectedDisc = 'none'; // none, credit, free, half, custom
 
-        // --- RECORD CUT LOGIC (COMPLEX) ---
-        function handleRecordCut() {
+        function openCheckout() {
             const c = getClient(activeId);
-            let finalPrice = 0;
-            let discount = 0;
-            let tip = 0;
+            document.getElementById('payPrice').value = c.price || 35;
+            document.getElementById('payTip').value = 0;
+            document.getElementById('customDiscBox').style.display = 'none';
+            selectedDisc = 'none';
 
-            // 1. Price Check
-            if(confirm(`Charge standard $35?`)) {
-                finalPrice = 35;
-            } else {
-                const manual = prompt("Enter price:", c.price || 35);
-                if(manual === null) return;
-                finalPrice = parseFloat(manual);
+            // Build Options
+            const opts = document.getElementById('discountList');
+            opts.innerHTML = '';
+
+            addOpt(opts, 'none', 'No Discount', true);
+            
+            if((c.banked || 0) > 0) addOpt(opts, 'free', `Redeem 1 Free Cut (Banked: ${c.banked})`);
+            if((c.credit || 0) > 0) addOpt(opts, 'credit', `Redeem $5 Credit (Bal: $${c.credit})`);
+            
+            // Birthday/Anniversary Logic
+            if( (c.dob && isMonth(c.dob)) || (c.first && isAnniversary(c.first)) ) {
+                addOpt(opts, 'half', `Redeem 50% Off (Special Month)`);
             }
 
-            // 2. Referral Credit Check
-            if(c.referralCredit > 0) {
-                if(confirm(`Client has $${c.referralCredit} credit. Apply it?`)) {
-                    // If credit covers price
-                    if(c.referralCredit >= finalPrice) {
-                        c.referralCredit -= finalPrice;
-                        discount += finalPrice;
-                        finalPrice = 0;
-                    } else {
-                        discount += c.referralCredit;
-                        finalPrice -= c.referralCredit;
-                        c.referralCredit = 0;
+            addOpt(opts, 'custom', 'Custom % Discount');
+
+            openModal('checkoutModal');
+            calcTotal();
+        }
+
+        function addOpt(parent, val, label, selected = false) {
+            const div = document.createElement('div');
+            div.className = `discount-opt ${selected ? 'selected' : ''}`;
+            div.innerText = label;
+            div.onclick = () => {
+                document.querySelectorAll('.discount-opt').forEach(d => d.classList.remove('selected'));
+                div.classList.add('selected');
+                selectedDisc = val;
+                document.getElementById('customDiscBox').style.display = val === 'custom' ? 'block' : 'none';
+                calcTotal();
+            };
+            parent.appendChild(div);
+        }
+
+        function calcTotal() {
+            const base = parseFloat(document.getElementById('payPrice').value) || 0;
+            const tip = parseFloat(document.getElementById('payTip').value) || 0;
+            let discount = 0;
+            const c = getClient(activeId);
+
+            if(selectedDisc === 'free') discount = base; // 100% off base
+            if(selectedDisc === 'half') discount = base * 0.5;
+            if(selectedDisc === 'credit') discount = Math.min(base, 5); // Max $5
+            if(selectedDisc === 'custom') {
+                const pct = parseFloat(document.getElementById('payCustomPct').value) || 0;
+                discount = base * (pct / 100);
+            }
+
+            checkoutGiveback = discount;
+            checkoutTotal = (base - discount) + tip;
+
+            document.getElementById('payTotal').innerText = `$${checkoutTotal.toFixed(2)}`;
+            document.getElementById('givebackDisplay').innerText = `Giveback: $${checkoutGiveback.toFixed(2)}`;
+        }
+
+        async function finalizeCut() {
+            const c = getClient(activeId);
+            
+            // Consume Banked/Credits
+            if(selectedDisc === 'free') {
+                c.banked = (c.banked || 0) - 1;
+            }
+            if(selectedDisc === 'credit') {
+                c.credit = Math.max(0, (c.credit || 0) - 5);
+            }
+
+            // Update Client Stats
+            c.spent = (c.spent || 0) + checkoutTotal;
+            c.giveback = (c.giveback || 0) + checkoutGiveback;
+            c.cuts = (c.cuts || 0) + 1;
+            c.last = new Date().toISOString().split('T')[0];
+
+            // Loyalty Logic (If not a free cut redemption)
+            if(selectedDisc !== 'free') {
+                c.loyalty = (c.loyalty || 0) + 1;
+                if(c.loyalty >= 6) { // 6th cut is free logic: 1..5 then 6th free? Or 1..6? 
+                    // User said: "1/5, 2/5... then bank". So after 5 cuts, they get a bank.
+                    // Let's assume hitting 6 triggers the bank.
+                     if(await customConfirm("Client reached 6th cut! Bank a free cut?")) {
+                        c.banked = (c.banked || 0) + 1;
+                        c.loyalty = 0;
                     }
                 }
             }
 
-            // 3. Tip
-            const t = prompt("Add a tip amount? (0 for none)", "0");
-            tip = parseFloat(t) || 0;
-
-            // 4. Execute
-            finishCut(c, finalPrice, discount, tip, false);
-        }
-
-        function handleRedeemFree() {
-            const c = getClient(activeId);
-            if(confirm("Redeem 1 Banked Free Cut? (Price $0, Adds $35 to Giveback)")) {
-                // Ask for tip even on free cut
-                const t = prompt("Add a tip amount?", "0");
-                const tip = parseFloat(t) || 0;
-                
-                c.bankedFreeCuts--;
-                // Value of cut is standard price (35) or custom price. Lets assume 35 for free cut value.
-                finishCut(c, 0, 35, tip, true); 
-            }
-        }
-
-        function openManualDiscount() {
-            const amt = parseFloat(prompt("Enter discount amount to track in Giveback:"));
-            if(amt) {
-                const c = getClient(activeId);
-                c.giveback = (c.giveback || 0) + amt;
-                saveData();
-                openView(activeId); // Refresh
-            }
-        }
-
-        function finishCut(c, paidPrice, discountAmt, tipAmt, isFreeRedemption) {
-            const today = new Date().toISOString().split('T')[0];
-            
-            c.lastCut = today;
-            c.totalSpent = (c.totalSpent || 0) + paidPrice + tipAmt; // Revenue includes tips? User said "for my revenue"
-            c.giveback = (c.giveback || 0) + discountAmt;
-            c.totalCuts = (c.totalCuts || 0) + 1;
-
-            // Loyalty Logic
-            if (!isFreeRedemption) {
-                c.loyalty++;
-                if (c.loyalty >= 5) { // If they just hit 5/5
-                    // They earned a free one? Or is 6th free? 
-                    // User said: "1/5, 2/5... then bank the free cuts".
-                    // So after 5th cut, they get a token.
-                    alert("Client reached 5 cuts! 1 Free Cut Banked.");
-                    c.bankedFreeCuts = (c.bankedFreeCuts || 0) + 1;
-                    c.loyalty = 0;
-                }
-            }
-
             saveData();
+            closeModal('checkoutModal');
             closeModal('viewModal');
-            renderList();
+            render();
         }
 
-        // --- EDIT/ADD LOGIC ---
-        function openAddModal() {
-            document.getElementById('editTitle').innerText = 'New Client';
-            document.getElementById('eId').value = '';
-            document.getElementById('eName').value = '';
-            document.getElementById('ePhone').value = '';
-            document.getElementById('ePrice').value = '35';
-            document.getElementById('eInsta').value = '';
-            document.getElementById('eAddress').value = '';
-            document.getElementById('eDob').value = '';
-            document.getElementById('eFirstCut').value = new Date().toISOString().split('T')[0];
-            document.getElementById('eFreq').value = '4';
-            document.getElementById('eRef').value = '';
-            document.getElementById('eNotes').value = '';
-            document.getElementById('editModal').style.display = 'flex';
-        }
-
-        function openEdit(id) {
-            const c = getClient(id);
-            document.getElementById('editTitle').innerText = 'Edit Profile';
+        // --- EDIT/SAVE CLIENT ---
+        function editClient() {
+            closeModal('viewModal');
+            const c = getClient(activeId);
+            document.getElementById('eTitle').innerText = 'Edit Client';
             document.getElementById('eId').value = c.id;
             document.getElementById('eName').value = c.name;
             document.getElementById('ePhone').value = c.phone;
-            document.getElementById('ePrice').value = c.price;
             document.getElementById('eInsta').value = c.insta;
-            document.getElementById('eAddress').value = c.address;
-            document.getElementById('eDob').value = c.dob;
-            document.getElementById('eFirstCut').value = c.firstCut;
+            document.getElementById('ePrice').value = c.price;
+            document.getElementById('eAddr').value = c.address;
             document.getElementById('eFreq').value = c.freq;
+            document.getElementById('eFirst').value = c.first;
+            document.getElementById('eDob').value = c.dob;
             document.getElementById('eRef').value = c.refBy || '';
             document.getElementById('eNotes').value = c.notes;
-            document.getElementById('editModal').style.display = 'flex';
+            openModal('editModal');
         }
 
-        function saveClient() {
-            const idVal = document.getElementById('eId').value;
-            const isNew = !idVal;
-            const id = idVal || Date.now().toString();
-            
-            const formName = document.getElementById('eName').value;
-            const formRef = document.getElementById('eRef').value;
+        function openAddModal() {
+            document.getElementById('eTitle').innerText = 'New Client';
+            document.getElementById('eId').value = '';
+            document.getElementById('eName').value = '';
+            document.getElementById('ePrice').value = 35;
+            document.getElementById('eFreq').value = 4;
+            document.getElementById('eFirst').value = new Date().toISOString().split('T')[0];
+            openModal('editModal');
+        }
 
-            // Ref Logic (Only on New)
-            let refCreditToAdd = 0;
-            if (isNew && formRef) {
-                const referrer = clients.find(c => c.name.toLowerCase() === formRef.toLowerCase());
-                if(referrer) {
-                    referrer.referralCredit = (referrer.referralCredit || 0) + 5;
-                    refCreditToAdd = 5; // New client gets 5 too
-                    alert(`Referral linked! $5 added to ${referrer.name} and new client.`);
+        async function saveClient() {
+            const id = document.getElementById('eId').value || Date.now().toString();
+            const isNew = !document.getElementById('eId').value;
+            
+            // Ref Logic
+            const refName = document.getElementById('eRef').value;
+            let creditAdd = 0;
+            if(isNew && refName) {
+                const referee = clients.find(x => x.name.toLowerCase() === refName.toLowerCase());
+                if(referee) {
+                    referee.credit = (referee.credit || 0) + 5;
+                    creditAdd = 5;
+                    await customConfirm(`Linked to ${referee.name}! $5 added to both accounts.`);
                 }
             }
 
-            const clientData = {
+            const data = {
                 id: id,
-                name: formName,
+                name: document.getElementById('eName').value,
                 phone: document.getElementById('ePhone').value,
-                price: parseFloat(document.getElementById('ePrice').value) || 35,
                 insta: document.getElementById('eInsta').value,
-                address: document.getElementById('eAddress').value,
+                address: document.getElementById('eAddr').value,
+                price: parseFloat(document.getElementById('ePrice').value),
+                freq: parseInt(document.getElementById('eFreq').value),
+                first: document.getElementById('eFirst').value,
                 dob: document.getElementById('eDob').value,
-                firstCut: document.getElementById('eFirstCut').value,
-                freq: parseInt(document.getElementById('eFreq').value) || 4,
-                refBy: formRef,
+                refBy: refName,
                 notes: document.getElementById('eNotes').value,
-                // Persist existing stats or init new
-                lastCut: isNew ? new Date().toISOString().split('T')[0] : getClient(id).lastCut,
+                // Stats persist
+                credit: isNew ? creditAdd : getClient(id).credit,
+                banked: isNew ? 0 : getClient(id).banked,
                 loyalty: isNew ? 0 : getClient(id).loyalty,
-                totalSpent: isNew ? 0 : getClient(id).totalSpent,
+                spent: isNew ? 0 : getClient(id).spent,
                 giveback: isNew ? 0 : getClient(id).giveback,
-                totalCuts: isNew ? 0 : getClient(id).totalCuts,
-                bankedFreeCuts: isNew ? 0 : (getClient(id).bankedFreeCuts || 0),
-                referralCredit: isNew ? refCreditToAdd : (getClient(id).referralCredit || 0)
+                cuts: isNew ? 0 : getClient(id).cuts,
+                last: isNew ? null : getClient(id).last
             };
 
-            if(isNew) clients.push(clientData);
+            if(isNew) clients.push(data);
             else {
-                const idx = clients.findIndex(c => c.id === id);
-                clients[idx] = { ...clients[idx], ...clientData };
+                const idx = clients.findIndex(x => x.id === id);
+                clients[idx] = data;
             }
 
             saveData();
             closeModal('editModal');
-            renderList();
+            render();
         }
-        
-        function deleteClient() {
-            const id = document.getElementById('eId').value;
-            if(confirm("Delete this client permanently?")) {
-                clients = clients.filter(c => c.id !== id);
+
+        async function deleteClient() {
+            if(await customConfirm("Permanently delete this client?")) {
+                clients = clients.filter(c => c.id !== document.getElementById('eId').value);
                 saveData();
                 closeModal('editModal');
-                renderList();
+                render();
             }
         }
 
-        function searchRef(val) {
-            const div = document.getElementById('refResults');
-            div.innerHTML = '';
-            if(val.length < 2) { div.style.display = 'none'; return; }
-            
-            const matches = clients.filter(c => c.name.toLowerCase().includes(val.toLowerCase()));
-            if(matches.length > 0) {
-                div.style.display = 'block';
-                matches.forEach(m => {
-                    const r = document.createElement('div');
-                    r.className = 'ref-result';
-                    r.innerText = m.name;
-                    r.onclick = () => {
-                        document.getElementById('eRef').value = m.name;
-                        div.style.display = 'none';
-                    }
-                    div.appendChild(r);
-                });
-            } else div.style.display = 'none';
+        // --- UTILS ---
+        function getClient(id) { return clients.find(x => x.id === id); }
+        function saveData() { localStorage.setItem('bbClients', JSON.stringify(clients)); }
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        
+        function setTab(t, btn) {
+            activeFilter = t;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            render();
         }
 
-        // --- CALENDAR & UTILS ---
-        function openSchedule() {
+        function isMonth(d) { return new Date(d).getMonth() === new Date().getMonth(); }
+        function isAnniversary(d) {
+            const dt = new Date(d);
+            const now = new Date();
+            return dt.getMonth() === now.getMonth() && dt.getFullYear() !== now.getFullYear();
+        }
+        function openInsta() {
             const c = getClient(activeId);
-            // Default time to next hour
-            const d = new Date();
-            d.setMinutes(0); d.setSeconds(0); d.setMilliseconds(0);
-            d.setHours(d.getHours() + 1);
-            
-            // Adjust to local ISO string for input
-            const localIso = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0,16);
-            document.getElementById('schedDate').value = localIso;
-            document.getElementById('schedModal').style.display = 'flex';
+            if(c.insta) window.open(`https://instagram.com/${c.insta.replace('@','')}`);
         }
 
+        // --- CUSTOM CONFIRM ---
+        function customConfirm(msg) {
+            return new Promise((resolve) => {
+                document.getElementById('cMsg').innerText = msg;
+                document.getElementById('confirmModal').style.display = 'flex';
+                document.getElementById('cYes').onclick = () => {
+                    document.getElementById('confirmModal').style.display = 'none';
+                    resolve(true);
+                };
+                document.getElementById('cNo').onclick = () => {
+                    document.getElementById('confirmModal').style.display = 'none';
+                    resolve(false);
+                };
+            });
+        }
+
+        function searchRef(val) {
+             const div = document.getElementById('refResults');
+             if(!val) { div.style.display='none'; return; }
+             const matches = clients.filter(c => c.name.toLowerCase().includes(val.toLowerCase()));
+             div.innerHTML = '';
+             if(matches.length){
+                 div.style.display='block';
+                 matches.forEach(m => {
+                     const d = document.createElement('div');
+                     d.innerText = m.name;
+                     d.style.padding='8px'; d.style.borderBottom='1px solid #444';
+                     d.onclick = () => { document.getElementById('eRef').value = m.name; div.style.display='none'; };
+                     div.appendChild(d);
+                 });
+             } else div.style.display='none';
+        }
+
+        // --- CALENDAR / SETTINGS ---
+        function openSchedule() { openModal('schedModal'); }
+        function openSettings() { openModal('settingsModal'); }
+        
         function addToCalendar() {
             const c = getClient(activeId);
-            const startStr = document.getElementById('schedDate').value;
-            const type = document.getElementById('schedLoc').value;
-            
-            const startDate = new Date(startStr);
-            const endDate = new Date(startDate.getTime() + (60 * 60 * 1000)); // 1 hour block
-            
-            const location = type === 'shop' ? settings.location : (c.address || 'Client Home');
-            
-            const formatTime = (d) => d.toISOString().replace(/-|:|\.\d\d\d/g,"");
+            const d = new Date(document.getElementById('schedDate').value);
+            const loc = document.getElementById('schedLoc').value === 'shop' ? settings.location : c.address;
+            const end = new Date(d.getTime() + 7200000); // 2 hrs
+            const fmt = (x) => x.toISOString().replace(/-|:|\.\d\d\d/g,"");
             
             const ics = `BEGIN:VCALENDAR
 VERSION:2.0
 BEGIN:VEVENT
-DTSTART:${formatTime(startDate)}
-DTEND:${formatTime(endDate)}
+DTSTART:${fmt(d)}
+DTEND:${fmt(end)}
 SUMMARY:Cut - ${c.name}
-DESCRIPTION:Notes: ${c.notes}
-LOCATION:${location}
+LOCATION:${loc}
 END:VEVENT
 END:VCALENDAR`;
-
-            const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
-            const link = document.createElement('a');
-            link.href = window.URL.createObjectURL(blob);
-            link.setAttribute('download', 'appointment.ics');
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            const blob = new Blob([ics], {type:'text/calendar;charset=utf-8'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'appt.ics';
+            a.click();
             closeModal('schedModal');
         }
 
-        // --- HELPERS ---
-        function getClient(id) { return clients.find(c => c.id === id); }
-        function saveData() { localStorage.setItem('bbClients', JSON.stringify(clients)); }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function setTab(t, btn) { 
-            currentTab = t; 
-            document.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            renderList();
-        }
-        function filterSearch(val) { renderList(val); }
-        
-        function getStatus(c) {
-            const last = new Date(c.lastCut);
-            const today = new Date();
-            const diffDays = (today - last) / (1000*60*60*24);
-            const freqDays = (c.freq || 4) * 7;
-            
-            if(diffDays >= 56) return 'overdue'; // 8 weeks
-            if(diffDays >= freqDays) return 'due';
-            return 'good';
-        }
-
-        function getNextDueDate(c) {
-            const last = new Date(c.lastCut);
-            last.setDate(last.getDate() + ((c.freq || 4) * 7));
-            return last.toLocaleDateString();
-        }
-
-        function isSameMonth(dateStr) {
-            return new Date(dateStr).getMonth() === new Date().getMonth();
-        }
-        function isAnniversary(dateStr) {
-            const d = new Date(dateStr);
-            const now = new Date();
-            return d.getMonth() === now.getMonth() && d.getDate() === now.getDate() && d.getFullYear() !== now.getFullYear();
-        }
-
-        // Settings
-        function openSettings() { document.getElementById('settingsModal').style.display = 'flex'; }
         function saveSettings() {
-            settings.location = document.getElementById('settingLoc').value;
+            settings.location = document.getElementById('setLoc').value;
             localStorage.setItem('bbSettings', JSON.stringify(settings));
             closeModal('settingsModal');
         }
-        function backupData() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({clients, settings}));
-            const dLink = document.createElement('a');
-            dLink.href = dataStr; dLink.download = "blackbook_backup.json";
-            dLink.click();
+        function exportData() {
+            const s = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({clients, settings}));
+            const a = document.createElement('a'); a.href = s; a.download = 'backup.json'; a.click();
         }
         function restoreData(input) {
-            const file = input.files[0];
-            const reader = new FileReader();
-            reader.onload = (e) => {
+            const r = new FileReader();
+            r.onload = (e) => {
                 const d = JSON.parse(e.target.result);
-                if(d.clients) {
-                    clients = d.clients; settings = d.settings || settings;
-                    saveData(); renderList(); alert("Restored!"); closeModal('settingsModal');
-                }
+                if(d.clients) { clients = d.clients; settings = d.settings||settings; saveData(); render(); alert('Done'); closeModal('settingsModal'); }
             };
-            reader.readAsText(file);
+            r.readAsText(input.files[0]);
         }
     </script>
 </body>
