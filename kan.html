@@ -140,8 +140,8 @@
         .form-label { display: block; font-size: 0.75rem; color: var(--subtext); font-weight: 800; margin-bottom: 8px; letter-spacing: 1px; }
         .form-input { width: 100%; padding: 14px; background: var(--col-bg); border: 1px solid var(--border); color: var(--text); border-radius: 12px; font-size: 1.1rem; box-sizing: border-box; margin-bottom: 18px; }
         
-        /* ALIGNMENT FIX */
-        .form-row { display: flex; gap: 12px; margin-bottom: 18px; }
+        /* FIXED ALIGNMENT FOR DATE/PRIORITY */
+        .form-row { display: flex; gap: 12px; margin-bottom: 18px; align-items: stretch; }
         .fixed-height { height: 50px; box-sizing: border-box; } /* Force height match */
         
         .prio-select { display: flex; gap: 6px; background: var(--col-bg); padding: 6px; border-radius: 14px; flex: 1; border: 1px solid var(--border); }
@@ -210,7 +210,7 @@
     <div id="save-menu" class="dropdown">
         <div class="dd-sect">AUDIO & FX</div>
         <button class="dd-item" onclick="toggleSound(); closeMenu()">🔊 Sound FX <span class="dd-badge" id="snd-stat">ON</span></button>
-        <button class="dd-item" onclick="setConfetti('square'); closeMenu()">🎉 Confetti (Default)</button>
+        <button class="dd-item" onclick="setConfetti('square'); closeMenu()">🎉 Default Confetti</button>
         <button class="dd-item" id="fx-star" onclick="setConfetti('star'); closeMenu()">⭐ Stars <span class="dd-badge">LVL 10</span></button>
         <button class="dd-item" id="fx-coin" onclick="setConfetti('coin'); closeMenu()">🪙 Coins <span class="dd-badge">LVL 20</span></button>
         <button class="dd-item" id="fx-gem" onclick="setConfetti('gem'); closeMenu()">💎 Gems <span class="dd-badge">LVL 30</span></button>
@@ -353,13 +353,15 @@
 
         function playTone(freq, type, duration) {
             if(!soundOn || !audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + duration);
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + duration);
+            } catch(e) { console.log("Audio Error", e); }
         }
 
         function sfx(type) {
@@ -533,7 +535,6 @@
             if(prestige === 0 && reqs[type] && stats.level < reqs[type]) return alert(`Locked until Level ${reqs[type]}`);
             confettiStyle = type;
             localStorage.setItem('mc_fx', type);
-            showToast(`Effect Set: ${type.toUpperCase()}`, false);
         }
 
         function launchConfetti() {
@@ -654,7 +655,9 @@
         }
 
         function openModal(id) {
-            initAudio(); // Late init fix for iOS
+            // SAFE AUDIO INIT
+            try { initAudio(); } catch(e) { console.log(e); }
+
             const t = id ? tasks.find(x => x.id === id) : { id: '', title: '', steps: [], col: 0, prio:'Med', date:'', archived:false };
             document.getElementById('t-id').value = t.id;
             document.getElementById('t-title').value = t.title;
