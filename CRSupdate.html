@@ -108,7 +108,7 @@
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: flex-start; overflow-y: auto; padding: 20px 0; }
         .modal-content { background: var(--card); width: 90%; max-width: 400px; padding: 20px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.5); margin-bottom: 80px; }
 
-        /* ZONES & FORMS */
+        /* ZONES */
         .zone { border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid transparent; }
         .z-blue { background: rgba(59, 130, 246, 0.05); border-color: rgba(59, 130, 246, 0.2); } .z-blue .z-title { color: var(--blue); }
         .z-gold { background: rgba(245, 158, 11, 0.05); border-color: rgba(245, 158, 11, 0.2); } .z-gold .z-title { color: var(--gold); }
@@ -129,20 +129,13 @@
         
         .fab { position: fixed; bottom: 30px; right: 20px; background: var(--accent); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4); cursor: pointer; border: none; z-index: 500; }
         
-        /* LIST OPTIONS */
         .list-option { width: 100%; padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; font-size: 1rem; background: var(--card); color: var(--text); text-align: left; border:none; }
-        .list-option:last-child { border-bottom: none; }
-
-        /* DROPDOWN */
         .dropdown { position: absolute; top: 60px; right: 15px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; display: none; flex-direction: column; width: 180px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 200; }
         .dropdown.show { display: flex; }
 
-        /* READ ONLY PROFILE */
         .ro-row { display: flex; padding: 12px 0; border-bottom: 1px solid var(--border); }
         .ro-lbl { width: 120px; color: var(--subtext); font-size: 0.9rem; }
         .ro-val { flex: 1; color: var(--text); font-weight: 700; font-size: 0.95rem; }
-        
-        /* STATS */
         .stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
         .stat-val { font-weight: bold; color: var(--accent); }
     </style>
@@ -251,7 +244,7 @@
                 </div>
                 <input id="cal-addr" class="form-input" placeholder="Address...">
             </div>
-            <button class="btn-main" onclick="generateICS()">ADD TO CALENDAR</button>
+            <button class="btn-main" onclick="generateICS()">ADD TO CALENDAR (2HR)</button>
             <button class="btn-full" onclick="closeModals()">Cancel</button>
         </div>
     </div>
@@ -314,7 +307,6 @@
         let shopSettings = JSON.parse(localStorage.getItem('bb_settings') || '{"addr":""}');
         let filterType = 'all';
         let tempId = null;
-        let pendingCutId = null; 
 
         if(localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
         render();
@@ -356,8 +348,7 @@
                 let lastCutTxt = 'New';
                 if(c.lastVisit) {
                     const d = new Date(c.lastVisit);
-                    // Force User Timezone to prevent day shift
-                    lastCutTxt = new Date(d.getTime() + d.getTimezoneOffset() * 60000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    lastCutTxt = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                 }
                 
                 let cardClass = daysTill < 0 ? 'card-header due' : 'card-header';
@@ -405,25 +396,41 @@
             });
         }
 
-        // --- CUT LOGIC ---
+        // --- CUT LOGIC (STREAMLINED) ---
         function startCutFlow(id) {
             const c = clients.find(x=>x.id==id);
-            if(c.free > 0) {
-                customConfirm(`🌟 Client has ${c.free} FREE CUT available.\nRedeem it now?`, 
-                    () => { 
-                        c.free--;
-                        c.redeemedVal = (c.redeemedVal || 0) + (c.price || 30); 
-                        confirmFormulaAndSave(c, 0); 
-                    },
-                    () => { proceedToPaid(c); } 
+            
+            // 1. Birthday Check
+            if(isThisWeek(c.dob)) {
+                customConfirm("🎂 Birthday Week! Redeem 1/2 OFF Cut?", 
+                    () => { proceedToPaid(c, true); }, // YES -> Half Off
+                    () => { checkFreeCut(c); }         // NO -> Check Free
                 );
             } else {
-                proceedToPaid(c);
+                checkFreeCut(c);
             }
         }
 
-        function proceedToPaid(c) {
-            const price = prompt("Price paid today? (Enter 0 if unpaid)", c.price||0);
+        function checkFreeCut(c) {
+            if(c.free > 0) {
+                customConfirm(`🌟 Client has ${c.free} FREE CUT available.\nRedeem it now?`, 
+                    () => { // YES -> Redeem Free
+                        c.free--;
+                        c.redeemedVal = (c.redeemedVal || 0) + (c.price || 30);
+                        processStats(c, 0); // Price 0
+                    },
+                    () => { proceedToPaid(c, false); } // NO -> Paid
+                );
+            } else {
+                proceedToPaid(c, false);
+            }
+        }
+
+        function proceedToPaid(c, isHalfOff) {
+            let defPrice = c.price || 0;
+            if(isHalfOff) defPrice = defPrice / 2;
+
+            const price = prompt("Price paid today?", defPrice);
             if(price === null) return;
             let paid = parseFloat(price)||0;
 
@@ -433,25 +440,10 @@
                     let creditUsed = parseFloat(use)||0;
                     if(creditUsed > c.credit) creditUsed = c.credit;
                     c.credit -= creditUsed;
-                    c.redeemedVal = (c.redeemedVal || 0) + creditUsed; 
+                    c.redeemedVal = (c.redeemedVal || 0) + creditUsed;
                 }
             }
-            confirmFormulaAndSave(c, paid);
-        }
-
-        function confirmFormulaAndSave(c, paid) {
-            customConfirm("Did the haircut style change?", 
-                () => { 
-                    tempId = c.id; 
-                    openClientModal(c.id);
-                    processStats(c, paid);
-                    alert("Stats updated. Update style formula then Save.");
-                }, 
-                () => { 
-                    processStats(c, paid);
-                    save(); render();
-                }
-            );
+            processStats(c, paid);
         }
 
         function processStats(c, paid) {
@@ -466,38 +458,10 @@
             } else {
                 c.loyalty = currentPoints;
             }
+            save(); render();
         }
 
-        // --- CREDIT MANAGER ---
-        function openCreditModal() {
-            updateRefList();
-            document.getElementById('credit-input').value = '';
-            document.getElementById('credit-modal').style.display = 'flex';
-        }
-        function applyCredit() {
-            const name = document.getElementById('credit-input').value;
-            const c = clients.find(x => x.name.toLowerCase() === name.toLowerCase());
-            if(c) { c.credit += 5; save(); render(); alert(`$5 added to ${c.name}`); closeModals(); }
-            else { alert("Client not found."); }
-        }
-
-        // --- GLOBAL STATS ---
-        function openSettings() {
-            let rev = clients.reduce((a,b)=>a+(b.ltv||0),0);
-            let cuts = clients.reduce((a,b)=>a+(b.cuts||0),0);
-            let refs = clients.filter(c=>c.ref && c.ref.length>0).length;
-            let red = clients.reduce((a,b)=>a+(b.redeemedVal||0),0);
-
-            document.getElementById('st-rev').innerText = `$${rev}`;
-            document.getElementById('st-cuts').innerText = cuts;
-            document.getElementById('st-ref').innerText = refs;
-            document.getElementById('st-red').innerText = `$${red}`;
-
-            document.getElementById('s-shop-addr').value = shopSettings.addr;
-            document.getElementById('settings-modal').style.display = 'flex';
-        }
-
-        // --- SCHEDULING (DATA URI FIX) ---
+        // --- SCHEDULING (2HR + IOS DATA URI) ---
         function openSchedule(id) {
             const c=clients.find(x=>x.id==id); document.getElementById('cal-id').value=id;
             document.getElementById('cal-date').value=new Date().toISOString().split('T')[0];
@@ -514,19 +478,23 @@
             if(!d||!t) return alert("Date/Time needed");
             
             const startRaw = d.replace(/-/g, '') + 'T' + t.replace(/:/g, '') + '00';
-            let h = parseInt(t.split(':')[0]); let m = parseInt(t.split(':')[1]) + 45;
-            if(m>=60) { h++; m-=60; }
+            
+            // 2 HOURS = 120 mins
+            let h = parseInt(t.split(':')[0]) + 2; 
+            let m = parseInt(t.split(':')[1]);
+            if(h>=24) h-=24; // Simple wrap
+            
             const endRaw = d.replace(/-/g, '') + 'T' + (h<10?'0':'')+h + (m<10?'0':'')+m + '00';
 
             const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Cut: ${c.name}\nDTSTART:${startRaw}\nDTEND:${endRaw}\nLOCATION:${loc}\nDESCRIPTION:${c.notes||'Haircut'}\nEND:VEVENT\nEND:VCALENDAR`;
             
-            // DATA URI METHOD (IOS COMPATIBLE)
+            // Data URI for iOS
             const uri = "data:text/calendar;charset=utf8," + encodeURIComponent(ics);
             window.location.href = uri;
             closeModals();
         }
 
-        // --- UTILS ---
+        // --- UTILS & GLOBAL ---
         function updateRefList() {
             const dl = document.getElementById('ref-list'); dl.innerHTML = '';
             clients.forEach(cl => { dl.innerHTML += `<option value="${cl.name}">`; });
@@ -537,13 +505,11 @@
             updateRefList();
             document.getElementById('client-modal').style.display = 'flex';
         }
-        
         function saveClient() {
             const id = document.getElementById('c-id').value;
             const name = document.getElementById('c-name').value;
             if(!name) return alert("Name required");
             const ref = document.getElementById('c-ref').value;
-            
             let data = {
                 name, phone: document.getElementById('c-phone').value,
                 price: parseFloat(document.getElementById('c-price').value)||0,
@@ -552,27 +518,16 @@
                 freq: parseInt(document.getElementById('c-freq').value)||0, lastVisit: document.getElementById('c-last').value,
                 sides: document.getElementById('c-sides').value, top: document.getElementById('c-top').value, notes: document.getElementById('c-notes').value
             };
-
-            if(id) {
-                const idx = clients.findIndex(x=>x.id==id);
-                clients[idx] = {...clients[idx], ...data};
-            } else {
-                data.id = Date.now().toString(); data.cuts=0; data.free=0; data.credit=0; data.ltv=0; data.loyalty=0; data.redeemedVal=0;
-                clients.push(data);
-                if(ref) {
-                    const referrer = clients.find(c => c.name.toLowerCase() === ref.toLowerCase() && c.id !== data.id);
-                    if(referrer) { referrer.credit+=5; data.credit+=5; alert("Referral linked! $5 credits."); }
-                }
+            if(id) { const idx = clients.findIndex(x=>x.id==id); clients[idx] = {...clients[idx], ...data}; } 
+            else { data.id = Date.now().toString(); data.cuts=0; data.free=0; data.credit=0; data.ltv=0; data.loyalty=0; data.redeemedVal=0; clients.push(data); 
+                if(ref) { const referrer = clients.find(c => c.name.toLowerCase() === ref.toLowerCase() && c.id !== data.id); if(referrer) { referrer.credit+=5; data.credit+=5; alert("Referral linked! $5 credits."); }}
             }
             save(); closeModals(); render();
         }
-
         function viewFull(id) {
             const c = clients.find(x=>x.id==id); tempId=id;
             document.getElementById('ro-title').innerText = c.name;
-            
             const fmt = (d) => d ? new Date(d).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) : '-';
-
             let html = `<div class="ro-row"><div class="ro-lbl">Phone</div><div class="ro-val">${c.phone||'-'}</div></div>
                         <div class="ro-row"><div class="ro-lbl">Address</div><div class="ro-val">${c.addr||'-'}</div></div>
                         <div class="ro-row"><div class="ro-lbl">Social</div><div class="ro-val">${c.social||'-'}</div></div>
@@ -585,54 +540,26 @@
             document.getElementById('profile-modal').style.display = 'flex';
         }
         function editFromProfile() { closeModals(); openClientModal(tempId); }
-
         function openText(id) {
-            const c = clients.find(x=>x.id==id);
-            if(!c.phone) return alert("No phone.");
+            const c = clients.find(x=>x.id==id); if(!c.phone) return alert("No phone.");
             const n = c.name.split(' ')[0];
-            const opts = [
-                {lbl:"Running Late", txt:`Hey ${n}, running a bit behind schedule. Thanks!`},
-                {lbl:"Confirm Cut", txt:`Hey ${n}, confirming our cut tomorrow. Still good?`},
-                {lbl:"Follow Up", txt:`Hey ${n}, checking in on the fresh cut. All good?`},
-                {lbl:"Custom", txt:''}
-            ];
+            const opts = [{lbl:"Running Late", txt:`Hey ${n}, running a bit behind schedule. Thanks!`}, {lbl:"Confirm Cut", txt:`Hey ${n}, confirming our cut tomorrow. Still good?`}, {lbl:"Follow Up", txt:`Hey ${n}, checking in on the fresh cut. All good?`}, {lbl:"Custom", txt:''}];
             const sep = navigator.userAgent.match(/iPhone|iPad/i) ? '&' : '?';
-            openListModal("Send Text", opts.map(o=>({
-                lbl: o.lbl, fn: ()=>{ window.location = `sms:${c.phone}${sep}body=${encodeURIComponent(o.txt)}`; }
-            })));
+            openListModal("Send Text", opts.map(o=>({lbl: o.lbl, fn: ()=>{ window.location = `sms:${c.phone}${sep}body=${encodeURIComponent(o.txt)}`; }})));
         }
-
-        // --- CORE ---
-        function updateDash() {
-            const today=new Date(); today.setHours(0,0,0,0);
-            let counts={due:0, bday:0, ghost:0, all:clients.length};
-            clients.forEach(c=>{
-                if(getDueDate(c)<=today) counts.due++;
-                if(isThisWeek(c.dob)) counts.bday++;
-                if(c.lastVisit && Math.ceil((today-new Date(c.lastVisit))/86400000)>90) counts.ghost++;
-            });
-            document.getElementById('d-due').innerText=counts.due; document.getElementById('d-bday').innerText=counts.bday;
-            document.getElementById('d-ghost').innerText=counts.ghost; document.getElementById('d-all').innerText=counts.all;
+        function openCreditModal() { updateRefList(); document.getElementById('credit-input').value=''; document.getElementById('credit-modal').style.display='flex'; }
+        function applyCredit() { const name=document.getElementById('credit-input').value; const c=clients.find(x=>x.name.toLowerCase()===name.toLowerCase()); if(c){c.credit+=5; save(); render(); alert(`$5 added to ${c.name}`); closeModals();}else{alert("Client not found.");} }
+        function openSettings() {
+            let rev=clients.reduce((a,b)=>a+(b.ltv||0),0); let cuts=clients.reduce((a,b)=>a+(b.cuts||0),0); let refs=clients.filter(c=>c.ref&&c.ref.length>0).length; let red=clients.reduce((a,b)=>a+(b.redeemedVal||0),0);
+            document.getElementById('st-rev').innerText=`$${rev}`; document.getElementById('st-cuts').innerText=cuts; document.getElementById('st-ref').innerText=refs; document.getElementById('st-red').innerText=`$${red}`;
+            document.getElementById('s-shop-addr').value=shopSettings.addr; document.getElementById('settings-modal').style.display='flex';
         }
-        function customConfirm(msg,yes,no) {
-            document.getElementById('confirm-msg').innerText=msg; document.getElementById('confirm-modal').style.display='flex';
-            document.getElementById('btn-yes').onclick=()=>{document.getElementById('confirm-modal').style.display='none';yes();};
-            document.getElementById('btn-no').onclick=()=>{document.getElementById('confirm-modal').style.display='none';if(no)no();};
-        }
-        function openListModal(title, options, callback) {
-            document.getElementById('list-title').innerText = title;
-            const container = document.getElementById('list-options'); container.innerHTML = '';
-            options.forEach(o => {
-                const btn = document.createElement('button'); btn.className = 'list-option';
-                btn.innerText = o.lbl; btn.onclick = () => { o.fn(); closeModals(); if(callback) callback(); };
-                container.appendChild(btn);
-            });
-            document.getElementById('list-modal').style.display = 'flex';
-        }
+        function customConfirm(msg,yes,no) { document.getElementById('confirm-msg').innerText=msg; document.getElementById('confirm-modal').style.display='flex'; document.getElementById('btn-yes').onclick=()=>{document.getElementById('confirm-modal').style.display='none';yes();}; document.getElementById('btn-no').onclick=()=>{document.getElementById('confirm-modal').style.display='none';if(no)no();}; }
+        function openListModal(title, options, callback) { document.getElementById('list-title').innerText=title; const c=document.getElementById('list-options'); c.innerHTML=''; options.forEach(o=>{const b=document.createElement('button'); b.className='list-option'; b.innerText=o.lbl; b.onclick=()=>{o.fn(); closeModals(); if(callback)callback();}; c.appendChild(b);}); document.getElementById('list-modal').style.display='flex'; }
         function getDueDate(c) { if(!c.lastVisit||!c.freq)return null; const d=new Date(c.lastVisit); d.setDate(d.getDate()+(c.freq*7)); d.setHours(0,0,0,0); return d; }
         function isThisWeek(dStr) { if(!dStr)return false; const d=new Date(dStr); const n=new Date(); n.setHours(0,0,0,0); const ty=new Date(n.getFullYear(),d.getMonth(),d.getDate()+1); const diff=Math.ceil((ty-n)/86400000); return diff>=0&&diff<=7; }
         function getYears(dStr) { if(!dStr)return 0; return new Date().getFullYear()-new Date(dStr).getFullYear(); }
-        function setToday(id) { document.getElementById(id).value = new Date().toISOString().split('T')[0]; }
+        function setToday(id) { document.getElementById(id).value=new Date().toISOString().split('T')[0]; }
         function fill(id,v) { document.getElementById(id).value=v; }
         function filter(t,el) { filterType=t; document.querySelectorAll('.dash-card').forEach(d=>d.classList.remove('active')); el.classList.add('active'); render(); }
         function toggleMenu() { document.getElementById('save-menu').classList.toggle('show'); }
@@ -640,7 +567,6 @@
         function closeModals() { document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); }
         function save() { localStorage.setItem('bb_clients_v3', JSON.stringify(clients)); }
         function saveSettings() { shopSettings.addr=document.getElementById('s-shop-addr').value; localStorage.setItem('bb_settings', JSON.stringify(shopSettings)); closeModals(); }
-        function delClient(id) { customConfirm("Delete?", ()=>{clients=clients.filter(x=>x.id!=id); save(); render();}); }
         function exportData(type) { toggleMenu(); if(type==='json'){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(clients)],{type:'application/json'})); a.download=`bb_${Date.now()}.json`; a.click();} else { let csv="Name,Phone,LTV\n"+clients.map(c=>`"${c.name}","${c.phone}",${c.ltv}`).join('\n'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=`bb.csv`; a.click(); }}
         function importData(el) { if(!el.files[0])return; const fr=new FileReader(); fr.onload=e=>{clients=JSON.parse(e.target.result); save(); render(); alert("Restored!");}; fr.readAsText(el.files[0]); }
     </script>
