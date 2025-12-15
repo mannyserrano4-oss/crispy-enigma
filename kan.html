@@ -346,6 +346,7 @@
             localStorage.setItem('mc_xp', userXP);
             localStorage.setItem('mc_prestige', prestige);
             const stats = getLevel(userXP);
+            
             const range = stats.nextReq - stats.prevReq;
             const current = userXP - stats.prevReq;
             const pct = Math.max(0, Math.min(100, (current / range) * 100));
