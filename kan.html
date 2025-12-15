@@ -96,7 +96,7 @@
         
         .empty-msg { text-align: center; color: var(--subtext); font-style: italic; font-size: 0.8rem; margin-top: 50px; opacity: 0.5; }
 
-        /* CARDS */
+        /* ANIMATED CARDS */
         .card { 
             background: var(--card-bg); padding: 16px; border-radius: var(--radius); 
             box-shadow: var(--shadow); transition: transform 0.2s, opacity 0.2s; 
@@ -104,14 +104,7 @@
         }
         .card:active { transform: scale(0.98); }
         
-        .card-actions { display:flex; gap:10px; margin-top:10px; justify-content:space-between; align-items:center;}
-        .btn-quick { background: var(--col-bg); border:1px solid var(--border); color:var(--text); width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold;}
-
-        @keyframes slideOutRight { to { transform: translateX(100%); opacity: 0; } }
-        @keyframes slideOutLeft { to { transform: translateX(-100%); opacity: 0; } }
         @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .slide-right { animation: slideOutRight 0.3s forwards; }
-        .slide-left { animation: slideOutLeft 0.3s forwards; }
         .slide-enter { animation: slideIn 0.3s forwards; }
 
         .card-top { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center; }
@@ -127,6 +120,9 @@
         .progress-track { background: var(--border); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 12px; }
         .progress-fill { height: 100%; background: var(--p-green); width: 0%; transition: width 0.3s; }
         .card-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--subtext); margin-top: 8px; font-weight: 600; }
+        
+        .card-actions { display:flex; gap:10px; margin-top:10px; justify-content:space-between; align-items:center;}
+        .btn-quick { background: var(--col-bg); border:1px solid var(--border); color:var(--text); width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold;}
 
         .fab { position: fixed; bottom: 30px; right: 20px; background: var(--p-purple); color: #000; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; box-shadow: 0 8px 30px rgba(0,0,0,0.4); cursor: pointer; border: none; z-index: 999999; transition: transform 0.2s; }
         .fab:active { transform: rotate(90deg); }
@@ -134,24 +130,20 @@
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: flex-start; overflow-y: auto; padding: 20px 0; }
         .modal-content { background: var(--card-bg); width: 90%; max-width: 450px; padding: 25px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: 0 20px 60px rgba(0,0,0,0.6); margin-bottom: 80px; }
         
-        #story-modal .modal-content { background: #1a1a1a; border: 2px solid #b45309; }
-        .story-header { font-family: Georgia, serif; text-align: center; color: #fcd34d; font-size: 1.5rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
-        .story-body { font-family: Georgia, serif; color: #e7e5e4; line-height: 1.6; font-size: 1.1rem; white-space: pre-wrap; height: 60vh; overflow-y: auto; padding-right: 10px; }
-        .story-lock { text-align: center; color: #666; padding: 50px 0; font-style: italic; }
-
         .form-label { display: block; font-size: 0.75rem; color: var(--subtext); font-weight: 800; margin-bottom: 8px; letter-spacing: 1px; }
-        .form-input { width: 100%; padding: 14px; background: var(--col-bg); border: 1px solid var(--border); color: var(--text); border-radius: 12px; font-size: 1.1rem; box-sizing: border-box; margin-bottom: 18px; }
         
-        /* FIXED ALIGNMENT */
-        .form-row { display: flex; gap: 12px; margin-bottom: 18px; align-items: stretch; }
-        .fixed-height { height: 50px; box-sizing: border-box; }
-        
-        .prio-select { display: flex; gap: 6px; background: var(--col-bg); padding: 6px; border-radius: 14px; flex: 1; border: 1px solid var(--border); }
-        .prio-opt { flex: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 0.85rem; font-weight: bold; cursor: pointer; color: var(--subtext); transition: 0.2s; }
-        .prio-opt.active[data-val="Low"] { background: var(--p-blue); color: #000; }
-        .prio-opt.active[data-val="Med"] { background: var(--p-orange); color: #000; }
-        .prio-opt.active[data-val="High"] { background: var(--p-red); color: #000; }
+        /* UNIFORM INPUTS */
+        .uniform-input { 
+            width: 100%; height: 50px; padding: 0 14px; 
+            background: var(--col-bg); border: 1px solid var(--border); 
+            color: var(--text); border-radius: 12px; font-size: 1.1rem; 
+            box-sizing: border-box; margin-bottom: 18px; 
+            font-family: inherit;
+        }
+        select.uniform-input { -webkit-appearance: none; appearance: none; } /* Removes default arrow on iOS */
 
+        .form-row { display: flex; gap: 12px; margin-bottom: 18px; align-items: stretch; }
+        
         .check-item { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; padding: 5px 0; }
         .check-box { width: 28px; height: 28px; border-radius: 8px; border: 2px solid var(--subtext); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
         .check-box.checked { background: var(--p-green); border-color: var(--p-green); }
@@ -164,6 +156,7 @@
         .btn-sec { width: 100%; padding: 14px; background: transparent; border: 1px solid var(--border); color: var(--subtext); border-radius: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 0.95rem; }
         .btn-cal { background: var(--col-bg); color: var(--text); border: 1px solid var(--border); padding: 10px; border-radius: 10px; font-size: 0.85rem; cursor: pointer; margin-top: 5px; width: 100%; text-align: center;}
 
+        /* TOAST & CODEX */
         #xp-toast { position: fixed; top: 90px; left: 50%; transform: translateX(-50%); background: var(--p-green); color: black; font-weight: 900; padding: 10px 20px; border-radius: 20px; opacity: 0; pointer-events: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: opacity 0.3s, transform 0.3s; z-index: 2000; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
         #xp-toast.loss { background: var(--p-red); }
         #xp-toast.crit { background: var(--gold); border: 2px solid white; transform: translateX(-50%) scale(1.2); }
@@ -181,6 +174,12 @@
         #codex-popup.active { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
         .codex-text { font-style: italic; font-size: 0.9rem; color: var(--text); margin-bottom: 5px; }
         .codex-src { font-size: 0.7rem; color: var(--p-purple); font-weight: bold; text-transform: uppercase; }
+        
+        /* STORY */
+        #story-modal .modal-content { background: #1a1a1a; border: 2px solid #b45309; }
+        .story-header { font-family: Georgia, serif; text-align: center; color: #fcd34d; font-size: 1.5rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
+        .story-body { font-family: Georgia, serif; color: #e7e5e4; line-height: 1.6; font-size: 1.1rem; white-space: pre-wrap; height: 60vh; overflow-y: auto; padding-right: 10px; }
+        .story-lock { text-align: center; color: #666; padding: 50px 0; font-style: italic; }
     </style>
 </head>
 <body>
@@ -257,27 +256,26 @@
             <h2 style="margin-top:0; text-align:center;">Mission Brief</h2>
             <input type="hidden" id="t-id">
             <span class="form-label">MISSION OBJECTIVE</span>
-            <input id="t-title" class="form-input" placeholder="e.g. Campaign Launch">
+            <input id="t-title" class="uniform-input" placeholder="e.g. Campaign Launch">
             <div class="form-row">
                 <div style="flex:1">
                     <span class="form-label">DEADLINE</span>
-                    <input type="date" id="t-date" class="form-input fixed-height" style="margin-bottom:0;">
+                    <input type="date" id="t-date" class="uniform-input" style="margin-bottom:0;">
                     <button class="btn-cal" onclick="addToCalendar()" id="btn-cal-sync" style="display:none;">📅 Sync</button>
                 </div>
                 <div style="flex:1">
                     <span class="form-label">PRIORITY</span>
-                    <div class="prio-select fixed-height">
-                        <div class="prio-opt" onclick="setPrio('Low')" data-val="Low">Low</div>
-                        <div class="prio-opt" onclick="setPrio('Med')" data-val="Med">Med</div>
-                        <div class="prio-opt" onclick="setPrio('High')" data-val="High">High</div>
-                    </div>
-                    <input type="hidden" id="t-prio" value="Med">
+                    <select id="t-prio" class="uniform-input" style="margin-bottom:0;">
+                        <option value="Low">Low</option>
+                        <option value="Med" selected>Med</option>
+                        <option value="High">High</option>
+                    </select>
                 </div>
             </div>
             <span class="form-label">TACTICAL CHECKLIST (+10 XP)</span>
             <div id="checklist-container"></div>
             <div class="form-row" style="margin-top:10px;">
-                <input id="new-step-input" class="form-input" placeholder="+ Add Step (Press Enter)" style="margin-bottom:0;" onkeypress="handleStepEnter(event)">
+                <input id="new-step-input" class="uniform-input" placeholder="+ Add Step (Press Enter)" style="margin-bottom:0;" onkeypress="handleStepEnter(event)">
             </div>
             
             <div class="form-row" id="move-controls" style="margin-top:20px; display:none;">
@@ -364,7 +362,7 @@
             
             document.getElementById('lvl-badge').innerText = badgeText;
             document.getElementById('xp-fill').style.width = `${pct}%`;
-            // FIXED: Ensuring this ID exists
+            // Fixed variable call
             const xpText = document.getElementById('xp-text');
             if(xpText) xpText.innerText = `${userXP} / ${stats.nextReq}`;
             
@@ -432,12 +430,39 @@
             const t = document.getElementById('xp-toast');
             t.querySelector('span').innerText = msg;
             t.className = isLoss ? 'loss' : '';
+            
+            if(isLoss && lastDeletedTask && prestige >= 1) {
+                if(!t.querySelector('.btn-undo')) {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-undo';
+                    btn.innerText = 'TIME WARP (UNDO)';
+                    btn.onclick = undoDelete;
+                    t.appendChild(btn);
+                }
+            } else {
+                const existingBtn = t.querySelector('.btn-undo');
+                if(existingBtn) existingBtn.remove();
+            }
+
             t.style.opacity = '1'; t.style.transform = 'translate(-50%, 0px) scale(1)';
             const bar = document.getElementById('xp-fill');
             if(isLoss) bar.classList.add('damage'); else bar.classList.remove('damage');
-            setTimeout(() => { 
+            
+            if(undoTimeout) clearTimeout(undoTimeout);
+            undoTimeout = setTimeout(() => { 
                 t.style.opacity = '0'; t.style.transform = 'translate(-50%, 10px)'; bar.classList.remove('damage'); 
-            }, 3000);
+                lastDeletedTask = null;
+            }, 5000);
+        }
+
+        function undoDelete() {
+            if(lastDeletedTask) {
+                tasks.push(lastDeletedTask);
+                updateLiveXP(lastDeletedTask.xpLost);
+                save(); render();
+                showToast("TIMELINE RESTORED", false);
+                lastDeletedTask = null;
+            }
         }
 
         function checkUnlocks(level) {
@@ -600,14 +625,16 @@
             document.getElementById('t-id').value = t.id;
             document.getElementById('t-title').value = t.title;
             document.getElementById('t-date').value = t.date;
-            setPrio(t.prio || 'Med');
+            document.getElementById('t-prio').value = t.prio || 'Med'; // Sync Select Box
+            
             document.getElementById('btn-cal-sync').style.display = (t.date && t.id) ? 'block' : 'none';
             document.getElementById('btn-archive-toggle').innerText = t.archived ? "🔥 Thaw" : "🧊 Cryo-Sleep";
             const container = document.getElementById('checklist-container');
             container.innerHTML = '';
             t.steps.forEach(s => addCheckItem(s.text, s.done));
             if(t.steps.length === 0) addCheckItem(); 
-            // SAFETY CHECK: Ensure move-controls exists before accessing style
+            
+            // Safety Check for missing elements
             const moveControls = document.getElementById('move-controls');
             if(moveControls) moveControls.style.display = id ? 'flex' : 'none';
             
@@ -627,7 +654,7 @@
                 if(val) {
                     addCheckItem(val);
                     document.getElementById('new-step-input').value = '';
-                    setTimeout(() => { const inputs = document.querySelectorAll('.check-text'); if(inputs.length > 0) inputs[inputs.length-1].focus(); }, 50);
+                    // No focus shift needed, stay in input
                 }
             }
         }
@@ -636,7 +663,7 @@
             const id = document.getElementById('t-id').value;
             const title = document.getElementById('t-title').value;
             if(!title) return alert("Title required");
-            const prio = document.getElementById('t-prio').value;
+            const prio = document.getElementById('t-prio').value; // Get value from SELECT
             const date = document.getElementById('t-date').value;
             const steps = [];
             document.querySelectorAll('.check-item').forEach(el => {
@@ -653,7 +680,7 @@
             save(); closeModal(); render();
         }
 
-        function setPrio(val) { document.getElementById('t-prio').value = val; document.querySelectorAll('.prio-opt').forEach(el => { el.classList.remove('active'); if(el.dataset.val === val) el.classList.add('active'); }); }
+        // REMOVED setPrio function as we use <select> now
         function toggleArchive() { const id = document.getElementById('t-id').value; const idx = tasks.findIndex(x => x.id === id); if(idx > -1) { tasks[idx].archived = !tasks[idx].archived; save(); closeModal(); render(); } }
         function toggleArchiveView() { showArchive = !showArchive; render(); }
         function save() { localStorage.setItem('mc_tasks', JSON.stringify(tasks)); }
