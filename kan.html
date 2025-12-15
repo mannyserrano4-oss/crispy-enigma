@@ -42,7 +42,7 @@
         body.theme-glitch .card-title { text-shadow: 2px 0 var(--p-red), -2px 0 var(--p-blue); }
 
         body { background-color: var(--bg); color: var(--text); font-family: var(--font-main); margin: 0; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; transition: background 0.5s, color 0.5s; }
-        body.zen-mode .header, body.zen-mode .xp-bar-container, body.zen-mode .fab { display: none !important; }
+        body.zen-mode .header, body.zen-mode .xp-bar-container, body.zen-mode .fab, body.zen-mode .control-deck { display: none !important; }
         body.zen-mode .board { height: 100vh; padding-top: max(20px, env(safe-area-inset-top)); }
         #exit-zen { position: fixed; top: 10px; right: 10px; z-index: 1000; opacity: 0.3; display: none; }
         body.zen-mode #exit-zen { display: block; }
@@ -57,6 +57,14 @@
         .header { padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
         h1 { margin: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; color: var(--p-blue); font-weight: 900; font-family: var(--font-head); }
         .icon-btn { font-size: 1.4rem; background: none; border: none; cursor: pointer; padding: 8px; opacity: 0.8; color: var(--text); }
+
+        /* CONTROL DECK (Search + Briefing) */
+        .control-deck { padding: 0 20px 10px 20px; display: flex; gap: 15px; align-items: center; }
+        .radar-box { flex: 1; position: relative; }
+        .radar-input { width: 100%; background: var(--col-bg); border: 1px solid var(--border); border-radius: 20px; padding: 8px 15px 8px 35px; color: var(--text); font-family: inherit; font-size: 0.9rem; box-sizing: border-box; }
+        .radar-input:focus { outline: none; border-color: var(--p-blue); }
+        .radar-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); opacity: 0.5; font-size: 0.8rem; }
+        .briefing { font-size: 0.7rem; color: var(--subtext); font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40%; text-align: right; }
 
         .board { flex: 1; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding: 10px; gap: 15px; scroll-behavior: smooth; }
         .column { min-width: 88vw; background: var(--col-bg); border-radius: var(--radius); display: flex; flex-direction: column; scroll-snap-align: center; border: 1px solid var(--border); }
@@ -84,6 +92,8 @@
         .card-date.overdue { background: var(--p-red); color: #000; }
         .prio-pill { font-size: 0.65rem; padding: 3px 8px; border-radius: 10px; font-weight: 800; text-transform: uppercase; margin-right: 5px; color:#000; }
         .pill-High { background: var(--p-red); } .pill-Med { background: var(--p-orange); } .pill-Low { background: var(--p-blue); }
+        .tag-pill { font-size: 0.65rem; padding: 3px 8px; border-radius: 10px; font-weight: 800; text-transform: uppercase; background: var(--border); color: var(--text); margin-right: 5px; }
+        
         .progress-track { background: var(--border); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 12px; }
         .progress-fill { height: 100%; background: var(--p-green); width: 0%; transition: width 0.3s; }
         .card-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--subtext); margin-top: 8px; font-weight: 600; }
@@ -151,6 +161,14 @@
         <div class="xp-text" id="xp-text">0 XP</div>
     </div>
 
+    <div class="control-deck">
+        <div class="radar-box">
+            <span class="radar-icon">🔍</span>
+            <input type="text" id="radar-search" class="radar-input" placeholder="Radar Search..." onkeyup="filterTasks()">
+        </div>
+        <div class="briefing" id="briefing-text">Loading...</div>
+    </div>
+
     <div id="xp-toast"><span>+10 XP</span></div>
     
     <div id="codex-popup">
@@ -215,12 +233,11 @@
             <h2 id="v-title" style="margin-top:0; text-align:center;"></h2>
             <div class="card-meta" style="margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:10px;">
                 <span id="v-prio" class="prio-pill"></span>
+                <span id="v-tag" class="tag-pill" style="display:none;"></span>
                 <span id="v-date" class="card-date"></span>
             </div>
-            
             <span class="form-label">TACTICAL STATUS</span>
             <div id="v-checks" style="margin-bottom:20px;"></div>
-
             <button class="btn-main" onclick="switchToEdit()">✏️ EDIT MISSION</button>
             <button class="btn-sec" onclick="closeViewer()" style="border:none;">Close</button>
         </div>
@@ -232,6 +249,10 @@
             <input type="hidden" id="e-id">
             <span class="form-label">MISSION OBJECTIVE</span>
             <input id="e-title" class="uniform-input input-title" placeholder="e.g. Campaign Launch">
+            
+            <span class="form-label">CATEGORY TAG</span>
+            <input id="e-tag" class="uniform-input input-base" placeholder="e.g. Work, Gym, Life">
+
             <div class="form-row">
                 <div style="flex:1">
                     <span class="form-label">DEADLINE</span>
@@ -294,6 +315,7 @@
         let currentChapter = 1;
         let currentViewId = null;
         let taskToDeleteId = null;
+        let searchTerm = "";
         
         const RANKS = ["Rookie", "Operative", "Specialist", "Tactician", "Mercenary", "Commander", "Warlord", "Vanguard", "Titan", "Legend"];
         const CODEX = [
@@ -321,15 +343,41 @@
             updateXP();
         }
 
+        // --- FILTERING ---
+        function filterTasks() {
+            searchTerm = document.getElementById('radar-search').value.toLowerCase();
+            render();
+        }
+
+        // --- RENDER ENGINE ---
         function render() {
             [0, 1, 2].forEach(i => { document.getElementById(`col-${i}`).innerHTML = ''; document.getElementById(`count-${i}`).innerText = '0'; });
             const today = new Date().toISOString().split('T')[0];
+            
+            // Briefing Calculations
+            let activeCount = 0;
+            let highPrioCount = 0;
+
             tasks.forEach(t => {
                 if (showArchive && !t.archived) return;
                 if (!showArchive && t.archived) return;
+                
+                // FILTER LOGIC
+                const tag = t.tag || '';
+                if(searchTerm && !t.title.toLowerCase().includes(searchTerm) && !tag.toLowerCase().includes(searchTerm)) {
+                    return;
+                }
+
+                // Briefing Logic
+                if(t.col === 1 && !t.archived) {
+                    activeCount++;
+                    if(t.prio === 'High') highPrioCount++;
+                }
+
                 const total = t.steps.length;
                 const done = t.steps.filter(s => s.done).length;
                 const pct = total === 0 ? 0 : (done / total) * 100;
+                
                 let dateHtml = '';
                 if(t.date) {
                     const isOverdue = t.date < today && t.col !== 2;
@@ -337,12 +385,20 @@
                     const dateStr = dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
                     dateHtml = `<span class="card-date ${isOverdue?'overdue':''}">${dateStr}</span>`;
                 }
+
                 const div = document.createElement('div');
                 div.className = `card slide-enter p-${t.prio||'Med'}`;
                 div.id = `card-${t.id}`;
                 div.onclick = () => openViewer(t.id);
+                
+                // ADD TAG PILL
+                const tagHtml = t.tag ? `<span class="tag-pill">${t.tag}</span>` : '';
+
                 div.innerHTML = `<div class="card-top"><span class="card-title">${t.title}</span>${dateHtml}</div>
-                                 <span class="prio-pill pill-${t.prio}">${t.prio}</span>
+                                 <div style="margin-bottom:5px;">
+                                    <span class="prio-pill pill-${t.prio}">${t.prio}</span>
+                                    ${tagHtml}
+                                 </div>
                                  <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
                                  <div class="card-meta"><span>${done}/${total} Steps</span><span>${pct.toFixed(0)}%</span></div>
                                  <div class="card-actions">
@@ -353,30 +409,32 @@
                 const colId = t.col !== undefined ? t.col : 0;
                 document.getElementById(`col-${colId}`).appendChild(div);
             });
+            
+            // Update Headers & Briefing
             [0, 1, 2].forEach(i => { 
                 const col = document.getElementById(`col-${i}`);
                 if(col.innerHTML === '') col.innerHTML = `<div class="empty-msg">Awaiting Orders...</div>`;
                 document.getElementById(`count-${i}`).innerText = tasks.filter(t => (t.col||0) === i && !t.archived).length; 
             });
             document.querySelector('h1').innerText = showArchive ? "Cryo-Storage 🧊" : "Mission Control 🚀";
+            
+            // UPDATE BRIEFING
+            const briefingText = `Active: ${activeCount} | Critical: ${highPrioCount}`;
+            document.getElementById('briefing-text').innerText = briefingText;
         }
 
-        // --- CAMERA TRACKING (AUTO-SCROLL) ---
+        // --- CAMERA TRACKING ---
         function scrollToColumn(colIdx) {
             const board = document.getElementById('main-board');
             const cols = document.querySelectorAll('.column');
             if (cols[colIdx]) {
-                // Determine scrolling logic
                 const isMobile = window.innerWidth < 600;
                 const scrollLeft = isMobile ? cols[colIdx].offsetLeft - 10 : cols[colIdx].offsetLeft;
-                
-                board.scrollTo({
-                    left: scrollLeft,
-                    behavior: 'smooth'
-                });
+                board.scrollTo({ left: scrollLeft, behavior: 'smooth' });
             }
         }
 
+        // --- VIEWER ---
         function openViewer(id) {
             const t = tasks.find(x => x.id === id);
             if(!t) return;
@@ -384,10 +442,16 @@
             document.getElementById('v-title').innerText = t.title;
             document.getElementById('v-prio').innerText = t.prio;
             document.getElementById('v-prio').className = `prio-pill pill-${t.prio}`;
+            
+            const tagEl = document.getElementById('v-tag');
+            if(t.tag) { tagEl.innerText = t.tag; tagEl.style.display = 'inline-block'; } 
+            else { tagEl.style.display = 'none'; }
+
             if(t.date) {
                 const dateObj = new Date(t.date + 'T00:00');
                 document.getElementById('v-date').innerText = dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
             } else { document.getElementById('v-date').innerText = "No Deadline"; }
+            
             const container = document.getElementById('v-checks');
             container.innerHTML = '';
             t.steps.forEach((s, idx) => {
@@ -410,12 +474,14 @@
         function switchToEdit() { closeViewer(); openEditor(currentViewId); }
         function closeViewer() { document.getElementById('viewer').style.display = 'none'; }
 
+        // --- EDITOR ---
         function openEditor(id = null) {
-            const t = id ? tasks.find(x => x.id === id) : { id: '', title: '', steps: [], col: 0, prio:'Med', date:'', archived:false };
+            const t = id ? tasks.find(x => x.id === id) : { id: '', title: '', steps: [], col: 0, prio:'Med', date:'', tag: '', archived:false };
             document.getElementById('e-id').value = t.id;
             document.getElementById('e-title').value = t.title;
             document.getElementById('e-date').value = t.date;
             document.getElementById('e-prio').value = t.prio || 'Med';
+            document.getElementById('e-tag').value = t.tag || ''; // LOAD TAG
             document.getElementById('btn-archive-toggle').innerText = t.archived ? "🔥 Thaw" : "🧊 Archive";
             const container = document.getElementById('e-checks');
             container.innerHTML = '';
@@ -446,47 +512,41 @@
             document.querySelectorAll('#e-checks .check-item').forEach(el => {
                 steps.push({ text: el.querySelector('.check-text').value.trim(), done: el.querySelector('.check-box').classList.contains('checked') });
             });
+            
+            const tag = document.getElementById('e-tag').value.trim(); // GET TAG
+
             if(id) {
                 const idx = tasks.findIndex(x => x.id === id);
-                tasks[idx] = { ...tasks[idx], title, steps, prio: document.getElementById('e-prio').value, date: document.getElementById('e-date').value };
+                tasks[idx] = { ...tasks[idx], title, steps, prio: document.getElementById('e-prio').value, date: document.getElementById('e-date').value, tag };
             } else {
-                tasks.push({ id: Date.now().toString(), title, steps, col: 0, prio: document.getElementById('e-prio').value, date: document.getElementById('e-date').value, archived: false });
+                tasks.push({ id: Date.now().toString(), title, steps, col: 0, prio: document.getElementById('e-prio').value, date: document.getElementById('e-date').value, tag, archived: false });
             }
             save(); closeEditor(); render();
         }
 
-        // --- CONFIRMATION MODAL LOGIC ---
+        // --- CONFIRMATION ---
         function confirmDelete() {
             taskToDeleteId = document.getElementById('e-id').value;
-            if(!taskToDeleteId) return; // Can't delete new
+            if(!taskToDeleteId) return; 
             document.getElementById('confirm-yes-btn').onclick = executeDelete;
             document.getElementById('confirm-modal').style.display = 'flex';
         }
 
-        function closeConfirm() {
-            document.getElementById('confirm-modal').style.display = 'none';
-            taskToDeleteId = null;
-        }
+        function closeConfirm() { document.getElementById('confirm-modal').style.display = 'none'; taskToDeleteId = null; }
 
         function executeDelete() {
             if(taskToDeleteId) {
                 const t = tasks.find(x => x.id === taskToDeleteId);
                 const sunkXP = t.steps.filter(s=>s.done).length * 10;
                 const totalLoss = sunkXP + 50;
-                
                 tasks = tasks.filter(x => x.id !== taskToDeleteId);
                 updateLiveXP(-totalLoss);
                 showToast(`FAILED (-${totalLoss} XP)`, true);
-                
-                save(); 
-                closeConfirm();
-                closeEditor();
-                render();
+                save(); closeConfirm(); closeEditor(); render();
             }
         }
 
-        function deleteCard() { confirmDelete(); } // Maps old call
-
+        function deleteCard() { confirmDelete(); }
         function closeEditor() { document.getElementById('editor').style.display = 'none'; }
         
         function toggleArchiveTask() {
@@ -506,8 +566,6 @@
                 showToast(`RETREAT (-${totalLoss})`, true); updateLiveXP(-totalLoss); task.winXP = 0; 
             }
             task.col = newCol; save(); updateXP(); render();
-            
-            // Auto-Scroll (Camera Tracking)
             setTimeout(() => scrollToColumn(newCol), 100);
         }
 
