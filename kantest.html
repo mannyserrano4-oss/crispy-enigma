@@ -7,25 +7,24 @@
     <style>
         :root {
             /* --- THEME: LIGHT (Pastel Dream) --- */
-            --bg-color: #fff0f5;       /* Lavender Blush */
-            --column-bg: #e6e6fa;      /* Lavender */
+            --bg-color: #fff0f5;
+            --column-bg: #e6e6fa;
             --card-bg: #ffffff;
             --text-color: #636e72;
             --text-sub: #b2bec3;
             
-            /* Accents */
-            --accent: #00b894;         /* Mint */
+            --accent: #00b894;
             --accent-glow: #55efc4;
             --danger: #ff7675;
             
-            /* Input & Modal Specifics (Light) */
             --input-bg: #ffffff;
             --input-border: #dfe6e9;
-            --group-logistics: #e3f2fd; /* Light Blue */
-            --group-objectives: #e8f5e9;/* Light Green */
-            --modal-text: #2d3436;
+            --group-logistics-bg: #e3f2fd; 
+            --group-logistics-border: #90caf9;
+            --group-objectives-bg: #e8f5e9;
+            --group-objectives-border: #a5d6a7;
             
-            /* UI Elements */
+            --modal-text: #2d3436;
             --shadow: 0 8px 15px rgba(0,0,0,0.05);
             --radius: 16px;
             --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -33,41 +32,42 @@
 
         /* --- THEME: DARK (Midnight Neon) --- */
         body.dark-mode {
-            --bg-color: #1e1e2e;       /* Deep Navy Background */
-            --column-bg: #2a2a40;      /* Lighter Navy Column */
-            --card-bg: #32324a;        /* Slate Card */
-            --text-color: #dcdde1;     /* White-ish Text */
-            --text-sub: #7f8fa6;
+            --bg-color: #13131f;       /* Darker Void */
+            --column-bg: #1e1e2e;      /* Deep Navy */
+            --card-bg: #2a2a3c;        /* Slate */
+            --text-color: #e0e0ff;     
+            --text-sub: #8a8aab;
             
-            /* Accents */
-            --accent: #00d2d3;         /* Bright Cyan/Mint */
-            --accent-glow: #00d2d3;
-            --danger: #ff6b6b;
+            --accent: #00e5ff;         /* Cyan Neon */
+            --accent-glow: #00e5ff;
+            --danger: #ff4757;
 
-            /* Input & Modal Specifics (Dark) */
-            --input-bg: #252535;
+            --input-bg: #1a1a26;
             --input-border: #404055;
-            --group-logistics: #252535; /* Dark Box */
-            --group-objectives: #252535;/* Dark Box */
+            
+            /* High Contrast Dark Mode Groups */
+            --group-logistics-bg: rgba(0, 100, 255, 0.15);
+            --group-logistics-border: #0056b3;
+            --group-objectives-bg: rgba(0, 255, 127, 0.1);
+            --group-objectives-border: #00b894;
+            
             --modal-text: #f5f6fa;
         }
 
-        /* Theme Overrides (Legacy) */
+        /* Theme Overrides */
         body.theme-wolf { --bg-color: #3e3b36; --column-bg: #5c5549; --text-color: #dcdccc; --accent: #8c7b6c; --card-bg: #4a453d; }
-        body.theme-neon { --bg-color: #000000; --column-bg: #111111; --text-color: #00ff00; --accent: #ff00ff; --card-bg: #1a1a1a; }
+        body.theme-neon { --bg-color: #000; --column-bg: #111; --text-color: #0f0; --accent: #f0f; --card-bg: #1a1a1a; }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { margin: 0; padding: 0; font-family: var(--font); background: var(--bg-color); color: var(--text-color); transition: background 0.3s, color 0.3s; padding-bottom: 100px; }
+        body { margin: 0; padding: 0; font-family: var(--font); background: var(--bg-color); color: var(--text-color); transition: background 0.3s, color 0.3s; padding-bottom: 100px; overflow-x: hidden; }
 
-        /* HUD & Controls */
+        /* HUD */
         #hud { padding: 15px; background: var(--card-bg); position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;}
         .hud-top { display: flex; justify-content: space-between; align-items: center; }
         .level-badge { font-weight: 800; font-size: 1.4rem; color: var(--accent); letter-spacing: -0.5px; text-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        
         .progress-container { width: 100%; height: 12px; background: rgba(0,0,0,0.1); border-radius: 6px; overflow: hidden; margin-top: 5px; position: relative; }
         .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-glow)); width: 0%; transition: width 0.5s ease; border-radius: 6px; }
         
-        /* GLOW ANIMATION */
         @keyframes glowPulse {
             0% { box-shadow: 0 0 5px var(--accent); filter: brightness(1); }
             50% { box-shadow: 0 0 15px var(--accent), 0 0 5px white; filter: brightness(1.3); }
@@ -75,11 +75,11 @@
         }
         .progress-bar.glowing { animation: glowPulse 0.8s ease-in-out infinite; }
 
-        /* Floating Action Button (FAB) */
+        /* FAB */
         .fab {
             position: fixed; bottom: 30px; right: 25px;
             width: 65px; height: 65px;
-            background: var(--accent); color: white; /* Always white icon */
+            background: var(--accent); color: white;
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             font-size: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.3);
@@ -88,68 +88,52 @@
         .fab:active { transform: scale(0.9); }
 
         /* Buttons */
-        button { background: var(--accent); color: #fff; border: none; padding: 10px 16px; border-radius: var(--radius); font-weight: 600; cursor: pointer; font-size: 0.9rem; }
+        button { background: var(--accent); color: #fff; border: none; padding: 10px 18px; border-radius: var(--radius); font-weight: 700; cursor: pointer; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; }
         button.secondary { background: var(--column-bg); color: var(--text-color); border: 1px solid rgba(0,0,0,0.1); }
         button.danger { background: var(--danger); color: white; }
-        .icon-btn { padding: 8px; font-size: 1.2rem; background: transparent; color: var(--text-color); }
+        .icon-btn { padding: 8px; font-size: 1.2rem; background: transparent; color: var(--text-color); border: none; text-transform: none;}
 
         /* Search */
         #search-bar { width: 100%; padding: 12px; border-radius: var(--radius); border: 1px solid transparent; background: var(--column-bg); color: var(--text-color); font-size: 1rem; }
         #search-bar:focus { border-color: var(--accent); background: var(--card-bg); }
 
-        /* Kanban Columns */
-        .board { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; height: calc(100vh - 180px); gap: 15px; padding: 15px; }
-        .column { min-width: 85vw; background: var(--column-bg); border-radius: var(--radius); padding: 15px; display: flex; flex-direction: column; scroll-snap-align: center; height: 100%; }
+        /* Board */
+        .board { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; height: calc(100vh - 180px); gap: 15px; padding: 15px; scroll-behavior: smooth; }
+        .column { min-width: 85vw; background: var(--column-bg); border-radius: var(--radius); padding: 15px; display: flex; flex-direction: column; scroll-snap-align: center; height: 100%; transition: background 0.3s; }
         .column-header { font-weight: 800; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-color); opacity: 0.8; }
 
         /* Cards */
-        .card { background: var(--card-bg); padding: 20px; margin-bottom: 15px; border-radius: var(--radius); box-shadow: var(--shadow); transition: transform 0.2s; position: relative; border-left: 6px solid transparent; }
+        .card { background: var(--card-bg); padding: 20px; margin-bottom: 15px; border-radius: var(--radius); box-shadow: var(--shadow); position: relative; border-left: 6px solid transparent; }
         .card.priority-High { border-left-color: var(--danger); }
         .card.priority-Med { border-left-color: var(--accent); }
         .card.priority-Low { border-left-color: #74b9ff; }
         .card h3 { margin: 0 0 5px 0; font-size: 1.2rem; color: var(--text-color); }
         .card-meta { font-size: 0.8rem; color: var(--text-sub); display: flex; justify-content: space-between; margin-bottom: 15px; }
         
-        /* Objective Boxes */
         .objective-list { list-style: none; padding: 0; margin: 15px 0; }
         .objective-box { 
-            background: rgba(0,0,0,0.03); 
-            border: 1px solid rgba(0,0,0,0.05);
+            background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05);
             padding: 10px; margin-bottom: 8px; border-radius: 8px; 
-            display: flex; align-items: center; gap: 10px; font-size: 0.95rem;
-            color: var(--text-color);
+            display: flex; align-items: center; gap: 10px; font-size: 0.95rem; color: var(--text-color);
         }
-        /* Dark mode adjustment for obj boxes */
         body.dark-mode .objective-box { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
-
         .objective-check { width: 22px; height: 22px; cursor: pointer; accent-color: var(--accent); }
 
-        /* Card Actions */
         .card-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
-        .action-btn { font-size: 0.8rem; padding: 8px 14px; border-radius: 20px;}
+        .action-btn { font-size: 0.75rem; padding: 8px 12px; border-radius: 20px;}
 
         /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; }
         .modal { background: var(--card-bg); width: 90%; max-width: 500px; padding: 25px; border-radius: 25px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.4); color: var(--modal-text); }
-        .modal h2 { color: var(--text-color); }
-
-        /* Field Groups */
-        .field-group { padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--input-border); }
-        .group-logistics { background: var(--group-logistics); }
-        .group-objectives { background: var(--group-objectives); }
-
-        .field-group label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 0.85rem; text-transform: uppercase; color: var(--accent); }
         
-        /* Inputs */
-        input, select, textarea { 
-            width: 100%; padding: 12px; border-radius: 8px; 
-            border: 1px solid var(--input-border); 
-            background: var(--input-bg); 
-            color: var(--text-color); 
-            font-size: 1rem; 
-        }
+        /* Groups - Improved Dark Mode Contrast */
+        .field-group { padding: 15px; border-radius: 12px; margin-bottom: 15px; border-width: 1px; border-style: solid; }
+        .group-logistics { background: var(--group-logistics-bg); border-color: var(--group-logistics-border); }
+        .group-objectives { background: var(--group-objectives-bg); border-color: var(--group-objectives-border); }
+
+        .field-group label { display: block; margin-bottom: 8px; font-weight: 800; font-size: 0.85rem; text-transform: uppercase; color: var(--accent); letter-spacing: 0.5px; }
+        input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); font-size: 1rem; }
         
-        /* Dynamic Objective Inputs */
         .dyn-input-row { display: flex; gap: 5px; margin-bottom: 8px; }
         .dyn-del-btn { background: var(--danger); color: white; width: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; }
 
@@ -158,7 +142,18 @@
         body.zen-mode #zen-active-container { display: flex; flex-direction: column; align-items: center; padding: 20px; height: 100vh; background: var(--bg-color); }
         #zen-exit { position: fixed; bottom: 30px; left: 30px; opacity: 0.5; width: 50px; height: 50px; cursor: pointer; border: 2px solid var(--text-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text-color); font-size: 20px; }
 
-        /* Canvas for FX */
+        /* XP Floating Animation */
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-50px) scale(1.5); } }
+        @keyframes sinkDown { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(50px) scale(0.8); } }
+        
+        .xp-floater {
+            position: fixed; left: 50%; top: 40%; transform: translate(-50%, -50%);
+            font-size: 3rem; font-weight: 900; pointer-events: none; z-index: 4000;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        .xp-gain { color: #ffeaa7; animation: floatUp 1.5s forwards; }
+        .xp-loss { color: var(--danger); animation: sinkDown 1.5s forwards; }
+
         #confetti-canvas { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 2000; }
         .story-text { font-family: "Georgia", serif; line-height: 1.6; font-size: 1.1rem; white-space: pre-wrap; color: var(--text-color); }
     </style>
@@ -166,7 +161,6 @@
 <body>
 
 <canvas id="confetti-canvas"></canvas>
-
 <button class="fab" onclick="openAddTask()">+</button>
 
 <div id="hud">
@@ -180,7 +174,7 @@
     <div class="progress-container">
         <div id="xp-bar" class="progress-bar"></div>
     </div>
-    <input type="text" id="search-bar" placeholder="Search missions or objectives..." onkeyup="renderBoard()">
+    <input type="text" id="search-bar" placeholder="Scan for Missions..." onkeyup="renderBoard()">
 </div>
 
 <div class="board" id="main-board">
@@ -188,12 +182,10 @@
         <div class="column-header">Staging Area</div>
         <div id="list-staging"></div>
     </div>
-
     <div class="column" id="col-active">
         <div class="column-header">Active Mission</div>
         <div id="list-active"></div>
     </div>
-
     <div class="column" id="col-victory">
         <div class="column-header">Victory</div>
         <div id="list-victory"></div>
@@ -208,7 +200,7 @@
 
 <div class="modal-overlay" id="menu-modal">
     <div class="modal">
-        <h2>System Menu</h2>
+        <h2>System Config</h2>
         <div id="utility-stats" style="display:none; padding:15px; background:var(--column-bg); border-radius:var(--radius); margin-bottom:15px;">
             <h3>📊 Status Report</h3>
             <p>Total XP: <span id="stat-total-xp">0</span></p>
@@ -216,10 +208,8 @@
             <p>Prestige Rank: <span id="stat-prestige">0</span></p>
         </div>
 
-        <h3>Settings</h3>
-        <button class="secondary" onclick="toggleZen(true)" id="btn-zen" style="display:none; width:100%; margin-bottom:10px;">Enter Zen Mode</button>
-        
-        <h3>Themes</h3>
+        <h3>Visuals</h3>
+        <button class="secondary" onclick="toggleZen(true)" id="btn-zen" style="display:none; width:100%; margin-bottom:10px;">Engage Zen Mode</button>
         <select id="theme-selector" onchange="changeTheme(this.value)" style="width:100%; margin-bottom:10px;">
             <option value="default">Pastel / Midnight (Default)</option>
             <option value="wolf" disabled>🔒 Lvl 5: The Wolf</option>
@@ -244,10 +234,10 @@
         </div>
 
         <div id="story-library-btn" style="display:none; margin-top:15px;">
-            <button style="width:100%; background: purple;" onclick="openStoryModal()">📖 The Archives (Story)</button>
+            <button style="width:100%; background: purple;" onclick="openStoryModal()">📖 The Archives</button>
         </div>
 
-        <button onclick="closeModal('menu-modal')" style="width:100%; margin-top:20px;">Close</button>
+        <button onclick="closeModal('menu-modal')" style="width:100%; margin-top:20px;">Disengage</button>
     </div>
 </div>
 
@@ -256,7 +246,7 @@
         <h2 id="modal-title" style="color:var(--accent); margin-top:0;">New Mission</h2>
         
         <div class="field-group group-logistics">
-            <label>Mission Logistics</label>
+            <label>Logistics</label>
             <div style="margin-bottom:10px;">
                 <input type="text" id="inp-title" placeholder="Mission Name">
             </div>
@@ -267,20 +257,18 @@
                     <option value="High">High Priority (200 XP)</option>
                 </select>
             </div>
-            <div>
-                <input type="date" id="inp-deadline">
-            </div>
+            <div><input type="date" id="inp-deadline"></div>
         </div>
 
         <div class="field-group group-objectives">
-            <label>Objectives (Press Enter to Add)</label>
+            <label>Objectives</label>
             <div id="objectives-container"></div>
-            <button class="secondary" style="width:100%; margin-top:5px; font-size:0.8rem;" onclick="addObjectiveInput()">+ Add Line</button>
+            <button class="secondary" style="width:100%; margin-top:5px; font-size:0.8rem;" onclick="addObjectiveInput()">+ Add Objective</button>
         </div>
 
         <div style="display:flex; justify-content:flex-end; gap:10px;">
-            <button class="secondary" onclick="closeModal('task-modal')">Cancel</button>
-            <button onclick="saveTask()">Save Mission</button>
+            <button class="secondary" onclick="closeModal('task-modal')">Disengage</button>
+            <button onclick="saveTask()">Initialize</button>
         </div>
     </div>
 </div>
@@ -289,20 +277,15 @@
     <div class="modal">
         <h2>The Archives</h2>
         <div id="story-content" class="story-text"></div>
-        <button onclick="closeModal('story-modal')" style="width:100%; margin-top:20px;">Close</button>
+        <button onclick="closeModal('story-modal')" style="width:100%; margin-top:20px;">Return</button>
     </div>
 </div>
 
 <script>
-    // --- STATE MANAGEMENT ---
-    let player = {
-        level: 1, xp: 0, prestige: 0, totalXpEarned: 0, completedTasks: 0,
-        settings: { darkMode: false, theme: 'default' }
-    };
+    let player = { level: 1, xp: 0, prestige: 0, totalXpEarned: 0, completedTasks: 0, settings: { darkMode: false, theme: 'default' } };
     let tasks = [];
     let editingId = null;
 
-    // --- INITIALIZATION ---
     window.onload = function() {
         if(localStorage.getItem('qb_player')) {
             player = JSON.parse(localStorage.getItem('qb_player'));
@@ -321,23 +304,30 @@
         updateStats();
     }
 
-    // --- GAME LOGIC ---
-    function getXpRequired(lvl) { return 500 + ((lvl - 1) * 50); }
+    // --- XP LOGIC & ANIMATION ---
+    function spawnFloatingXP(amount, type) {
+        const div = document.createElement('div');
+        div.className = `xp-floater ${type === 'gain' ? 'xp-gain' : 'xp-loss'}`;
+        div.innerText = type === 'gain' ? `+${amount} XP` : `-${amount} XP`;
+        document.body.appendChild(div);
+        setTimeout(() => div.remove(), 1500);
+    }
 
     function addXP(amount, isCheck = false) {
         let mult = 1 + (player.prestige * 0.1);
         let finalAmount = Math.floor(amount * mult);
-        
         let isCrit = Math.random() < 0.05;
         if(isCrit) { finalAmount += 50; showToast("CRITICAL SUCCESS! +50 XP"); }
 
         player.xp += finalAmount;
         player.totalXpEarned += finalAmount;
 
-        // Visual Glow Logic
+        // Visuals
         const bar = document.getElementById('xp-bar');
         bar.classList.add('glowing');
         setTimeout(() => bar.classList.remove('glowing'), 1500);
+        
+        spawnFloatingXP(finalAmount, 'gain');
 
         let req = getXpRequired(player.level);
         if (player.xp >= req) {
@@ -346,28 +336,22 @@
             showToast(`LEVEL UP! WELCOME TO LEVEL ${player.level}`);
             fireConfetti('level');
         }
-
         saveData();
         return { gained: finalAmount, crit: isCrit };
     }
 
+    function getXpRequired(lvl) { return 500 + ((lvl - 1) * 50); }
+
     function checkUnlocks() {
         const unlocks = [
-            { lvl: 2, id: 'utility-stats', type: 'el' },
-            { lvl: 5, val: 'wolf', type: 'theme' },
-            { lvl: 8, id: 'btn-zen', type: 'el' },
-            { lvl: 10, val: 'neon', type: 'theme' },
-            { lvl: 12, val: 'aperture', type: 'theme' },
-            { lvl: 15, val: 'eldritch', type: 'theme' },
-            { lvl: 18, val: 'vaporwave', type: 'theme' },
-            { lvl: 20, val: 'blueprint', type: 'theme' },
-            { lvl: 25, val: 'terminal', type: 'theme' },
-            { lvl: 30, val: 'gold', type: 'theme' },
+            { lvl: 2, id: 'utility-stats', type: 'el' }, { lvl: 5, val: 'wolf', type: 'theme' },
+            { lvl: 8, id: 'btn-zen', type: 'el' }, { lvl: 10, val: 'neon', type: 'theme' },
+            { lvl: 12, val: 'aperture', type: 'theme' }, { lvl: 15, val: 'eldritch', type: 'theme' },
+            { lvl: 18, val: 'vaporwave', type: 'theme' }, { lvl: 20, val: 'blueprint', type: 'theme' },
+            { lvl: 25, val: 'terminal', type: 'theme' }, { lvl: 30, val: 'gold', type: 'theme' },
             { lvl: 50, id: 'prestige-section', type: 'el' }
         ];
-
         if(player.prestige >= 1) document.getElementById('story-library-btn').style.display = 'block';
-
         unlocks.forEach(u => {
             if (player.level >= u.lvl) {
                 if(u.type === 'el') document.getElementById(u.id).style.display = 'block';
@@ -379,37 +363,22 @@
         });
     }
 
-    // --- OBJECTIVE INPUT LOGIC ---
     function addObjectiveInput(value = "") {
         const container = document.getElementById('objectives-container');
         const div = document.createElement('div');
         div.className = 'dyn-input-row';
-        div.innerHTML = `
-            <input type="text" class="obj-input" placeholder="Enter objective..." value="${value}">
-            <div class="dyn-del-btn" onclick="this.parentElement.remove()">✕</div>
-        `;
+        div.innerHTML = `<input type="text" class="obj-input" placeholder="Objective data..." value="${value}"><div class="dyn-del-btn" onclick="this.parentElement.remove()">✕</div>`;
         container.appendChild(div);
-        
         const inp = div.querySelector('input');
         inp.focus();
-        inp.addEventListener('keydown', function(e) {
-            if(e.key === 'Enter') {
-                e.preventDefault();
-                addObjectiveInput();
-            }
-        });
+        inp.addEventListener('keydown', function(e) { if(e.key === 'Enter') { e.preventDefault(); addObjectiveInput(); }});
     }
 
-    // --- TASK LOGIC ---
     function saveTask() {
         const title = document.getElementById('inp-title').value;
         if(!title) return;
-
-        // Scrape dynamic inputs
         const objInputs = document.querySelectorAll('.obj-input');
-        const subtasks = Array.from(objInputs).map(inp => ({
-            text: inp.value.trim(), done: false
-        })).filter(o => o.text !== "");
+        const subtasks = Array.from(objInputs).map(inp => ({ text: inp.value.trim(), done: false })).filter(o => o.text !== "");
 
         const newTask = {
             id: editingId || Date.now(),
@@ -418,29 +387,25 @@
             deadline: document.getElementById('inp-deadline').value,
             subtasks: subtasks,
             status: editingId ? tasks.find(t => t.id === editingId).status : 'staging',
-            winXP: 0,
-            completedDate: null
+            winXP: 0, completedDate: null
         };
 
-        if(editingId) {
-            const idx = tasks.findIndex(t => t.id === editingId);
-            tasks[idx] = newTask;
-            editingId = null;
-        } else {
-            tasks.push(newTask);
-        }
-
+        if(editingId) { tasks[tasks.findIndex(t => t.id === editingId)] = newTask; editingId = null; }
+        else { tasks.push(newTask); }
         closeModal('task-modal');
         saveData();
         renderBoard();
+        
+        // Camera Track to Staging if new
+        if(!editingId) document.getElementById('col-staging').scrollIntoView({ behavior: 'smooth', inline: 'center' });
     }
 
     function moveTask(id, dest) {
         const t = tasks.find(x => x.id === id);
         if (t.status === 'victory' && dest !== 'victory') {
-            if(!confirm("RETREAT WARNING: You will lose the XP earned from this mission + 50 XP Penalty. Proceed?")) return;
+            if(!confirm("CONFIRM PROTOCOL: Retreat? XP penalty will be applied.")) return;
             player.xp = Math.max(0, player.xp - t.winXP - 50);
-            showToast(`RETREAT! Lost ${t.winXP + 50} XP`);
+            spawnFloatingXP(t.winXP + 50, 'loss');
             t.winXP = 0; t.completedDate = null; player.completedTasks--;
         }
 
@@ -448,19 +413,10 @@
             let base = t.priority === 'High' ? 200 : t.priority === 'Med' ? 150 : 100;
             let bonusMsg = "";
             if(t.deadline) {
-                // Just compare Dates now (ignore time)
-                const now = new Date();
-                const due = new Date(t.deadline);
-                // Reset times to midnight for fair comparison
-                now.setHours(0,0,0,0);
-                due.setHours(0,0,0,0);
-                
-                // Diff in days
-                const diffTime = due - now;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-
-                if (diffDays >= 1) { base = Math.floor(base * 1.2); bonusMsg += " (Early +20%)"; }
-                else if (diffDays < 0) { base = Math.floor(base * 0.8); bonusMsg += " (Late -20%)"; }
+                const now = new Date(); const due = new Date(t.deadline); now.setHours(0,0,0,0); due.setHours(0,0,0,0);
+                const diffDays = Math.ceil((due - now) / (1000 * 60 * 60 * 24)); 
+                if (diffDays >= 1) { base = Math.floor(base * 1.2); bonusMsg += " (Early)"; }
+                else if (diffDays < 0) { base = Math.floor(base * 0.8); bonusMsg += " (Late)"; }
             }
             const result = addXP(base);
             t.winXP = result.gained;
@@ -468,46 +424,44 @@
             player.completedTasks++;
             let fx = player.level >= 30 ? 'gem' : player.level >= 20 ? 'coin' : player.level >= 10 ? 'star' : 'paper';
             fireConfetti(fx);
-            showToast(`Mission Complete! +${result.gained} XP${bonusMsg}`);
         }
 
         t.status = dest;
         saveData();
         renderBoard();
+
+        // CAMERA TRACKING: Smooth scroll to the new column
+        const destCol = document.getElementById(`col-${dest}`);
+        setTimeout(() => {
+            destCol.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+        }, 100);
     }
 
     function toggleSubtask(taskId, subIdx) {
         const t = tasks.find(x => x.id === taskId);
         t.subtasks[subIdx].done = !t.subtasks[subIdx].done;
         if(t.subtasks[subIdx].done) addXP(10, true); 
-        saveData();
-        renderBoard();
+        saveData(); renderBoard();
     }
 
     function deleteTask(id) {
-        if(confirm("Delete this mission permanently?")) {
+        if(confirm("CONFIRM PROTOCOL: Abort Mission Permanently?")) {
             tasks = tasks.filter(t => t.id !== id);
-            saveData();
-            renderBoard();
+            saveData(); renderBoard();
         }
     }
 
-    // --- RENDERING ---
     function renderBoard() {
         const filter = document.getElementById('search-bar').value.toLowerCase();
-        
         ['staging', 'active', 'victory'].forEach(col => {
             const container = document.getElementById(`list-${col}`);
             const zenContainer = document.getElementById('zen-list');
             if(col === 'active') zenContainer.innerHTML = ''; 
-
             container.innerHTML = '';
-            
             tasks.filter(t => t.status === col).forEach(t => {
                 let match = t.title.toLowerCase().includes(filter);
                 t.subtasks.forEach(s => { if(s.text.toLowerCase().includes(filter)) match = true; });
                 if(!match) return;
-
                 const card = createCardHTML(t);
                 container.appendChild(card);
                 if(col === 'active') zenContainer.appendChild(createCardHTML(t));
@@ -519,52 +473,30 @@
         const div = document.createElement('div');
         div.className = `card priority-${t.priority}`;
         if(player.settings.theme === 'blueprint') div.style.borderStyle = "dashed";
-
-        // Date Display
         let dateStr = "";
         if(t.deadline) {
-            // Fix timezone offset issue by treating the YYYY-MM-DD string as local parts
             const parts = t.deadline.split('-');
-            if(parts.length === 3) {
-                const d = new Date(parts[0], parts[1]-1, parts[2]);
-                dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            }
+            if(parts.length === 3) dateStr = new Date(parts[0], parts[1]-1, parts[2]).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         }
-
         let subHtml = '<ul class="objective-list">';
         t.subtasks.forEach((s, i) => {
-            subHtml += `<li class="objective-box">
-                <input type="checkbox" class="objective-check" ${s.done ? 'checked' : ''} onchange="toggleSubtask(${t.id}, ${i})">
-                <span style="${s.done ? 'text-decoration:line-through; opacity:0.6' : ''}">${s.text}</span>
-            </li>`;
+            subHtml += `<li class="objective-box"><input type="checkbox" class="objective-check" ${s.done ? 'checked' : ''} onchange="toggleSubtask(${t.id}, ${i})"><span style="${s.done ? 'text-decoration:line-through; opacity:0.6' : ''}">${s.text}</span></li>`;
         });
         subHtml += '</ul>';
 
         let btns = '';
-        if(t.status === 'staging') btns = `<button class="action-btn" onclick="moveTask(${t.id}, 'active')">Start</button>`;
-        if(t.status === 'active') btns = `<button class="action-btn secondary" onclick="moveTask(${t.id}, 'staging')">Hold</button><button class="action-btn" onclick="moveTask(${t.id}, 'victory')">Complete</button>`;
+        if(t.status === 'staging') btns = `<button class="action-btn" onclick="moveTask(${t.id}, 'active')">Engage</button>`;
+        if(t.status === 'active') btns = `<button class="action-btn secondary" onclick="moveTask(${t.id}, 'staging')">Standby</button><button class="action-btn" onclick="moveTask(${t.id}, 'victory')">Complete</button>`;
         if(t.status === 'victory') btns = `<button class="action-btn danger" onclick="moveTask(${t.id}, 'active')">Retreat</button>`;
         
-        div.innerHTML = `
-            <h3>${t.title}</h3>
-            <div class="card-meta">
-                <span>${t.priority} Priority</span>
-                <span>${dateStr ? '📅 ' + dateStr : ''}</span>
-            </div>
-            ${subHtml}
-            <div class="card-actions">
-                <button class="action-btn secondary" style="margin-right:auto" onclick="deleteTask(${t.id})">🗑️</button>
-                ${btns}
-            </div>
-        `;
+        div.innerHTML = `<h3>${t.title}</h3><div class="card-meta"><span>${t.priority} Priority</span><span>${dateStr ? '📅 ' + dateStr : ''}</span></div>${subHtml}<div class="card-actions"><button class="action-btn secondary" style="margin-right:auto" onclick="deleteTask(${t.id})">Abort</button>${btns}</div>`;
         return div;
     }
 
     function updateStats() {
         document.getElementById('level-display').innerText = `LVL ${player.level} ${player.prestige > 0 ? '✪'.repeat(player.prestige) : ''}`;
         const req = getXpRequired(player.level);
-        const pct = (player.xp / req) * 100;
-        document.getElementById('xp-bar').style.width = `${pct}%`;
+        document.getElementById('xp-bar').style.width = `${(player.xp / req) * 100}%`;
         document.getElementById('stat-total-xp').innerText = player.totalXpEarned;
         document.getElementById('stat-tasks').innerText = player.completedTasks;
         document.getElementById('stat-prestige').innerText = player.prestige;
@@ -582,8 +514,7 @@
     }
 
     function toggleZen(active) {
-        if(active) document.body.classList.add('zen-mode');
-        else document.body.classList.remove('zen-mode');
+        if(active) document.body.classList.add('zen-mode'); else document.body.classList.remove('zen-mode');
         closeModal('menu-modal');
     }
 
@@ -591,7 +522,7 @@
         document.getElementById('modal-title').innerText = "New Mission";
         document.getElementById('inp-title').value = "";
         document.getElementById('objectives-container').innerHTML = ""; 
-        addObjectiveInput(); // Start with one empty box
+        addObjectiveInput();
         editingId = null;
         document.getElementById('task-modal').style.display = 'flex';
         document.getElementById('inp-title').focus();
@@ -624,12 +555,12 @@
             try {
                 const json = JSON.parse(e.target.result);
                 if(json.player && json.tasks) { player = json.player; tasks = json.tasks; saveData(); location.reload(); }
-            } catch(err) { alert("Invalid Backup File"); }
+            } catch(err) { alert("Data Corrupted."); }
         };
         reader.readAsText(file);
     }
     function prestigeReset() {
-        if(!confirm("⚠️ FINAL WARNING ⚠️\nReset Level to 1 & XP to 0?\n+10% XP multiplier.\nAre you sure?")) return;
+        if(!confirm("⚠️ FINAL WARNING ⚠️\nReset Level to 1 & XP to 0?\n+10% XP multiplier.\nConfirm?")) return;
         player.level = 1; player.xp = 0; player.prestige++; saveData(); location.reload();
     }
 
@@ -639,7 +570,6 @@
     let particles = [];
     function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     window.addEventListener('resize', resizeCanvas); resizeCanvas();
-
     function fireConfetti(type) {
         const count = type === 'level' ? 200 : 50;
         for(let i=0; i<count; i++) {
@@ -651,7 +581,6 @@
         }
         animateConfetti();
     }
-
     function animateConfetti() {
         if(particles.length === 0) return;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -676,38 +605,12 @@
         }
         ctx.lineTo(cx, cy - outerRadius); ctx.closePath();
     }
-
     const stories = {
-        1: `<h3>Chapter I: The Frost and the Flame</h3>
-<p>The wind howled outside the obsidian walls of the Bastion, a sound like a thousand dying wolves. You stood at the parapet, looking out over the endless white. They called it the Long Silence—the winter that had lasted a generation. But you were not just a watcher anymore. You had begun the climb.</p>
-<p>In the old texts, preserved by the Orders of Ink and Bone, it was written that authority is not given, but forged. Like the Valyrian steel of old, or the Shardplate of the Radiants, your will had to be hammered into shape. Every task you completed was a strike of that hammer.</p>
-<p>You remembered the Alchemist's words: "When you want something, all the universe conspires in helping you to achieve it." But the universe was cold here. It did not care. You had to <i>make</i> it care. You had to burn bright enough to melt the snow.</p>
-<p>The nebula overhead swirled with colors unseen by common men—violets and deep, bruising blues. You felt the surge of something ancient in your blood. The First Oath. Life before death. Strength before weakness. Journey before destination. You had taken the first step out of the staging area of your life. The mission was active.</p>`,
-        
-        2: `<h3>Chapter II: The Golden Cage</h3>
-<p>You had ascended. The world below looked like a map drawn by a child, small and insignificant. With the Midas touch, everything you handled turned to success, but gold is a heavy metal. It weighs down the soul.</p>
-<p>The court of the High Lords was a viper's nest. They smiled with teeth of pearl and eyes of flint. You navigated their treachery not with swords, but with completed objectives. High Priority tasks were your shield; Critical Successes your dagger.</p>
-<p>"Power resides where men believe it resides," the eunuch had once whispered. You built your power brick by brick, checkmark by checkmark. But the cold was still there. The impact winter had not ended; it had merely moved inside your heart.</p>
-<p>You looked at your hands. They were glowing, not with warmth, but with the cold light of efficiency. You were becoming something more than human. Something inevitable.</p>`,
-        
-        3: `<h3>Chapter III: The Glitch in the Weave</h3>
-<p>The sky flickered. For a moment, the sun was a square of dead pixels, black against the azure. You blinked, and it was gone, but you knew what you saw. The simulation was straining under the weight of your progress.</p>
-<p>You had pushed too far. Like an Edgedancer sliding on friction-less light, you were moving faster than the world could render. The logic of the universe—the +10 XPs, the Penalties, the Levels—was laying bare before you. You saw the strings.</p>
-<p>It was terrifying. It was exhilarating. You were the storm now. You were the one who knocks. The reality of the board was bending to your will. Tasks completed themselves before you even touched them. But the void was watching. And the void was hungry.</p>`,
-        
-        4: `<h3>Finale: The Architect</h3>
-<p>There is no snow anymore. There is no gold. There is no glitch. There is only the Board. You stand in the center of infinity, the white space of the Staging Area stretching out forever.</p>
-<p>You realize now that the Victory column was never a destination. It was a graveyard of ambition. The joy was never in the having, but in the doing. The Alchemist found his treasure under the tree where he started. You found yours in the daily grind.</p>
-<p>You are the Herald of your own destiny. You have spoken the final oaths. You have survived the winter. You are the master of the two worlds.</p>
-<p>Now... what is your next task?</p>`
+        1: `<h3>Chapter I: The Frost and the Flame</h3><p>The wind howled outside...</p>`,
     };
     function openStoryModal() {
         let content = "";
         if(player.prestige >= 1) content += stories[1];
-        if(player.prestige >= 2) content += stories[2];
-        if(player.prestige >= 3) content += stories[3];
-        if(player.prestige >= 4) content += stories[4];
-        
         document.getElementById('story-content').innerHTML = content || "<p>You must Prestige to unlock the Archives.</p>";
         document.getElementById('story-modal').style.display = 'flex';
     }
