@@ -24,7 +24,7 @@
             --font-head: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
-        /* --- THEME PACKS (ALL RESTORED & COLOR CORRECTED) --- */
+        /* --- THEME PACKS --- */
         body.theme-light { 
             --bg: #eff1f5; --card-bg: #ffffff; --col-bg: #e6e9ef; 
             --text: #4c4f69; --subtext: #9ca0b0; --border: #bcc0cc; 
@@ -202,6 +202,7 @@
         .input-step { background: transparent; border: 1px dashed var(--subtext); color: var(--subtext); }
 
         .form-row { display: flex; gap: 12px; margin-bottom: 18px; align-items: stretch; }
+        .fixed-height { height: 50px; box-sizing: border-box; }
         
         .check-item { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; padding: 8px; background: var(--col-bg); border-radius: 10px; }
         .check-box { width: 28px; height: 28px; border-radius: 8px; border: 2px solid var(--subtext); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
@@ -700,7 +701,8 @@
                 'theme-wolf': 5, 'theme-neon': 10, 'theme-aperture': 12, 'theme-horror': 15,
                 'theme-vapor': 18, 'theme-blueprint': 20, 'theme-terminal': 25, 'theme-gold': 30,
                 'theme-nebula': 999, 'theme-midas': 999, 'theme-glitch': 999, 
-                'feat-status': 2, 'feat-zen': 8, 'feat-prestige': 50
+                'feat-status': 2, 'feat-zen': 8, 'feat-prestige': 50,
+                'fx-star': 10, 'fx-coin': 20, 'fx-gem': 30
             };
             for(let id in locks) {
                 const btn = document.getElementById(id); if(!btn) continue;
