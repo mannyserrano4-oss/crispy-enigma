@@ -4,11 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Mission Control</title>
-    
-    <script>window.onerror = function(msg, url, line) { alert("System Error:\n" + msg + "\nLine: " + line); return true; };</script>
-
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" type="image/png" href="icon.png">
+
+    <script>window.onerror = function(msg, url, line) { alert("System Error:\n" + msg + "\nLine: " + line); return true; };</script>
 
     <style>
         :root {
@@ -17,7 +16,7 @@
             --text: #cdd6f4; --subtext: #a6adc8; --border: #313244;
             --p-red: #ffb8b8; --p-orange: #f9ccac; --p-blue: #9ae4e8;   
             --p-green: #a7f3d0; --p-purple: #c4b5fd;
-            --radius: 16px; --shadow: 0 4px 10px rgba(0,0,0,0.2);
+            --radius: 16px; --shadow: 0 4px 10px rgba(0,0,0,0.1);
             --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             --font-head: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
@@ -29,6 +28,12 @@
         body.theme-neon .card { border: 1px solid var(--p-blue); }
         body.theme-aperture { --bg: #e0e0e0; --card-bg: #ffffff; --col-bg: #d1d1d1; --text: #333; --subtext: #666; --border: #999; --p-red: #e74c3c; --p-orange: #ffa500; --p-blue: #00a5ff; --p-green: #00a5ff; --p-purple: #333; --font-main: Helvetica, Arial, sans-serif; --radius: 20px; --shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff; }
         body.theme-aperture .col-active { color: #00a5ff; } body.theme-aperture .col-victory { color: #ffa500; } 
+        body.theme-horror { --bg: #0a0505; --card-bg: #1a0505; --col-bg: #110000; --text: #ffcccc; --subtext: #804040; --border: #4d0000; --p-red: #ff0000; --p-green: #225522; --p-purple: #330033; --font-main: Helvetica, sans-serif; --radius: 2px; }
+        body.theme-vapor { --bg: #2d1b4e; --card-bg: #1b1030; --col-bg: #432c7a; --text: #ffd166; --subtext: #ef476f; --border: #118ab2; --p-red: #ef476f; --p-orange: #ffd166; --p-blue: #118ab2; --p-green: #06d6a0; --p-purple: #d783ff; --font-main: 'Verdana', sans-serif; --radius: 0px; background: linear-gradient(180deg, #2d1b4e 0%, #000 100%); }
+        body.theme-blueprint { --bg: #1e3a8a; --card-bg: #172554; --col-bg: #1e40af; --text: #bfdbfe; --subtext: #60a5fa; --border: #93c5fd; --p-red: #fff; --p-green: #fff; --p-purple: #fff; --p-blue: #fff; --font-main: 'Courier New', monospace; --radius: 0px; background-image: linear-gradient(#3b82f6 1px, transparent 1px), linear-gradient(90deg, #3b82f6 1px, transparent 1px); background-size: 20px 20px; }
+        body.theme-blueprint .card { border: 2px solid var(--border); box-shadow: none; }
+        body.theme-terminal { --bg: #000; --card-bg: #000; --col-bg: #000; --text: #22c55e; --subtext: #15803d; --border: #22c55e; --p-red: #22c55e; --p-orange: #22c55e; --p-blue: #22c55e; --p-green: #22c55e; --p-purple: #22c55e; --font-main: 'Courier New', monospace; --radius: 0px; }
+        body.theme-terminal .card, body.theme-terminal .column { border: 1px dashed var(--border); }
         body.theme-gold { --bg: #0f0f0f; --card-bg: #1c1c1c; --col-bg: #141414; --text: #fcd34d; --subtext: #b45309; --border: #78350f; --p-red: #991b1b; --p-green: #f59e0b; --p-purple: #d97706; --p-blue: #fcd34d; --font-main: Georgia, serif; --radius: 8px; --shadow: 0 10px 30px rgba(251, 191, 36, 0.1); }
         body.theme-gold .level-badge { background: linear-gradient(to right, #fcd34d, #b45309); color: black; }
 
@@ -115,8 +120,10 @@
         .progress-fill { height: 100%; background: var(--p-green); width: 0%; transition: width 0.3s; }
         .card-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--subtext); margin-top: 8px; font-weight: 600; }
         
-        .card-actions { display:flex; gap:10px; margin-top:10px; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:10px; }
+        /* CARD ACTIONS: UPDATED FOR EDIT BTN */
+        .card-actions { display:flex; gap:10px; margin-top:10px; justify-content:space-between; align-items:center; border-top: 1px solid var(--border); padding-top:10px; }
         .btn-quick { background: var(--col-bg); border:1px solid var(--border); color:var(--text); width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold;}
+        .edit-btn { color: var(--p-purple); border-color: var(--p-purple); font-size:1rem; width: auto; padding: 0 15px;}
 
         .fab { position: fixed; bottom: 30px; right: 20px; background: var(--p-purple); color: #000; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; box-shadow: 0 8px 30px rgba(0,0,0,0.4); cursor: pointer; border: none; z-index: 999999; transition: transform 0.2s; }
         .fab:active { transform: rotate(90deg); }
@@ -126,6 +133,7 @@
         
         .form-label { display: block; font-size: 0.75rem; color: var(--subtext); font-weight: 800; margin-bottom: 8px; letter-spacing: 1px; }
         
+        /* UNIFORM INPUTS */
         .uniform-input { 
             width: 100%; height: 50px; padding: 0 14px; 
             background: var(--col-bg); border: 1px solid var(--border); 
@@ -156,6 +164,7 @@
         .btn-sec { width: 100%; padding: 14px; background: transparent; border: 1px solid var(--border); color: var(--subtext); border-radius: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 0.95rem; }
         .btn-cal { background: var(--col-bg); color: var(--text); border: 1px solid var(--border); padding: 10px; border-radius: 10px; font-size: 0.85rem; cursor: pointer; margin-top: 5px; width: 100%; text-align: center;}
 
+        /* TOAST & CODEX */
         #xp-toast { position: fixed; top: 90px; left: 50%; transform: translateX(-50%); background: var(--p-green); color: black; font-weight: 900; padding: 10px 20px; border-radius: 20px; opacity: 0; pointer-events: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: opacity 0.3s, transform 0.3s; z-index: 2000; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
         #xp-toast.loss { background: var(--p-red); }
         #xp-toast.crit { background: var(--gold); border: 2px solid white; transform: translateX(-50%) scale(1.2); }
@@ -335,10 +344,10 @@
             { t: "Discipline is freedom.", s: "Codex" }
         ];
         const STORY = {
-            1: "CHAPTER I: THE EMBER\n\nThe endless frost began not with a bang, but a whisper...",
-            2: "CHAPTER II: THE FROZEN COURT\n\nI traveled South, following the faint pull of the blade...",
-            3: "CHAPTER III: THE ALCHEMIST'S MIRROR\n\nI chose the snow. I ran. The blade guided me...",
-            4: "FINALE: THE ZENITH\n\nThe climb took everything. My gear, my strength, my blood..."
+            1: "CHAPTER I: THE EMBER\n\nThe endless frost began not with a bang, but a whisper. The sun simply... dimmed. Years turned to decades of twilight. Civilization crumbled into the snow.\n\nI am Kael, a scavenger of the Old World. Yesterday, digging through the ruins of a tech-spire, I found it. Not food, not fuel, but a sword. It wasn't cold steel. It hummed. A faint, golden heat radiated from the blade.\n\nThey say the Alchemists of old trapped sunlight in metal. If that's true, I'm holding the only warmth left in the world. And the Shadows are coming for it.",
+            2: "CHAPTER II: THE FROZEN COURT\n\nI traveled South, following the faint pull of the blade. The Capital still stands, a fortress of black ice and iron. The Lords play their games of thrones while the poor freeze outside the walls.\n\nI tried to barter entry, but the guards saw the sword. Now I am a prisoner, or a guest? The High Warden wants the weapon. He says it belongs to the 'Vanguard,' a mythical order of knights.\n\nI must choose. Give him the sword and live in luxury while the world dies? Or escape, and find the source of the blade's power? The whispers in my mind are getting louder. 'Protect the Light.'",
+            3: "CHAPTER III: THE ALCHEMIST'S MIRROR\n\nI chose the snow. I ran. The blade guided me to a mountain peak above the cloud layer. There was no temple, only a cave, and an old woman reflecting starlight with mirrors.\n\n'You look for a savior,' she laughed. 'But the sword is just a key.'\n\nShe showed me the truth. The sun didn't die. We blocked it. The 'Shield' meant to protect us from solar flares froze in place. The sword unlocks the atmospheric controls. But the climb to the Zenith Spire is a suicide mission. Vampiric creatures nest there. I am afraid. But the sword is burning hot now. It knows.",
+            4: "FINALE: THE ZENITH\n\nThe climb took everything. My gear, my strength, my blood. I stand at the Zenith controls. The Shadows surround me, screeching in the thin air.\n\nI plunge the blade into the console. Not a key, but a spark. The machine roars. The sky tears open. For the first time in a century, a beam of pure, unfiltered gold hits the snow.\n\nThe Shadows burn away. The ice weeps. I fall to my knees, blinded, weeping with it. The Sunless Age is over. I am the Vanguard. And I am warm."
         };
 
         initApp();
@@ -368,7 +377,6 @@
                 div.className = `card slide-enter p-${t.prio||'Med'}`;
                 div.id = `card-${t.id}`;
                 
-                // CLICK CARD TO VIEW
                 div.onclick = () => openViewer(t.id);
                 
                 div.innerHTML = `<div class="card-top"><span class="card-title">${t.title}</span>${dateHtml}</div>
@@ -390,7 +398,7 @@
             document.querySelector('h1').innerText = showArchive ? "Cryo-Storage 🧊" : "Mission Control 🚀";
         }
 
-        // --- NEW: VIEWER LOGIC ---
+        // --- VIEWER LOGIC ---
         function openViewer(id) {
             const t = tasks.find(x => x.id === id);
             if(!t) return;
@@ -407,7 +415,6 @@
             t.steps.forEach((s, idx) => {
                 const div = document.createElement('div');
                 div.className = 'check-item';
-                // Interactive Checkbox in View Mode
                 div.innerHTML = `<div class="check-box ${s.done?'checked':''}" onclick="toggleStepDone('${id}', ${idx})"></div><span class="check-text" style="border:none;">${s.text}</span>`;
                 container.appendChild(div);
             });
@@ -422,26 +429,19 @@
             if(t.steps[stepIdx].done) { showToast("+10 XP", false); updateLiveXP(10); }
             else { showToast("-10 XP", true); updateLiveXP(-10); }
             
-            save(); 
-            openViewer(taskId); // Re-render view
-            render(); // Update board progress bars
+            save(); openViewer(taskId); render(); 
         }
 
-        function switchToEdit() {
-            closeViewer();
-            openEditor(currentViewId);
-        }
-
+        function switchToEdit() { closeViewer(); openEditor(currentViewId); }
         function closeViewer() { document.getElementById('viewer').style.display = 'none'; }
 
-        // --- EDITOR LOGIC (RENAMED FROM MODAL) ---
+        // --- EDITOR LOGIC ---
         function openEditor(id = null) {
             const t = id ? tasks.find(x => x.id === id) : { id: '', title: '', steps: [], col: 0, prio:'Med', date:'', archived:false };
             document.getElementById('e-id').value = t.id;
             document.getElementById('e-title').value = t.title;
             document.getElementById('e-date').value = t.date;
             document.getElementById('e-prio').value = t.prio || 'Med';
-            
             document.getElementById('btn-archive-toggle').innerText = t.archived ? "🔥 Thaw" : "🧊 Cryo-Sleep";
             
             const container = document.getElementById('e-checks');
@@ -462,11 +462,7 @@
             if(e.key === 'Enter') {
                 e.preventDefault();
                 const input = document.getElementById('new-step-input');
-                if(input.value.trim()) {
-                    addEditStep(input.value.trim());
-                    input.value = '';
-                    input.focus();
-                }
+                if(input.value.trim()) { addEditStep(input.value.trim()); input.value = ''; input.focus(); }
             }
         }
 
@@ -477,34 +473,21 @@
             
             const steps = [];
             document.querySelectorAll('#e-checks .check-item').forEach(el => {
-                steps.push({ 
-                    text: el.querySelector('.check-text').value.trim(), 
-                    done: el.querySelector('.check-box').classList.contains('checked') 
-                });
+                steps.push({ text: el.querySelector('.check-text').value.trim(), done: el.querySelector('.check-box').classList.contains('checked') });
             });
 
             if(id) {
                 const idx = tasks.findIndex(x => x.id === id);
                 tasks[idx] = { ...tasks[idx], title, steps, prio: document.getElementById('e-prio').value, date: document.getElementById('e-date').value };
             } else {
-                tasks.push({ 
-                    id: Date.now().toString(), 
-                    title, steps, col: 0, 
-                    prio: document.getElementById('e-prio').value, 
-                    date: document.getElementById('e-date').value, 
-                    archived: false 
-                });
+                tasks.push({ id: Date.now().toString(), title, steps, col: 0, prio: document.getElementById('e-prio').value, date: document.getElementById('e-date').value, archived: false });
             }
             save(); closeEditor(); render();
         }
 
         function deleteCard() {
             const id = document.getElementById('e-id').value;
-            if(confirm("Abort Mission?")) {
-                tasks = tasks.filter(x => x.id !== id);
-                updateLiveXP(-50);
-                save(); closeEditor(); render();
-            }
+            if(confirm("Abort Mission?")) { tasks = tasks.filter(x => x.id !== id); updateLiveXP(-50); save(); closeEditor(); render(); }
         }
 
         function closeEditor() { document.getElementById('editor').style.display = 'none'; }
@@ -512,72 +495,41 @@
         function toggleArchiveTask() {
             const id = document.getElementById('e-id').value;
             const t = tasks.find(x => x.id === id);
-            t.archived = !t.archived;
-            save(); closeEditor(); render();
+            t.archived = !t.archived; save(); closeEditor(); render();
         }
 
-        // --- MOVEMENT & XP LOGIC ---
+        // --- XP LOGIC ---
         function moveCardLogic(idx, dir) {
             let newCol = (tasks[idx].col || 0) + dir;
             if(newCol < 0) newCol = 0; if(newCol > 2) newCol = 2;
-            
             const task = tasks[idx];
-            
-            // Victory Calculation
-            if(task.col !== 2 && newCol === 2) {
-                calculateFinishXP(task);
-                launchConfetti();
-            }
-            if(task.col === 2 && newCol !== 2) { showToast("RETREAT (-20%)", true); updateLiveXP(-20); } // Flat penalty for retreat
-
-            task.col = newCol;
-            save(); updateXP(); render();
+            if(task.col !== 2 && newCol === 2) { calculateFinishXP(task); launchConfetti(); }
+            if(task.col === 2 && newCol !== 2) { showToast("RETREAT (-20%)", true); updateLiveXP(-20); }
+            task.col = newCol; save(); updateXP(); render();
         }
 
         function calculateFinishXP(task) {
-            let base = 100;
-            if(task.prio === 'Med') base = 150;
-            if(task.prio === 'High') base = 200;
-
+            let base = 100; if(task.prio === 'Med') base = 150; if(task.prio === 'High') base = 200;
             let multiplier = 1.0;
             if(task.date) {
-                const due = new Date(task.date);
-                const today = new Date();
-                // Reset time to midnight for fair comparison
+                const due = new Date(task.date); const today = new Date();
                 due.setHours(0,0,0,0); today.setHours(0,0,0,0);
-                
-                if(today < due) multiplier = 1.2; // Early Bonus
-                else if(today > due) multiplier = 0.8; // Late Penalty
+                if(today < due) multiplier = 1.2; else if(today > due) multiplier = 0.8;
             }
-
             const total = Math.floor(base * multiplier);
             const msg = multiplier > 1 ? "EARLY VICTORY!" : (multiplier < 1 ? "LATE VICTORY" : "VICTORY!");
-            
-            showToast(`${msg} (+${total} XP)`, false);
-            updateLiveXP(total);
+            showToast(`${msg} (+${total} XP)`, false); updateLiveXP(total);
         }
 
         function updateLiveXP(amount) {
-            // Prestige Multiplier
             const pMult = 1 + (prestige * 0.1); 
             let final = Math.floor(amount * pMult);
-            
-            // Critical Chance (5%)
-            if(amount > 0 && Math.random() < 0.05) {
-                final += 50;
-                showToast("CRITICAL SUCCESS! (+50 BONUS)", false);
-                showCodex();
-            }
-
-            userXP += final;
-            if(userXP < 0) userXP = 0;
-            updateXP();
+            if(amount > 0 && Math.random() < 0.05) { final += 50; showToast("CRITICAL SUCCESS! (+50)", false); showCodex(); }
+            userXP += final; if(userXP < 0) userXP = 0; updateXP();
         }
 
-        // --- CORE UTILS ---
         function updateXP() {
-            localStorage.setItem('mc_xp', userXP);
-            localStorage.setItem('mc_prestige', prestige);
+            localStorage.setItem('mc_xp', userXP); localStorage.setItem('mc_prestige', prestige);
             const stats = getLevel(userXP);
             const pct = Math.max(0, Math.min(100, ((userXP - stats.prevReq) / (stats.nextReq - stats.prevReq)) * 100));
             document.getElementById('lvl-badge').innerText = `LVL ${stats.level}`;
@@ -600,57 +552,50 @@
             setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translate(-50%, 10px)'; }, 3000);
         }
 
-        // --- STANDARD UTILS (Theme, Menu, Export) ---
         function checkUnlocks(level) {
             const locks = {'theme-wolf':5, 'theme-neon':10, 'theme-aperture':12, 'theme-gold':30, 'feat-prestige':50};
             for(let id in locks) {
-                const btn = document.getElementById(id);
-                if(!btn) continue;
-                if(prestige > 0 || level >= locks[id]) { 
-                    btn.classList.remove('dd-locked'); 
-                    if(btn.innerText.includes('🔒')) btn.innerText = btn.innerText.replace(' 🔒', '');
-                } else {
-                    btn.classList.add('dd-locked'); 
-                    if(!btn.innerText.includes('🔒')) btn.innerText += ' 🔒';
-                }
+                const btn = document.getElementById(id); if(!btn) continue;
+                if(prestige > 0 || level >= locks[id]) { btn.classList.remove('dd-locked'); if(btn.innerText.includes('🔒')) btn.innerText = btn.innerText.replace(' 🔒', ''); } 
+                else { btn.classList.add('dd-locked'); if(!btn.innerText.includes('🔒')) btn.innerText += ' 🔒'; }
             }
         }
         function setTheme(name, force) {
             if(!force && name !== 'default' && name !== 'light' && prestige === 0) {
-                // Simple check, real check is in checkUnlocks logic visually
-                const stats = getLevel(userXP);
-                const reqs = {'wolf':5, 'neon':10, 'aperture':12, 'gold':30};
+                const stats = getLevel(userXP); const reqs = {'wolf':5, 'neon':10, 'aperture':12, 'gold':30};
                 if(stats.level < reqs[name]) return alert("Locked!");
             }
-            document.body.className = `theme-${name}`;
-            currentTheme = name;
-            localStorage.setItem('theme', name);
+            document.body.className = `theme-${name}`; currentTheme = name; localStorage.setItem('theme', name);
         }
         function toggleMenu() { document.getElementById('save-menu').classList.toggle('show'); }
         function closeMenu() { document.getElementById('save-menu').classList.remove('show'); }
         function toggleArchiveView() { showArchive = !showArchive; render(); }
-        function showCodex() {
-            const quote = CODEX[Math.floor(Math.random() * CODEX.length)];
-            const el = document.getElementById('codex-popup');
-            document.getElementById('codex-text').innerText = `"${quote.t}"`;
-            document.getElementById('codex-src').innerText = quote.s;
-            el.classList.add('active');
-            setTimeout(() => el.classList.remove('active'), 5000);
-        }
         function setConfetti(type) { confettiStyle = type; localStorage.setItem('mc_fx', type); }
+        function launchConfetti() {
+            const emojis = { 'square': '', 'star': '⭐', 'coin': '🪙', 'gem': '💎' };
+            const icon = emojis[confettiStyle];
+            for(let i=0; i<30; i++) {
+                const c = document.createElement('div'); c.className = 'confetti'; c.innerText = icon; c.style.left = Math.random()*100 + 'vw';
+                if(confettiStyle === 'square') { c.style.width = '10px'; c.style.height = '10px'; c.style.background = `hsl(${Math.random()*360}, 100%, 50%)`; }
+                c.style.animation = `fall ${Math.random()*1+1}s linear forwards`; document.body.appendChild(c); setTimeout(()=>c.remove(), 2000);
+            }
+        }
         function save() { localStorage.setItem('mc_tasks', JSON.stringify(tasks)); }
         function toggleZen() { document.body.classList.toggle('zen-mode'); closeMenu(); }
         function doPrestige() {
              const stats = getLevel(userXP);
              if(stats.level < 50) return alert("Level 50 Required");
-             if(confirm("Prestige? Reset Level, keep themes.")) { userXP=0; prestige++; updateXP(); }
+             if(confirm("Prestige? Reset Level, keep themes.")) { userXP=0; prestige++; updateXP(); alert("PRESTIGE UNLOCKED!"); closeMenu(); }
         }
-        function showStatusReport() { alert(`XP: ${userXP}\nPrestige: ${prestige}`); }
+        function showStatusReport() { const stats = getLevel(userXP); alert(`XP: ${userXP}\nLevel: ${stats.level}\nPrestige: ${prestige}`); }
         function exportData() {
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(new Blob([JSON.stringify(tasks)], {type:'application/json'}));
-            a.download = 'mission_backup.json';
-            a.click();
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(tasks)], {type:'application/json'}));
+            a.download = 'mission_backup.json'; a.click();
+        }
+        function importData(input) {
+            const file = input.files[0]; const reader = new FileReader();
+            reader.onload = function(e) { try { tasks = JSON.parse(e.target.result); save(); render(); alert("Loaded!"); } catch(err) { alert("Invalid File"); } };
+            reader.readAsText(file);
         }
     </script>
 </body>
