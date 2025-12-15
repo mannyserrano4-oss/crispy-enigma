@@ -22,7 +22,7 @@
             --font-head: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
-        /* --- THEME PACKS (RESTORED) --- */
+        /* --- THEME PACKS --- */
         body.theme-light { --bg: #f3f4f6; --card-bg: #ffffff; --col-bg: #e5e7eb; --text: #1f2937; --subtext: #6b7280; --border: #d1d5db; }
         body.theme-wolf { --bg: #1c1917; --card-bg: #292524; --col-bg: #0c0a09; --text: #e7e5e4; --subtext: #a8a29e; --border: #44403c; --p-red: #7f1d1d; --p-orange: #b45309; --p-blue: #3b82f6; --p-green: #15803d; --p-purple: #a21caf; --font-main: Georgia, serif; --radius: 4px; --shadow: 0 4px 15px rgba(0,0,0,0.5); }
         body.theme-neon { --bg: #050505; --card-bg: #111; --col-bg: #0a0a0a; --text: #fff; --subtext: #888; --border: #333; --p-red: #ff0055; --p-orange: #ff9900; --p-blue: #00f3ff; --p-green: #00ff66; --p-purple: #bc13fe; --font-main: 'Courier New', monospace; --radius: 0px; --shadow: 0 0 10px var(--p-blue); }
@@ -129,6 +129,7 @@
         .check-box.checked { background: var(--p-green); border-color: var(--p-green); }
         .check-box.checked::after { content:'✓'; color:black; font-weight:900; font-size:1rem; }
         .check-text { flex: 1; background: transparent; border: none; color: var(--text); font-size: 1.1rem; border-bottom: 1px solid transparent; }
+        .check-text:focus { border-bottom: 1px solid var(--p-purple); outline: none; }
         .check-del { color: var(--p-red); cursor: pointer; padding: 8px; font-weight: bold; font-size: 1.2rem; opacity: 0.5; }
 
         .btn-main { width: 100%; padding: 18px; background: var(--p-purple); color: #000; border: none; border-radius: 16px; font-weight: 800; font-size: 1.1rem; cursor: pointer; margin-top: 20px; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(196, 181, 253, 0.3); }
@@ -258,6 +259,11 @@
                 <input id="new-step-input" class="form-input" placeholder="+ Add Step (Press Enter)" style="margin-bottom:0;" onkeypress="handleStepEnter(event)">
             </div>
             
+            <div class="form-row" id="move-controls" style="margin-top:20px; display:none;">
+                <button class="btn-sec" onclick="moveCardAnim(-1)">⬅️ Back</button>
+                <button class="btn-sec" onclick="moveCardAnim(1)">Advance ➡️</button>
+            </div>
+
             <button class="btn-main" onclick="saveCard()">SAVE MISSION</button>
             <div class="form-row" style="margin-top:10px;">
                 <button class="btn-sec" id="btn-archive-toggle" onclick="toggleArchive()">🧊 Cryo-Sleep</button>
@@ -287,6 +293,8 @@
         let confettiStyle = localStorage.getItem('mc_fx') || 'square';
         let showArchive = false;
         let currentChapter = 1;
+        let lastDeletedTask = null;
+        let undoTimeout = null;
         
         const RANKS = ["Rookie", "Operative", "Specialist", "Tactician", "Mercenary", "Commander", "Warlord", "Vanguard", "Titan", "Legend"];
         const CODEX = [
@@ -331,7 +339,7 @@
             
             document.getElementById('lvl-badge').innerText = badgeText;
             document.getElementById('xp-fill').style.width = `${pct}%`;
-            document.getElementById('xp-val').innerText = `${userXP} / ${stats.nextReq}`;
+            document.getElementById('xp-text').innerText = `${userXP} / ${stats.nextReq}`;
             
             checkUnlocks(stats.level);
         }
