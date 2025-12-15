@@ -11,115 +11,78 @@
 
     <style>
         :root {
-            /* REFINED PALETTE (Easier on Eyes) */
-            --bg: #181825;       /* Softer Dark Background */
-            --card-bg: #262636;  /* Card Color */
-            --col-bg: #1e1e2e;   /* Column Background */
-            --text: #cdd6f4;
-            --subtext: #9399b2;
-            --border: #313244;
-            
-            /* DISTINCT INPUT COLORS */
-            --in-title: #313244;
-            --in-date: #232336;
-            --in-prio: #2a2a3c;
-            
-            /* ACCENTS */
-            --p-red: #f38ba8;    
-            --p-orange: #fab387; 
-            --p-blue: #89b4fa;   
-            --p-green: #a6e3a1;  
-            --p-purple: #cba6f7;
-            
-            --radius: 16px;
-            --shadow: 0 6px 15px rgba(0,0,0,0.25);
+            /* DEFAULT (Tactical Dark) */
+            --bg: #181825; --card-bg: #262636; --col-bg: #1e1e2e;
+            --text: #cdd6f4; --subtext: #9399b2; --border: #313244;
+            --in-title: #313244; --in-date: #232336; --in-prio: #2a2a3c;
+            --p-red: #f38ba8; --p-orange: #fab387; --p-blue: #89b4fa;   
+            --p-green: #a6e3a1; --p-purple: #cba6f7;
+            --radius: 16px; --shadow: 0 6px 15px rgba(0,0,0,0.25);
             --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             --font-head: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
-        /* --- THEME PACKS --- */
+        /* --- THEMES --- */
         body.theme-light { --bg: #eff1f5; --card-bg: #ffffff; --col-bg: #e6e9ef; --text: #4c4f69; --subtext: #9ca0b0; --border: #bcc0cc; --in-title:#e6e9ef; --in-date:#dce0e8; --in-prio:#e6e9ef; }
         body.theme-wolf { --bg: #1c1917; --card-bg: #292524; --col-bg: #0c0a09; --text: #e7e5e4; --subtext: #a8a29e; --border: #44403c; --p-red: #7f1d1d; --p-orange: #b45309; --p-blue: #3b82f6; --p-green: #15803d; --p-purple: #a21caf; --font-main: Georgia, serif; --radius: 4px; }
         body.theme-neon { --bg: #050505; --card-bg: #111; --col-bg: #0a0a0a; --text: #fff; --subtext: #888; --border: #333; --p-red: #ff0055; --p-orange: #ff9900; --p-blue: #00f3ff; --p-green: #00ff66; --p-purple: #bc13fe; --font-main: 'Courier New', monospace; --radius: 0px; }
         body.theme-neon .card { border: 1px solid var(--p-blue); }
-        
-        /* --- BASE STYLES --- */
-        body { 
-            background-color: var(--bg); color: var(--text); 
-            font-family: var(--font-main);
-            margin: 0; height: 100dvh; display: flex; flex-direction: column; overflow: hidden;
-            transition: background 0.3s, color 0.3s;
-        }
+        body.theme-aperture { --bg: #e0e0e0; --card-bg: #ffffff; --col-bg: #d1d1d1; --text: #333; --subtext: #666; --border: #999; --p-red: #e74c3c; --p-orange: #ffa500; --p-blue: #00a5ff; --p-green: #00a5ff; --p-purple: #333; --font-main: Helvetica, Arial, sans-serif; --radius: 20px; }
+        body.theme-gold { --bg: #0f0f0f; --card-bg: #1c1c1c; --col-bg: #141414; --text: #fcd34d; --subtext: #b45309; --border: #78350f; --p-red: #991b1b; --p-green: #f59e0b; --p-purple: #d97706; --p-blue: #fcd34d; --font-main: Georgia, serif; --radius: 8px; }
+        body.theme-gold .level-badge { background: linear-gradient(to right, #fcd34d, #b45309); color: black; }
+        body.theme-nebula { --bg: #0b0014; --card-bg: #1a0b2e; --col-bg: #11051f; --text: #e0ccff; --subtext: #8a64b5; --border: #4a2b6b; --p-red: #ff3366; --p-green: #00ffcc; --p-purple: #bb00ff; --p-blue: #00ccff; background: radial-gradient(circle at 50% 50%, #1a0b2e 0%, #000000 100%); --font-head: 'Verdana', sans-serif; }
+        body.theme-nebula .level-badge { background: linear-gradient(90deg, #ff00cc, #3333ff); box-shadow: 0 0 15px #bb00ff; }
+        body.theme-midas { --bg: #080808; --card-bg: #141414; --col-bg: #0d0d0d; --text: #d4af37; --subtext: #8a7324; --border: #d4af37; --p-red: #ff4444; --p-green: #d4af37; --p-purple: #ffd700; --p-blue: #c5a028; --radius: 2px; --font-main: 'Times New Roman', serif; }
+        body.theme-midas .card { border: 1px solid #d4af37; box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
+        body.theme-glitch { --bg: #121212; --card-bg: #000000; --col-bg: #1a1a1a; --text: #ffffff; --subtext: #555555; --border: #333333; --p-red: #ff003c; --p-green: #05ffa1; --p-blue: #00f0ff; --p-purple: #ff003c; --font-main: 'Courier New', monospace; }
+        body.theme-glitch .card-title { text-shadow: 2px 0 var(--p-red), -2px 0 var(--p-blue); }
 
+        body { background-color: var(--bg); color: var(--text); font-family: var(--font-main); margin: 0; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; transition: background 0.5s, color 0.5s; }
         body.zen-mode .header, body.zen-mode .xp-bar-container, body.zen-mode .fab { display: none !important; }
         body.zen-mode .board { height: 100vh; padding-top: max(20px, env(safe-area-inset-top)); }
         #exit-zen { position: fixed; top: 10px; right: 10px; z-index: 1000; opacity: 0.3; display: none; }
         body.zen-mode #exit-zen { display: block; }
 
-        .xp-bar-container {
-            background: var(--col-bg); padding: 15px 20px;
-            padding-top: max(15px, env(safe-area-inset-top)); 
-            border-bottom: 1px solid var(--border);
-            display: flex; align-items: center; gap: 15px;
-        }
-        .level-badge {
-            background: linear-gradient(135deg, var(--p-purple), var(--p-blue));
-            color: #000; font-weight: 900; padding: 6px 14px; border-radius: 20px;
-            font-size: 0.8rem; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            white-space: nowrap; font-family: var(--font-head);
-        }
+        .xp-bar-container { background: var(--col-bg); padding: 15px 20px; padding-top: max(15px, env(safe-area-inset-top)); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 15px; }
+        .level-badge { background: linear-gradient(135deg, var(--p-purple), var(--p-blue)); color: #000; font-weight: 900; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; box-shadow: 0 2px 10px rgba(0,0,0,0.2); white-space: nowrap; font-family: var(--font-head); }
         .xp-track { flex: 1; height: 10px; background: var(--border); border-radius: 5px; overflow: hidden; position: relative; }
-        .xp-fill { 
-            height: 100%; background: var(--p-green); width: 0%; 
-            transition: width 0.5s ease-out, background 0.2s; 
-        }
-        .xp-text { font-size: 0.75rem; color: var(--subtext); font-weight: bold; width: 80px; text-align: right; }
+        .xp-fill { height: 100%; background: var(--p-green); width: 0%; transition: width 0.5s ease-out, background 0.2s; }
+        .xp-fill.damage { background: var(--p-red); } 
+        .xp-text { font-size: 0.7rem; color: var(--subtext); font-weight: bold; width: 80px; text-align: right; }
 
         .header { padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
         h1 { margin: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; color: var(--p-blue); font-weight: 900; font-family: var(--font-head); }
         .icon-btn { font-size: 1.4rem; background: none; border: none; cursor: pointer; padding: 8px; opacity: 0.8; color: var(--text); }
 
         .board { flex: 1; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding: 10px; gap: 15px; }
-        .column { 
-            min-width: 88vw; background: var(--col-bg); 
-            border-radius: var(--radius); display: flex; flex-direction: column;
-            scroll-snap-align: center; border: 1px solid var(--border);
-        }
+        .column { min-width: 88vw; background: var(--col-bg); border-radius: var(--radius); display: flex; flex-direction: column; scroll-snap-align: center; border: 1px solid var(--border); }
         @media (min-width: 600px) { .column { min-width: 340px; } }
-
         .col-header { padding: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; font-family: var(--font-head); color: var(--subtext); }
         .task-list { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 12px; }
-        
         .empty-msg { text-align: center; color: var(--subtext); font-style: italic; font-size: 0.8rem; margin-top: 50px; opacity: 0.5; }
 
-        /* CARDS */
-        .card { 
-            background: var(--card-bg); padding: 16px; border-radius: var(--radius); 
-            box-shadow: var(--shadow); transition: transform 0.2s, opacity 0.2s; 
-            border-left: 0; position: relative; overflow: hidden;
-        }
+        .card { background: var(--card-bg); padding: 16px; border-radius: var(--radius); box-shadow: var(--shadow); transition: transform 0.2s, opacity 0.2s; border-left: 0; position: relative; overflow: hidden; }
         .card:active { transform: scale(0.98); }
-        
+        .card-actions { display:flex; gap:10px; margin-top:10px; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:10px; }
+        .btn-quick { background: var(--col-bg); border:1px solid var(--border); color:var(--text); width:30px; height:35px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; font-size:1.1rem; }
+        .edit-btn { color: var(--p-purple); border-color: var(--p-purple); font-size:1rem; width: auto; padding: 0 15px;}
+
         @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .slide-enter { animation: slideIn 0.3s forwards; }
+        .slide-right { animation: slideOutRight 0.3s forwards; }
+        .slide-left { animation: slideOutLeft 0.3s forwards; }
+        @keyframes slideOutRight { to { transform: translateX(100%); opacity: 0; } }
+        @keyframes slideOutLeft { to { transform: translateX(-100%); opacity: 0; } }
 
         .card-top { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center; }
         .card-title { font-weight: bold; font-size: 1.1rem; color: var(--text); }
         .card-date { font-size: 0.7rem; background: var(--border); padding: 4px 8px; border-radius: 6px; color: var(--subtext); height: fit-content; font-weight: 600; }
         .card-date.overdue { background: var(--p-red); color: #000; }
-        
         .prio-pill { font-size: 0.65rem; padding: 3px 8px; border-radius: 10px; font-weight: 800; text-transform: uppercase; margin-right: 5px; color:#000; }
-        .pill-High { background: var(--p-red); }
-        .pill-Med { background: var(--p-orange); }
-        .pill-Low { background: var(--p-blue); }
-
+        .pill-High { background: var(--p-red); } .pill-Med { background: var(--p-orange); } .pill-Low { background: var(--p-blue); }
         .progress-track { background: var(--border); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 12px; }
         .progress-fill { height: 100%; background: var(--p-green); width: 0%; transition: width 0.3s; }
         .card-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--subtext); margin-top: 8px; font-weight: 600; }
-        
-        .card-actions { display:flex; gap:10px; margin-top:10px; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:10px; }
-        .btn-quick { background: var(--col-bg); border:1px solid var(--border); color:var(--text); width:30px; height:35px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; font-size:1.1rem; }
-        .edit-btn { color: var(--p-purple); border-color: var(--p-purple); font-size:1rem; width: auto; padding: 0 15px;}
 
         .fab { position: fixed; bottom: 30px; right: 20px; background: var(--p-purple); color: #000; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; box-shadow: 0 8px 30px rgba(0,0,0,0.4); cursor: pointer; border: none; z-index: 999999; transition: transform 0.2s; }
         .fab:active { transform: rotate(90deg); }
@@ -128,23 +91,15 @@
         .modal-content { background: var(--card-bg); width: 90%; max-width: 450px; padding: 25px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: 0 20px 60px rgba(0,0,0,0.6); margin-bottom: 80px; }
         
         .form-label { display: block; font-size: 0.75rem; color: var(--subtext); font-weight: 800; margin-bottom: 8px; letter-spacing: 1px; text-transform: uppercase; }
-        
-        /* --- DISTINCT INPUT STYLES --- */
-        .input-base {
-            width: 100%; height: 50px; padding: 0 14px; 
-            border: 1px solid var(--border); 
-            color: var(--text); border-radius: 12px; font-size: 1.1rem; 
-            box-sizing: border-box; margin-bottom: 18px; 
-            font-family: inherit; transition: 0.2s;
-        }
+        .uniform-input { width: 100%; height: 50px; padding: 0 14px; background: var(--col-bg); border: 1px solid var(--border); color: var(--text); border-radius: 12px; font-size: 1.1rem; box-sizing: border-box; margin-bottom: 18px; font-family: inherit; }
         .input-base:focus { outline: none; border-color: var(--p-purple); }
-
         .input-title { background: var(--in-title); font-weight: bold; }
         .input-date { background: var(--in-date); color: var(--p-blue); }
         .input-select { background: var(--in-prio); color: var(--p-orange); -webkit-appearance: none; appearance: none; }
         .input-step { background: transparent; border: 1px dashed var(--subtext); color: var(--subtext); }
-        
+
         .form-row { display: flex; gap: 12px; margin-bottom: 18px; align-items: stretch; }
+        .fixed-height { height: 50px; box-sizing: border-box; }
         
         .check-item { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; padding: 8px; background: var(--col-bg); border-radius: 10px; }
         .check-box { width: 28px; height: 28px; border-radius: 8px; border: 2px solid var(--subtext); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
@@ -155,18 +110,13 @@
 
         .btn-main { width: 100%; padding: 18px; background: var(--p-purple); color: #000; border: none; border-radius: 16px; font-weight: 800; font-size: 1.1rem; cursor: pointer; margin-top: 10px; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(196, 181, 253, 0.3); }
         .btn-sec { width: 100%; padding: 14px; background: transparent; border: 1px solid var(--border); color: var(--subtext); border-radius: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 0.95rem; }
-        
-        /* TOAST & CODEX */
+        .btn-cal { background: var(--col-bg); color: var(--text); border: 1px solid var(--border); padding: 10px; border-radius: 10px; font-size: 0.85rem; cursor: pointer; margin-top: 5px; width: 100%; text-align: center;}
+
         #xp-toast { position: fixed; top: 90px; left: 50%; transform: translateX(-50%); background: var(--p-green); color: black; font-weight: 900; padding: 10px 20px; border-radius: 20px; opacity: 0; pointer-events: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: opacity 0.3s, transform 0.3s; z-index: 2000; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
         #xp-toast.loss { background: var(--p-red); }
-        
-        #codex-popup { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--card-bg); border: 1px solid var(--p-purple); padding: 15px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); max-width: 90%; width: 300px; z-index: 2000; opacity: 0; pointer-events: none; transition: 0.5s; text-align: center; }
-        #codex-popup.active { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
-        .codex-text { font-style: italic; font-size: 0.9rem; color: var(--text); margin-bottom: 5px; }
-        .codex-src { font-size: 0.7rem; color: var(--p-purple); font-weight: bold; text-transform: uppercase; }
-        
-        /* STORY & MENU */
+        #xp-toast.crit { background: var(--gold); border: 2px solid white; transform: translateX(-50%) scale(1.2); }
         .confetti { position: fixed; width: 20px; height: 20px; top: -20px; z-index: 3000; font-size:20px; text-align:center; }
+        
         .dropdown { position: absolute; top: 60px; right: 15px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; display: none; flex-direction: column; width: 240px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 200; overflow: hidden; max-height: 80vh; overflow-y: auto;}
         .dropdown.show { display: flex; }
         .dd-item { padding: 15px; text-align: left; background: none; border: none; border-bottom: 1px solid var(--border); color: var(--text); font-size: 1rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
@@ -174,10 +124,19 @@
         .dd-badge { font-size: 0.65rem; background: var(--border); padding: 2px 6px; border-radius: 4px; color: var(--subtext); font-weight: bold; }
         .dd-sect { padding:10px; font-size:0.7rem; color:var(--subtext); font-weight:bold; background:var(--col-bg); letter-spacing:1px; }
         
+        #codex-popup { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--card-bg); border: 1px solid var(--p-purple); padding: 15px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); max-width: 90%; width: 300px; z-index: 2000; opacity: 0; pointer-events: none; transition: 0.5s; text-align: center; }
+        #codex-popup.active { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+        .codex-text { font-style: italic; font-size: 0.9rem; color: var(--text); margin-bottom: 5px; }
+        .codex-src { font-size: 0.7rem; color: var(--p-purple); font-weight: bold; text-transform: uppercase; }
+        
         #story-modal .modal-content { background: #1a1a1a; border: 2px solid #b45309; }
         .story-header { font-family: Georgia, serif; text-align: center; color: #fcd34d; font-size: 1.5rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
         .story-body { font-family: Georgia, serif; color: #e7e5e4; line-height: 1.6; font-size: 1.1rem; white-space: pre-wrap; height: 60vh; overflow-y: auto; padding-right: 10px; }
         .story-lock { text-align: center; color: #666; padding: 50px 0; font-style: italic; }
+
+        /* CONFIRM MODAL */
+        #confirm-modal { z-index: 200000; }
+        #confirm-modal .modal-content { border: 2px solid var(--p-red); text-align: center; }
     </style>
 </head>
 <body>
@@ -256,10 +215,8 @@
                 <span id="v-prio" class="prio-pill"></span>
                 <span id="v-date" class="card-date"></span>
             </div>
-            
             <span class="form-label">TACTICAL STATUS</span>
             <div id="v-checks" style="margin-bottom:20px;"></div>
-
             <button class="btn-main" onclick="switchToEdit()">✏️ EDIT MISSION</button>
             <button class="btn-sec" onclick="closeViewer()" style="border:none;">Close</button>
         </div>
@@ -294,9 +251,20 @@
             <button class="btn-main" onclick="saveCard()">SAVE CHANGES</button>
             <div class="form-row" style="margin-top:10px;">
                 <button class="btn-sec" id="btn-archive-toggle" onclick="toggleArchiveTask()">🧊 Archive</button>
-                <button class="btn-sec" onclick="deleteCard()" style="color:var(--p-red); border-color:var(--p-red);">💀 Delete</button>
+                <button class="btn-sec" onclick="confirmDelete()" style="color:var(--p-red); border-color:var(--p-red);">💀 Delete</button>
             </div>
             <button class="btn-sec" onclick="closeEditor()" style="border:none;">Cancel</button>
+        </div>
+    </div>
+
+    <div id="confirm-modal" class="modal">
+        <div class="modal-content" style="text-align:center;">
+            <h2 style="color:var(--p-red); margin-top:0;">⚠️ WARNING</h2>
+            <p id="confirm-msg" style="margin-bottom:20px; font-size:1.1rem; color:var(--text);">Abort Mission?<br><span style="font-size:0.9rem; opacity:0.8;">Penalty: -50 XP</span></p>
+            <div class="form-row">
+                <button class="btn-sec" onclick="closeConfirm()">NO</button>
+                <button class="btn-main" style="background:var(--p-red); color:black;" id="confirm-yes-btn">YES, ABORT</button>
+            </div>
         </div>
     </div>
 
@@ -321,6 +289,7 @@
         let showArchive = false;
         let currentChapter = 1;
         let currentViewId = null;
+        let taskToDeleteId = null;
         
         const RANKS = ["Rookie", "Operative", "Specialist", "Tactician", "Mercenary", "Commander", "Warlord", "Vanguard", "Titan", "Legend"];
         const CODEX = [
@@ -348,7 +317,6 @@
             updateXP();
         }
 
-        // --- RENDER ENGINE ---
         function render() {
             [0, 1, 2].forEach(i => { document.getElementById(`col-${i}`).innerHTML = ''; document.getElementById(`count-${i}`).innerText = '0'; });
             const today = new Date().toISOString().split('T')[0];
@@ -358,18 +326,13 @@
                 const total = t.steps.length;
                 const done = t.steps.filter(s => s.done).length;
                 const pct = total === 0 ? 0 : (done / total) * 100;
-                
-                // --- DATE FORMATTING START ---
                 let dateHtml = '';
                 if(t.date) {
                     const isOverdue = t.date < today && t.col !== 2;
-                    // Format Date to "Dec 12, 2025"
-                    const dateObj = new Date(t.date + 'T00:00'); // T00:00 prevents timezone shift
+                    const dateObj = new Date(t.date + 'T00:00');
                     const dateStr = dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
                     dateHtml = `<span class="card-date ${isOverdue?'overdue':''}">${dateStr}</span>`;
                 }
-                // --- DATE FORMATTING END ---
-
                 const div = document.createElement('div');
                 div.className = `card slide-enter p-${t.prio||'Med'}`;
                 div.id = `card-${t.id}`;
@@ -394,34 +357,25 @@
             document.querySelector('h1').innerText = showArchive ? "Cryo-Storage 🧊" : "Mission Control 🚀";
         }
 
-        // --- VIEWER LOGIC ---
         function openViewer(id) {
             const t = tasks.find(x => x.id === id);
             if(!t) return;
             currentViewId = id;
-            
             document.getElementById('v-title').innerText = t.title;
             document.getElementById('v-prio').innerText = t.prio;
             document.getElementById('v-prio').className = `prio-pill pill-${t.prio}`;
-            
-            // Format View Date
             if(t.date) {
                 const dateObj = new Date(t.date + 'T00:00');
                 document.getElementById('v-date').innerText = dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-            } else {
-                document.getElementById('v-date').innerText = "No Deadline";
-            }
-            
+            } else { document.getElementById('v-date').innerText = "No Deadline"; }
             const container = document.getElementById('v-checks');
             container.innerHTML = '';
-            
             t.steps.forEach((s, idx) => {
                 const div = document.createElement('div');
                 div.className = 'check-item';
                 div.innerHTML = `<div class="check-box ${s.done?'checked':''}" onclick="toggleStepDone('${id}', ${idx})"></div><span class="check-text" style="border:none;">${s.text}</span>`;
                 container.appendChild(div);
             });
-
             document.getElementById('viewer').style.display = 'flex';
         }
 
@@ -436,7 +390,6 @@
         function switchToEdit() { closeViewer(); openEditor(currentViewId); }
         function closeViewer() { document.getElementById('viewer').style.display = 'none'; }
 
-        // --- EDITOR LOGIC ---
         function openEditor(id = null) {
             const t = id ? tasks.find(x => x.id === id) : { id: '', title: '', steps: [], col: 0, prio:'Med', date:'', archived:false };
             document.getElementById('e-id').value = t.id;
@@ -444,11 +397,9 @@
             document.getElementById('e-date').value = t.date;
             document.getElementById('e-prio').value = t.prio || 'Med';
             document.getElementById('btn-archive-toggle').innerText = t.archived ? "🔥 Thaw" : "🧊 Cryo-Sleep";
-            
             const container = document.getElementById('e-checks');
             container.innerHTML = '';
             t.steps.forEach(s => addEditStep(s.text, s.done));
-            
             document.getElementById('editor').style.display = 'flex';
         }
 
@@ -484,10 +435,30 @@
             save(); closeEditor(); render();
         }
 
-        function deleteCard() {
-            const id = document.getElementById('e-id').value;
-            if(confirm("Abort Mission?")) { tasks = tasks.filter(x => x.id !== id); updateLiveXP(-50); save(); closeEditor(); render(); }
+        // --- CONFIRMATION MODAL LOGIC ---
+        function confirmDelete() {
+            taskToDeleteId = document.getElementById('e-id').value;
+            document.getElementById('confirm-yes-btn').onclick = executeDelete;
+            document.getElementById('confirm-modal').style.display = 'flex';
         }
+
+        function closeConfirm() {
+            document.getElementById('confirm-modal').style.display = 'none';
+            taskToDeleteId = null;
+        }
+
+        function executeDelete() {
+            if(taskToDeleteId) {
+                tasks = tasks.filter(x => x.id !== taskToDeleteId);
+                updateLiveXP(-50);
+                save(); 
+                closeConfirm();
+                closeEditor();
+                render();
+            }
+        }
+
+        function deleteCard() { confirmDelete(); } // Maps old call
 
         function closeEditor() { document.getElementById('editor').style.display = 'none'; }
         
@@ -501,12 +472,16 @@
             let newCol = (tasks[idx].col || 0) + dir;
             if(newCol < 0) newCol = 0; if(newCol > 2) newCol = 2;
             const task = tasks[idx];
-            if(task.col !== 2 && newCol === 2) { calculateFinishXP(task); launchConfetti(); }
-            if(task.col === 2 && newCol !== 2) { showToast("RETREAT (-20%)", true); updateLiveXP(-20); }
+            if(task.col !== 2 && newCol === 2) { calculateFinishXP(task); launchConfetti(); task.winXP = calculateFinishValue(task); }
+            if(task.col === 2 && newCol !== 2) { 
+                const refund = task.winXP || 100;
+                const totalLoss = refund + 50; 
+                showToast(`RETREAT (-${totalLoss})`, true); updateLiveXP(-totalLoss); task.winXP = 0; 
+            }
             task.col = newCol; save(); updateXP(); render();
         }
 
-        function calculateFinishXP(task) {
+        function calculateFinishValue(task) {
             let base = 100; if(task.prio === 'Med') base = 150; if(task.prio === 'High') base = 200;
             let multiplier = 1.0;
             if(task.date) {
@@ -514,7 +489,11 @@
                 due.setHours(0,0,0,0); today.setHours(0,0,0,0);
                 if(today < due) multiplier = 1.2; else if(today > due) multiplier = 0.8;
             }
-            const total = Math.floor(base * multiplier);
+            return Math.floor(base * multiplier);
+        }
+
+        function calculateFinishXP(task) {
+            const total = calculateFinishValue(task);
             showToast(`VICTORY! (+${total} XP)`, false); updateLiveXP(total);
         }
 
