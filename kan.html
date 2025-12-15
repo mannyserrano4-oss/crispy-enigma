@@ -425,6 +425,7 @@
             4: "FINALE: THE ZENITH\n\nThe climb took everything. My gear, my strength, my blood. I stand at the Zenith controls. The Shadows surround me, screeching in the thin air.\n\nI plunge the blade into the console. Not a key, but a spark. The machine roars. The sky tears open. For the first time in a century, a beam of pure, unfiltered gold hits the snow.\n\nThe Shadows burn away. The ice weeps. I fall to my knees, blinded, weeping with it. The Sunless Age is over. I am the Vanguard. And I am warm."
         };
 
+        // --- INIT ---
         initApp();
 
         function initApp() {
@@ -432,6 +433,190 @@
             render();
             updateXP();
         }
+
+        // --- CORE LOGIC ---
+        function getLevel(xp) {
+            let lvl = 1; let req = 500; let gap = 500;
+            while(xp >= req) { lvl++; gap += 50; req += gap; }
+            return { level: lvl, nextReq: req, prevReq: req - gap };
+        }
+
+        function updateXP() {
+            localStorage.setItem('mc_xp', userXP);
+            localStorage.setItem('mc_prestige', prestige);
+            const stats = getLevel(userXP);
+            const pct = Math.max(0, Math.min(100, ((userXP - stats.prevReq) / (stats.nextReq - stats.prevReq)) * 100));
+            
+            let badgeText = `LVL ${stats.level}: ${RANKS[Math.min(stats.level-1, RANKS.length-1)]}`;
+            if(prestige > 0) badgeText += ` ${"✪".repeat(prestige)}`;
+            
+            document.getElementById('lvl-badge').innerText = badgeText;
+            document.getElementById('xp-fill').style.width = `${pct}%`;
+            const xpText = document.getElementById('xp-text');
+            if(xpText) xpText.innerText = `${userXP} / ${stats.nextReq}`;
+            
+            checkUnlocks(stats.level);
+        }
+
+        function updateLiveXP(amount) {
+            const mult = 1 + (prestige * 0.1);
+            const finalAmt = Math.floor(amount * mult);
+            const oldLvl = getLevel(userXP).level;
+            userXP += finalAmt;
+            if(userXP < 0) userXP = 0; 
+            const newLvl = getLevel(userXP).level;
+            
+            if(amount > 0 && Math.random() < 0.05) { userXP += 50; showToast("CRITICAL SUCCESS! +50 XP", false); showCodex(); }
+            if(newLvl > oldLvl) { showToast("LEVEL UP!", false); showCodex(); }
+            if(newLvl < oldLvl) { showToast("LEVEL LOST", true); } 
+            
+            updateXP();
+        }
+
+        function doPrestige() {
+            const stats = getLevel(userXP);
+            if(stats.level < 50) return alert("MUST REACH LEVEL 50 TO PRESTIGE.");
+            if(confirm("WARNING: Resets Level to 1. Keeps Themes & Unlocks Story Chapter. Do it?")) {
+                userXP = 0; prestige++; updateXP();
+                alert(`PRESTIGE ${prestige} UNLOCKED! Story Chapter ${prestige} Available.`);
+                closeMenu();
+            }
+        }
+
+        function showCodex() {
+            const quote = CODEX[Math.floor(Math.random() * CODEX.length)];
+            const el = document.getElementById('codex-popup');
+            document.getElementById('codex-text').innerText = `"${quote.t}"`;
+            document.getElementById('codex-src').innerText = quote.s;
+            el.classList.add('active');
+            setTimeout(() => el.classList.remove('active'), 5000);
+        }
+
+        function openStory() {
+            currentChapter = prestige === 0 ? 1 : prestige; 
+            renderChapter();
+            document.getElementById('story-modal').style.display = 'flex';
+        }
+
+        function changeChapter(dir) {
+            currentChapter += dir;
+            if(currentChapter < 1) currentChapter = 1;
+            if(currentChapter > 4) currentChapter = 4;
+            renderChapter();
+        }
+
+        function renderChapter() {
+            const content = document.getElementById('story-content');
+            if(prestige >= currentChapter) {
+                content.innerText = STORY[currentChapter];
+                content.classList.remove('story-lock');
+            } else {
+                content.innerHTML = `<div class="story-lock">🔒 LOCKED<br><br>Reach Prestige ${currentChapter} to decode this chronicle.</div>`;
+            }
+        }
+
+        function showToast(msg, isLoss) {
+            const t = document.getElementById('xp-toast');
+            t.querySelector('span').innerText = msg;
+            t.className = isLoss ? 'loss' : '';
+            
+            if(isLoss && lastDeletedTask && prestige >= 1) {
+                if(!t.querySelector('.btn-undo')) {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-undo';
+                    btn.innerText = 'TIME WARP (UNDO)';
+                    btn.onclick = undoDelete;
+                    t.appendChild(btn);
+                }
+            } else {
+                const existingBtn = t.querySelector('.btn-undo');
+                if(existingBtn) existingBtn.remove();
+            }
+
+            t.style.opacity = '1'; t.style.transform = 'translate(-50%, 0px) scale(1)';
+            const bar = document.getElementById('xp-fill');
+            if(isLoss) bar.classList.add('damage'); else bar.classList.remove('damage');
+            
+            if(undoTimeout) clearTimeout(undoTimeout);
+            undoTimeout = setTimeout(() => { 
+                t.style.opacity = '0'; t.style.transform = 'translate(-50%, 10px)'; bar.classList.remove('damage'); 
+                lastDeletedTask = null;
+            }, 5000);
+        }
+
+        function undoDelete() {
+            if(lastDeletedTask) {
+                tasks.push(lastDeletedTask);
+                updateLiveXP(lastDeletedTask.xpLost);
+                save(); render();
+                showToast("TIMELINE RESTORED", false);
+                lastDeletedTask = null;
+            }
+        }
+
+        function checkUnlocks(level) {
+            const locks = {
+                'theme-wolf': 5, 'theme-neon': 10, 'theme-aperture': 12, 'theme-horror': 15,
+                'theme-vapor': 18, 'theme-blueprint': 20, 'theme-terminal': 25, 'theme-gold': 30,
+                'theme-nebula': 999, 'theme-midas': 999, 'theme-glitch': 999, 
+                'feat-status': 2, 'feat-zen': 8, 'feat-prestige': 50,
+                'fx-star': 10, 'fx-coin': 20, 'fx-gem': 30
+            };
+            for(let id in locks) {
+                const btn = document.getElementById(id);
+                if(!btn) continue;
+                let isUnlocked = false;
+                if(id === 'theme-nebula') isUnlocked = prestige >= 1;
+                else if(id === 'theme-midas') isUnlocked = prestige >= 2;
+                else if(id === 'theme-glitch') isUnlocked = prestige >= 3;
+                else isUnlocked = unlockAll || level >= locks[id];
+                if(isUnlocked) { btn.classList.remove('dd-locked'); if(btn.innerText.includes('🔒')) btn.innerText = btn.innerText.replace(' 🔒', ''); } 
+                else { btn.classList.add('dd-locked'); if(!btn.innerText.includes('🔒')) btn.innerText += ' 🔒'; }
+            }
+        }
+
+        function setTheme(name, force) {
+            const stats = getLevel(userXP);
+            const reqs = { 'wolf': 5, 'neon': 10, 'aperture': 12, 'horror': 15, 'vapor': 18, 'blueprint': 20, 'terminal': 25, 'gold': 30 };
+            const pReqs = { 'nebula': 1, 'midas': 2, 'glitch': 3 };
+            if(!force) {
+                if(pReqs[name] && prestige < pReqs[name]) return alert(`LOCKED! Reach Prestige ${pReqs[name]} to unlock.`);
+                if(reqs[name] && prestige === 0 && stats.level < reqs[name]) return alert(`LOCKED! Reach Level ${reqs[name]} to unlock.`);
+            }
+            document.body.className = ''; 
+            if(name !== 'default') document.body.classList.add(`theme-${name}`);
+            currentTheme = name;
+            localStorage.setItem('theme', name);
+        }
+
+        function setConfetti(type) {
+            const stats = getLevel(userXP);
+            const reqs = { 'star': 10, 'coin': 20, 'gem': 30 };
+            if(prestige === 0 && reqs[type] && stats.level < reqs[type]) return alert(`Locked until Level ${reqs[type]}`);
+            confettiStyle = type;
+            localStorage.setItem('mc_fx', type);
+        }
+
+        function launchConfetti() {
+            const emojis = { 'square': '', 'star': '⭐', 'coin': '🪙', 'gem': '💎' };
+            const icon = emojis[confettiStyle];
+            for(let i=0; i<30; i++) {
+                const c = document.createElement('div');
+                c.className = 'confetti';
+                c.innerText = icon;
+                c.style.left = Math.random()*100 + 'vw';
+                if(confettiStyle === 'square') {
+                    c.style.width = '10px'; c.style.height = '10px';
+                    c.style.background = `hsl(${Math.random()*360}, 100%, 50%)`;
+                }
+                c.style.animation = `fall ${Math.random()*1+1}s linear forwards`;
+                document.body.appendChild(c);
+                setTimeout(()=>c.remove(), 2000);
+            }
+        }
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = `@keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }`;
+        document.head.appendChild(styleSheet);
 
         // --- FILTERING ---
         function filterTasks() {
@@ -508,6 +693,7 @@
             document.getElementById('briefing-text').innerText = `Active: ${activeCount} | Critical: ${highPrioCount}`;
         }
 
+        // --- CAMERA TRACKING ---
         function scrollToColumn(colIdx) {
             const board = document.getElementById('main-board');
             const cols = document.querySelectorAll('.column');
@@ -518,6 +704,7 @@
             }
         }
 
+        // --- VIEWER ---
         function openViewer(id) {
             const t = tasks.find(x => x.id === id);
             if(!t) return;
@@ -557,6 +744,7 @@
         function switchToEdit() { closeViewer(); openEditor(currentViewId); }
         function closeViewer() { document.getElementById('viewer').style.display = 'none'; }
 
+        // --- EDITOR ---
         function openEditor(id = null) {
             const t = id ? tasks.find(x => x.id === id) : { id: '', title: '', steps: [], col: 0, prio:'Med', date:'', tag: '', archived:false };
             document.getElementById('e-id').value = t.id;
@@ -605,6 +793,7 @@
             save(); closeEditor(); render();
         }
 
+        // --- CONFIRMATION ---
         function confirmDelete() {
             taskToDeleteId = document.getElementById('e-id').value;
             if(!taskToDeleteId) return; 
@@ -665,71 +854,6 @@
             showToast(`VICTORY! (+${total} XP)`, false); updateLiveXP(total);
         }
 
-        function updateLiveXP(amount) {
-            const pMult = 1 + (prestige * 0.1); 
-            let final = Math.floor(amount * pMult);
-            if(amount > 0 && Math.random() < 0.05) { final += 50; showToast("CRITICAL SUCCESS! (+50)", false); showCodex(); }
-            userXP += final; if(userXP < 0) userXP = 0; updateXP();
-        }
-
-        function updateXP() {
-            localStorage.setItem('mc_xp', userXP); localStorage.setItem('mc_prestige', prestige);
-            const stats = getLevel(userXP);
-            const pct = Math.max(0, Math.min(100, ((userXP - stats.prevReq) / (stats.nextReq - stats.prevReq)) * 100));
-            document.getElementById('lvl-badge').innerText = `LVL ${stats.level}`;
-            document.getElementById('xp-fill').style.width = `${pct}%`;
-            document.getElementById('xp-text').innerText = `${userXP} / ${stats.nextReq}`;
-            checkUnlocks(stats.level);
-        }
-
-        function getLevel(xp) {
-            let lvl = 1; let req = 500; let gap = 500;
-            while(xp >= req) { lvl++; gap += 50; req += gap; }
-            return { level: lvl, nextReq: req, prevReq: req - gap };
-        }
-
-        function showToast(msg, isLoss) {
-            const t = document.getElementById('xp-toast');
-            t.querySelector('span').innerText = msg;
-            t.className = isLoss ? 'loss' : '';
-            t.style.opacity = '1'; t.style.transform = 'translate(-50%, 0px) scale(1)';
-            setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translate(-50%, 10px)'; }, 3000);
-        }
-
-        function checkUnlocks(level) {
-            const locks = {
-                'theme-wolf': 5, 'theme-neon': 10, 'theme-aperture': 12, 'theme-horror': 15,
-                'theme-vapor': 18, 'theme-blueprint': 20, 'theme-terminal': 25, 'theme-gold': 30,
-                'theme-nebula': 999, 'theme-midas': 999, 'theme-glitch': 999, 
-                'feat-status': 2, 'feat-zen': 8, 'feat-prestige': 50,
-                'fx-star': 10, 'fx-coin': 20, 'fx-gem': 30
-            };
-            for(let id in locks) {
-                const btn = document.getElementById(id); if(!btn) continue;
-                if(prestige > 0 || level >= locks[id]) { btn.classList.remove('dd-locked'); if(btn.innerText.includes('🔒')) btn.innerText = btn.innerText.replace(' 🔒', ''); } 
-                else { btn.classList.add('dd-locked'); if(!btn.innerText.includes('🔒')) btn.innerText += ' 🔒'; }
-            }
-        }
-        function setTheme(name, force) {
-            if(!force && name !== 'default' && name !== 'light' && prestige === 0) {
-                const stats = getLevel(userXP); const reqs = {'wolf':5, 'neon':10, 'aperture':12, 'gold':30};
-                if(stats.level < reqs[name]) return alert("Locked!");
-            }
-            document.body.className = `theme-${name}`; currentTheme = name; localStorage.setItem('theme', name);
-        }
-        function toggleMenu() { document.getElementById('save-menu').classList.toggle('show'); }
-        function closeMenu() { document.getElementById('save-menu').classList.remove('show'); }
-        function toggleArchiveView() { showArchive = !showArchive; render(); }
-        function setConfetti(type) { confettiStyle = type; localStorage.setItem('mc_fx', type); }
-        function launchConfetti() {
-            const emojis = { 'square': '', 'star': '⭐', 'coin': '🪙', 'gem': '💎' };
-            const icon = emojis[confettiStyle];
-            for(let i=0; i<30; i++) {
-                const c = document.createElement('div'); c.className = 'confetti'; c.innerText = icon; c.style.left = Math.random()*100 + 'vw';
-                if(confettiStyle === 'square') { c.style.width = '10px'; c.style.height = '10px'; c.style.background = `hsl(${Math.random()*360}, 100%, 50%)`; }
-                c.style.animation = `fall ${Math.random()*1+1}s linear forwards`; document.body.appendChild(c); setTimeout(()=>c.remove(), 2000);
-            }
-        }
         function save() { localStorage.setItem('mc_tasks', JSON.stringify(tasks)); }
         function toggleZen() { document.body.classList.toggle('zen-mode'); closeMenu(); }
         function doPrestige() {
