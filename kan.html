@@ -7,7 +7,7 @@
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" type="image/png" href="icon.png">
 
-    <script>window.onerror = function(msg, url, line) { alert("Error: " + msg + "\nLine: " + line); return true; };</script>
+    <script>window.onerror = function(msg, url, line) { alert("System Error:\n" + msg + "\nLine: " + line); return true; };</script>
 
     <style>
         :root {
@@ -76,7 +76,6 @@
             transition: width 0.5s ease-out, background 0.2s; 
         }
         .xp-fill.damage { background: var(--p-red); } 
-        /* ID ADDED HERE TO FIX CRASH */
         .xp-text { font-size: 0.7rem; color: var(--subtext); font-weight: bold; width: 80px; text-align: right; }
 
         .header { padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
@@ -143,7 +142,14 @@
         select.uniform-input { -webkit-appearance: none; appearance: none; }
 
         .form-row { display: flex; gap: 12px; margin-bottom: 18px; align-items: stretch; }
+        .fixed-height { height: 50px; box-sizing: border-box; }
         
+        .prio-select { display: flex; gap: 6px; background: var(--col-bg); padding: 6px; border-radius: 14px; flex: 1; border: 1px solid var(--border); }
+        .prio-opt { flex: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 0.85rem; font-weight: bold; cursor: pointer; color: var(--subtext); transition: 0.2s; }
+        .prio-opt.active[data-val="Low"] { background: var(--p-blue); color: #000; }
+        .prio-opt.active[data-val="Med"] { background: var(--p-orange); color: #000; }
+        .prio-opt.active[data-val="High"] { background: var(--p-red); color: #000; }
+
         .check-item { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; padding: 5px 0; }
         .check-box { width: 28px; height: 28px; border-radius: 8px; border: 2px solid var(--subtext); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
         .check-box.checked { background: var(--p-green); border-color: var(--p-green); }
@@ -615,7 +621,7 @@
             const container = document.getElementById('checklist-container');
             container.innerHTML = '';
             t.steps.forEach(s => addCheckItem(s.text, s.done));
-            if(t.steps.length === 0) addCheckItem(); 
+            // Removed auto-add check item to fix bug
             
             // Safety Check for missing elements
             const moveControls = document.getElementById('move-controls');
@@ -627,8 +633,20 @@
         function addCheckItem(text = '', done = false) {
             const div = document.createElement('div');
             div.className = 'check-item';
-            div.innerHTML = `<div class="check-box ${done?'checked':''}" onclick="toggleCheck(this)"></div><input type="text" class="check-text" value="${text}" placeholder="New Step..."><span class="check-del" onclick="this.parentElement.remove(); showToast('-10 XP', true); updateLiveXP(-10);">✕</span>`;
+            // Added onkeypress event to list inputs for smart editing
+            div.innerHTML = `<div class="check-box ${done?'checked':''}" onclick="toggleCheck(this)"></div><input type="text" class="check-text" value="${text}" placeholder="New Step..." onkeypress="handleListEnter(event, this)"><span class="check-del" onclick="this.parentElement.remove(); showToast('-10 XP', true); updateLiveXP(-10);">✕</span>`;
             document.getElementById('checklist-container').appendChild(div);
+            // Auto focus the new input
+            if(!text) {
+                setTimeout(() => div.querySelector('input').focus(), 10);
+            }
+        }
+        
+        function handleListEnter(e, input) {
+            if(e.key === 'Enter') {
+                e.preventDefault();
+                addCheckItem('');
+            }
         }
         
         function handleStepEnter(e) {
