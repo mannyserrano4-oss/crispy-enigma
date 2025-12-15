@@ -7,7 +7,7 @@
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" type="image/png" href="icon.png">
 
-    <script>window.onerror = function(msg, url, line) { alert("System Error:\n" + msg + "\nLine: " + line); return true; };</script>
+    <script>window.onerror = function(msg, url, line) { alert("Error: " + msg + "\nLine: " + line); return true; };</script>
 
     <style>
         :root {
@@ -140,7 +140,7 @@
             box-sizing: border-box; margin-bottom: 18px; 
             font-family: inherit;
         }
-        select.uniform-input { -webkit-appearance: none; appearance: none; } /* Removes default arrow on iOS */
+        select.uniform-input { -webkit-appearance: none; appearance: none; }
 
         .form-row { display: flex; gap: 12px; margin-bottom: 18px; align-items: stretch; }
         
@@ -430,29 +430,12 @@
             const t = document.getElementById('xp-toast');
             t.querySelector('span').innerText = msg;
             t.className = isLoss ? 'loss' : '';
-            
-            if(isLoss && lastDeletedTask && prestige >= 1) {
-                if(!t.querySelector('.btn-undo')) {
-                    const btn = document.createElement('button');
-                    btn.className = 'btn-undo';
-                    btn.innerText = 'TIME WARP (UNDO)';
-                    btn.onclick = undoDelete;
-                    t.appendChild(btn);
-                }
-            } else {
-                const existingBtn = t.querySelector('.btn-undo');
-                if(existingBtn) existingBtn.remove();
-            }
-
             t.style.opacity = '1'; t.style.transform = 'translate(-50%, 0px) scale(1)';
             const bar = document.getElementById('xp-fill');
             if(isLoss) bar.classList.add('damage'); else bar.classList.remove('damage');
-            
-            if(undoTimeout) clearTimeout(undoTimeout);
-            undoTimeout = setTimeout(() => { 
+            setTimeout(() => { 
                 t.style.opacity = '0'; t.style.transform = 'translate(-50%, 10px)'; bar.classList.remove('damage'); 
-                lastDeletedTask = null;
-            }, 5000);
+            }, 3000);
         }
 
         function undoDelete() {
@@ -625,7 +608,7 @@
             document.getElementById('t-id').value = t.id;
             document.getElementById('t-title').value = t.title;
             document.getElementById('t-date').value = t.date;
-            document.getElementById('t-prio').value = t.prio || 'Med'; // Sync Select Box
+            document.getElementById('t-prio').value = t.prio || 'Med';
             
             document.getElementById('btn-cal-sync').style.display = (t.date && t.id) ? 'block' : 'none';
             document.getElementById('btn-archive-toggle').innerText = t.archived ? "🔥 Thaw" : "🧊 Cryo-Sleep";
@@ -650,11 +633,13 @@
         
         function handleStepEnter(e) {
             if(e.key === 'Enter') {
-                const val = document.getElementById('new-step-input').value.trim();
+                e.preventDefault(); // Stop form submission
+                const input = document.getElementById('new-step-input');
+                const val = input.value.trim();
                 if(val) {
                     addCheckItem(val);
-                    document.getElementById('new-step-input').value = '';
-                    // No focus shift needed, stay in input
+                    input.value = '';
+                    input.focus(); // Keep focus
                 }
             }
         }
@@ -663,7 +648,7 @@
             const id = document.getElementById('t-id').value;
             const title = document.getElementById('t-title').value;
             if(!title) return alert("Title required");
-            const prio = document.getElementById('t-prio').value; // Get value from SELECT
+            const prio = document.getElementById('t-prio').value; 
             const date = document.getElementById('t-date').value;
             const steps = [];
             document.querySelectorAll('.check-item').forEach(el => {
