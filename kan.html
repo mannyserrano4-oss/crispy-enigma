@@ -5,517 +5,644 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Mission Control</title>
     
-    <script>window.onerror = function(msg, url, line) { alert("System Error: " + msg + "\nLine: " + line); return true; };</script>
+    <script>window.onerror = function(msg, url, line) { alert("Error: " + msg + "\nLine: " + line); return true; };</script>
+
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
 
     <style>
         :root {
-            --bg: #1e1e2e; --card: #2a2a3c; --col: #232334;
-            --text: #cdd6f4; --sub: #a6adc8; --border: #313244;
-            --acc: #c4b5fd; --green: #a7f3d0; --red: #ffb8b8; --gold: #f9ccac;
-            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            --rad: 16px;
+            /* DEFAULT (Tactical Dark) */
+            --bg: #1e1e2e; --card-bg: #2a2a3c; --col-bg: #232334;
+            --text: #cdd6f4; --subtext: #a6adc8; --border: #313244;
+            --p-red: #ffb8b8; --p-orange: #f9ccac; --p-blue: #9ae4e8;   
+            --p-green: #a7f3d0; --p-purple: #c4b5fd; --gold: #ffd700;
+            --radius: 16px; --shadow: 0 4px 10px rgba(0,0,0,0.2);
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-head: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
-        /* THEMES */
-        body.light { --bg: #f3f4f6; --card: #fff; --col: #e5e7eb; --text: #1f2937; --sub: #6b7280; --border: #d1d5db; }
-        body.wolf { --bg:#1c1917; --card:#292524; --col:#0c0a09; --text:#e7e5e4; --sub:#a8a29e; --border:#44403c; --acc:#a21caf; --green:#15803d; --red:#7f1d1d; --gold:#b45309; --font: Georgia, serif; --rad:4px; }
-        body.neon { --bg:#000; --card:#111; --col:#0a0a0a; --text:#fff; --sub:#888; --border:#333; --acc:#bc13fe; --green:#00ff66; --red:#ff0055; --gold:#ff9900; --font: 'Courier New', monospace; --rad:0px; }
-        body.aperture { --bg:#e0e0e0; --card:#fff; --col:#d1d1d1; --text:#333; --sub:#666; --border:#999; --acc:#333; --green:#00a5ff; --red:#e74c3c; --gold:#ffa500; --font: Arial, sans-serif; --rad:20px; }
-        
-        /* CORE LAYOUT */
-        body { background: var(--bg); color: var(--text); font-family: var(--font); margin: 0; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; transition: 0.3s; }
-        
-        /* HEADER */
-        .header { padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); background: var(--col); z-index: 10; }
-        h1 { margin: 0; font-size: 1.1rem; font-weight: 900; letter-spacing: 1px; color: var(--acc); text-transform: uppercase; }
-        .btn-icon { background: none; border: none; font-size: 1.4rem; cursor: pointer; padding: 5px; filter: grayscale(100%); transition: 0.2s; }
-        .btn-icon:active { transform: scale(0.9); }
+        /* --- THEME PACKS (RESTORED) --- */
+        body.theme-light { --bg: #f3f4f6; --card-bg: #ffffff; --col-bg: #e5e7eb; --text: #1f2937; --subtext: #6b7280; --border: #d1d5db; }
+        body.theme-wolf { --bg: #1c1917; --card-bg: #292524; --col-bg: #0c0a09; --text: #e7e5e4; --subtext: #a8a29e; --border: #44403c; --p-red: #7f1d1d; --p-orange: #b45309; --p-blue: #3b82f6; --p-green: #15803d; --p-purple: #a21caf; --font-main: Georgia, serif; --radius: 4px; --shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        body.theme-neon { --bg: #050505; --card-bg: #111; --col-bg: #0a0a0a; --text: #fff; --subtext: #888; --border: #333; --p-red: #ff0055; --p-orange: #ff9900; --p-blue: #00f3ff; --p-green: #00ff66; --p-purple: #bc13fe; --font-main: 'Courier New', monospace; --radius: 0px; --shadow: 0 0 10px var(--p-blue); }
+        body.theme-neon .card { border: 1px solid var(--p-blue); }
+        body.theme-aperture { --bg: #e0e0e0; --card-bg: #ffffff; --col-bg: #d1d1d1; --text: #333; --subtext: #666; --border: #999; --p-red: #e74c3c; --p-orange: #ffa500; --p-blue: #00a5ff; --p-green: #00a5ff; --p-purple: #333; --font-main: Helvetica, Arial, sans-serif; --radius: 20px; --shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff; }
+        body.theme-aperture .col-active { color: #00a5ff; } body.theme-aperture .col-victory { color: #ffa500; } 
+        body.theme-gold { --bg: #0f0f0f; --card-bg: #1c1c1c; --col-bg: #141414; --text: #fcd34d; --subtext: #b45309; --border: #78350f; --p-red: #991b1b; --p-green: #f59e0b; --p-purple: #d97706; --p-blue: #fcd34d; --font-main: Georgia, serif; --radius: 8px; --shadow: 0 10px 30px rgba(251, 191, 36, 0.1); }
+        body.theme-gold .level-badge { background: linear-gradient(to right, #fcd34d, #b45309); color: black; }
 
-        /* XP BAR */
-        .xp-bar { padding: 10px 15px; background: var(--card); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; font-size: 0.8rem; font-weight: bold; }
-        .badge { background: var(--acc); color: #000; padding: 4px 10px; border-radius: 20px; }
-        .track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
-        .fill { height: 100%; background: var(--green); width: 0%; transition: width 0.5s; }
+        /* --- BASE STYLES --- */
+        body { 
+            background-color: var(--bg); color: var(--text); 
+            font-family: var(--font-main);
+            margin: 0; height: 100dvh; display: flex; flex-direction: column; overflow: hidden;
+            transition: background 0.5s, color 0.5s;
+        }
 
-        /* BOARD */
-        .board { flex: 1; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding: 10px; gap: 10px; }
-        .col { min-width: 85vw; background: var(--col); border-radius: var(--rad); border: 1px solid var(--border); display: flex; flex-direction: column; scroll-snap-align: center; }
-        @media(min-width:600px) { .col { min-width: 320px; } }
+        body.zen-mode .header, body.zen-mode .xp-bar-container, body.zen-mode .fab { display: none !important; }
+        body.zen-mode .board { height: 100vh; padding-top: max(20px, env(safe-area-inset-top)); }
+        #exit-zen { position: fixed; top: 10px; right: 10px; z-index: 1000; opacity: 0.3; display: none; }
+        body.zen-mode #exit-zen { display: block; }
+
+        .xp-bar-container {
+            background: var(--col-bg); padding: 15px 20px;
+            padding-top: max(15px, env(safe-area-inset-top)); 
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 15px;
+        }
+        .level-badge {
+            background: linear-gradient(135deg, var(--p-purple), var(--p-blue));
+            color: #000; font-weight: 900; padding: 6px 14px; border-radius: 20px;
+            font-size: 0.8rem; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            white-space: nowrap; font-family: var(--font-head);
+        }
+        .xp-track { flex: 1; height: 10px; background: var(--border); border-radius: 5px; overflow: hidden; position: relative; }
+        .xp-fill { 
+            height: 100%; background: var(--p-green); width: 0%; 
+            transition: width 0.5s ease-out, background 0.2s; 
+        }
+        .xp-text { font-size: 0.7rem; color: var(--subtext); font-weight: bold; width: 80px; text-align: right; }
+
+        .header { padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+        h1 { margin: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; color: var(--p-blue); font-weight: 900; font-family: var(--font-head); }
+        .icon-btn { font-size: 1.4rem; background: none; border: none; cursor: pointer; padding: 8px; opacity: 0.8; color: var(--text); }
+
+        .board { flex: 1; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding: 10px; gap: 15px; }
+        .column { 
+            min-width: 88vw; background: var(--col-bg); 
+            border-radius: var(--radius); display: flex; flex-direction: column;
+            scroll-snap-align: center; border: 1px solid var(--border);
+        }
+        @media (min-width: 600px) { .column { min-width: 340px; } }
+
+        .col-header { padding: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; font-family: var(--font-head); }
+        .task-list { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 12px; }
         
-        .col-head { padding: 15px; font-weight: 900; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); }
-        .list { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 10px; }
-        .empty { text-align: center; padding: 40px; color: var(--sub); font-style: italic; opacity: 0.6; font-size: 0.9rem; }
+        .empty-msg { text-align: center; color: var(--subtext); font-style: italic; font-size: 0.8rem; margin-top: 50px; opacity: 0.5; }
 
-        /* CARDS */
-        .card { background: var(--card); padding: 15px; border-radius: var(--rad); box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-left: 5px solid transparent; position: relative; }
+        /* ANIMATED CARDS */
+        .card { 
+            background: var(--card-bg); padding: 16px; border-radius: var(--radius); 
+            box-shadow: var(--shadow); transition: transform 0.2s, opacity 0.2s; 
+            border-left: 0; position: relative; overflow: hidden;
+        }
         .card:active { transform: scale(0.98); }
-        .p-High { border-left-color: var(--red); } .p-Med { border-left-color: var(--gold); } .p-Low { border-left-color: var(--acc); }
         
-        .c-top { display: flex; justify-content: space-between; margin-bottom: 8px; }
-        .c-title { font-weight: bold; font-size: 1rem; }
-        .c-date { font-size: 0.7rem; background: var(--border); padding: 3px 6px; border-radius: 4px; }
-        .prog { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-top: 10px; }
-        .prog-fill { height: 100%; background: var(--green); width: 0%; }
-        
-        .c-act { display: flex; justify-content: space-between; margin-top: 10px; }
-        .btn-move { background: var(--col); border: 1px solid var(--border); color: var(--text); padding: 5px 15px; border-radius: 6px; font-weight: bold; font-size: 1.2rem; }
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .slide-enter { animation: slideIn 0.3s forwards; }
 
-        /* FAB (Add Button) */
-        #fab { position: fixed; bottom: 30px; right: 20px; width: 60px; height: 60px; background: var(--acc); color: #000; border-radius: 50%; font-size: 2.5rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(0,0,0,0.5); z-index: 99999; cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; }
-        #fab:active { transform: scale(0.9); }
+        .card-top { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center; }
+        .card-title { font-weight: bold; font-size: 1.05rem; color: var(--text); }
+        .card-date { font-size: 0.7rem; background: var(--border); padding: 4px 8px; border-radius: 6px; color: var(--subtext); height: fit-content; font-weight: 600; }
+        .prio-pill { font-size: 0.65rem; padding: 3px 8px; border-radius: 10px; font-weight: 800; text-transform: uppercase; margin-right: 5px; color:#000; }
+        .pill-High { background: var(--p-red); }
+        .pill-Med { background: var(--p-orange); }
+        .pill-Low { background: var(--p-blue); }
 
-        /* MODALS */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100000; display: none; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 20px 0; backdrop-filter: blur(5px); }
-        .box { background: var(--card); width: 90%; max-width: 400px; padding: 20px; border-radius: var(--rad); border: 1px solid var(--border); margin-bottom: 50px; }
+        .progress-track { background: var(--border); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 12px; }
+        .progress-fill { height: 100%; background: var(--p-green); width: 0%; transition: width 0.3s; }
+        .card-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--subtext); margin-top: 8px; font-weight: 600; }
         
-        input, select { width: 100%; padding: 12px; background: var(--col); border: 1px solid var(--border); color: var(--text); border-radius: 8px; font-size: 1rem; margin-bottom: 15px; box-sizing: border-box; font-family: inherit; }
-        .row { display: flex; gap: 10px; }
-        
-        .btn { width: 100%; padding: 15px; border-radius: 10px; border: none; font-weight: bold; font-size: 1rem; margin-top: 10px; cursor: pointer; }
-        .btn-pri { background: var(--acc); color: #000; }
-        .btn-sec { background: transparent; border: 1px solid var(--border); color: var(--sub); }
-        .btn-del { background: transparent; border: 1px solid var(--red); color: var(--red); }
+        .card-actions { display:flex; gap:10px; margin-top:10px; justify-content:space-between; align-items:center;}
+        .btn-quick { background: var(--col-bg); border:1px solid var(--border); color:var(--text); width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold;}
 
-        /* CHECKLIST */
-        .chk-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .chk-box { width: 24px; height: 24px; border: 2px solid var(--sub); border-radius: 6px; display: flex; align-items: center; justify-content: center; }
-        .chk-box.on { background: var(--green); border-color: var(--green); }
-        .chk-box.on::after { content: '✓'; color: #000; font-weight: bold; }
-        .chk-del { color: var(--red); font-weight: bold; padding: 5px; }
+        .fab { position: fixed; bottom: 30px; right: 20px; background: var(--p-purple); color: #000; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; box-shadow: 0 8px 30px rgba(0,0,0,0.4); cursor: pointer; border: none; z-index: 99999; transition: transform 0.2s; }
+        .fab:active { transform: rotate(90deg); }
 
-        /* MENU & STORY */
-        .menu { position: absolute; top: 60px; right: 10px; width: 220px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; display: none; flex-direction: column; z-index: 2000; box-shadow: 0 10px 40px #000; max-height: 70vh; overflow-y: auto; }
-        .menu-item { padding: 15px; border-bottom: 1px solid var(--border); text-align: left; background: none; color: var(--text); font-size: 0.9rem; cursor: pointer; }
-        .menu-head { padding: 10px; font-size: 0.7rem; font-weight: bold; color: var(--sub); background: var(--col); letter-spacing: 1px; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: flex-start; overflow-y: auto; padding: 20px 0; }
+        .modal-content { background: var(--card-bg); width: 90%; max-width: 450px; padding: 25px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: 0 20px 60px rgba(0,0,0,0.6); margin-bottom: 80px; }
         
-        #story-text { white-space: pre-wrap; line-height: 1.6; color: var(--text); font-size: 1.1rem; max-height: 50vh; overflow-y: auto; }
-        .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: var(--green); color: #000; padding: 8px 16px; border-radius: 20px; font-weight: bold; display: none; z-index: 3000; }
-        .toast.red { background: var(--red); }
+        .form-label { display: block; font-size: 0.75rem; color: var(--subtext); font-weight: 800; margin-bottom: 8px; letter-spacing: 1px; }
+        .form-input { width: 100%; padding: 14px; background: var(--col-bg); border: 1px solid var(--border); color: var(--text); border-radius: 12px; font-size: 1.1rem; box-sizing: border-box; margin-bottom: 18px; }
+        .form-row { display: flex; gap: 12px; margin-bottom: 18px; align-items: stretch; }
+        .fixed-height { height: 50px; box-sizing: border-box; }
+        
+        .prio-select { display: flex; gap: 6px; background: var(--col-bg); padding: 6px; border-radius: 14px; flex: 1; border: 1px solid var(--border); }
+        .prio-opt { flex: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 0.85rem; font-weight: bold; cursor: pointer; color: var(--subtext); transition: 0.2s; }
+        .prio-opt.active[data-val="Low"] { background: var(--p-blue); color: #000; }
+        .prio-opt.active[data-val="Med"] { background: var(--p-orange); color: #000; }
+        .prio-opt.active[data-val="High"] { background: var(--p-red); color: #000; }
+
+        .check-item { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; padding: 5px 0; }
+        .check-box { width: 28px; height: 28px; border-radius: 8px; border: 2px solid var(--subtext); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+        .check-box.checked { background: var(--p-green); border-color: var(--p-green); }
+        .check-box.checked::after { content:'✓'; color:black; font-weight:900; font-size:1rem; }
+        .check-text { flex: 1; background: transparent; border: none; color: var(--text); font-size: 1.1rem; border-bottom: 1px solid transparent; }
+        .check-del { color: var(--p-red); cursor: pointer; padding: 8px; font-weight: bold; font-size: 1.2rem; opacity: 0.5; }
+
+        .btn-main { width: 100%; padding: 18px; background: var(--p-purple); color: #000; border: none; border-radius: 16px; font-weight: 800; font-size: 1.1rem; cursor: pointer; margin-top: 20px; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(196, 181, 253, 0.3); }
+        .btn-sec { width: 100%; padding: 14px; background: transparent; border: 1px solid var(--border); color: var(--subtext); border-radius: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 0.95rem; }
+        .btn-cal { background: var(--col-bg); color: var(--text); border: 1px solid var(--border); padding: 10px; border-radius: 10px; font-size: 0.85rem; cursor: pointer; margin-top: 5px; width: 100%; text-align: center;}
+
+        /* TOAST & CODEX */
+        #xp-toast { position: fixed; top: 90px; left: 50%; transform: translateX(-50%); background: var(--p-green); color: black; font-weight: 900; padding: 10px 20px; border-radius: 20px; opacity: 0; pointer-events: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: opacity 0.3s, transform 0.3s; z-index: 2000; font-size: 1.1rem; }
+        #xp-toast.loss { background: var(--p-red); }
+        
+        #codex-popup { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--card-bg); border: 1px solid var(--p-purple); padding: 15px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); max-width: 90%; width: 300px; z-index: 2000; opacity: 0; pointer-events: none; transition: 0.5s; text-align: center; }
+        #codex-popup.active { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+        .codex-text { font-style: italic; font-size: 0.9rem; color: var(--text); margin-bottom: 5px; }
+        .codex-src { font-size: 0.7rem; color: var(--p-purple); font-weight: bold; text-transform: uppercase; }
+
+        .confetti { position: fixed; width: 20px; height: 20px; top: -20px; z-index: 3000; font-size:20px; text-align:center; }
+        
+        /* MENU */
+        .dropdown { position: absolute; top: 60px; right: 15px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; display: none; flex-direction: column; width: 240px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 200; overflow: hidden; max-height: 80vh; overflow-y: auto;}
+        .dropdown.show { display: flex; }
+        .dd-item { padding: 15px; text-align: left; background: none; border: none; border-bottom: 1px solid var(--border); color: var(--text); font-size: 1rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .dd-locked { opacity: 0.5; pointer-events: none; }
+        .dd-badge { font-size: 0.65rem; background: var(--border); padding: 2px 6px; border-radius: 4px; color: var(--subtext); font-weight: bold; }
+        .dd-sect { padding:10px; font-size:0.7rem; color:var(--subtext); font-weight:bold; background:var(--col-bg); letter-spacing:1px; }
+        
+        /* STORY */
+        #story-modal .modal-content { background: #1a1a1a; border: 2px solid #b45309; }
+        .story-header { font-family: Georgia, serif; text-align: center; color: #fcd34d; font-size: 1.5rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
+        .story-body { font-family: Georgia, serif; color: #e7e5e4; line-height: 1.6; font-size: 1.1rem; white-space: pre-wrap; height: 60vh; overflow-y: auto; padding-right: 10px; }
+        .story-lock { text-align: center; color: #666; padding: 50px 0; font-style: italic; }
     </style>
 </head>
 <body>
 
-    <div id="toast" class="toast">+10 XP</div>
+    <button class="btn-sec" id="exit-zen" onclick="toggleZen()">Exit Zen</button>
+
+    <div class="xp-bar-container">
+        <div class="level-badge" id="lvl-badge">LVL 1</div>
+        <div class="xp-track"><div class="xp-fill" id="xp-fill"></div></div>
+        <div class="xp-text"><span id="xp-val">0</span> XP</div>
+    </div>
+
+    <div id="xp-toast"><span>+10 XP</span></div>
+    
+    <div id="codex-popup">
+        <div class="codex-text" id="codex-text">"Quote"</div>
+        <div class="codex-src" id="codex-src">- Source</div>
+    </div>
 
     <div class="header">
         <h1>Mission Control</h1>
         <div style="display:flex; gap:10px;">
-            <button class="btn-icon" onclick="openStory()">📖</button>
-            <button class="btn-icon" onclick="toggleArchive()">📦</button>
-            <button class="btn-icon" onclick="toggleMenu()">⚙️</button>
+            <button class="icon-btn" onclick="openStory()" id="btn-story">📖</button>
+            <button class="icon-btn" onclick="toggleArchiveView()" id="btn-archive">📦</button>
+            <button class="icon-btn" onclick="toggleMenu()">🎨</button>
         </div>
     </div>
 
-    <div class="xp-bar">
-        <div class="badge" id="lvl-badge">LVL 1</div>
-        <div class="track"><div class="fill" id="xp-fill"></div></div>
-        <div id="xp-text">0 / 500</div>
-    </div>
+    <div id="save-menu" class="dropdown">
+        <div class="dd-sect">VISUALS</div>
+        <button class="dd-item" onclick="setConfetti('square'); closeMenu()">🎉 Default Confetti</button>
+        <button class="dd-item" id="fx-star" onclick="setConfetti('star'); closeMenu()">⭐ Stars <span class="dd-badge">LVL 10</span></button>
+        <button class="dd-item" id="fx-coin" onclick="setConfetti('coin'); closeMenu()">🪙 Coins <span class="dd-badge">LVL 20</span></button>
+        <button class="dd-item" id="fx-gem" onclick="setConfetti('gem'); closeMenu()">💎 Gems <span class="dd-badge">LVL 30</span></button>
 
-    <div id="menu" class="menu">
-        <div class="menu-head">THEMES</div>
-        <button class="menu-item" onclick="setTheme('default')">Tactical Dark</button>
-        <button class="menu-item" onclick="setTheme('light')">Light Mode</button>
-        <button class="menu-item" onclick="setTheme('wolf')">The Wolf (Lvl 5)</button>
-        <button class="menu-item" onclick="setTheme('neon')">Neon City (Lvl 10)</button>
-        <button class="menu-item" onclick="setTheme('aperture')">Aperture (Lvl 12)</button>
+        <div class="dd-sect">THEME LOCKER</div>
+        <button class="dd-item" onclick="setTheme('default'); closeMenu()">Tactical Dark</button>
+        <button class="dd-item" onclick="setTheme('light'); closeMenu()">Clean Light</button>
+        <button class="dd-item" id="theme-wolf" onclick="setTheme('wolf'); closeMenu()">The Wolf <span class="dd-badge">LVL 5</span></button>
+        <button class="dd-item" id="theme-neon" onclick="setTheme('neon'); closeMenu()">Neon City <span class="dd-badge">LVL 10</span></button>
+        <button class="dd-item" id="theme-aperture" onclick="setTheme('aperture'); closeMenu()">Aperture <span class="dd-badge">LVL 12</span></button>
+        <button class="dd-item" id="theme-horror" onclick="setTheme('horror'); closeMenu()">Eldritch <span class="dd-badge">LVL 15</span></button>
+        <button class="dd-item" id="theme-vapor" onclick="setTheme('vapor'); closeMenu()">Vaporwave <span class="dd-badge">LVL 18</span></button>
+        <button class="dd-item" id="theme-blueprint" onclick="setTheme('blueprint'); closeMenu()">Blueprint <span class="dd-badge">LVL 20</span></button>
+        <button class="dd-item" id="theme-terminal" onclick="setTheme('terminal'); closeMenu()">Terminal <span class="dd-badge">LVL 25</span></button>
+        <button class="dd-item" id="theme-gold" onclick="setTheme('gold'); closeMenu()">Gold Standard <span class="dd-badge">LVL 30</span></button>
         
-        <div class="menu-head">ACTIONS</div>
-        <button class="menu-item" onclick="doPrestige()" style="color:var(--gold)">🎖️ PRESTIGE (Lvl 50)</button>
-        <button class="menu-item" onclick="exportData()">💾 Backup Data</button>
-        <button class="menu-item" onclick="document.getElementById('file-in').click()">📂 Restore Data</button>
-        <button class="menu-item" onclick="hardReset()" style="color:var(--red)">💀 Hard Reset</button>
+        <div class="dd-sect" style="color:var(--p-orange)">PRESTIGE TIERS</div>
+        <button class="dd-item" id="theme-nebula" onclick="setTheme('nebula'); closeMenu()">Nebula <span class="dd-badge" style="background:var(--p-purple);color:#000">P 1</span></button>
+        <button class="dd-item" id="theme-midas" onclick="setTheme('midas'); closeMenu()">Midas <span class="dd-badge" style="background:var(--p-orange);color:#000">P 2</span></button>
+        <button class="dd-item" id="theme-glitch" onclick="setTheme('glitch'); closeMenu()">The Glitch <span class="dd-badge" style="background:var(--p-red);color:#000">P 3</span></button>
+
+        <div class="dd-sect">UPGRADES</div>
+        <button class="dd-item" id="feat-status" onclick="showStatusReport(); closeMenu()">📊 Status Report <span class="dd-badge">LVL 2</span></button>
+        <button class="dd-item" id="feat-zen" onclick="toggleZen(); closeMenu()">🧘 Zen Mode <span class="dd-badge">LVL 8</span></button>
+        <button class="dd-item" id="feat-prestige" onclick="doPrestige(); closeMenu()" style="color:var(--p-orange)">🎖️ PRESTIGE <span class="dd-badge">LVL 50</span></button>
+
+        <div class="dd-sect">DATA</div>
+        <button class="dd-item" onclick="exportData(); closeMenu()">Backup</button>
+        <button class="dd-item" onclick="document.getElementById('file-input').click(); closeMenu()">Restore</button>
     </div>
-    <input type="file" id="file-in" hidden onchange="importData(this)">
+    <input type="file" id="file-input" hidden onchange="importData(this)">
 
-    <div class="board">
-        <div class="col">
-            <div class="col-head">Staging <span id="c0">0</span></div>
-            <div class="list" id="list-0"></div>
-        </div>
-        <div class="col">
-            <div class="col-head" style="color:var(--acc)">Active <span id="c1">0</span></div>
-            <div class="list" id="list-1"></div>
-        </div>
-        <div class="col">
-            <div class="col-head" style="color:var(--green)">Victory <span id="c2">0</span></div>
-            <div class="list" id="list-2"></div>
-        </div>
+    <div class="board" id="main-board">
+        <div class="column"><div class="col-header h-0">Staging <span id="count-0">0</span></div><div class="task-list" id="col-0"></div></div>
+        <div class="column"><div class="col-header h-1">Active <span id="count-1">0</span></div><div class="task-list" id="col-1"></div></div>
+        <div class="column"><div class="col-header h-2">Victory <span id="count-2">0</span></div><div class="task-list" id="col-2"></div></div>
     </div>
 
-    <div id="fab" onclick="openEditor()">+</div>
+    <button class="fab" onclick="openModal()">+</button>
 
-    <div id="editor" class="modal">
-        <div class="box">
-            <h3>MISSION BRIEF</h3>
-            <input type="hidden" id="e-id">
-            
-            <label class="form-label">OBJECTIVE</label>
-            <input id="e-title" placeholder="e.g. Conquer World">
-            
-            <div class="row">
+    <div id="task-modal" class="modal">
+        <div class="modal-content">
+            <h2 style="margin-top:0; text-align:center;">Mission Brief</h2>
+            <input type="hidden" id="t-id">
+            <span class="form-label">MISSION OBJECTIVE</span>
+            <input id="t-title" class="form-input" placeholder="e.g. Campaign Launch">
+            <div class="form-row">
                 <div style="flex:1">
-                    <label class="form-label">DEADLINE</label>
-                    <input type="date" id="e-date" style="height:45px;">
+                    <span class="form-label">DEADLINE</span>
+                    <input type="date" id="t-date" class="form-input fixed-height" style="margin-bottom:0;">
+                    <button class="btn-cal" onclick="addToCalendar()" id="btn-cal-sync" style="display:none;">📅 Sync</button>
                 </div>
                 <div style="flex:1">
-                    <label class="form-label">PRIORITY</label>
-                    <select id="e-prio" style="height:45px;">
-                        <option value="Low">Low</option>
-                        <option value="Med" selected>Med</option>
-                        <option value="High">High</option>
-                    </select>
+                    <span class="form-label">PRIORITY</span>
+                    <div class="prio-select fixed-height">
+                        <div class="prio-opt" onclick="setPrio('Low')" data-val="Low">Low</div>
+                        <div class="prio-opt" onclick="setPrio('Med')" data-val="Med">Med</div>
+                        <div class="prio-opt" onclick="setPrio('High')" data-val="High">High</div>
+                    </div>
+                    <input type="hidden" id="t-prio" value="Med">
                 </div>
             </div>
-
-            <label class="form-label">TACTICS (+10 XP)</label>
-            <div id="e-checks"></div>
-            <input id="e-new-step" placeholder="+ Add Step (Enter)" onkeypress="handleEnter(event)">
-
-            <button class="btn btn-pri" onclick="saveTask()">SAVE MISSION</button>
-            <button class="btn btn-sec" id="btn-arc" onclick="toggleTaskArchive()">ARCHIVE</button>
-            <button class="btn btn-del" onclick="deleteTask()">ABORT</button>
-            <button class="btn btn-sec" onclick="closeEditor()">CLOSE</button>
+            <span class="form-label">TACTICAL CHECKLIST (+10 XP)</span>
+            <div id="checklist-container"></div>
+            <div class="form-row" style="margin-top:10px;">
+                <input id="new-step-input" class="form-input" placeholder="+ Add Step (Press Enter)" style="margin-bottom:0;" onkeypress="handleStepEnter(event)">
+            </div>
+            
+            <button class="btn-main" onclick="saveCard()">SAVE MISSION</button>
+            <div class="form-row" style="margin-top:10px;">
+                <button class="btn-sec" id="btn-archive-toggle" onclick="toggleArchive()">🧊 Cryo-Sleep</button>
+                <button class="btn-sec" onclick="deleteCard()" style="color:var(--p-red); border-color:var(--p-red);">💀 Abort (-XP)</button>
+            </div>
+            <button class="btn-sec" onclick="closeModal()" style="border:none;">Close</button>
         </div>
     </div>
 
-    <div id="story" class="modal">
-        <div class="box">
-            <h3>THE CHRONICLES</h3>
-            <div id="story-text"></div>
-            <div class="row" style="margin-top:15px;">
-                <button class="btn btn-sec" onclick="navStory(-1)">PREV</button>
-                <button class="btn btn-sec" onclick="navStory(1)">NEXT</button>
+    <div id="story-modal" class="modal">
+        <div class="modal-content">
+            <div class="story-header">THE SUNLESS AGE</div>
+            <div class="story-body" id="story-content"></div>
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn-sec" onclick="changeChapter(-1)">Prev</button>
+                <button class="btn-sec" onclick="changeChapter(1)">Next</button>
             </div>
-            <button class="btn btn-sec" onclick="document.getElementById('story').style.display='none'">CLOSE</button>
+            <button class="btn-sec" onclick="document.getElementById('story-modal').style.display='none'" style="width:100%; border:none; margin-top:10px;">Close Book</button>
         </div>
     </div>
 
     <script>
-        // --- DATA CORE ---
-        let tasks = [];
-        let xp = 0;
-        let prestige = 0;
-        let theme = 'default';
-        let isArchive = false;
-        let storyPage = 1;
+        let tasks = JSON.parse(localStorage.getItem('mc_tasks') || '[]');
+        let userXP = parseInt(localStorage.getItem('mc_xp') || '0');
+        let prestige = parseInt(localStorage.getItem('mc_prestige') || '0');
+        let currentTheme = localStorage.getItem('theme') || 'default';
+        let confettiStyle = localStorage.getItem('mc_fx') || 'square';
+        let showArchive = false;
+        let currentChapter = 1;
+        
+        const RANKS = ["Rookie", "Operative", "Specialist", "Tactician", "Mercenary", "Commander", "Warlord", "Vanguard", "Titan", "Legend"];
+        const CODEX = [
+            { t: "Life before death. Strength before weakness. Journey before destination.", s: "Stormlight" },
+            { t: "The most important step a man can take. It's not the first one, is it? It's the next one.", s: "Stormlight" },
+            { t: "It's the possibility of having a dream come true that makes life interesting.", s: "Alchemist" },
+            { t: "When you want something, all the universe conspires in helping you to achieve it.", s: "Alchemist" },
+            { t: "Chaos isn't a pit. Chaos is a ladder.", s: "GoT" },
+            { t: "A lion does not concern himself with the opinion of sheep.", s: "GoT" },
+            { t: "Winter is coming.", s: "GoT" },
+            { t: "Discipline is freedom.", s: "Codex" }
+        ];
+        const STORY = {
+            1: "CHAPTER I: THE EMBER\n\nThe endless frost began not with a bang, but a whisper. The sun simply... dimmed. Years turned to decades of twilight. Civilization crumbled into the snow.\n\nI am Kael, a scavenger of the Old World. Yesterday, digging through the ruins of a tech-spire, I found it. Not food, not fuel, but a sword. It wasn't cold steel. It hummed. A faint, golden heat radiated from the blade.\n\nThey say the Alchemists of old trapped sunlight in metal. If that's true, I'm holding the only warmth left in the world. And the Shadows are coming for it.",
+            2: "CHAPTER II: THE FROZEN COURT\n\nI traveled South, following the faint pull of the blade. The Capital still stands, a fortress of black ice and iron. The Lords play their games of thrones while the poor freeze outside the walls.\n\nI tried to barter entry, but the guards saw the sword. Now I am a prisoner, or a guest? The High Warden wants the weapon. He says it belongs to the 'Vanguard,' a mythical order of knights.\n\nI must choose. Give him the sword and live in luxury while the world dies? Or escape, and find the source of the blade's power? The whispers in my mind are getting louder. 'Protect the Light.'",
+            3: "CHAPTER III: THE ALCHEMIST'S MIRROR\n\nI chose the snow. I ran. The blade guided me to a mountain peak above the cloud layer. There was no temple, only a cave, and an old woman reflecting starlight with mirrors.\n\n'You look for a savior,' she laughed. 'But the sword is just a key.'\n\nShe showed me the truth. The sun didn't die. We blocked it. The 'Shield' meant to protect us from solar flares froze in place. The sword unlocks the atmospheric controls. But the climb to the Zenith Spire is a suicide mission. Vampiric creatures nest there. I am afraid. But the sword is burning hot now. It knows.",
+            4: "FINALE: THE ZENITH\n\nThe climb took everything. My gear, my strength, my blood. I stand at the Zenith controls. The Shadows surround me, screeching in the thin air.\n\nI plunge the blade into the console. Not a key, but a spark. The machine roars. The sky tears open. For the first time in a century, a beam of pure, unfiltered gold hits the snow.\n\nThe Shadows burn away. The ice weeps. I fall to my knees, blinded, weeping with it. The Sunless Age is over. I am the Vanguard. And I am warm."
+        };
 
         // --- INIT ---
-        try {
-            const t = localStorage.getItem('mc_tasks');
-            if(t) tasks = JSON.parse(t);
-            xp = parseInt(localStorage.getItem('mc_xp') || '0');
-            prestige = parseInt(localStorage.getItem('mc_prestige') || '0');
-            theme = localStorage.getItem('mc_theme') || 'default';
-        } catch(e) {
-            console.error("Data Load Error", e);
-            tasks = [];
-        }
-
-        applyTheme(theme);
+        setTheme(currentTheme, true); 
         render();
-        updateStats();
+        updateXP();
 
-        // --- RENDER ENGINE ---
-        function render() {
-            // Clear lists
-            document.getElementById('list-0').innerHTML = '';
-            document.getElementById('list-1').innerHTML = '';
-            document.getElementById('list-2').innerHTML = '';
-            
-            // Counts
-            let counts = [0,0,0];
-
-            tasks.forEach(t => {
-                // Filter
-                if(isArchive && !t.archived) return;
-                if(!isArchive && t.archived) return;
-
-                counts[t.col||0]++;
-
-                // Calculate Progress
-                const done = t.steps.filter(s=>s.done).length;
-                const total = t.steps.length;
-                const pct = total === 0 ? 0 : (done/total)*100;
-
-                // Card HTML
-                const el = document.createElement('div');
-                el.className = `card p-${t.prio}`;
-                el.onclick = () => openEditor(t.id);
-                el.innerHTML = `
-                    <div class="c-top">
-                        <span class="c-title">${t.title}</span>
-                        ${t.date ? `<span class="c-date">${t.date}</span>` : ''}
-                    </div>
-                    <div class="prog"><div class="prog-fill" style="width:${pct}%"></div></div>
-                    <div class="c-act">
-                        <button class="btn-move" onclick="event.stopPropagation(); moveTask('${t.id}', -1)">←</button>
-                        <button class="btn-move" onclick="event.stopPropagation(); moveTask('${t.id}', 1)">→</button>
-                    </div>
-                `;
-                
-                const colId = t.col !== undefined ? t.col : 0;
-                document.getElementById(`list-${colId}`).appendChild(el);
-            });
-
-            // Update Headers
-            document.getElementById('c0').innerText = counts[0];
-            document.getElementById('c1').innerText = counts[1];
-            document.getElementById('c2').innerText = counts[2];
-            document.querySelector('h1').innerText = isArchive ? "CRYO-ARCHIVE" : "MISSION CONTROL";
+        // --- CORE LOGIC ---
+        function getLevel(xp) {
+            let lvl = 1; let req = 500; let gap = 500;
+            while(xp >= req) { lvl++; gap += 50; req += gap; }
+            return { level: lvl, nextReq: req, prevReq: req - gap };
         }
 
-        // --- EDITOR LOGIC ---
-        function openEditor(id) {
-            const t = id ? tasks.find(x => x.id === id) : { id:'', title:'', date:'', prio:'Med', steps:[], archived:false };
-            
-            document.getElementById('e-id').value = t.id || '';
-            document.getElementById('e-title').value = t.title;
-            document.getElementById('e-date').value = t.date;
-            document.getElementById('e-prio').value = t.prio;
-            
-            const btnArc = document.getElementById('btn-arc');
-            btnArc.innerText = t.archived ? "UN-ARCHIVE" : "ARCHIVE";
-            btnArc.style.display = id ? 'block' : 'none';
-
-            // Steps
-            const con = document.getElementById('e-checks');
-            con.innerHTML = '';
-            t.steps.forEach(s => addStepUI(s.text, s.done));
-
-            document.getElementById('editor').style.display = 'flex';
-        }
-
-        function addStepUI(text, done) {
-            const div = document.createElement('div');
-            div.className = 'chk-row';
-            div.innerHTML = `
-                <div class="chk-box ${done?'on':''}" onclick="this.classList.toggle('on'); giveXP(this.classList.contains('on')?10:-10)"></div>
-                <input class="chk-text" value="${text}">
-                <div class="chk-del" onclick="this.parentElement.remove()">✕</div>
-            `;
-            document.getElementById('e-checks').appendChild(div);
-        }
-
-        function handleEnter(e) {
-            if(e.key === 'Enter') {
-                addStepUI(e.target.value, false);
-                e.target.value = '';
-            }
-        }
-
-        function closeEditor() {
-            document.getElementById('editor').style.display = 'none';
-        }
-
-        // --- ACTIONS ---
-        function saveTask() {
-            const id = document.getElementById('e-id').value;
-            const title = document.getElementById('e-title').value;
-            if(!title) return alert("Missing Objective");
-
-            const steps = [];
-            document.querySelectorAll('.chk-row').forEach(row => {
-                steps.push({
-                    text: row.querySelector('.chk-text').value,
-                    done: row.querySelector('.chk-box').classList.contains('on')
-                });
-            });
-
-            if(id) {
-                const idx = tasks.findIndex(x => x.id === id);
-                tasks[idx] = { ...tasks[idx], title, date:document.getElementById('e-date').value, prio:document.getElementById('e-prio').value, steps };
-            } else {
-                tasks.push({
-                    id: Date.now().toString(),
-                    title,
-                    date: document.getElementById('e-date').value,
-                    prio: document.getElementById('e-prio').value,
-                    steps,
-                    col: 0,
-                    archived: false
-                });
-            }
-            saveData();
-            closeEditor();
-            render();
-        }
-
-        function moveTask(id, dir) {
-            const t = tasks.find(x => x.id === id);
-            if(!t) return;
-            
-            let c = (t.col || 0) + dir;
-            if(c < 0) c = 0;
-            if(c > 2) c = 2;
-            
-            // Victory Logic
-            if(t.col !== 2 && c === 2) { giveXP(100); launchConfetti(); }
-            
-            t.col = c;
-            saveData();
-            render();
-        }
-
-        function deleteTask() {
-            const id = document.getElementById('e-id').value;
-            if(!id) return;
-            if(confirm("Delete permanently? (-50 XP Penalty)")) {
-                tasks = tasks.filter(x => x.id !== id);
-                giveXP(-50);
-                saveData();
-                closeEditor();
-                render();
-            }
-        }
-
-        function toggleTaskArchive() {
-            const id = document.getElementById('e-id').value;
-            const t = tasks.find(x => x.id === id);
-            t.archived = !t.archived;
-            saveData();
-            closeEditor();
-            render();
-        }
-
-        // --- XP SYSTEM ---
-        function giveXP(amount) {
-            userXP += amount;
-            if(userXP < 0) userXP = 0;
-            updateStats();
-            
-            const t = document.getElementById('toast');
-            t.innerText = (amount > 0 ? "+" : "") + amount + " XP";
-            t.className = amount > 0 ? "toast" : "toast red";
-            t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 2000);
-        }
-
-        function updateStats() {
+        function updateXP() {
             localStorage.setItem('mc_xp', userXP);
             localStorage.setItem('mc_prestige', prestige);
+            const stats = getLevel(userXP);
+            const range = stats.nextReq - stats.prevReq;
+            const current = userXP - stats.prevReq;
+            const pct = Math.max(0, Math.min(100, (current / range) * 100));
             
-            // Level Calc (500 base + 50 per level)
-            let lvl = 1, req = 500, gap = 500;
-            while(userXP >= req) {
-                lvl++;
-                gap += 50;
-                req += gap;
-            }
+            let badgeText = `LVL ${stats.level}: ${RANKS[Math.min(stats.level-1, RANKS.length-1)]}`;
+            if(prestige > 0) badgeText += ` ${"✪".repeat(prestige)}`;
             
-            const prevReq = req - gap;
-            const pct = ((userXP - prevReq) / gap) * 100;
+            document.getElementById('lvl-badge').innerText = badgeText;
+            document.getElementById('xp-fill').style.width = `${pct}%`;
+            document.getElementById('xp-val').innerText = `${userXP} / ${stats.nextReq}`;
             
-            let txt = `LVL ${lvl}`;
-            if(prestige > 0) txt += ` P${prestige}`;
+            checkUnlocks(stats.level);
+        }
+
+        function updateLiveXP(amount) {
+            const mult = 1 + (prestige * 0.1);
+            const finalAmt = Math.floor(amount * mult);
+            const oldLvl = getLevel(userXP).level;
+            userXP += finalAmt;
+            if(userXP < 0) userXP = 0; 
+            const newLvl = getLevel(userXP).level;
             
-            document.getElementById('lvl-badge').innerText = txt;
-            document.getElementById('xp-fill').style.width = pct + "%";
-            document.getElementById('xp-text').innerText = `${userXP} / ${req}`;
+            if(amount > 0 && Math.random() < 0.05) { userXP += 50; showToast("CRITICAL SUCCESS! +50 XP", false); showCodex(); }
+            if(newLvl > oldLvl) { showToast("LEVEL UP!", false); showCodex(); }
+            if(newLvl < oldLvl) { showToast("LEVEL LOST", true); } 
+            
+            updateXP();
         }
 
         function doPrestige() {
-            if(userXP < 20000) return alert("Must reach high XP to prestige."); // Simple check
-            if(confirm("Reset Level to 1? You keep themes/archive.")) {
-                userXP = 0;
-                prestige++;
-                updateStats();
-                toggleMenu();
+            const stats = getLevel(userXP);
+            if(stats.level < 50) return alert("MUST REACH LEVEL 50 TO PRESTIGE.");
+            if(confirm("WARNING: Resets Level to 1. Keeps Themes & Unlocks Story Chapter. Do it?")) {
+                userXP = 0; prestige++; updateXP();
+                alert(`PRESTIGE ${prestige} UNLOCKED! Story Chapter ${prestige} Available.`);
+                closeMenu();
             }
         }
 
-        // --- THEMES & UI ---
-        function setTheme(name) {
-            document.body.className = name;
-            localStorage.setItem('mc_theme', name);
-            toggleMenu();
+        function showCodex() {
+            const quote = CODEX[Math.floor(Math.random() * CODEX.length)];
+            const el = document.getElementById('codex-popup');
+            document.getElementById('codex-text').innerText = `"${quote.t}"`;
+            document.getElementById('codex-src').innerText = quote.s;
+            el.classList.add('active');
+            setTimeout(() => el.classList.remove('active'), 5000);
         }
-
-        function toggleMenu() {
-            const m = document.getElementById('menu');
-            m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
-        }
-
-        function toggleArchive() {
-            isArchive = !isArchive;
-            render();
-        }
-
-        function saveData() {
-            localStorage.setItem('mc_tasks', JSON.stringify(tasks));
-        }
-
-        function hardReset() {
-            if(confirm("WIPE ALL DATA?")) {
-                localStorage.clear();
-                location.reload();
-            }
-        }
-
-        // --- STORY ---
-        const STORY = {
-            1: "CHAPTER I: THE EMBER\n\nThe sun dimmed. We scavenge the ruins. I found a sword that hums with warmth.",
-            2: "CHAPTER II: THE FROZEN COURT\n\nThe High Warden demands the blade. I must choose: luxury or truth?",
-            3: "CHAPTER III: THE MIRROR\n\nThe Alchemist showed me the truth. The sun isn't dead. We blocked it.",
-            4: "FINALE: ZENITH\n\nI pierced the sky mechanism. The sun returns. The ice weeps."
-        };
 
         function openStory() {
-            storyPage = Math.max(1, Math.min(4, prestige + 1));
-            renderStory();
-            document.getElementById('story').style.display = 'flex';
+            currentChapter = prestige === 0 ? 1 : prestige; 
+            renderChapter();
+            document.getElementById('story-modal').style.display = 'flex';
         }
 
-        function navStory(dir) {
-            storyPage += dir;
-            renderStory();
+        function changeChapter(dir) {
+            currentChapter += dir;
+            if(currentChapter < 1) currentChapter = 1;
+            if(currentChapter > 4) currentChapter = 4;
+            renderChapter();
         }
 
-        function renderStory() {
-            const txt = document.getElementById('story-text');
-            if(storyPage > prestige + 1) {
-                txt.innerText = "🔒 LOCKED (Reach Prestige " + storyPage + ")";
+        function renderChapter() {
+            const content = document.getElementById('story-content');
+            if(prestige >= currentChapter) {
+                content.innerText = STORY[currentChapter];
+                content.classList.remove('story-lock');
             } else {
-                txt.innerText = STORY[storyPage] || "To Be Continued...";
+                content.innerHTML = `<div class="story-lock">🔒 LOCKED<br><br>Reach Prestige ${currentChapter} to decode this chronicle.</div>`;
             }
         }
 
-        // --- EXPORT/IMPORT ---
-        function exportData() {
-            const str = JSON.stringify(tasks);
-            const blob = new Blob([str], {type: "application/json"});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `mission_backup_${Date.now()}.json`;
-            a.click();
-            toggleMenu();
+        function showToast(msg, isLoss) {
+            const t = document.getElementById('xp-toast');
+            t.querySelector('span').innerText = msg;
+            t.className = isLoss ? 'loss' : '';
+            t.style.opacity = '1'; t.style.transform = 'translate(-50%, 0px) scale(1)';
+            const bar = document.getElementById('xp-fill');
+            if(isLoss) bar.classList.add('damage'); else bar.classList.remove('damage');
+            setTimeout(() => { 
+                t.style.opacity = '0'; t.style.transform = 'translate(-50%, 10px)'; bar.classList.remove('damage'); 
+            }, 3000);
         }
 
-        function importData(input) {
-            const file = input.files[0];
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    tasks = JSON.parse(e.target.result);
-                    saveData();
-                    render();
-                    alert("Loaded!");
-                } catch(err) { alert("Invalid File"); }
-            };
-            reader.readAsText(file);
-            toggleMenu();
+        function checkUnlocks(level) {
+            const locks = { 'feat-status': 2, 'feat-zen': 8, 'feat-prestige': 50, 'fx-star': 10, 'fx-coin': 20, 'fx-gem': 30, 'theme-wolf': 5, 'theme-neon': 10, 'theme-aperture': 12, 'theme-horror': 15, 'theme-vapor': 18, 'theme-blueprint': 20, 'theme-terminal': 25, 'theme-gold': 30, 'theme-nebula': 999, 'theme-midas': 999, 'theme-glitch': 999 };
+            const unlockAll = prestige > 0;
+            for(let id in locks) {
+                const btn = document.getElementById(id);
+                if(!btn) continue;
+                let isUnlocked = false;
+                if(id === 'theme-nebula') isUnlocked = prestige >= 1;
+                else if(id === 'theme-midas') isUnlocked = prestige >= 2;
+                else if(id === 'theme-glitch') isUnlocked = prestige >= 3;
+                else isUnlocked = unlockAll || level >= locks[id];
+                if(isUnlocked) { btn.classList.remove('dd-locked'); if(btn.innerHTML.includes('🔒')) btn.innerHTML = btn.innerHTML.replace(' 🔒', ''); } 
+                else { btn.classList.add('dd-locked'); if(!btn.innerHTML.includes('🔒')) btn.innerHTML += ' 🔒'; }
+            }
+        }
+
+        function setTheme(name, force) {
+            const stats = getLevel(userXP);
+            const reqs = { 'wolf': 5, 'neon': 10, 'aperture': 12, 'horror': 15, 'vapor': 18, 'blueprint': 20, 'terminal': 25, 'gold': 30 };
+            const pReqs = { 'nebula': 1, 'midas': 2, 'glitch': 3 };
+            if(!force) {
+                if(pReqs[name] && prestige < pReqs[name]) return alert(`LOCKED! Reach Prestige ${pReqs[name]} to unlock.`);
+                if(reqs[name] && prestige === 0 && stats.level < reqs[name]) return alert(`LOCKED! Reach Level ${reqs[name]} to unlock.`);
+            }
+            document.body.className = ''; 
+            if(name !== 'default') document.body.classList.add(`theme-${name}`);
+            currentTheme = name;
+            localStorage.setItem('theme', name);
+        }
+
+        function setConfetti(type) {
+            const stats = getLevel(userXP);
+            const reqs = { 'star': 10, 'coin': 20, 'gem': 30 };
+            if(prestige === 0 && reqs[type] && stats.level < reqs[type]) return alert(`Locked until Level ${reqs[type]}`);
+            confettiStyle = type;
+            localStorage.setItem('mc_fx', type);
         }
 
         function launchConfetti() {
-            // Visual confetti placeholder
-            const b = document.body;
-            const c = document.createElement('div');
-            c.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:rgba(0,255,0,0.1);transition:1s;";
-            b.appendChild(c);
-            setTimeout(() => { c.style.opacity=0; setTimeout(()=>c.remove(),1000); }, 500);
+            const emojis = { 'square': '', 'star': '⭐', 'coin': '🪙', 'gem': '💎' };
+            const icon = emojis[confettiStyle];
+            for(let i=0; i<30; i++) {
+                const c = document.createElement('div');
+                c.className = 'confetti';
+                c.innerText = icon;
+                c.style.left = Math.random()*100 + 'vw';
+                if(confettiStyle === 'square') {
+                    c.style.width = '10px'; c.style.height = '10px';
+                    c.style.background = `hsl(${Math.random()*360}, 100%, 50%)`;
+                }
+                c.style.animation = `fall ${Math.random()*1+1}s linear forwards`;
+                document.body.appendChild(c);
+                setTimeout(()=>c.remove(), 2000);
+            }
+        }
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = `@keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }`;
+        document.head.appendChild(styleSheet);
+
+        function render() {
+            [0, 1, 2].forEach(i => { document.getElementById(`col-${i}`).innerHTML = ''; document.getElementById(`count-${i}`).innerText = '0'; });
+            const today = new Date().toISOString().split('T')[0];
+            tasks.forEach(t => {
+                if (showArchive && !t.archived) return;
+                if (!showArchive && t.archived) return;
+                const total = t.steps.length;
+                const done = t.steps.filter(s => s.done).length;
+                const pct = total === 0 ? 0 : (done / total) * 100;
+                let dateHtml = '';
+                if(t.date) {
+                    const isOverdue = t.date < today && t.col !== 2;
+                    dateHtml = `<span class="card-date ${isOverdue?'overdue':''}">${t.date}</span>`;
+                }
+                const div = document.createElement('div');
+                div.className = `card slide-enter p-${t.prio||'Med'}`;
+                div.id = `card-${t.id}`;
+                // Quick actions
+                const actions = `
+                    <div class="card-actions">
+                        <div class="btn-quick" onclick="event.stopPropagation(); moveCardLogic(${tasks.indexOf(t)}, -1)">←</div>
+                        <div class="btn-quick" onclick="event.stopPropagation(); moveCardLogic(${tasks.indexOf(t)}, 1)">→</div>
+                    </div>
+                `;
+                div.onclick = () => openModal(t.id);
+                div.innerHTML = `<div class="card-top"><span class="card-title">${t.title}</span>${dateHtml}</div>
+                                 <span class="prio-pill pill-${t.prio}">${t.prio}</span>
+                                 <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+                                 <div class="card-meta"><span>${done}/${total} Steps</span><span>${pct.toFixed(0)}%</span></div>
+                                 ${actions}`;
+                const colId = t.col !== undefined ? t.col : 0;
+                document.getElementById(`col-${colId}`).appendChild(div);
+            });
+            [0, 1, 2].forEach(i => { 
+                const col = document.getElementById(`col-${i}`);
+                if(col.innerHTML === '') col.innerHTML = `<div class="empty-msg">Awaiting Orders...</div>`;
+                document.getElementById(`count-${i}`).innerText = tasks.filter(t => (t.col||0) === i && !t.archived).length; 
+            });
+            document.querySelector('h1').innerText = showArchive ? "Cryo-Storage 🧊" : "Mission Control 🚀";
         }
 
+        // --- KINETIC LOGIC ---
+        function moveCardAnim(dir) {
+            const id = document.getElementById('t-id').value;
+            const idx = tasks.findIndex(x => x.id === id);
+            closeModal();
+            const cardEl = document.getElementById(`card-${id}`);
+            if(cardEl) {
+                cardEl.classList.add(dir === 1 ? 'slide-right' : 'slide-left');
+                setTimeout(() => { moveCardLogic(idx, dir); }, 300); 
+            } else { moveCardLogic(idx, dir); }
+        }
+
+        function moveCardLogic(idx, dir) {
+            if(idx > -1) {
+                let newCol = (tasks[idx].col || 0) + dir;
+                if(newCol < 0) newCol = 0; if(newCol > 2) newCol = 2;
+                const today = new Date().toISOString().split('T')[0];
+                const isLate = tasks[idx].date && tasks[idx].date < today;
+                const prio = tasks[idx].prio || 'Med';
+                const penalty = prio === 'High' ? -50 : (prio === 'Med' ? -30 : -10);
+
+                if(tasks[idx].col !== 2 && newCol === 2) { 
+                    if(isLate) { showToast(`⚠️ LATE (${penalty} XP)`, true); updateLiveXP(penalty); }
+                    else { showToast("VICTORY! (+100 XP)", false); updateLiveXP(100); launchConfetti(); }
+                }
+                if(tasks[idx].col === 2 && newCol !== 2) { showToast("RETREAT (-100 XP)", true); updateLiveXP(-100); }
+                tasks[idx].col = newCol;
+                save(); updateXP(); render();
+            }
+        }
+
+        function moveCard(dir) { moveCardAnim(dir); } 
+
+        function deleteCard() {
+            const id = document.getElementById('t-id').value;
+            if(!id) return;
+            if(confirm("ABORT MISSION? -50 XP Penalty")) {
+                const t = tasks.find(x => x.id === id);
+                let sunkXP = t.steps.filter(s=>s.done).length * 10;
+                if(t.col === 2) sunkXP += 100;
+                const totalLoss = sunkXP + 50;
+                updateLiveXP(-totalLoss);
+                tasks = tasks.filter(x => x.id !== id);
+                showToast(`FAILED (-${totalLoss} XP)`, true);
+                save(); closeModal(); render();
+            }
+        }
+
+        function toggleCheck(el) {
+            const isChecked = el.classList.toggle('checked');
+            if(isChecked) { showToast("+10 XP", false); updateLiveXP(10); } 
+            else { showToast("-10 XP", true); updateLiveXP(-10); }
+        }
+
+        function openModal(id) {
+            const t = id ? tasks.find(x => x.id === id) : { id: '', title: '', steps: [], col: 0, prio:'Med', date:'', archived:false };
+            document.getElementById('t-id').value = t.id;
+            document.getElementById('t-title').value = t.title;
+            document.getElementById('t-date').value = t.date;
+            setPrio(t.prio || 'Med');
+            document.getElementById('btn-cal-sync').style.display = (t.date && t.id) ? 'block' : 'none';
+            document.getElementById('btn-archive-toggle').innerText = t.archived ? "🔥 Thaw" : "🧊 Cryo-Sleep";
+            const container = document.getElementById('checklist-container');
+            container.innerHTML = '';
+            t.steps.forEach(s => addCheckItem(s.text, s.done));
+            if(t.steps.length === 0) addCheckItem(); 
+            document.getElementById('move-controls').style.display = id ? 'flex' : 'none';
+            document.getElementById('task-modal').style.display = 'flex';
+        }
+
+        function addCheckItem(text = '', done = false) {
+            const div = document.createElement('div');
+            div.className = 'check-item';
+            div.innerHTML = `<div class="check-box ${done?'checked':''}" onclick="toggleCheck(this)"></div><input type="text" class="check-text" value="${text}" placeholder="New Step..."><span class="check-del" onclick="this.parentElement.remove(); showToast('-10 XP', true); updateLiveXP(-10);">✕</span>`;
+            document.getElementById('checklist-container').appendChild(div);
+        }
+        
+        function handleStepEnter(e) {
+            if(e.key === 'Enter') {
+                const val = document.getElementById('new-step-input').value.trim();
+                if(val) {
+                    addCheckItem(val);
+                    document.getElementById('new-step-input').value = '';
+                    setTimeout(() => { const inputs = document.querySelectorAll('.check-text'); if(inputs.length > 0) inputs[inputs.length-1].focus(); }, 50);
+                }
+            }
+        }
+
+        function saveCard() {
+            const id = document.getElementById('t-id').value;
+            const title = document.getElementById('t-title').value;
+            if(!title) return alert("Title required");
+            const prio = document.getElementById('t-prio').value;
+            const date = document.getElementById('t-date').value;
+            const steps = [];
+            document.querySelectorAll('.check-item').forEach(el => {
+                const txt = el.querySelector('.check-text').value.trim();
+                const chk = el.querySelector('.check-box').classList.contains('checked');
+                if(txt) steps.push({ text: txt, done: chk });
+            });
+            if(id) {
+                const idx = tasks.findIndex(x => x.id === id);
+                tasks[idx] = { ...tasks[idx], title, steps, prio, date };
+            } else {
+                tasks.push({ id: Date.now().toString(), title, steps, col: 0, prio, date, archived:false });
+            }
+            save(); closeModal(); render();
+        }
+
+        function setPrio(val) { document.getElementById('t-prio').value = val; document.querySelectorAll('.prio-opt').forEach(el => { el.classList.remove('active'); if(el.dataset.val === val) el.classList.add('active'); }); }
+        function toggleArchive() { const id = document.getElementById('t-id').value; const idx = tasks.findIndex(x => x.id === id); if(idx > -1) { tasks[idx].archived = !tasks[idx].archived; save(); closeModal(); render(); } }
+        function toggleArchiveView() { showArchive = !showArchive; render(); }
+        function save() { localStorage.setItem('mc_tasks', JSON.stringify(tasks)); }
+        function closeModal() { document.getElementById('task-modal').style.display = 'none'; }
+        function toggleMenu() { document.getElementById('save-menu').classList.toggle('show'); }
+        function closeMenu() { document.getElementById('save-menu').classList.remove('show'); }
+        function showStatusReport() {
+            const stats = getLevel(userXP);
+            if(stats.level < 2 && prestige === 0) return alert("Unlock this at Level 2.");
+            const total = tasks.length;
+            const wins = tasks.filter(t => t.col === 2).length;
+            const rate = total === 0 ? 0 : Math.round((wins/total)*100);
+            alert(`📊 STATUS REPORT\n\nRank: ${RANKS[Math.min(stats.level-1, RANKS.length-1)]}\nXP: ${userXP}\n\nMissions: ${total}\nVictories: ${wins}\nSuccess Rate: ${rate}%`);
+        }
+        function toggleZen() {
+            const stats = getLevel(userXP);
+            if(stats.level < 8 && prestige === 0) return alert("Unlock Zen Mode at Level 8.");
+            document.body.classList.toggle('zen-mode'); toggleMenu();
+        }
+        function exportData() { const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(tasks)],{type:'application/json'})); a.download=`mission_backup_${Date.now()}.json`; a.click(); toggleMenu(); }
+        function importData(el) { const fr=new FileReader(); fr.onload=e=>{tasks=JSON.parse(e.target.result); recalcTotalXP(); save(); render(); alert("Data Restored");}; fr.readAsText(el.files[0]); toggleMenu(); }
+        function recalcTotalXP() { let total = 0; tasks.forEach(t => { t.steps.forEach(s => { if(s.done) total += 10; }); if(t.col === 2) total += 100; }); userXP = total; updateXP(); }
+        function addToCalendar() {
+            const t = document.getElementById('t-title').value; const d = document.getElementById('t-date').value;
+            if(!d) return alert("Set a date first"); const s=d.replace(/-/g,'')+'T090000'; const e=d.replace(/-/g,'')+'T100000';
+            const ics=`BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:${t}\nDTSTART:${s}\nDTEND:${e}\nEND:VEVENT\nEND:VCALENDAR`;
+            const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar'})); a.download='mission.ics'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        }
     </script>
 </body>
 </html>
