@@ -11,46 +11,44 @@
 
     <style>
         :root {
-            /* DEFAULT (Tactical Dark) */
-            --bg: #1e1e2e; --card-bg: #2a2a3c; --col-bg: #232334;
-            --text: #cdd6f4; --subtext: #a6adc8; --border: #313244;
-            --p-red: #ffb8b8; --p-orange: #f9ccac; --p-blue: #9ae4e8;   
-            --p-green: #a7f3d0; --p-purple: #c4b5fd;
-            --radius: 16px; --shadow: 0 4px 10px rgba(0,0,0,0.1);
+            /* REFINED PALETTE (Easier on Eyes) */
+            --bg: #181825;       /* Softer Dark Background */
+            --card-bg: #262636;  /* Card Color */
+            --col-bg: #1e1e2e;   /* Column Background */
+            --text: #cdd6f4;
+            --subtext: #9399b2;
+            --border: #313244;
+            
+            /* DISTINCT INPUT COLORS */
+            --in-title: #313244;
+            --in-date: #232336;
+            --in-prio: #2a2a3c;
+            
+            /* ACCENTS */
+            --p-red: #f38ba8;    
+            --p-orange: #fab387; 
+            --p-blue: #89b4fa;   
+            --p-green: #a6e3a1;  
+            --p-purple: #cba6f7;
+            
+            --radius: 16px;
+            --shadow: 0 6px 15px rgba(0,0,0,0.25);
             --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             --font-head: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         /* --- THEME PACKS --- */
-        body.theme-light { --bg: #f3f4f6; --card-bg: #ffffff; --col-bg: #e5e7eb; --text: #1f2937; --subtext: #6b7280; --border: #d1d5db; }
-        body.theme-wolf { --bg: #1c1917; --card-bg: #292524; --col-bg: #0c0a09; --text: #e7e5e4; --subtext: #a8a29e; --border: #44403c; --p-red: #7f1d1d; --p-orange: #b45309; --p-blue: #3b82f6; --p-green: #15803d; --p-purple: #a21caf; --font-main: Georgia, serif; --radius: 4px; --shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        body.theme-neon { --bg: #050505; --card-bg: #111; --col-bg: #0a0a0a; --text: #fff; --subtext: #888; --border: #333; --p-red: #ff0055; --p-orange: #ff9900; --p-blue: #00f3ff; --p-green: #00ff66; --p-purple: #bc13fe; --font-main: 'Courier New', monospace; --radius: 0px; --shadow: 0 0 10px var(--p-blue); }
+        body.theme-light { --bg: #eff1f5; --card-bg: #ffffff; --col-bg: #e6e9ef; --text: #4c4f69; --subtext: #9ca0b0; --border: #bcc0cc; --in-title:#e6e9ef; --in-date:#dce0e8; --in-prio:#e6e9ef; }
+        body.theme-wolf { --bg: #1c1917; --card-bg: #292524; --col-bg: #0c0a09; --text: #e7e5e4; --subtext: #a8a29e; --border: #44403c; --p-red: #7f1d1d; --p-orange: #b45309; --p-blue: #3b82f6; --p-green: #15803d; --p-purple: #a21caf; --font-main: Georgia, serif; --radius: 4px; }
+        body.theme-neon { --bg: #050505; --card-bg: #111; --col-bg: #0a0a0a; --text: #fff; --subtext: #888; --border: #333; --p-red: #ff0055; --p-orange: #ff9900; --p-blue: #00f3ff; --p-green: #00ff66; --p-purple: #bc13fe; --font-main: 'Courier New', monospace; --radius: 0px; }
         body.theme-neon .card { border: 1px solid var(--p-blue); }
-        body.theme-aperture { --bg: #e0e0e0; --card-bg: #ffffff; --col-bg: #d1d1d1; --text: #333; --subtext: #666; --border: #999; --p-red: #e74c3c; --p-orange: #ffa500; --p-blue: #00a5ff; --p-green: #00a5ff; --p-purple: #333; --font-main: Helvetica, Arial, sans-serif; --radius: 20px; --shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff; }
-        body.theme-aperture .col-active { color: #00a5ff; } body.theme-aperture .col-victory { color: #ffa500; } 
-        body.theme-horror { --bg: #0a0505; --card-bg: #1a0505; --col-bg: #110000; --text: #ffcccc; --subtext: #804040; --border: #4d0000; --p-red: #ff0000; --p-green: #225522; --p-purple: #330033; --font-main: Helvetica, sans-serif; --radius: 2px; }
-        body.theme-vapor { --bg: #2d1b4e; --card-bg: #1b1030; --col-bg: #432c7a; --text: #ffd166; --subtext: #ef476f; --border: #118ab2; --p-red: #ef476f; --p-orange: #ffd166; --p-blue: #118ab2; --p-green: #06d6a0; --p-purple: #d783ff; --font-main: 'Verdana', sans-serif; --radius: 0px; background: linear-gradient(180deg, #2d1b4e 0%, #000 100%); }
-        body.theme-blueprint { --bg: #1e3a8a; --card-bg: #172554; --col-bg: #1e40af; --text: #bfdbfe; --subtext: #60a5fa; --border: #93c5fd; --p-red: #fff; --p-green: #fff; --p-purple: #fff; --p-blue: #fff; --font-main: 'Courier New', monospace; --radius: 0px; background-image: linear-gradient(#3b82f6 1px, transparent 1px), linear-gradient(90deg, #3b82f6 1px, transparent 1px); background-size: 20px 20px; }
-        body.theme-blueprint .card { border: 2px solid var(--border); box-shadow: none; }
-        body.theme-terminal { --bg: #000; --card-bg: #000; --col-bg: #000; --text: #22c55e; --subtext: #15803d; --border: #22c55e; --p-red: #22c55e; --p-orange: #22c55e; --p-blue: #22c55e; --p-green: #22c55e; --p-purple: #22c55e; --font-main: 'Courier New', monospace; --radius: 0px; }
-        body.theme-terminal .card, body.theme-terminal .column { border: 1px dashed var(--border); }
-        body.theme-gold { --bg: #0f0f0f; --card-bg: #1c1c1c; --col-bg: #141414; --text: #fcd34d; --subtext: #b45309; --border: #78350f; --p-red: #991b1b; --p-green: #f59e0b; --p-purple: #d97706; --p-blue: #fcd34d; --font-main: Georgia, serif; --radius: 8px; --shadow: 0 10px 30px rgba(251, 191, 36, 0.1); }
-        body.theme-gold .level-badge { background: linear-gradient(to right, #fcd34d, #b45309); color: black; }
-
-        /* PRESTIGE THEMES */
-        body.theme-nebula { --bg: #0b0014; --card-bg: #1a0b2e; --col-bg: #11051f; --text: #e0ccff; --subtext: #8a64b5; --border: #4a2b6b; --p-red: #ff3366; --p-green: #00ffcc; --p-purple: #bb00ff; --p-blue: #00ccff; background: radial-gradient(circle at 50% 50%, #1a0b2e 0%, #000000 100%); --font-head: 'Verdana', sans-serif; }
-        body.theme-nebula .level-badge { background: linear-gradient(90deg, #ff00cc, #3333ff); box-shadow: 0 0 15px #bb00ff; }
-        body.theme-midas { --bg: #080808; --card-bg: #141414; --col-bg: #0d0d0d; --text: #d4af37; --subtext: #8a7324; --border: #d4af37; --p-red: #ff4444; --p-green: #d4af37; --p-purple: #ffd700; --p-blue: #c5a028; --radius: 2px; --font-main: 'Times New Roman', serif; }
-        body.theme-midas .card { border: 1px solid #d4af37; box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
-        body.theme-glitch { --bg: #121212; --card-bg: #000000; --col-bg: #1a1a1a; --text: #ffffff; --subtext: #555555; --border: #333333; --p-red: #ff003c; --p-green: #05ffa1; --p-blue: #00f0ff; --p-purple: #ff003c; --font-main: 'Courier New', monospace; }
-        body.theme-glitch .card-title { text-shadow: 2px 0 var(--p-red), -2px 0 var(--p-blue); }
-
+        
         /* --- BASE STYLES --- */
         body { 
             background-color: var(--bg); color: var(--text); 
             font-family: var(--font-main);
             margin: 0; height: 100dvh; display: flex; flex-direction: column; overflow: hidden;
-            transition: background 0.5s, color 0.5s;
+            transition: background 0.3s, color 0.3s;
         }
 
         body.zen-mode .header, body.zen-mode .xp-bar-container, body.zen-mode .fab { display: none !important; }
@@ -75,8 +73,7 @@
             height: 100%; background: var(--p-green); width: 0%; 
             transition: width 0.5s ease-out, background 0.2s; 
         }
-        .xp-fill.damage { background: var(--p-red); } 
-        .xp-text { font-size: 0.7rem; color: var(--subtext); font-weight: bold; width: 80px; text-align: right; }
+        .xp-text { font-size: 0.75rem; color: var(--subtext); font-weight: bold; width: 80px; text-align: right; }
 
         .header { padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
         h1 { margin: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; color: var(--p-blue); font-weight: 900; font-family: var(--font-head); }
@@ -90,12 +87,12 @@
         }
         @media (min-width: 600px) { .column { min-width: 340px; } }
 
-        .col-header { padding: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; font-family: var(--font-head); }
+        .col-header { padding: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; font-family: var(--font-head); color: var(--subtext); }
         .task-list { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 12px; }
         
         .empty-msg { text-align: center; color: var(--subtext); font-style: italic; font-size: 0.8rem; margin-top: 50px; opacity: 0.5; }
 
-        /* ANIMATED CARDS */
+        /* CARDS */
         .card { 
             background: var(--card-bg); padding: 16px; border-radius: var(--radius); 
             box-shadow: var(--shadow); transition: transform 0.2s, opacity 0.2s; 
@@ -107,7 +104,7 @@
         .slide-enter { animation: slideIn 0.3s forwards; }
 
         .card-top { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center; }
-        .card-title { font-weight: bold; font-size: 1.05rem; color: var(--text); }
+        .card-title { font-weight: bold; font-size: 1.1rem; color: var(--text); }
         .card-date { font-size: 0.7rem; background: var(--border); padding: 4px 8px; border-radius: 6px; color: var(--subtext); height: fit-content; font-weight: 600; }
         .card-date.overdue { background: var(--p-red); color: #000; }
         
@@ -120,9 +117,8 @@
         .progress-fill { height: 100%; background: var(--p-green); width: 0%; transition: width 0.3s; }
         .card-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--subtext); margin-top: 8px; font-weight: 600; }
         
-        /* CARD ACTIONS: UPDATED FOR EDIT BTN */
         .card-actions { display:flex; gap:10px; margin-top:10px; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:10px; }
-        .btn-quick { background: var(--col-bg); border:1px solid var(--border); color:var(--text); width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold;}
+        .btn-quick { background: var(--col-bg); border:1px solid var(--border); color:var(--text); width:30px; height:35px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; font-size:1.1rem; }
         .edit-btn { color: var(--p-purple); border-color: var(--p-purple); font-size:1rem; width: auto; padding: 0 15px;}
 
         .fab { position: fixed; bottom: 30px; right: 20px; background: var(--p-purple); color: #000; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; box-shadow: 0 8px 30px rgba(0,0,0,0.4); cursor: pointer; border: none; z-index: 999999; transition: transform 0.2s; }
@@ -131,45 +127,45 @@
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: flex-start; overflow-y: auto; padding: 20px 0; }
         .modal-content { background: var(--card-bg); width: 90%; max-width: 450px; padding: 25px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: 0 20px 60px rgba(0,0,0,0.6); margin-bottom: 80px; }
         
-        .form-label { display: block; font-size: 0.75rem; color: var(--subtext); font-weight: 800; margin-bottom: 8px; letter-spacing: 1px; }
+        .form-label { display: block; font-size: 0.75rem; color: var(--subtext); font-weight: 800; margin-bottom: 8px; letter-spacing: 1px; text-transform: uppercase; }
         
-        /* UNIFORM INPUTS */
-        .uniform-input { 
+        /* --- DISTINCT INPUT STYLES --- */
+        .input-base {
             width: 100%; height: 50px; padding: 0 14px; 
-            background: var(--col-bg); border: 1px solid var(--border); 
+            border: 1px solid var(--border); 
             color: var(--text); border-radius: 12px; font-size: 1.1rem; 
             box-sizing: border-box; margin-bottom: 18px; 
-            font-family: inherit;
+            font-family: inherit; transition: 0.2s;
         }
-        select.uniform-input { -webkit-appearance: none; appearance: none; }
+        .input-base:focus { outline: none; border-color: var(--p-purple); }
 
-        .form-row { display: flex; gap: 12px; margin-bottom: 18px; align-items: stretch; }
-        .fixed-height { height: 50px; box-sizing: border-box; }
+        .input-title { background: var(--in-title); font-weight: bold; }
+        .input-date { background: var(--in-date); color: var(--p-blue); }
+        .input-select { background: var(--in-prio); color: var(--p-orange); -webkit-appearance: none; appearance: none; }
+        .input-step { background: transparent; border: 1px dashed var(--subtext); color: var(--subtext); }
         
-        .prio-select { display: flex; gap: 6px; background: var(--col-bg); padding: 6px; border-radius: 14px; flex: 1; border: 1px solid var(--border); }
-        .prio-opt { flex: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 0.85rem; font-weight: bold; cursor: pointer; color: var(--subtext); transition: 0.2s; }
-        .prio-opt.active[data-val="Low"] { background: var(--p-blue); color: #000; }
-        .prio-opt.active[data-val="Med"] { background: var(--p-orange); color: #000; }
-        .prio-opt.active[data-val="High"] { background: var(--p-red); color: #000; }
-
-        .check-item { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; padding: 5px 0; }
+        .form-row { display: flex; gap: 12px; margin-bottom: 18px; align-items: stretch; }
+        
+        .check-item { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; padding: 8px; background: var(--col-bg); border-radius: 10px; }
         .check-box { width: 28px; height: 28px; border-radius: 8px; border: 2px solid var(--subtext); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
         .check-box.checked { background: var(--p-green); border-color: var(--p-green); }
         .check-box.checked::after { content:'✓'; color:black; font-weight:900; font-size:1rem; }
-        .check-text { flex: 1; background: transparent; border: none; color: var(--text); font-size: 1.1rem; border-bottom: 1px solid transparent; }
-        .check-text:focus { border-bottom: 1px solid var(--p-purple); outline: none; }
+        .check-text { flex: 1; background: transparent; border: none; color: var(--text); font-size: 1.1rem; }
         .check-del { color: var(--p-red); cursor: pointer; padding: 8px; font-weight: bold; font-size: 1.2rem; opacity: 0.5; }
 
-        .btn-main { width: 100%; padding: 18px; background: var(--p-purple); color: #000; border: none; border-radius: 16px; font-weight: 800; font-size: 1.1rem; cursor: pointer; margin-top: 20px; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(196, 181, 253, 0.3); }
+        .btn-main { width: 100%; padding: 18px; background: var(--p-purple); color: #000; border: none; border-radius: 16px; font-weight: 800; font-size: 1.1rem; cursor: pointer; margin-top: 10px; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(196, 181, 253, 0.3); }
         .btn-sec { width: 100%; padding: 14px; background: transparent; border: 1px solid var(--border); color: var(--subtext); border-radius: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 0.95rem; }
-        .btn-cal { background: var(--col-bg); color: var(--text); border: 1px solid var(--border); padding: 10px; border-radius: 10px; font-size: 0.85rem; cursor: pointer; margin-top: 5px; width: 100%; text-align: center;}
-
+        
         /* TOAST & CODEX */
         #xp-toast { position: fixed; top: 90px; left: 50%; transform: translateX(-50%); background: var(--p-green); color: black; font-weight: 900; padding: 10px 20px; border-radius: 20px; opacity: 0; pointer-events: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: opacity 0.3s, transform 0.3s; z-index: 2000; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
         #xp-toast.loss { background: var(--p-red); }
-        #xp-toast.crit { background: var(--gold); border: 2px solid white; transform: translateX(-50%) scale(1.2); }
-        .btn-undo { background: black; color: white; padding: 5px 10px; border-radius: 10px; border: 1px solid white; font-size: 0.8rem; cursor: pointer; pointer-events: auto; }
-
+        
+        #codex-popup { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--card-bg); border: 1px solid var(--p-purple); padding: 15px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); max-width: 90%; width: 300px; z-index: 2000; opacity: 0; pointer-events: none; transition: 0.5s; text-align: center; }
+        #codex-popup.active { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+        .codex-text { font-style: italic; font-size: 0.9rem; color: var(--text); margin-bottom: 5px; }
+        .codex-src { font-size: 0.7rem; color: var(--p-purple); font-weight: bold; text-transform: uppercase; }
+        
+        /* STORY & MENU */
         .confetti { position: fixed; width: 20px; height: 20px; top: -20px; z-index: 3000; font-size:20px; text-align:center; }
         .dropdown { position: absolute; top: 60px; right: 15px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; display: none; flex-direction: column; width: 240px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 200; overflow: hidden; max-height: 80vh; overflow-y: auto;}
         .dropdown.show { display: flex; }
@@ -178,12 +174,6 @@
         .dd-badge { font-size: 0.65rem; background: var(--border); padding: 2px 6px; border-radius: 4px; color: var(--subtext); font-weight: bold; }
         .dd-sect { padding:10px; font-size:0.7rem; color:var(--subtext); font-weight:bold; background:var(--col-bg); letter-spacing:1px; }
         
-        #codex-popup { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--card-bg); border: 1px solid var(--p-purple); padding: 15px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); max-width: 90%; width: 300px; z-index: 2000; opacity: 0; pointer-events: none; transition: 0.5s; text-align: center; }
-        #codex-popup.active { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
-        .codex-text { font-style: italic; font-size: 0.9rem; color: var(--text); margin-bottom: 5px; }
-        .codex-src { font-size: 0.7rem; color: var(--p-purple); font-weight: bold; text-transform: uppercase; }
-        
-        /* STORY */
         #story-modal .modal-content { background: #1a1a1a; border: 2px solid #b45309; }
         .story-header { font-family: Georgia, serif; text-align: center; color: #fcd34d; font-size: 1.5rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
         .story-body { font-family: Georgia, serif; color: #e7e5e4; line-height: 1.6; font-size: 1.1rem; white-space: pre-wrap; height: 60vh; overflow-y: auto; padding-right: 10px; }
@@ -280,15 +270,15 @@
             <h2 style="margin-top:0; text-align:center;">Edit Mission</h2>
             <input type="hidden" id="e-id">
             <span class="form-label">MISSION OBJECTIVE</span>
-            <input id="e-title" class="uniform-input" placeholder="e.g. Campaign Launch">
+            <input id="e-title" class="input-base input-title" placeholder="e.g. Campaign Launch">
             <div class="form-row">
                 <div style="flex:1">
                     <span class="form-label">DEADLINE</span>
-                    <input type="date" id="e-date" class="uniform-input" style="margin-bottom:0;">
+                    <input type="date" id="e-date" class="input-base input-date" style="margin-bottom:0;">
                 </div>
                 <div style="flex:1">
                     <span class="form-label">PRIORITY</span>
-                    <select id="e-prio" class="uniform-input" style="margin-bottom:0;">
+                    <select id="e-prio" class="input-base input-select" style="margin-bottom:0;">
                         <option value="Low">Low</option>
                         <option value="Med">Med</option>
                         <option value="High">High</option>
@@ -298,7 +288,7 @@
             <span class="form-label">TACTICAL CHECKLIST</span>
             <div id="e-checks"></div>
             <div class="form-row" style="margin-top:10px;">
-                <input id="new-step-input" class="uniform-input" placeholder="+ Add Step (Press Enter)" style="margin-bottom:0;" onkeypress="handleStepEnter(event)">
+                <input id="new-step-input" class="input-base input-step" placeholder="+ Add Step (Press Enter)" style="margin-bottom:0;" onkeypress="handleStepEnter(event)">
             </div>
             
             <button class="btn-main" onclick="saveCard()">SAVE CHANGES</button>
@@ -368,24 +358,29 @@
                 const total = t.steps.length;
                 const done = t.steps.filter(s => s.done).length;
                 const pct = total === 0 ? 0 : (done / total) * 100;
+                
+                // --- DATE FORMATTING START ---
                 let dateHtml = '';
                 if(t.date) {
                     const isOverdue = t.date < today && t.col !== 2;
-                    dateHtml = `<span class="card-date ${isOverdue?'overdue':''}">${t.date}</span>`;
+                    // Format Date to "Dec 12, 2025"
+                    const dateObj = new Date(t.date + 'T00:00'); // T00:00 prevents timezone shift
+                    const dateStr = dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                    dateHtml = `<span class="card-date ${isOverdue?'overdue':''}">${dateStr}</span>`;
                 }
+                // --- DATE FORMATTING END ---
+
                 const div = document.createElement('div');
                 div.className = `card slide-enter p-${t.prio||'Med'}`;
                 div.id = `card-${t.id}`;
-                
-                // CLICK CARD TO VIEW
                 div.onclick = () => openViewer(t.id);
-                
                 div.innerHTML = `<div class="card-top"><span class="card-title">${t.title}</span>${dateHtml}</div>
                                  <span class="prio-pill pill-${t.prio}">${t.prio}</span>
                                  <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
                                  <div class="card-meta"><span>${done}/${total} Steps</span><span>${pct.toFixed(0)}%</span></div>
                                  <div class="card-actions">
                                     <div class="btn-quick" onclick="event.stopPropagation(); moveCardLogic(${tasks.indexOf(t)}, -1)">←</div>
+                                    <div class="btn-quick edit-btn" onclick="event.stopPropagation(); openEditor('${t.id}')">✏️</div>
                                     <div class="btn-quick" onclick="event.stopPropagation(); moveCardLogic(${tasks.indexOf(t)}, 1)">→</div>
                                  </div>`;
                 const colId = t.col !== undefined ? t.col : 0;
@@ -399,7 +394,7 @@
             document.querySelector('h1').innerText = showArchive ? "Cryo-Storage 🧊" : "Mission Control 🚀";
         }
 
-        // --- NEW: VIEWER LOGIC ---
+        // --- VIEWER LOGIC ---
         function openViewer(id) {
             const t = tasks.find(x => x.id === id);
             if(!t) return;
@@ -408,7 +403,14 @@
             document.getElementById('v-title').innerText = t.title;
             document.getElementById('v-prio').innerText = t.prio;
             document.getElementById('v-prio').className = `prio-pill pill-${t.prio}`;
-            document.getElementById('v-date').innerText = t.date || "No Deadline";
+            
+            // Format View Date
+            if(t.date) {
+                const dateObj = new Date(t.date + 'T00:00');
+                document.getElementById('v-date').innerText = dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+            } else {
+                document.getElementById('v-date').innerText = "No Deadline";
+            }
             
             const container = document.getElementById('v-checks');
             container.innerHTML = '';
@@ -416,7 +418,6 @@
             t.steps.forEach((s, idx) => {
                 const div = document.createElement('div');
                 div.className = 'check-item';
-                // Interactive Checkbox in View Mode
                 div.innerHTML = `<div class="check-box ${s.done?'checked':''}" onclick="toggleStepDone('${id}', ${idx})"></div><span class="check-text" style="border:none;">${s.text}</span>`;
                 container.appendChild(div);
             });
@@ -427,30 +428,21 @@
         function toggleStepDone(taskId, stepIdx) {
             const t = tasks.find(x => x.id === taskId);
             t.steps[stepIdx].done = !t.steps[stepIdx].done;
-            
             if(t.steps[stepIdx].done) { showToast("+10 XP", false); updateLiveXP(10); }
             else { showToast("-10 XP", true); updateLiveXP(-10); }
-            
-            save(); 
-            openViewer(taskId); // Re-render view
-            render(); // Update board progress bars
+            save(); openViewer(taskId); render(); 
         }
 
-        function switchToEdit() {
-            closeViewer();
-            openEditor(currentViewId);
-        }
-
+        function switchToEdit() { closeViewer(); openEditor(currentViewId); }
         function closeViewer() { document.getElementById('viewer').style.display = 'none'; }
 
-        // --- EDITOR LOGIC (RENAMED FROM MODAL) ---
+        // --- EDITOR LOGIC ---
         function openEditor(id = null) {
             const t = id ? tasks.find(x => x.id === id) : { id: '', title: '', steps: [], col: 0, prio:'Med', date:'', archived:false };
             document.getElementById('e-id').value = t.id;
             document.getElementById('e-title').value = t.title;
             document.getElementById('e-date').value = t.date;
             document.getElementById('e-prio').value = t.prio || 'Med';
-            
             document.getElementById('btn-archive-toggle').innerText = t.archived ? "🔥 Thaw" : "🧊 Cryo-Sleep";
             
             const container = document.getElementById('e-checks');
@@ -471,11 +463,7 @@
             if(e.key === 'Enter') {
                 e.preventDefault();
                 const input = document.getElementById('new-step-input');
-                if(input.value.trim()) {
-                    addEditStep(input.value.trim());
-                    input.value = '';
-                    input.focus();
-                }
+                if(input.value.trim()) { addEditStep(input.value.trim()); input.value = ''; input.focus(); }
             }
         }
 
@@ -483,37 +471,22 @@
             const id = document.getElementById('e-id').value;
             const title = document.getElementById('e-title').value;
             if(!title) return alert("Title required");
-            
             const steps = [];
             document.querySelectorAll('#e-checks .check-item').forEach(el => {
-                steps.push({ 
-                    text: el.querySelector('.check-text').value.trim(), 
-                    done: el.querySelector('.check-box').classList.contains('checked') 
-                });
+                steps.push({ text: el.querySelector('.check-text').value.trim(), done: el.querySelector('.check-box').classList.contains('checked') });
             });
-
             if(id) {
                 const idx = tasks.findIndex(x => x.id === id);
                 tasks[idx] = { ...tasks[idx], title, steps, prio: document.getElementById('e-prio').value, date: document.getElementById('e-date').value };
             } else {
-                tasks.push({ 
-                    id: Date.now().toString(), 
-                    title, steps, col: 0, 
-                    prio: document.getElementById('e-prio').value, 
-                    date: document.getElementById('e-date').value, 
-                    archived: false 
-                });
+                tasks.push({ id: Date.now().toString(), title, steps, col: 0, prio: document.getElementById('e-prio').value, date: document.getElementById('e-date').value, archived: false });
             }
             save(); closeEditor(); render();
         }
 
         function deleteCard() {
             const id = document.getElementById('e-id').value;
-            if(confirm("Abort Mission?")) {
-                tasks = tasks.filter(x => x.id !== id);
-                updateLiveXP(-50);
-                save(); closeEditor(); render();
-            }
+            if(confirm("Abort Mission?")) { tasks = tasks.filter(x => x.id !== id); updateLiveXP(-50); save(); closeEditor(); render(); }
         }
 
         function closeEditor() { document.getElementById('editor').style.display = 'none'; }
@@ -521,85 +494,39 @@
         function toggleArchiveTask() {
             const id = document.getElementById('e-id').value;
             const t = tasks.find(x => x.id === id);
-            t.archived = !t.archived;
-            save(); closeEditor(); render();
+            t.archived = !t.archived; save(); closeEditor(); render();
         }
 
-        // --- MOVEMENT & XP LOGIC ---
         function moveCardLogic(idx, dir) {
             let newCol = (tasks[idx].col || 0) + dir;
             if(newCol < 0) newCol = 0; if(newCol > 2) newCol = 2;
-            
             const task = tasks[idx];
-            
-            // Victory Calculation: Check if moving TO Victory (Col 2)
-            if(task.col !== 2 && newCol === 2) {
-                calculateFinishXP(task);
-                launchConfetti();
-                // Stamp value
-                task.winXP = calculateFinishValue(task);
-            }
-            // Retreat Calculation: Check if moving FROM Victory
-            if(task.col === 2 && newCol !== 2) {
-                // Deduct what was earned (or default to base if old data)
-                const refund = task.winXP || 100;
-                const penalty = 50; 
-                const totalLoss = refund + penalty;
-                
-                showToast(`RETREAT (-${totalLoss})`, true);
-                updateLiveXP(-totalLoss);
-                task.winXP = 0; // Reset
-            }
-
-            task.col = newCol;
-            save(); updateXP(); render();
-        }
-
-        function calculateFinishValue(task) {
-            let base = 100;
-            if(task.prio === 'Med') base = 150;
-            if(task.prio === 'High') base = 200;
-
-            let multiplier = 1.0;
-            if(task.date) {
-                const due = new Date(task.date);
-                const today = new Date();
-                due.setHours(0,0,0,0); today.setHours(0,0,0,0);
-                
-                if(today < due) multiplier = 1.2; // Early Bonus
-                else if(today > due) multiplier = 0.8; // Late Penalty
-            }
-            return Math.floor(base * multiplier);
+            if(task.col !== 2 && newCol === 2) { calculateFinishXP(task); launchConfetti(); }
+            if(task.col === 2 && newCol !== 2) { showToast("RETREAT (-20%)", true); updateLiveXP(-20); }
+            task.col = newCol; save(); updateXP(); render();
         }
 
         function calculateFinishXP(task) {
-            const total = calculateFinishValue(task);
-            const msg = total > 200 ? "EPIC VICTORY!" : "VICTORY!";
-            showToast(`${msg} (+${total} XP)`, false);
-            updateLiveXP(total);
+            let base = 100; if(task.prio === 'Med') base = 150; if(task.prio === 'High') base = 200;
+            let multiplier = 1.0;
+            if(task.date) {
+                const due = new Date(task.date); const today = new Date();
+                due.setHours(0,0,0,0); today.setHours(0,0,0,0);
+                if(today < due) multiplier = 1.2; else if(today > due) multiplier = 0.8;
+            }
+            const total = Math.floor(base * multiplier);
+            showToast(`VICTORY! (+${total} XP)`, false); updateLiveXP(total);
         }
 
         function updateLiveXP(amount) {
-            // Prestige Multiplier
             const pMult = 1 + (prestige * 0.1); 
             let final = Math.floor(amount * pMult);
-            
-            // Critical Chance (5%)
-            if(amount > 0 && Math.random() < 0.05) {
-                final += 50;
-                showToast("CRITICAL SUCCESS! (+50 BONUS)", false);
-                showCodex();
-            }
-
-            userXP += final;
-            if(userXP < 0) userXP = 0;
-            updateXP();
+            if(amount > 0 && Math.random() < 0.05) { final += 50; showToast("CRITICAL SUCCESS! (+50)", false); showCodex(); }
+            userXP += final; if(userXP < 0) userXP = 0; updateXP();
         }
 
-        // --- CORE UTILS ---
         function updateXP() {
-            localStorage.setItem('mc_xp', userXP);
-            localStorage.setItem('mc_prestige', prestige);
+            localStorage.setItem('mc_xp', userXP); localStorage.setItem('mc_prestige', prestige);
             const stats = getLevel(userXP);
             const pct = Math.max(0, Math.min(100, ((userXP - stats.prevReq) / (stats.nextReq - stats.prevReq)) * 100));
             document.getElementById('lvl-badge').innerText = `LVL ${stats.level}`;
@@ -622,31 +549,20 @@
             setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translate(-50%, 10px)'; }, 3000);
         }
 
-        // --- STANDARD UTILS (Theme, Menu, Export) ---
         function checkUnlocks(level) {
             const locks = {'theme-wolf':5, 'theme-neon':10, 'theme-aperture':12, 'theme-gold':30, 'feat-prestige':50};
             for(let id in locks) {
-                const btn = document.getElementById(id);
-                if(!btn) continue;
-                if(prestige > 0 || level >= locks[id]) { 
-                    btn.classList.remove('dd-locked'); 
-                    if(btn.innerText.includes('🔒')) btn.innerText = btn.innerText.replace(' 🔒', '');
-                } else {
-                    btn.classList.add('dd-locked'); 
-                    if(!btn.innerText.includes('🔒')) btn.innerText += ' 🔒';
-                }
+                const btn = document.getElementById(id); if(!btn) continue;
+                if(prestige > 0 || level >= locks[id]) { btn.classList.remove('dd-locked'); if(btn.innerText.includes('🔒')) btn.innerText = btn.innerText.replace(' 🔒', ''); } 
+                else { btn.classList.add('dd-locked'); if(!btn.innerText.includes('🔒')) btn.innerText += ' 🔒'; }
             }
         }
         function setTheme(name, force) {
             if(!force && name !== 'default' && name !== 'light' && prestige === 0) {
-                // Simple check, real check is in checkUnlocks logic visually
-                const stats = getLevel(userXP);
-                const reqs = {'wolf':5, 'neon':10, 'aperture':12, 'gold':30};
+                const stats = getLevel(userXP); const reqs = {'wolf':5, 'neon':10, 'aperture':12, 'gold':30};
                 if(stats.level < reqs[name]) return alert("Locked!");
             }
-            document.body.className = `theme-${name}`;
-            currentTheme = name;
-            localStorage.setItem('theme', name);
+            document.body.className = `theme-${name}`; currentTheme = name; localStorage.setItem('theme', name);
         }
         function toggleMenu() { document.getElementById('save-menu').classList.toggle('show'); }
         function closeMenu() { document.getElementById('save-menu').classList.remove('show'); }
@@ -678,10 +594,8 @@
         }
         function showStatusReport() { const stats = getLevel(userXP); alert(`XP: ${userXP}\nLevel: ${stats.level}\nPrestige: ${prestige}`); }
         function exportData() {
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(new Blob([JSON.stringify(tasks)], {type:'application/json'}));
-            a.download = 'mission_backup.json';
-            a.click();
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(tasks)], {type:'application/json'}));
+            a.download = 'mission_backup.json'; a.click();
         }
         function importData(input) {
             const file = input.files[0]; const reader = new FileReader();
