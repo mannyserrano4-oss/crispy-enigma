@@ -11,38 +11,87 @@
 
     <style>
         :root {
-            /* TACTICAL DARK PALETTE */
+            /* DEFAULT (Tactical Dark) */
             --bg: #181825; --card-bg: #262636; --col-bg: #1e1e2e;
             --text: #cdd6f4; --subtext: #9399b2; --border: #313244;
+            --in-title: #313244; --in-date: #232336; --in-prio: #2a2a3c;
             --p-red: #f38ba8; --p-orange: #fab387; --p-blue: #89b4fa;   
             --p-green: #a6e3a1; --p-purple: #cba6f7;
-            
-            /* INPUT COLORS */
-            --in-title: #313244;
-            --in-date: #232336;
-            --in-prio: #2a2a3c;
-            
-            --radius: 16px; 
-            --shadow: 0 6px 15px rgba(0,0,0,0.25);
+            --radius: 16px; --shadow: 0 6px 15px rgba(0,0,0,0.25);
             --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             --font-head: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
-        /* THEMES */
-        body.theme-light { --bg: #eff1f5; --card-bg: #ffffff; --col-bg: #e6e9ef; --text: #4c4f69; --subtext: #9ca0b0; --border: #bcc0cc; --in-title:#e6e9ef; --in-date:#dce0e8; --in-prio:#e6e9ef; }
-        body.theme-wolf { --bg: #1c1917; --card-bg: #292524; --col-bg: #0c0a09; --text: #e7e5e4; --subtext: #a8a29e; --border: #44403c; --p-red: #7f1d1d; --p-orange: #b45309; --p-blue: #3b82f6; --p-green: #15803d; --p-purple: #a21caf; --font-main: Georgia, serif; --radius: 4px; }
-        body.theme-neon { --bg: #050505; --card-bg: #111; --col-bg: #0a0a0a; --text: #fff; --subtext: #888; --border: #333; --p-red: #ff0055; --p-orange: #ff9900; --p-blue: #00f3ff; --p-green: #00ff66; --p-purple: #bc13fe; --font-main: 'Courier New', monospace; --radius: 0px; }
+        /* --- THEME PACKS (Now with Input Colors) --- */
+        body.theme-light { 
+            --bg: #eff1f5; --card-bg: #ffffff; --col-bg: #e6e9ef; 
+            --text: #4c4f69; --subtext: #9ca0b0; --border: #bcc0cc; 
+            --in-title:#e6e9ef; --in-date:#dce0e8; --in-prio:#e6e9ef; 
+        }
+        
+        body.theme-wolf { 
+            --bg: #1c1917; --card-bg: #292524; --col-bg: #0c0a09; 
+            --text: #e7e5e4; --subtext: #a8a29e; --border: #44403c; 
+            --p-red: #7f1d1d; --p-orange: #b45309; --p-blue: #3b82f6; --p-green: #15803d; --p-purple: #a21caf; 
+            --in-title: #44403c; --in-date: #292524; --in-prio: #57534e;
+            --font-main: Georgia, serif; --radius: 4px; 
+        }
+        
+        body.theme-neon { 
+            --bg: #050505; --card-bg: #111; --col-bg: #0a0a0a; 
+            --text: #fff; --subtext: #888; --border: #333; 
+            --p-red: #ff0055; --p-orange: #ff9900; --p-blue: #00f3ff; --p-green: #00ff66; --p-purple: #bc13fe; 
+            --in-title: #222; --in-date: #000; --in-prio: #222;
+            --font-main: 'Courier New', monospace; --radius: 0px; 
+        }
         body.theme-neon .card { border: 1px solid var(--p-blue); }
-        body.theme-aperture { --bg: #e0e0e0; --card-bg: #ffffff; --col-bg: #d1d1d1; --text: #333; --subtext: #666; --border: #999; --p-red: #e74c3c; --p-orange: #ffa500; --p-blue: #00a5ff; --p-green: #00a5ff; --p-purple: #333; --font-main: Helvetica, Arial, sans-serif; --radius: 20px; }
-        body.theme-gold { --bg: #0f0f0f; --card-bg: #1c1c1c; --col-bg: #141414; --text: #fcd34d; --subtext: #b45309; --border: #78350f; --p-red: #991b1b; --p-green: #f59e0b; --p-purple: #d97706; --p-blue: #fcd34d; --font-main: Georgia, serif; --radius: 8px; }
+        
+        body.theme-aperture { 
+            --bg: #e0e0e0; --card-bg: #ffffff; --col-bg: #d1d1d1; 
+            --text: #333; --subtext: #666; --border: #999; 
+            --p-red: #e74c3c; --p-orange: #ffa500; --p-blue: #00a5ff; --p-green: #00a5ff; --p-purple: #333; 
+            --in-title: #f2f2f2; --in-date: #e6e6e6; --in-prio: #f2f2f2;
+            --font-main: Helvetica, Arial, sans-serif; --radius: 20px; 
+        }
+        
+        body.theme-gold { 
+            --bg: #0f0f0f; --card-bg: #1c1c1c; --col-bg: #141414; 
+            --text: #fcd34d; --subtext: #b45309; --border: #78350f; 
+            --p-red: #991b1b; --p-green: #f59e0b; --p-purple: #d97706; --p-blue: #fcd34d; 
+            --in-title: #2d2d2d; --in-date: #000; --in-prio: #2d2d2d;
+            --font-main: Georgia, serif; --radius: 8px; 
+        }
         body.theme-gold .level-badge { background: linear-gradient(to right, #fcd34d, #b45309); color: black; }
-        body.theme-nebula { --bg: #0b0014; --card-bg: #1a0b2e; --col-bg: #11051f; --text: #e0ccff; --subtext: #8a64b5; --border: #4a2b6b; --p-red: #ff3366; --p-green: #00ffcc; --p-purple: #bb00ff; --p-blue: #00ccff; background: radial-gradient(circle at 50% 50%, #1a0b2e 0%, #000000 100%); --font-head: 'Verdana', sans-serif; }
+        
+        /* PRESTIGE THEMES */
+        body.theme-nebula { 
+            --bg: #0b0014; --card-bg: #1a0b2e; --col-bg: #11051f; 
+            --text: #e0ccff; --subtext: #8a64b5; --border: #4a2b6b; 
+            --p-red: #ff3366; --p-green: #00ffcc; --p-purple: #bb00ff; --p-blue: #00ccff; 
+            --in-title: #240046; --in-date: #10002b; --in-prio: #240046;
+            background: radial-gradient(circle at 50% 50%, #1a0b2e 0%, #000000 100%); --font-head: 'Verdana', sans-serif; 
+        }
         body.theme-nebula .level-badge { background: linear-gradient(90deg, #ff00cc, #3333ff); box-shadow: 0 0 15px #bb00ff; }
-        body.theme-midas { --bg: #080808; --card-bg: #141414; --col-bg: #0d0d0d; --text: #d4af37; --subtext: #8a7324; --border: #d4af37; --p-red: #ff4444; --p-green: #d4af37; --p-purple: #ffd700; --p-blue: #c5a028; --radius: 2px; --font-main: 'Times New Roman', serif; }
+        
+        body.theme-midas { 
+            --bg: #080808; --card-bg: #141414; --col-bg: #0d0d0d; 
+            --text: #d4af37; --subtext: #8a7324; --border: #d4af37; 
+            --p-red: #ff4444; --p-green: #d4af37; --p-purple: #ffd700; --p-blue: #c5a028; 
+            --in-title: #1a1a1a; --in-date: #000; --in-prio: #1a1a1a;
+            --radius: 2px; --font-main: 'Times New Roman', serif; 
+        }
         body.theme-midas .card { border: 1px solid #d4af37; box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
-        body.theme-glitch { --bg: #121212; --card-bg: #000000; --col-bg: #1a1a1a; --text: #ffffff; --subtext: #555555; --border: #333333; --p-red: #ff003c; --p-green: #05ffa1; --p-blue: #00f0ff; --p-purple: #ff003c; --font-main: 'Courier New', monospace; }
+        
+        body.theme-glitch { 
+            --bg: #121212; --card-bg: #000000; --col-bg: #1a1a1a; 
+            --text: #ffffff; --subtext: #555555; --border: #333333; 
+            --p-red: #ff003c; --p-green: #05ffa1; --p-blue: #00f0ff; --p-purple: #ff003c; 
+            --in-title: #111; --in-date: #050505; --in-prio: #111;
+            --font-main: 'Courier New', monospace; 
+        }
         body.theme-glitch .card-title { text-shadow: 2px 0 var(--p-red), -2px 0 var(--p-blue); }
 
+        /* --- CORE STYLES --- */
         body { background-color: var(--bg); color: var(--text); font-family: var(--font-main); margin: 0; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; transition: background 0.5s, color 0.5s; }
         body.zen-mode .header, body.zen-mode .xp-bar-container, body.zen-mode .fab { display: none !important; }
         body.zen-mode .board { height: 100vh; padding-top: max(20px, env(safe-area-inset-top)); }
@@ -67,7 +116,6 @@
         .task-list { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 12px; }
         .empty-msg { text-align: center; color: var(--subtext); font-style: italic; font-size: 0.8rem; margin-top: 50px; opacity: 0.5; }
 
-        /* CARDS */
         .card { background: var(--card-bg); padding: 16px; border-radius: var(--radius); box-shadow: var(--shadow); transition: transform 0.2s, opacity 0.2s; border-left: 0; position: relative; overflow: hidden; }
         .card:active { transform: scale(0.98); }
         .card-actions { display:flex; gap:10px; margin-top:10px; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:10px; }
@@ -98,16 +146,7 @@
         .modal-content { background: var(--card-bg); width: 90%; max-width: 450px; padding: 25px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: 0 20px 60px rgba(0,0,0,0.6); margin-bottom: 80px; }
         
         .form-label { display: block; font-size: 0.75rem; color: var(--subtext); font-weight: 800; margin-bottom: 8px; letter-spacing: 1px; text-transform: uppercase; }
-        
-        /* UNIFORM INPUTS (MOBILE FRIENDLY) */
-        .uniform-input { 
-            width: 100%; height: 54px; /* Mobile Friendly Height */
-            padding: 0 14px; 
-            background: var(--col-bg); border: 1px solid var(--border); 
-            color: var(--text); border-radius: 12px; font-size: 1.1rem; 
-            box-sizing: border-box; margin-bottom: 18px; 
-            font-family: inherit; -webkit-appearance: none; appearance: none;
-        }
+        .uniform-input { width: 100%; height: 54px; padding: 0 14px; background: var(--col-bg); border: 1px solid var(--border); color: var(--text); border-radius: 12px; font-size: 1.1rem; box-sizing: border-box; margin-bottom: 18px; font-family: inherit; -webkit-appearance: none; appearance: none; }
         .input-base:focus { outline: none; border-color: var(--p-purple); }
         .input-title { background: var(--in-title); font-weight: bold; }
         .input-date { background: var(--in-date); color: var(--p-blue); }
@@ -229,8 +268,10 @@
                 <span id="v-prio" class="prio-pill"></span>
                 <span id="v-date" class="card-date"></span>
             </div>
+            
             <span class="form-label">TACTICAL STATUS</span>
             <div id="v-checks" style="margin-bottom:20px;"></div>
+
             <button class="btn-main" onclick="switchToEdit()">✏️ EDIT MISSION</button>
             <button class="btn-sec" onclick="closeViewer()" style="border:none;">Close</button>
         </div>
@@ -274,7 +315,7 @@
     <div id="confirm-modal" class="modal">
         <div class="modal-content" style="text-align:center;">
             <h2 style="color:var(--p-red); margin-top:0;">⚠️ WARNING</h2>
-            <p id="confirm-msg" style="margin-bottom:20px; font-size:1.1rem; color:var(--text);">Abort Mission?<br><span style="font-size:0.9rem; opacity:0.8;">Penalty: -50 XP (Plus lost step XP)</span></p>
+            <p id="confirm-msg" style="margin-bottom:20px; font-size:1.1rem; color:var(--text);">ABORT MISSION?<br><span style="font-size:0.9rem; opacity:0.8;">Penalty: -50 XP (Plus lost step XP)</span></p>
             <div class="form-row">
                 <button class="btn-sec" onclick="closeConfirm()">NO</button>
                 <button class="btn-main" style="background:var(--p-red); color:black;" id="confirm-yes-btn">YES, ABORT</button>
@@ -340,13 +381,18 @@
                 const total = t.steps.length;
                 const done = t.steps.filter(s => s.done).length;
                 const pct = total === 0 ? 0 : (done / total) * 100;
+                
+                // --- DATE FORMATTING START ---
                 let dateHtml = '';
                 if(t.date) {
                     const isOverdue = t.date < today && t.col !== 2;
-                    const dateObj = new Date(t.date + 'T00:00');
+                    // Format Date to "Dec 12, 2025"
+                    const dateObj = new Date(t.date + 'T00:00'); // T00:00 prevents timezone shift
                     const dateStr = dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
                     dateHtml = `<span class="card-date ${isOverdue?'overdue':''}">${dateStr}</span>`;
                 }
+                // --- DATE FORMATTING END ---
+
                 const div = document.createElement('div');
                 div.className = `card slide-enter p-${t.prio||'Med'}`;
                 div.id = `card-${t.id}`;
