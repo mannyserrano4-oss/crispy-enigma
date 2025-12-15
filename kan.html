@@ -121,7 +121,7 @@
         .card-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--subtext); margin-top: 8px; font-weight: 600; }
         
         /* CARD ACTIONS: UPDATED FOR EDIT BTN */
-        .card-actions { display:flex; gap:10px; margin-top:10px; justify-content:space-between; align-items:center; border-top: 1px solid var(--border); padding-top:10px; }
+        .card-actions { display:flex; gap:10px; margin-top:10px; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:10px; }
         .btn-quick { background: var(--col-bg); border:1px solid var(--border); color:var(--text); width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold;}
         .edit-btn { color: var(--p-purple); border-color: var(--p-purple); font-size:1rem; width: auto; padding: 0 15px;}
 
@@ -344,10 +344,10 @@
             { t: "Discipline is freedom.", s: "Codex" }
         ];
         const STORY = {
-            1: "CHAPTER I: THE EMBER\n\nThe endless frost began not with a bang, but a whisper. The sun simply... dimmed. Years turned to decades of twilight. Civilization crumbled into the snow.\n\nI am Kael, a scavenger of the Old World. Yesterday, digging through the ruins of a tech-spire, I found it. Not food, not fuel, but a sword. It wasn't cold steel. It hummed. A faint, golden heat radiated from the blade.\n\nThey say the Alchemists of old trapped sunlight in metal. If that's true, I'm holding the only warmth left in the world. And the Shadows are coming for it.",
-            2: "CHAPTER II: THE FROZEN COURT\n\nI traveled South, following the faint pull of the blade. The Capital still stands, a fortress of black ice and iron. The Lords play their games of thrones while the poor freeze outside the walls.\n\nI tried to barter entry, but the guards saw the sword. Now I am a prisoner, or a guest? The High Warden wants the weapon. He says it belongs to the 'Vanguard,' a mythical order of knights.\n\nI must choose. Give him the sword and live in luxury while the world dies? Or escape, and find the source of the blade's power? The whispers in my mind are getting louder. 'Protect the Light.'",
-            3: "CHAPTER III: THE ALCHEMIST'S MIRROR\n\nI chose the snow. I ran. The blade guided me to a mountain peak above the cloud layer. There was no temple, only a cave, and an old woman reflecting starlight with mirrors.\n\n'You look for a savior,' she laughed. 'But the sword is just a key.'\n\nShe showed me the truth. The sun didn't die. We blocked it. The 'Shield' meant to protect us from solar flares froze in place. The sword unlocks the atmospheric controls. But the climb to the Zenith Spire is a suicide mission. Vampiric creatures nest there. I am afraid. But the sword is burning hot now. It knows.",
-            4: "FINALE: THE ZENITH\n\nThe climb took everything. My gear, my strength, my blood. I stand at the Zenith controls. The Shadows surround me, screeching in the thin air.\n\nI plunge the blade into the console. Not a key, but a spark. The machine roars. The sky tears open. For the first time in a century, a beam of pure, unfiltered gold hits the snow.\n\nThe Shadows burn away. The ice weeps. I fall to my knees, blinded, weeping with it. The Sunless Age is over. I am the Vanguard. And I am warm."
+            1: "CHAPTER I: THE EMBER\n\nThe endless frost began not with a bang, but a whisper...",
+            2: "CHAPTER II: THE FROZEN COURT\n\nI traveled South, following the faint pull of the blade...",
+            3: "CHAPTER III: THE ALCHEMIST'S MIRROR\n\nI chose the snow. I ran. The blade guided me...",
+            4: "FINALE: THE ZENITH\n\nThe climb took everything. My gear, my strength, my blood..."
         };
 
         initApp();
@@ -377,6 +377,7 @@
                 div.className = `card slide-enter p-${t.prio||'Med'}`;
                 div.id = `card-${t.id}`;
                 
+                // CLICK CARD TO VIEW
                 div.onclick = () => openViewer(t.id);
                 
                 div.innerHTML = `<div class="card-top"><span class="card-title">${t.title}</span>${dateHtml}</div>
@@ -398,7 +399,7 @@
             document.querySelector('h1').innerText = showArchive ? "Cryo-Storage 🧊" : "Mission Control 🚀";
         }
 
-        // --- VIEWER LOGIC ---
+        // --- NEW: VIEWER LOGIC ---
         function openViewer(id) {
             const t = tasks.find(x => x.id === id);
             if(!t) return;
@@ -415,6 +416,7 @@
             t.steps.forEach((s, idx) => {
                 const div = document.createElement('div');
                 div.className = 'check-item';
+                // Interactive Checkbox in View Mode
                 div.innerHTML = `<div class="check-box ${s.done?'checked':''}" onclick="toggleStepDone('${id}', ${idx})"></div><span class="check-text" style="border:none;">${s.text}</span>`;
                 container.appendChild(div);
             });
@@ -429,19 +431,26 @@
             if(t.steps[stepIdx].done) { showToast("+10 XP", false); updateLiveXP(10); }
             else { showToast("-10 XP", true); updateLiveXP(-10); }
             
-            save(); openViewer(taskId); render(); 
+            save(); 
+            openViewer(taskId); // Re-render view
+            render(); // Update board progress bars
         }
 
-        function switchToEdit() { closeViewer(); openEditor(currentViewId); }
+        function switchToEdit() {
+            closeViewer();
+            openEditor(currentViewId);
+        }
+
         function closeViewer() { document.getElementById('viewer').style.display = 'none'; }
 
-        // --- EDITOR LOGIC ---
+        // --- EDITOR LOGIC (RENAMED FROM MODAL) ---
         function openEditor(id = null) {
             const t = id ? tasks.find(x => x.id === id) : { id: '', title: '', steps: [], col: 0, prio:'Med', date:'', archived:false };
             document.getElementById('e-id').value = t.id;
             document.getElementById('e-title').value = t.title;
             document.getElementById('e-date').value = t.date;
             document.getElementById('e-prio').value = t.prio || 'Med';
+            
             document.getElementById('btn-archive-toggle').innerText = t.archived ? "🔥 Thaw" : "🧊 Cryo-Sleep";
             
             const container = document.getElementById('e-checks');
@@ -462,7 +471,11 @@
             if(e.key === 'Enter') {
                 e.preventDefault();
                 const input = document.getElementById('new-step-input');
-                if(input.value.trim()) { addEditStep(input.value.trim()); input.value = ''; input.focus(); }
+                if(input.value.trim()) {
+                    addEditStep(input.value.trim());
+                    input.value = '';
+                    input.focus();
+                }
             }
         }
 
@@ -473,21 +486,34 @@
             
             const steps = [];
             document.querySelectorAll('#e-checks .check-item').forEach(el => {
-                steps.push({ text: el.querySelector('.check-text').value.trim(), done: el.querySelector('.check-box').classList.contains('checked') });
+                steps.push({ 
+                    text: el.querySelector('.check-text').value.trim(), 
+                    done: el.querySelector('.check-box').classList.contains('checked') 
+                });
             });
 
             if(id) {
                 const idx = tasks.findIndex(x => x.id === id);
                 tasks[idx] = { ...tasks[idx], title, steps, prio: document.getElementById('e-prio').value, date: document.getElementById('e-date').value };
             } else {
-                tasks.push({ id: Date.now().toString(), title, steps, col: 0, prio: document.getElementById('e-prio').value, date: document.getElementById('e-date').value, archived: false });
+                tasks.push({ 
+                    id: Date.now().toString(), 
+                    title, steps, col: 0, 
+                    prio: document.getElementById('e-prio').value, 
+                    date: document.getElementById('e-date').value, 
+                    archived: false 
+                });
             }
             save(); closeEditor(); render();
         }
 
         function deleteCard() {
             const id = document.getElementById('e-id').value;
-            if(confirm("Abort Mission?")) { tasks = tasks.filter(x => x.id !== id); updateLiveXP(-50); save(); closeEditor(); render(); }
+            if(confirm("Abort Mission?")) {
+                tasks = tasks.filter(x => x.id !== id);
+                updateLiveXP(-50);
+                save(); closeEditor(); render();
+            }
         }
 
         function closeEditor() { document.getElementById('editor').style.display = 'none'; }
@@ -495,41 +521,85 @@
         function toggleArchiveTask() {
             const id = document.getElementById('e-id').value;
             const t = tasks.find(x => x.id === id);
-            t.archived = !t.archived; save(); closeEditor(); render();
+            t.archived = !t.archived;
+            save(); closeEditor(); render();
         }
 
-        // --- XP LOGIC ---
+        // --- MOVEMENT & XP LOGIC ---
         function moveCardLogic(idx, dir) {
             let newCol = (tasks[idx].col || 0) + dir;
             if(newCol < 0) newCol = 0; if(newCol > 2) newCol = 2;
+            
             const task = tasks[idx];
-            if(task.col !== 2 && newCol === 2) { calculateFinishXP(task); launchConfetti(); }
-            if(task.col === 2 && newCol !== 2) { showToast("RETREAT (-20%)", true); updateLiveXP(-20); }
-            task.col = newCol; save(); updateXP(); render();
+            
+            // Victory Calculation: Check if moving TO Victory (Col 2)
+            if(task.col !== 2 && newCol === 2) {
+                calculateFinishXP(task);
+                launchConfetti();
+                // Stamp value
+                task.winXP = calculateFinishValue(task);
+            }
+            // Retreat Calculation: Check if moving FROM Victory
+            if(task.col === 2 && newCol !== 2) {
+                // Deduct what was earned (or default to base if old data)
+                const refund = task.winXP || 100;
+                const penalty = 50; 
+                const totalLoss = refund + penalty;
+                
+                showToast(`RETREAT (-${totalLoss})`, true);
+                updateLiveXP(-totalLoss);
+                task.winXP = 0; // Reset
+            }
+
+            task.col = newCol;
+            save(); updateXP(); render();
+        }
+
+        function calculateFinishValue(task) {
+            let base = 100;
+            if(task.prio === 'Med') base = 150;
+            if(task.prio === 'High') base = 200;
+
+            let multiplier = 1.0;
+            if(task.date) {
+                const due = new Date(task.date);
+                const today = new Date();
+                due.setHours(0,0,0,0); today.setHours(0,0,0,0);
+                
+                if(today < due) multiplier = 1.2; // Early Bonus
+                else if(today > due) multiplier = 0.8; // Late Penalty
+            }
+            return Math.floor(base * multiplier);
         }
 
         function calculateFinishXP(task) {
-            let base = 100; if(task.prio === 'Med') base = 150; if(task.prio === 'High') base = 200;
-            let multiplier = 1.0;
-            if(task.date) {
-                const due = new Date(task.date); const today = new Date();
-                due.setHours(0,0,0,0); today.setHours(0,0,0,0);
-                if(today < due) multiplier = 1.2; else if(today > due) multiplier = 0.8;
-            }
-            const total = Math.floor(base * multiplier);
-            const msg = multiplier > 1 ? "EARLY VICTORY!" : (multiplier < 1 ? "LATE VICTORY" : "VICTORY!");
-            showToast(`${msg} (+${total} XP)`, false); updateLiveXP(total);
+            const total = calculateFinishValue(task);
+            const msg = total > 200 ? "EPIC VICTORY!" : "VICTORY!";
+            showToast(`${msg} (+${total} XP)`, false);
+            updateLiveXP(total);
         }
 
         function updateLiveXP(amount) {
+            // Prestige Multiplier
             const pMult = 1 + (prestige * 0.1); 
             let final = Math.floor(amount * pMult);
-            if(amount > 0 && Math.random() < 0.05) { final += 50; showToast("CRITICAL SUCCESS! (+50)", false); showCodex(); }
-            userXP += final; if(userXP < 0) userXP = 0; updateXP();
+            
+            // Critical Chance (5%)
+            if(amount > 0 && Math.random() < 0.05) {
+                final += 50;
+                showToast("CRITICAL SUCCESS! (+50 BONUS)", false);
+                showCodex();
+            }
+
+            userXP += final;
+            if(userXP < 0) userXP = 0;
+            updateXP();
         }
 
+        // --- CORE UTILS ---
         function updateXP() {
-            localStorage.setItem('mc_xp', userXP); localStorage.setItem('mc_prestige', prestige);
+            localStorage.setItem('mc_xp', userXP);
+            localStorage.setItem('mc_prestige', prestige);
             const stats = getLevel(userXP);
             const pct = Math.max(0, Math.min(100, ((userXP - stats.prevReq) / (stats.nextReq - stats.prevReq)) * 100));
             document.getElementById('lvl-badge').innerText = `LVL ${stats.level}`;
@@ -552,24 +622,43 @@
             setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translate(-50%, 10px)'; }, 3000);
         }
 
+        // --- STANDARD UTILS (Theme, Menu, Export) ---
         function checkUnlocks(level) {
             const locks = {'theme-wolf':5, 'theme-neon':10, 'theme-aperture':12, 'theme-gold':30, 'feat-prestige':50};
             for(let id in locks) {
-                const btn = document.getElementById(id); if(!btn) continue;
-                if(prestige > 0 || level >= locks[id]) { btn.classList.remove('dd-locked'); if(btn.innerText.includes('🔒')) btn.innerText = btn.innerText.replace(' 🔒', ''); } 
-                else { btn.classList.add('dd-locked'); if(!btn.innerText.includes('🔒')) btn.innerText += ' 🔒'; }
+                const btn = document.getElementById(id);
+                if(!btn) continue;
+                if(prestige > 0 || level >= locks[id]) { 
+                    btn.classList.remove('dd-locked'); 
+                    if(btn.innerText.includes('🔒')) btn.innerText = btn.innerText.replace(' 🔒', '');
+                } else {
+                    btn.classList.add('dd-locked'); 
+                    if(!btn.innerText.includes('🔒')) btn.innerText += ' 🔒';
+                }
             }
         }
         function setTheme(name, force) {
             if(!force && name !== 'default' && name !== 'light' && prestige === 0) {
-                const stats = getLevel(userXP); const reqs = {'wolf':5, 'neon':10, 'aperture':12, 'gold':30};
+                // Simple check, real check is in checkUnlocks logic visually
+                const stats = getLevel(userXP);
+                const reqs = {'wolf':5, 'neon':10, 'aperture':12, 'gold':30};
                 if(stats.level < reqs[name]) return alert("Locked!");
             }
-            document.body.className = `theme-${name}`; currentTheme = name; localStorage.setItem('theme', name);
+            document.body.className = `theme-${name}`;
+            currentTheme = name;
+            localStorage.setItem('theme', name);
         }
         function toggleMenu() { document.getElementById('save-menu').classList.toggle('show'); }
         function closeMenu() { document.getElementById('save-menu').classList.remove('show'); }
         function toggleArchiveView() { showArchive = !showArchive; render(); }
+        function showCodex() {
+            const quote = CODEX[Math.floor(Math.random() * CODEX.length)];
+            const el = document.getElementById('codex-popup');
+            document.getElementById('codex-text').innerText = `"${quote.t}"`;
+            document.getElementById('codex-src').innerText = quote.s;
+            el.classList.add('active');
+            setTimeout(() => el.classList.remove('active'), 5000);
+        }
         function setConfetti(type) { confettiStyle = type; localStorage.setItem('mc_fx', type); }
         function launchConfetti() {
             const emojis = { 'square': '', 'star': '⭐', 'coin': '🪙', 'gem': '💎' };
@@ -589,8 +678,10 @@
         }
         function showStatusReport() { const stats = getLevel(userXP); alert(`XP: ${userXP}\nLevel: ${stats.level}\nPrestige: ${prestige}`); }
         function exportData() {
-            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(tasks)], {type:'application/json'}));
-            a.download = 'mission_backup.json'; a.click();
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([JSON.stringify(tasks)], {type:'application/json'}));
+            a.download = 'mission_backup.json';
+            a.click();
         }
         function importData(input) {
             const file = input.files[0]; const reader = new FileReader();
