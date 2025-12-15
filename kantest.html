@@ -6,37 +6,55 @@
     <title>QuestBoard RPG</title>
     <style>
         :root {
-            /* Base Theme - Pastel Dream (Pink/Lavender/Mint) */
-            --bg-color: #fff0f5; /* Lavender Blush */
-            --text-color: #636e72;
+            /* --- THEME: LIGHT (Pastel Dream) --- */
+            --bg-color: #fff0f5;       /* Lavender Blush */
+            --column-bg: #e6e6fa;      /* Lavender */
             --card-bg: #ffffff;
-            --column-bg: #e6e6fa; /* Lavender */
-            --accent: #00b894; /* Mint Green (Darker for readability) */
-            --accent-light: #55efc4; /* Mint Green (Lighter) */
-            --highlight-pink: #ffeaa7;
-            --highlight-blue: #74b9ff;
-            --success: #00b894;
+            --text-color: #636e72;
+            --text-sub: #b2bec3;
+            
+            /* Accents */
+            --accent: #00b894;         /* Mint */
+            --accent-glow: #55efc4;
             --danger: #ff7675;
+            
+            /* Input & Modal Specifics (Light) */
+            --input-bg: #ffffff;
+            --input-border: #dfe6e9;
+            --group-logistics: #e3f2fd; /* Light Blue */
+            --group-objectives: #e8f5e9;/* Light Green */
+            --modal-text: #2d3436;
+            
+            /* UI Elements */
             --shadow: 0 8px 15px rgba(0,0,0,0.05);
-            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             --radius: 16px;
+            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        /* Dark Mode */
+        /* --- THEME: DARK (Midnight Neon) --- */
         body.dark-mode {
-            --bg-color: #2d3436;
-            --text-color: #dfe6e9;
-            --card-bg: #636e72;
-            --column-bg: #2d3436;
-            --accent: #81ecec;
-            --shadow: 0 4px 6px rgba(0,0,0,0.4);
-            --highlight-pink: #444;
-            --highlight-blue: #444;
+            --bg-color: #1e1e2e;       /* Deep Navy Background */
+            --column-bg: #2a2a40;      /* Lighter Navy Column */
+            --card-bg: #32324a;        /* Slate Card */
+            --text-color: #dcdde1;     /* White-ish Text */
+            --text-sub: #7f8fa6;
+            
+            /* Accents */
+            --accent: #00d2d3;         /* Bright Cyan/Mint */
+            --accent-glow: #00d2d3;
+            --danger: #ff6b6b;
+
+            /* Input & Modal Specifics (Dark) */
+            --input-bg: #252535;
+            --input-border: #404055;
+            --group-logistics: #252535; /* Dark Box */
+            --group-objectives: #252535;/* Dark Box */
+            --modal-text: #f5f6fa;
         }
 
-        /* Theme Overrides (Previous themes kept for legacy support/unlocks) */
+        /* Theme Overrides (Legacy) */
         body.theme-wolf { --bg-color: #3e3b36; --column-bg: #5c5549; --text-color: #dcdccc; --accent: #8c7b6c; --card-bg: #4a453d; }
-        body.theme-neon { --bg-color: #0a0a0a; --column-bg: #141414; --text-color: #e0e0e0; --accent: #0ff; --card-bg: #1a1a1a; --success: #39ff14; --danger: #ff0055; }
+        body.theme-neon { --bg-color: #000000; --column-bg: #111111; --text-color: #00ff00; --accent: #ff00ff; --card-bg: #1a1a1a; }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body { margin: 0; padding: 0; font-family: var(--font); background: var(--bg-color); color: var(--text-color); transition: background 0.3s, color 0.3s; padding-bottom: 100px; }
@@ -44,15 +62,15 @@
         /* HUD & Controls */
         #hud { padding: 15px; background: var(--card-bg); position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;}
         .hud-top { display: flex; justify-content: space-between; align-items: center; }
-        .level-badge { font-weight: 800; font-size: 1.4rem; color: var(--accent); letter-spacing: -0.5px; }
+        .level-badge { font-weight: 800; font-size: 1.4rem; color: var(--accent); letter-spacing: -0.5px; text-shadow: 0 0 10px rgba(0,0,0,0.1); }
         
-        .progress-container { width: 100%; height: 12px; background: #dfe6e9; border-radius: 6px; overflow: hidden; margin-top: 5px; position: relative; }
-        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-light)); width: 0%; transition: width 0.5s ease; border-radius: 6px; }
+        .progress-container { width: 100%; height: 12px; background: rgba(0,0,0,0.1); border-radius: 6px; overflow: hidden; margin-top: 5px; position: relative; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-glow)); width: 0%; transition: width 0.5s ease; border-radius: 6px; }
         
-        /* GLOW EFFECT ANIMATION */
+        /* GLOW ANIMATION */
         @keyframes glowPulse {
             0% { box-shadow: 0 0 5px var(--accent); filter: brightness(1); }
-            50% { box-shadow: 0 0 20px var(--accent), 0 0 10px white; filter: brightness(1.3); }
+            50% { box-shadow: 0 0 15px var(--accent), 0 0 5px white; filter: brightness(1.3); }
             100% { box-shadow: 0 0 5px var(--accent); filter: brightness(1); }
         }
         .progress-bar.glowing { animation: glowPulse 0.8s ease-in-out infinite; }
@@ -61,81 +79,88 @@
         .fab {
             position: fixed; bottom: 30px; right: 25px;
             width: 65px; height: 65px;
-            background: var(--accent); color: white;
+            background: var(--accent); color: white; /* Always white icon */
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-            z-index: 500; cursor: pointer; transition: transform 0.2s;
-            border: none;
+            font-size: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            z-index: 500; cursor: pointer; transition: transform 0.2s; border: none;
         }
         .fab:active { transform: scale(0.9); }
 
         /* Buttons */
-        button { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: var(--radius); font-weight: 600; cursor: pointer; font-size: 0.9rem; }
-        button.secondary { background: #b2bec3; color: white; }
-        button.danger { background: var(--danger); }
+        button { background: var(--accent); color: #fff; border: none; padding: 10px 16px; border-radius: var(--radius); font-weight: 600; cursor: pointer; font-size: 0.9rem; }
+        button.secondary { background: var(--column-bg); color: var(--text-color); border: 1px solid rgba(0,0,0,0.1); }
+        button.danger { background: var(--danger); color: white; }
         .icon-btn { padding: 8px; font-size: 1.2rem; background: transparent; color: var(--text-color); }
 
         /* Search */
-        #search-bar { width: 100%; padding: 12px; border-radius: var(--radius); border: none; background: #f1f2f6; color: var(--text-color); font-size: 1rem; }
+        #search-bar { width: 100%; padding: 12px; border-radius: var(--radius); border: 1px solid transparent; background: var(--column-bg); color: var(--text-color); font-size: 1rem; }
+        #search-bar:focus { border-color: var(--accent); background: var(--card-bg); }
 
         /* Kanban Columns */
         .board { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; height: calc(100vh - 180px); gap: 15px; padding: 15px; }
         .column { min-width: 85vw; background: var(--column-bg); border-radius: var(--radius); padding: 15px; display: flex; flex-direction: column; scroll-snap-align: center; height: 100%; }
-        .column-header { font-weight: 800; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-color); opacity: 0.7; }
+        .column-header { font-weight: 800; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-color); opacity: 0.8; }
 
         /* Cards */
         .card { background: var(--card-bg); padding: 20px; margin-bottom: 15px; border-radius: var(--radius); box-shadow: var(--shadow); transition: transform 0.2s; position: relative; border-left: 6px solid transparent; }
         .card.priority-High { border-left-color: var(--danger); }
         .card.priority-Med { border-left-color: var(--accent); }
         .card.priority-Low { border-left-color: #74b9ff; }
-        .card h3 { margin: 0 0 5px 0; font-size: 1.2rem; }
-        .card-meta { font-size: 0.8rem; opacity: 0.7; display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .card h3 { margin: 0 0 5px 0; font-size: 1.2rem; color: var(--text-color); }
+        .card-meta { font-size: 0.8rem; color: var(--text-sub); display: flex; justify-content: space-between; margin-bottom: 15px; }
         
-        /* Individual Objective Boxes (In Card) */
+        /* Objective Boxes */
         .objective-list { list-style: none; padding: 0; margin: 15px 0; }
         .objective-box { 
             background: rgba(0,0,0,0.03); 
             border: 1px solid rgba(0,0,0,0.05);
             padding: 10px; margin-bottom: 8px; border-radius: 8px; 
-            display: flex; align-items: center; gap: 10px; font-size: 0.95rem; 
+            display: flex; align-items: center; gap: 10px; font-size: 0.95rem;
+            color: var(--text-color);
         }
+        /* Dark mode adjustment for obj boxes */
+        body.dark-mode .objective-box { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
+
         .objective-check { width: 22px; height: 22px; cursor: pointer; accent-color: var(--accent); }
 
         /* Card Actions */
         .card-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
         .action-btn { font-size: 0.8rem; padding: 8px 14px; border-radius: 20px;}
 
-        /* Modals & Forms */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; }
-        .modal { background: var(--card-bg); width: 90%; max-width: 500px; padding: 25px; border-radius: 25px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
-        
-        /* Highlighted/Grouped Input Fields */
-        .field-group {
-            background: var(--bg-color);
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            border: 1px solid rgba(0,0,0,0.05);
-        }
+        /* Modals */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal { background: var(--card-bg); width: 90%; max-width: 500px; padding: 25px; border-radius: 25px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.4); color: var(--modal-text); }
+        .modal h2 { color: var(--text-color); }
+
+        /* Field Groups */
+        .field-group { padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--input-border); }
+        .group-logistics { background: var(--group-logistics); }
+        .group-objectives { background: var(--group-objectives); }
+
         .field-group label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 0.85rem; text-transform: uppercase; color: var(--accent); }
-        .field-group input, .field-group select { 
-            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; background: #fff; color: #333; font-size: 1rem; 
+        
+        /* Inputs */
+        input, select, textarea { 
+            width: 100%; padding: 12px; border-radius: 8px; 
+            border: 1px solid var(--input-border); 
+            background: var(--input-bg); 
+            color: var(--text-color); 
+            font-size: 1rem; 
         }
         
-        /* Dynamic Objective Inputs in Modal */
+        /* Dynamic Objective Inputs */
         .dyn-input-row { display: flex; gap: 5px; margin-bottom: 8px; }
-        .dyn-input-row input { flex-grow: 1; padding: 10px; border-radius: 8px; border: 1px solid #ddd; }
-        .dyn-del-btn { background: #ff7675; color: white; width: 30px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; }
+        .dyn-del-btn { background: var(--danger); color: white; width: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; }
 
         /* Zen Mode */
         body.zen-mode #hud, body.zen-mode .board, body.zen-mode .fab { display: none; }
         body.zen-mode #zen-active-container { display: flex; flex-direction: column; align-items: center; padding: 20px; height: 100vh; background: var(--bg-color); }
-        #zen-exit { position: fixed; bottom: 30px; left: 30px; opacity: 0.5; width: 40px; height: 40px; cursor: pointer; border: 2px solid var(--text-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;}
+        #zen-exit { position: fixed; bottom: 30px; left: 30px; opacity: 0.5; width: 50px; height: 50px; cursor: pointer; border: 2px solid var(--text-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text-color); font-size: 20px; }
 
         /* Canvas for FX */
         #confetti-canvas { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 2000; }
-        .story-text { font-family: "Georgia", serif; line-height: 1.6; font-size: 1.1rem; white-space: pre-wrap; }
+        .story-text { font-family: "Georgia", serif; line-height: 1.6; font-size: 1.1rem; white-space: pre-wrap; color: var(--text-color); }
     </style>
 </head>
 <body>
@@ -176,7 +201,7 @@
 </div>
 
 <div id="zen-active-container" style="display:none;">
-    <h2 style="opacity:0.5; margin-bottom:30px; letter-spacing:2px;">FOCUS MODE</h2>
+    <h2 style="opacity:0.5; margin-bottom:30px; letter-spacing:2px; color:var(--text-color);">FOCUS MODE</h2>
     <div id="zen-list" style="width:100%;"></div>
     <div id="zen-exit" onclick="toggleZen(false)">✕</div>
 </div>
@@ -195,8 +220,8 @@
         <button class="secondary" onclick="toggleZen(true)" id="btn-zen" style="display:none; width:100%; margin-bottom:10px;">Enter Zen Mode</button>
         
         <h3>Themes</h3>
-        <select id="theme-selector" onchange="changeTheme(this.value)" style="width:100%; padding:10px; border-radius:var(--radius); margin-bottom:10px;">
-            <option value="default">Pastel Dream (Default)</option>
+        <select id="theme-selector" onchange="changeTheme(this.value)" style="width:100%; margin-bottom:10px;">
+            <option value="default">Pastel / Midnight (Default)</option>
             <option value="wolf" disabled>🔒 Lvl 5: The Wolf</option>
             <option value="neon" disabled>🔒 Lvl 10: Neon City</option>
             <option value="aperture" disabled>🔒 Lvl 12: Aperture</option>
@@ -230,8 +255,8 @@
     <div class="modal">
         <h2 id="modal-title" style="color:var(--accent); margin-top:0;">New Mission</h2>
         
-        <div class="field-group" style="background: #e3f2fd;">
-            <label style="color:#0984e3">Mission Logistics</label>
+        <div class="field-group group-logistics">
+            <label>Mission Logistics</label>
             <div style="margin-bottom:10px;">
                 <input type="text" id="inp-title" placeholder="Mission Name">
             </div>
@@ -243,14 +268,13 @@
                 </select>
             </div>
             <div>
-                <input type="datetime-local" id="inp-deadline">
+                <input type="date" id="inp-deadline">
             </div>
         </div>
 
-        <div class="field-group" style="background: #e8f5e9;">
-            <label style="color:#00b894">Objectives (Press Enter to Add)</label>
-            <div id="objectives-container">
-                </div>
+        <div class="field-group group-objectives">
+            <label>Objectives (Press Enter to Add)</label>
+            <div id="objectives-container"></div>
             <button class="secondary" style="width:100%; margin-top:5px; font-size:0.8rem;" onclick="addObjectiveInput()">+ Add Line</button>
         </div>
 
@@ -424,9 +448,19 @@
             let base = t.priority === 'High' ? 200 : t.priority === 'Med' ? 150 : 100;
             let bonusMsg = "";
             if(t.deadline) {
-                const diffHours = (new Date(t.deadline) - new Date()) / 36e5;
-                if (diffHours > 24) { base = Math.floor(base * 1.2); bonusMsg += " (Early +20%)"; }
-                else if (diffHours < 0) { base = Math.floor(base * 0.8); bonusMsg += " (Late -20%)"; }
+                // Just compare Dates now (ignore time)
+                const now = new Date();
+                const due = new Date(t.deadline);
+                // Reset times to midnight for fair comparison
+                now.setHours(0,0,0,0);
+                due.setHours(0,0,0,0);
+                
+                // Diff in days
+                const diffTime = due - now;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+
+                if (diffDays >= 1) { base = Math.floor(base * 1.2); bonusMsg += " (Early +20%)"; }
+                else if (diffDays < 0) { base = Math.floor(base * 0.8); bonusMsg += " (Late -20%)"; }
             }
             const result = addXP(base);
             t.winXP = result.gained;
@@ -486,7 +520,16 @@
         div.className = `card priority-${t.priority}`;
         if(player.settings.theme === 'blueprint') div.style.borderStyle = "dashed";
 
-        let dateStr = t.deadline ? new Date(t.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : "";
+        // Date Display
+        let dateStr = "";
+        if(t.deadline) {
+            // Fix timezone offset issue by treating the YYYY-MM-DD string as local parts
+            const parts = t.deadline.split('-');
+            if(parts.length === 3) {
+                const d = new Date(parts[0], parts[1]-1, parts[2]);
+                dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            }
+        }
 
         let subHtml = '<ul class="objective-list">';
         t.subtasks.forEach((s, i) => {
@@ -635,11 +678,37 @@
     }
 
     const stories = {
-        1: `<h3>Chapter I: The Frost and the Flame</h3><p>The wind howled outside...</p>`,
-        // (Truncated for brevity, logic exists in full version if needed)
+        1: `<h3>Chapter I: The Frost and the Flame</h3>
+<p>The wind howled outside the obsidian walls of the Bastion, a sound like a thousand dying wolves. You stood at the parapet, looking out over the endless white. They called it the Long Silence—the winter that had lasted a generation. But you were not just a watcher anymore. You had begun the climb.</p>
+<p>In the old texts, preserved by the Orders of Ink and Bone, it was written that authority is not given, but forged. Like the Valyrian steel of old, or the Shardplate of the Radiants, your will had to be hammered into shape. Every task you completed was a strike of that hammer.</p>
+<p>You remembered the Alchemist's words: "When you want something, all the universe conspires in helping you to achieve it." But the universe was cold here. It did not care. You had to <i>make</i> it care. You had to burn bright enough to melt the snow.</p>
+<p>The nebula overhead swirled with colors unseen by common men—violets and deep, bruising blues. You felt the surge of something ancient in your blood. The First Oath. Life before death. Strength before weakness. Journey before destination. You had taken the first step out of the staging area of your life. The mission was active.</p>`,
+        
+        2: `<h3>Chapter II: The Golden Cage</h3>
+<p>You had ascended. The world below looked like a map drawn by a child, small and insignificant. With the Midas touch, everything you handled turned to success, but gold is a heavy metal. It weighs down the soul.</p>
+<p>The court of the High Lords was a viper's nest. They smiled with teeth of pearl and eyes of flint. You navigated their treachery not with swords, but with completed objectives. High Priority tasks were your shield; Critical Successes your dagger.</p>
+<p>"Power resides where men believe it resides," the eunuch had once whispered. You built your power brick by brick, checkmark by checkmark. But the cold was still there. The impact winter had not ended; it had merely moved inside your heart.</p>
+<p>You looked at your hands. They were glowing, not with warmth, but with the cold light of efficiency. You were becoming something more than human. Something inevitable.</p>`,
+        
+        3: `<h3>Chapter III: The Glitch in the Weave</h3>
+<p>The sky flickered. For a moment, the sun was a square of dead pixels, black against the azure. You blinked, and it was gone, but you knew what you saw. The simulation was straining under the weight of your progress.</p>
+<p>You had pushed too far. Like an Edgedancer sliding on friction-less light, you were moving faster than the world could render. The logic of the universe—the +10 XPs, the Penalties, the Levels—was laying bare before you. You saw the strings.</p>
+<p>It was terrifying. It was exhilarating. You were the storm now. You were the one who knocks. The reality of the board was bending to your will. Tasks completed themselves before you even touched them. But the void was watching. And the void was hungry.</p>`,
+        
+        4: `<h3>Finale: The Architect</h3>
+<p>There is no snow anymore. There is no gold. There is no glitch. There is only the Board. You stand in the center of infinity, the white space of the Staging Area stretching out forever.</p>
+<p>You realize now that the Victory column was never a destination. It was a graveyard of ambition. The joy was never in the having, but in the doing. The Alchemist found his treasure under the tree where he started. You found yours in the daily grind.</p>
+<p>You are the Herald of your own destiny. You have spoken the final oaths. You have survived the winter. You are the master of the two worlds.</p>
+<p>Now... what is your next task?</p>`
     };
     function openStoryModal() {
-        document.getElementById('story-content').innerHTML = "<h3>The Archives</h3><p>Story unlocked at Prestige.</p>";
+        let content = "";
+        if(player.prestige >= 1) content += stories[1];
+        if(player.prestige >= 2) content += stories[2];
+        if(player.prestige >= 3) content += stories[3];
+        if(player.prestige >= 4) content += stories[4];
+        
+        document.getElementById('story-content').innerHTML = content || "<p>You must Prestige to unlock the Archives.</p>";
         document.getElementById('story-modal').style.display = 'flex';
     }
 </script>
