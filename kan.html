@@ -208,8 +208,7 @@
     </div>
 
     <div id="save-menu" class="dropdown">
-        <div class="dd-sect">AUDIO & FX</div>
-        <button class="dd-item" onclick="toggleSound(); closeMenu()">🔊 Sound FX <span class="dd-badge" id="snd-stat">ON</span></button>
+        <div class="dd-sect">VISUALS</div>
         <button class="dd-item" onclick="setConfetti('square'); closeMenu()">🎉 Default Confetti</button>
         <button class="dd-item" id="fx-star" onclick="setConfetti('star'); closeMenu()">⭐ Stars <span class="dd-badge">LVL 10</span></button>
         <button class="dd-item" id="fx-coin" onclick="setConfetti('coin'); closeMenu()">🪙 Coins <span class="dd-badge">LVL 20</span></button>
@@ -306,12 +305,10 @@
         let prestige = parseInt(localStorage.getItem('mc_prestige') || '0');
         let currentTheme = localStorage.getItem('theme') || 'default';
         let confettiStyle = localStorage.getItem('mc_fx') || 'square';
-        let soundOn = localStorage.getItem('mc_sound') === 'true';
         let showArchive = false;
         let currentChapter = 1;
         let lastDeletedTask = null;
         let undoTimeout = null;
-        let audioCtx = null; // START NULL
         
         const RANKS = ["Rookie", "Operative", "Specialist", "Tactician", "Mercenary", "Commander", "Warlord", "Vanguard", "Titan", "Legend"];
         const CODEX = [
@@ -331,50 +328,12 @@
             4: "FINALE: THE ZENITH\n\nThe climb took everything. My gear, my strength, my blood. I stand at the Zenith controls. The Shadows surround me, screeching in the thin air.\n\nI plunge the blade into the console. Not a key, but a spark. The machine roars. The sky tears open. For the first time in a century, a beam of pure, unfiltered gold hits the snow.\n\nThe Shadows burn away. The ice weeps. I fall to my knees, blinded, weeping with it. The Sunless Age is over. I am the Vanguard. And I am warm."
         };
 
-        // --- INIT & AUDIO (CRASH FIX: Only Init on Click) ---
-        document.addEventListener('click', () => {
-            if(!audioCtx) {
-                try {
-                    const AudioContext = window.AudioContext || window.webkitAudioContext;
-                    if(AudioContext) audioCtx = new AudioContext();
-                } catch(e) { console.log("Audio not supported"); }
-            }
-            if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-        }, { once: true });
-
         initApp();
 
         function initApp() {
             setTheme(currentTheme, true); 
-            document.getElementById('snd-stat').innerText = soundOn ? "ON" : "OFF";
             render();
             updateXP();
-        }
-
-        function playTone(freq, type, duration) {
-            if(!soundOn || !audioCtx) return;
-            try {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(); osc.stop(audioCtx.currentTime + duration);
-            } catch(e) { console.log(e); }
-        }
-
-        function sfx(type) {
-            if(type === 'check') playTone(880, 'sine', 0.1); 
-            if(type === 'uncheck') playTone(150, 'sawtooth', 0.2); 
-            if(type === 'win') { playTone(523.25,'triangle',0.1); setTimeout(()=>playTone(659.25,'triangle',0.1),100); setTimeout(()=>playTone(783.99,'triangle',0.2),200); setTimeout(()=>playTone(1046.50,'triangle',0.4),300); }
-            if(type === 'lvlup') { [440, 554, 659, 880].forEach((f, i) => setTimeout(() => playTone(f, 'square', 0.2), i*150)); }
-        }
-
-        function toggleSound() {
-            soundOn = !soundOn; localStorage.setItem('mc_sound', soundOn);
-            document.getElementById('snd-stat').innerText = soundOn ? "ON" : "OFF";
-            if(soundOn) sfx('check');
         }
 
         function getLevel(xp) {
@@ -411,7 +370,7 @@
             const newLvl = getLevel(userXP).level;
             
             if(amount > 0 && Math.random() < 0.05) { userXP += 50; showToast("CRITICAL SUCCESS! +50 XP", false, true); showCodex(); }
-            if(newLvl > oldLvl) { showToast("LEVEL UP!", false, true); sfx('lvlup'); showCodex(); }
+            if(newLvl > oldLvl) { showToast("LEVEL UP!", false, true); showCodex(); }
             if(newLvl < oldLvl) { showToast("LEVEL LOST", true); } 
             
             updateXP();
@@ -421,7 +380,7 @@
             const stats = getLevel(userXP);
             if(stats.level < 50) return alert("MUST REACH LEVEL 50 TO PRESTIGE.");
             if(confirm("WARNING: Resets Level to 1. Keeps Themes & Unlocks Story Chapter. Do it?")) {
-                userXP = 0; prestige++; updateXP(); sfx('lvlup');
+                userXP = 0; prestige++; updateXP();
                 alert(`PRESTIGE ${prestige} UNLOCKED! Story Chapter ${prestige} Available.`);
                 closeMenu();
             }
@@ -621,7 +580,7 @@
 
                 if(tasks[idx].col !== 2 && newCol === 2) { 
                     if(isLate) { showToast(`⚠️ LATE (${penalty} XP)`, true); updateLiveXP(penalty); }
-                    else { showToast("VICTORY! (+100 XP)", false); updateLiveXP(100); launchConfetti(); sfx('win'); }
+                    else { showToast("VICTORY! (+100 XP)", false); updateLiveXP(100); launchConfetti(); }
                 }
                 if(tasks[idx].col === 2 && newCol !== 2) { showToast("RETREAT (-100 XP)", true); updateLiveXP(-100); }
                 tasks[idx].col = newCol;
@@ -649,8 +608,8 @@
 
         function toggleCheck(el) {
             const isChecked = el.classList.toggle('checked');
-            if(isChecked) { showToast("+10 XP", false); updateLiveXP(10); sfx('check'); } 
-            else { showToast("-10 XP", true); updateLiveXP(-10); sfx('uncheck'); }
+            if(isChecked) { showToast("+10 XP", false); updateLiveXP(10); } 
+            else { showToast("-10 XP", true); updateLiveXP(-10); }
         }
 
         function openModal(id) {
