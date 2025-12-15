@@ -11,18 +11,24 @@
 
     <style>
         :root {
-            /* DEFAULT (Tactical Dark) */
+            /* TACTICAL DARK PALETTE */
             --bg: #181825; --card-bg: #262636; --col-bg: #1e1e2e;
             --text: #cdd6f4; --subtext: #9399b2; --border: #313244;
-            --in-title: #313244; --in-date: #232336; --in-prio: #2a2a3c;
             --p-red: #f38ba8; --p-orange: #fab387; --p-blue: #89b4fa;   
             --p-green: #a6e3a1; --p-purple: #cba6f7;
-            --radius: 16px; --shadow: 0 6px 15px rgba(0,0,0,0.25);
+            
+            /* INPUT COLORS */
+            --in-title: #313244;
+            --in-date: #232336;
+            --in-prio: #2a2a3c;
+            
+            --radius: 16px; 
+            --shadow: 0 6px 15px rgba(0,0,0,0.25);
             --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             --font-head: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
-        /* --- THEMES --- */
+        /* THEMES */
         body.theme-light { --bg: #eff1f5; --card-bg: #ffffff; --col-bg: #e6e9ef; --text: #4c4f69; --subtext: #9ca0b0; --border: #bcc0cc; --in-title:#e6e9ef; --in-date:#dce0e8; --in-prio:#e6e9ef; }
         body.theme-wolf { --bg: #1c1917; --card-bg: #292524; --col-bg: #0c0a09; --text: #e7e5e4; --subtext: #a8a29e; --border: #44403c; --p-red: #7f1d1d; --p-orange: #b45309; --p-blue: #3b82f6; --p-green: #15803d; --p-purple: #a21caf; --font-main: Georgia, serif; --radius: 4px; }
         body.theme-neon { --bg: #050505; --card-bg: #111; --col-bg: #0a0a0a; --text: #fff; --subtext: #888; --border: #333; --p-red: #ff0055; --p-orange: #ff9900; --p-blue: #00f3ff; --p-green: #00ff66; --p-purple: #bc13fe; --font-main: 'Courier New', monospace; --radius: 0px; }
@@ -61,6 +67,7 @@
         .task-list { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 12px; }
         .empty-msg { text-align: center; color: var(--subtext); font-style: italic; font-size: 0.8rem; margin-top: 50px; opacity: 0.5; }
 
+        /* CARDS */
         .card { background: var(--card-bg); padding: 16px; border-radius: var(--radius); box-shadow: var(--shadow); transition: transform 0.2s, opacity 0.2s; border-left: 0; position: relative; overflow: hidden; }
         .card:active { transform: scale(0.98); }
         .card-actions { display:flex; gap:10px; margin-top:10px; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:10px; }
@@ -91,15 +98,23 @@
         .modal-content { background: var(--card-bg); width: 90%; max-width: 450px; padding: 25px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: 0 20px 60px rgba(0,0,0,0.6); margin-bottom: 80px; }
         
         .form-label { display: block; font-size: 0.75rem; color: var(--subtext); font-weight: 800; margin-bottom: 8px; letter-spacing: 1px; text-transform: uppercase; }
-        .uniform-input { width: 100%; height: 50px; padding: 0 14px; background: var(--col-bg); border: 1px solid var(--border); color: var(--text); border-radius: 12px; font-size: 1.1rem; box-sizing: border-box; margin-bottom: 18px; font-family: inherit; }
+        
+        /* UNIFORM INPUTS (MOBILE FRIENDLY) */
+        .uniform-input { 
+            width: 100%; height: 54px; /* Mobile Friendly Height */
+            padding: 0 14px; 
+            background: var(--col-bg); border: 1px solid var(--border); 
+            color: var(--text); border-radius: 12px; font-size: 1.1rem; 
+            box-sizing: border-box; margin-bottom: 18px; 
+            font-family: inherit; -webkit-appearance: none; appearance: none;
+        }
         .input-base:focus { outline: none; border-color: var(--p-purple); }
         .input-title { background: var(--in-title); font-weight: bold; }
         .input-date { background: var(--in-date); color: var(--p-blue); }
-        .input-select { background: var(--in-prio); color: var(--p-orange); -webkit-appearance: none; appearance: none; }
+        .input-select { background: var(--in-prio); color: var(--p-orange); }
         .input-step { background: transparent; border: 1px dashed var(--subtext); color: var(--subtext); }
 
         .form-row { display: flex; gap: 12px; margin-bottom: 18px; align-items: stretch; }
-        .fixed-height { height: 50px; box-sizing: border-box; }
         
         .check-item { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; padding: 8px; background: var(--col-bg); border-radius: 10px; }
         .check-box { width: 28px; height: 28px; border-radius: 8px; border: 2px solid var(--subtext); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
@@ -110,8 +125,7 @@
 
         .btn-main { width: 100%; padding: 18px; background: var(--p-purple); color: #000; border: none; border-radius: 16px; font-weight: 800; font-size: 1.1rem; cursor: pointer; margin-top: 10px; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(196, 181, 253, 0.3); }
         .btn-sec { width: 100%; padding: 14px; background: transparent; border: 1px solid var(--border); color: var(--subtext); border-radius: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 0.95rem; }
-        .btn-cal { background: var(--col-bg); color: var(--text); border: 1px solid var(--border); padding: 10px; border-radius: 10px; font-size: 0.85rem; cursor: pointer; margin-top: 5px; width: 100%; text-align: center;}
-
+        
         #xp-toast { position: fixed; top: 90px; left: 50%; transform: translateX(-50%); background: var(--p-green); color: black; font-weight: 900; padding: 10px 20px; border-radius: 20px; opacity: 0; pointer-events: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: opacity 0.3s, transform 0.3s; z-index: 2000; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
         #xp-toast.loss { background: var(--p-red); }
         #xp-toast.crit { background: var(--gold); border: 2px solid white; transform: translateX(-50%) scale(1.2); }
@@ -227,15 +241,15 @@
             <h2 style="margin-top:0; text-align:center;">Edit Mission</h2>
             <input type="hidden" id="e-id">
             <span class="form-label">MISSION OBJECTIVE</span>
-            <input id="e-title" class="input-base input-title" placeholder="e.g. Campaign Launch">
+            <input id="e-title" class="uniform-input input-title" placeholder="e.g. Campaign Launch">
             <div class="form-row">
                 <div style="flex:1">
                     <span class="form-label">DEADLINE</span>
-                    <input type="date" id="e-date" class="input-base input-date" style="margin-bottom:0;">
+                    <input type="date" id="e-date" class="uniform-input input-date" style="margin-bottom:0;">
                 </div>
                 <div style="flex:1">
                     <span class="form-label">PRIORITY</span>
-                    <select id="e-prio" class="input-base input-select" style="margin-bottom:0;">
+                    <select id="e-prio" class="uniform-input input-select" style="margin-bottom:0;">
                         <option value="Low">Low</option>
                         <option value="Med">Med</option>
                         <option value="High">High</option>
@@ -245,7 +259,7 @@
             <span class="form-label">TACTICAL CHECKLIST</span>
             <div id="e-checks"></div>
             <div class="form-row" style="margin-top:10px;">
-                <input id="new-step-input" class="input-base input-step" placeholder="+ Add Step (Press Enter)" style="margin-bottom:0;" onkeypress="handleStepEnter(event)">
+                <input id="new-step-input" class="uniform-input input-step" placeholder="+ Add Step (Press Enter)" style="margin-bottom:0;" onkeypress="handleStepEnter(event)">
             </div>
             
             <button class="btn-main" onclick="saveCard()">SAVE CHANGES</button>
@@ -260,7 +274,7 @@
     <div id="confirm-modal" class="modal">
         <div class="modal-content" style="text-align:center;">
             <h2 style="color:var(--p-red); margin-top:0;">⚠️ WARNING</h2>
-            <p id="confirm-msg" style="margin-bottom:20px; font-size:1.1rem; color:var(--text);">Abort Mission?<br><span style="font-size:0.9rem; opacity:0.8;">Penalty: -50 XP</span></p>
+            <p id="confirm-msg" style="margin-bottom:20px; font-size:1.1rem; color:var(--text);">Abort Mission?<br><span style="font-size:0.9rem; opacity:0.8;">Penalty: -50 XP (Plus lost step XP)</span></p>
             <div class="form-row">
                 <button class="btn-sec" onclick="closeConfirm()">NO</button>
                 <button class="btn-main" style="background:var(--p-red); color:black;" id="confirm-yes-btn">YES, ABORT</button>
@@ -303,10 +317,10 @@
             { t: "Discipline is freedom.", s: "Codex" }
         ];
         const STORY = {
-            1: "CHAPTER I: THE EMBER\n\nThe endless frost began not with a bang, but a whisper...",
-            2: "CHAPTER II: THE FROZEN COURT\n\nI traveled South, following the faint pull of the blade...",
-            3: "CHAPTER III: THE ALCHEMIST'S MIRROR\n\nI chose the snow. I ran. The blade guided me...",
-            4: "FINALE: THE ZENITH\n\nThe climb took everything. My gear, my strength, my blood..."
+            1: "CHAPTER I: THE EMBER\n\nThe endless frost began not with a bang, but a whisper. The sun simply... dimmed. Years turned to decades of twilight. Civilization crumbled into the snow.\n\nI am Kael, a scavenger of the Old World. Yesterday, digging through the ruins of a tech-spire, I found it. Not food, not fuel, but a sword. It wasn't cold steel. It hummed. A faint, golden heat radiated from the blade.\n\nThey say the Alchemists of old trapped sunlight in metal. If that's true, I'm holding the only warmth left in the world. And the Shadows are coming for it.",
+            2: "CHAPTER II: THE FROZEN COURT\n\nI traveled South, following the faint pull of the blade. The Capital still stands, a fortress of black ice and iron. The Lords play their games of thrones while the poor freeze outside the walls.\n\nI tried to barter entry, but the guards saw the sword. Now I am a prisoner, or a guest? The High Warden wants the weapon. He says it belongs to the 'Vanguard,' a mythical order of knights.\n\nI must choose. Give him the sword and live in luxury while the world dies? Or escape, and find the source of the blade's power? The whispers in my mind are getting louder. 'Protect the Light.'",
+            3: "CHAPTER III: THE ALCHEMIST'S MIRROR\n\nI chose the snow. I ran. The blade guided me to a mountain peak above the cloud layer. There was no temple, only a cave, and an old woman reflecting starlight with mirrors.\n\n'You look for a savior,' she laughed. 'But the sword is just a key.'\n\nShe showed me the truth. The sun didn't die. We blocked it. The 'Shield' meant to protect us from solar flares froze in place. The sword unlocks the atmospheric controls. But the climb to the Zenith Spire is a suicide mission. Vampiric creatures nest there. I am afraid. But the sword is burning hot now. It knows.",
+            4: "FINALE: THE ZENITH\n\nThe climb took everything. My gear, my strength, my blood. I stand at the Zenith controls. The Shadows surround me, screeching in the thin air.\n\nI plunge the blade into the console. Not a key, but a spark. The machine roars. The sky tears open. For the first time in a century, a beam of pure, unfiltered gold hits the snow.\n\nThe Shadows burn away. The ice weeps. I fall to my knees, blinded, weeping with it. The Sunless Age is over. I am the Vanguard. And I am warm."
         };
 
         initApp();
@@ -438,6 +452,7 @@
         // --- CONFIRMATION MODAL LOGIC ---
         function confirmDelete() {
             taskToDeleteId = document.getElementById('e-id').value;
+            if(!taskToDeleteId) return; // Can't delete new
             document.getElementById('confirm-yes-btn').onclick = executeDelete;
             document.getElementById('confirm-modal').style.display = 'flex';
         }
@@ -449,8 +464,14 @@
 
         function executeDelete() {
             if(taskToDeleteId) {
+                const t = tasks.find(x => x.id === taskToDeleteId);
+                const sunkXP = t.steps.filter(s=>s.done).length * 10;
+                const totalLoss = sunkXP + 50;
+                
                 tasks = tasks.filter(x => x.id !== taskToDeleteId);
-                updateLiveXP(-50);
+                updateLiveXP(-totalLoss);
+                showToast(`FAILED (-${totalLoss} XP)`, true);
+                
                 save(); 
                 closeConfirm();
                 closeEditor();
