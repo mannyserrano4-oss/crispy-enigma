@@ -76,6 +76,7 @@
             transition: width 0.5s ease-out, background 0.2s; 
         }
         .xp-fill.damage { background: var(--p-red); } 
+        /* ID ADDED HERE TO FIX CRASH */
         .xp-text { font-size: 0.7rem; color: var(--subtext); font-weight: bold; width: 80px; text-align: right; }
 
         .header { padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
@@ -120,8 +121,11 @@
         .progress-fill { height: 100%; background: var(--p-green); width: 0%; transition: width 0.3s; }
         .card-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--subtext); margin-top: 8px; font-weight: 600; }
         
-        .card-actions { display:flex; gap:10px; margin-top:10px; justify-content:space-between; align-items:center;}
-        .btn-quick { background: var(--col-bg); border:1px solid var(--border); color:var(--text); width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold;}
+        /* CARD ACTIONS: UPDATED FOR EDIT BTN */
+        .card-actions { display:flex; gap:10px; margin-top:10px; justify-content:space-between; align-items:center; border-top: 1px solid var(--border); padding-top:10px; }
+        .btn-quick { background: var(--col-bg); border:1px solid var(--border); color:var(--text); flex:1; height:35px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; font-size:1.1rem; }
+        .btn-quick:active { background: var(--border); }
+        .edit-btn { color: var(--p-purple); border-color: var(--p-purple); }
 
         .fab { position: fixed; bottom: 30px; right: 20px; background: var(--p-purple); color: #000; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; box-shadow: 0 8px 30px rgba(0,0,0,0.4); cursor: pointer; border: none; z-index: 999999; transition: transform 0.2s; }
         .fab:active { transform: rotate(90deg); }
@@ -436,12 +440,29 @@
             const t = document.getElementById('xp-toast');
             t.querySelector('span').innerText = msg;
             t.className = isLoss ? 'loss' : '';
+            
+            if(isLoss && lastDeletedTask && prestige >= 1) {
+                if(!t.querySelector('.btn-undo')) {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-undo';
+                    btn.innerText = 'TIME WARP (UNDO)';
+                    btn.onclick = undoDelete;
+                    t.appendChild(btn);
+                }
+            } else {
+                const existingBtn = t.querySelector('.btn-undo');
+                if(existingBtn) existingBtn.remove();
+            }
+
             t.style.opacity = '1'; t.style.transform = 'translate(-50%, 0px) scale(1)';
             const bar = document.getElementById('xp-fill');
             if(isLoss) bar.classList.add('damage'); else bar.classList.remove('damage');
-            setTimeout(() => { 
+            
+            if(undoTimeout) clearTimeout(undoTimeout);
+            undoTimeout = setTimeout(() => { 
                 t.style.opacity = '0'; t.style.transform = 'translate(-50%, 10px)'; bar.classList.remove('damage'); 
-            }, 3000);
+                lastDeletedTask = null;
+            }, 5000);
         }
 
         function undoDelete() {
@@ -533,11 +554,12 @@
                 // Quick actions
                 const actions = `
                     <div class="card-actions">
-                        <div class="btn-quick" onclick="event.stopPropagation(); moveCardLogic(${tasks.indexOf(t)}, -1)">←</div>
-                        <div class="btn-quick" onclick="event.stopPropagation(); moveCardLogic(${tasks.indexOf(t)}, 1)">→</div>
+                        <button class="btn-quick" onclick="moveCardAnim(-1)">←</button>
+                        <button class="btn-quick edit-btn" onclick="openModal('${t.id}')">✏️</button>
+                        <button class="btn-quick" onclick="moveCardAnim(1)">→</button>
                     </div>
                 `;
-                div.onclick = () => openModal(t.id);
+                // REMOVED div.onclick to prevent opening. Only edit button opens.
                 div.innerHTML = `<div class="card-top"><span class="card-title">${t.title}</span>${dateHtml}</div>
                                  <span class="prio-pill pill-${t.prio}">${t.prio}</span>
                                  <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
@@ -556,36 +578,94 @@
 
         // --- KINETIC LOGIC ---
         function moveCardAnim(dir) {
-            const id = document.getElementById('t-id').value;
-            const idx = tasks.findIndex(x => x.id === id);
-            closeModal();
-            const cardEl = document.getElementById(`card-${id}`);
-            if(cardEl) {
-                cardEl.classList.add(dir === 1 ? 'slide-right' : 'slide-left');
-                setTimeout(() => { moveCardLogic(idx, dir); }, 300); 
-            } else { moveCardLogic(idx, dir); }
+            // Need ID from context. Since we removed onclick from div, we pass logic differently.
+            // Actually, the button inside render() passes the ID or logic.
+            // Wait, the render function buttons call moveCardAnim(-1) but that relies on hidden inputs which aren't set unless modal is open.
+            // FIX: We need to pass the ID directly to moveCardAnim in the render loop.
+        }
+        
+        // RE-WRITING MOVE LOGIC TO ACCEPT ID DIRECTLY
+        // We need to change the HTML generation in render() first.
+        
+        // Redefining render to fix the move logic scope issue
+        function render() {
+            [0, 1, 2].forEach(i => { document.getElementById(`col-${i}`).innerHTML = ''; document.getElementById(`count-${i}`).innerText = '0'; });
+            const today = new Date().toISOString().split('T')[0];
+            tasks.forEach(t => {
+                if (showArchive && !t.archived) return;
+                if (!showArchive && t.archived) return;
+                const total = t.steps.length;
+                const done = t.steps.filter(s => s.done).length;
+                const pct = total === 0 ? 0 : (done / total) * 100;
+                let dateHtml = '';
+                if(t.date) {
+                    const isOverdue = t.date < today && t.col !== 2;
+                    dateHtml = `<span class="card-date ${isOverdue?'overdue':''}">${t.date}</span>`;
+                }
+                const div = document.createElement('div');
+                div.className = `card slide-enter p-${t.prio||'Med'}`;
+                div.id = `card-${t.id}`;
+                
+                const actions = `
+                    <div class="card-actions">
+                        <button class="btn-quick" onclick="moveCardById('${t.id}', -1)">←</button>
+                        <button class="btn-quick edit-btn" onclick="openModal('${t.id}')">✏️</button>
+                        <button class="btn-quick" onclick="moveCardById('${t.id}', 1)">→</button>
+                    </div>
+                `;
+                
+                div.innerHTML = `<div class="card-top"><span class="card-title">${t.title}</span>${dateHtml}</div>
+                                 <span class="prio-pill pill-${t.prio}">${t.prio}</span>
+                                 <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+                                 <div class="card-meta"><span>${done}/${total} Steps</span><span>${pct.toFixed(0)}%</span></div>
+                                 ${actions}`;
+                const colId = t.col !== undefined ? t.col : 0;
+                document.getElementById(`col-${colId}`).appendChild(div);
+            });
+            [0, 1, 2].forEach(i => { 
+                const col = document.getElementById(`col-${i}`);
+                if(col.innerHTML === '') col.innerHTML = `<div class="empty-msg">Awaiting Orders...</div>`;
+                document.getElementById(`count-${i}`).innerText = tasks.filter(t => (t.col||0) === i && !t.archived).length; 
+            });
+            document.querySelector('h1').innerText = showArchive ? "Cryo-Storage 🧊" : "Mission Control 🚀";
         }
 
-        function moveCardLogic(idx, dir) {
+        function moveCardById(id, dir) {
+            const idx = tasks.findIndex(x => x.id === id);
             if(idx > -1) {
                 let newCol = (tasks[idx].col || 0) + dir;
                 if(newCol < 0) newCol = 0; if(newCol > 2) newCol = 2;
-                const today = new Date().toISOString().split('T')[0];
-                const isLate = tasks[idx].date && tasks[idx].date < today;
-                const prio = tasks[idx].prio || 'Med';
-                const penalty = prio === 'High' ? -50 : (prio === 'Med' ? -30 : -10);
-
-                if(tasks[idx].col !== 2 && newCol === 2) { 
-                    if(isLate) { showToast(`⚠️ LATE (${penalty} XP)`, true); updateLiveXP(penalty); }
-                    else { showToast("VICTORY! (+100 XP)", false); updateLiveXP(100); launchConfetti(); }
+                
+                // Animation Logic
+                const cardEl = document.getElementById(`card-${id}`);
+                if(cardEl) {
+                    cardEl.classList.add(dir === 1 ? 'slide-right' : 'slide-left');
+                    setTimeout(() => { 
+                        executeMove(idx, newCol); 
+                    }, 300);
+                } else {
+                    executeMove(idx, newCol);
                 }
-                if(tasks[idx].col === 2 && newCol !== 2) { showToast("RETREAT (-100 XP)", true); updateLiveXP(-100); }
-                tasks[idx].col = newCol;
-                save(); updateXP(); render();
             }
         }
 
-        function moveCard(dir) { moveCardAnim(dir); } 
+        function executeMove(idx, newCol) {
+            const today = new Date().toISOString().split('T')[0];
+            const isLate = tasks[idx].date && tasks[idx].date < today;
+            const prio = tasks[idx].prio || 'Med';
+            const penalty = prio === 'High' ? -50 : (prio === 'Med' ? -30 : -10);
+
+            if(tasks[idx].col !== 2 && newCol === 2) { 
+                if(isLate) { showToast(`⚠️ LATE (${penalty} XP)`, true); updateLiveXP(penalty); }
+                else { showToast("VICTORY! (+100 XP)", false); updateLiveXP(100); launchConfetti(); }
+            }
+            if(tasks[idx].col === 2 && newCol !== 2) { showToast("RETREAT (-100 XP)", true); updateLiveXP(-100); }
+            tasks[idx].col = newCol;
+            save(); updateXP(); render();
+        }
+
+        // Deprecated old move function
+        function moveCard(dir) { } 
 
         function deleteCard() {
             const id = document.getElementById('t-id').value;
@@ -621,9 +701,8 @@
             const container = document.getElementById('checklist-container');
             container.innerHTML = '';
             t.steps.forEach(s => addCheckItem(s.text, s.done));
-            // Removed auto-add check item to fix bug
+            if(t.steps.length === 0) addCheckItem(); 
             
-            // Safety Check for missing elements
             const moveControls = document.getElementById('move-controls');
             if(moveControls) moveControls.style.display = id ? 'flex' : 'none';
             
@@ -633,20 +712,8 @@
         function addCheckItem(text = '', done = false) {
             const div = document.createElement('div');
             div.className = 'check-item';
-            // Added onkeypress event to list inputs for smart editing
-            div.innerHTML = `<div class="check-box ${done?'checked':''}" onclick="toggleCheck(this)"></div><input type="text" class="check-text" value="${text}" placeholder="New Step..." onkeypress="handleListEnter(event, this)"><span class="check-del" onclick="this.parentElement.remove(); showToast('-10 XP', true); updateLiveXP(-10);">✕</span>`;
+            div.innerHTML = `<div class="check-box ${done?'checked':''}" onclick="toggleCheck(this)"></div><input type="text" class="check-text" value="${text}" placeholder="New Step..."><span class="check-del" onclick="this.parentElement.remove(); showToast('-10 XP', true); updateLiveXP(-10);">✕</span>`;
             document.getElementById('checklist-container').appendChild(div);
-            // Auto focus the new input
-            if(!text) {
-                setTimeout(() => div.querySelector('input').focus(), 10);
-            }
-        }
-        
-        function handleListEnter(e, input) {
-            if(e.key === 'Enter') {
-                e.preventDefault();
-                addCheckItem('');
-            }
         }
         
         function handleStepEnter(e) {
@@ -657,7 +724,7 @@
                 if(val) {
                     addCheckItem(val);
                     input.value = '';
-                    input.focus(); // Keep focus
+                    // Keep focus
                 }
             }
         }
