@@ -311,7 +311,7 @@
         let currentChapter = 1;
         let lastDeletedTask = null;
         let undoTimeout = null;
-        let audioCtx = null;
+        let audioCtx = null; // START NULL
         
         const RANKS = ["Rookie", "Operative", "Specialist", "Tactician", "Mercenary", "Commander", "Warlord", "Vanguard", "Titan", "Legend"];
         const CODEX = [
@@ -331,16 +331,16 @@
             4: "FINALE: THE ZENITH\n\nThe climb took everything. My gear, my strength, my blood. I stand at the Zenith controls. The Shadows surround me, screeching in the thin air.\n\nI plunge the blade into the console. Not a key, but a spark. The machine roars. The sky tears open. For the first time in a century, a beam of pure, unfiltered gold hits the snow.\n\nThe Shadows burn away. The ice weeps. I fall to my knees, blinded, weeping with it. The Sunless Age is over. I am the Vanguard. And I am warm."
         };
 
-        // --- INIT & AUDIO ---
-        document.addEventListener('click', initAudio, { once: true });
-        
-        function initAudio() {
+        // --- INIT & AUDIO (CRASH FIX: Only Init on Click) ---
+        document.addEventListener('click', () => {
             if(!audioCtx) {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                audioCtx = new AudioContext();
+                try {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if(AudioContext) audioCtx = new AudioContext();
+                } catch(e) { console.log("Audio not supported"); }
             }
-            if(audioCtx.state === 'suspended') audioCtx.resume();
-        }
+            if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+        }, { once: true });
 
         initApp();
 
@@ -361,7 +361,7 @@
                 gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
                 osc.connect(gain); gain.connect(audioCtx.destination);
                 osc.start(); osc.stop(audioCtx.currentTime + duration);
-            } catch(e) { console.log("Audio Error", e); }
+            } catch(e) { console.log(e); }
         }
 
         function sfx(type) {
@@ -387,7 +387,6 @@
             localStorage.setItem('mc_xp', userXP);
             localStorage.setItem('mc_prestige', prestige);
             const stats = getLevel(userXP);
-            
             const range = stats.nextReq - stats.prevReq;
             const current = userXP - stats.prevReq;
             const pct = Math.max(0, Math.min(100, (current / range) * 100));
@@ -655,9 +654,6 @@
         }
 
         function openModal(id) {
-            // SAFE AUDIO INIT
-            try { initAudio(); } catch(e) { console.log(e); }
-
             const t = id ? tasks.find(x => x.id === id) : { id: '', title: '', steps: [], col: 0, prio:'Med', date:'', archived:false };
             document.getElementById('t-id').value = t.id;
             document.getElementById('t-title').value = t.title;
