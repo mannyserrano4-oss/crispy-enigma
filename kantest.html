@@ -88,7 +88,7 @@
         }
         .fab:active { transform: scale(0.9); }
 
-        /* Buttons */
+        /* Buttons & Interactions */
         button { background: var(--accent); color: #fff; border: none; padding: 10px 16px; border-radius: var(--radius); font-weight: 700; cursor: pointer; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
         button.secondary { background: var(--column-bg); color: var(--text-color); border: 1px solid rgba(0,0,0,0.1); }
         button.danger { background: var(--danger); color: white; }
@@ -105,11 +105,7 @@
         .task-list { overflow-y: auto; flex-grow: 1; padding-bottom: 80px; padding-right: 5px; }
 
         /* Empty State */
-        .empty-state {
-            opacity: 0.4; text-align: center; padding: 40px 20px;
-            font-style: italic; font-weight: bold; border: 2px dashed rgba(0,0,0,0.1);
-            border-radius: var(--radius); margin-top: 20px;
-        }
+        .empty-state { opacity: 0.4; text-align: center; padding: 40px 20px; font-style: italic; font-weight: bold; border: 2px dashed rgba(0,0,0,0.1); border-radius: var(--radius); margin-top: 20px; }
         body.dark-mode .empty-state { border-color: rgba(255,255,255,0.1); }
 
         /* Cards */
@@ -135,12 +131,20 @@
         body.dark-mode .objective-box { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
         .objective-check { width: 22px; height: 22px; cursor: pointer; accent-color: var(--accent); flex-shrink: 0; }
 
-        /* Action Buttons */
+        /* Compact Action Buttons */
         .card-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; height: 32px; }
-        .action-group { display: flex; gap: 10px; align-items: center; }
-        .action-btn { font-size: 0.75rem; padding: 8px 12px; border-radius: 12px; }
-        .icon-only-btn { font-size: 1.1rem; padding: 5px 10px; background: transparent; color: var(--text-sub); border: 1px solid rgba(0,0,0,0.1); }
-        .icon-only-btn:hover { background: rgba(0,0,0,0.05); color: var(--text-color); }
+        .action-group { display: flex; gap: 8px; align-items: center; }
+        
+        /* Slim Buttons for Mobile Fit */
+        .action-btn { font-size: 0.7rem; padding: 8px 10px; border-radius: 10px; letter-spacing: 0.5px; }
+        
+        /* Specific Styles for Abort/Edit to sit politely on the left */
+        .btn-ghost { background: transparent; color: var(--text-sub); border: 1px solid rgba(0,0,0,0.15); }
+        .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+        
+        /* Abort specific style */
+        .btn-abort { color: var(--danger); border-color: rgba(255, 118, 117, 0.3); }
+        .btn-abort:hover { background: var(--danger); color: white; border-color: var(--danger); }
 
         /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; }
@@ -150,13 +154,7 @@
         .group-logistics { background: var(--group-logistics-bg); border-color: var(--group-logistics-border); }
         .group-objectives { background: var(--group-objectives-bg); border-color: var(--group-objectives-border); }
         .field-group label { display: block; margin-bottom: 8px; font-weight: 800; font-size: 0.85rem; text-transform: uppercase; color: var(--accent); letter-spacing: 0.5px; }
-        
-        input, select { 
-            width: 100%; padding: 12px; border-radius: 8px; 
-            border: 1px solid var(--input-border); background: var(--input-bg); 
-            color: var(--text-color); font-size: 1rem; 
-            box-sizing: border-box; max-width: 100%;
-        }
+        input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); font-size: 1rem; box-sizing: border-box; max-width: 100%; }
         .dyn-input-row { display: flex; gap: 5px; margin-bottom: 8px; }
         .dyn-del-btn { background: var(--danger); color: white; width: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; flex-shrink: 0; }
 
@@ -581,15 +579,15 @@
         });
         subHtml += '</ul>';
 
-        // Action Buttons
+        // COMPACT ACTION BUTTONS
         let btns = '';
         if(t.status === 'staging') btns = `<button class="action-btn" onclick="moveTask(${t.id}, 'active')">Engage</button>`;
         if(t.status === 'active') btns = `<button class="action-btn secondary" onclick="moveTask(${t.id}, 'staging')">Standby</button><button class="action-btn" onclick="moveTask(${t.id}, 'victory')">Complete</button>`;
         if(t.status === 'victory') btns = `<button class="action-btn danger" onclick="moveTask(${t.id}, 'active')">Retreat</button>`;
         
-        // Left Actions (Compact Icons)
-        let leftActions = `<div class="action-group"><button class="action-btn icon-only-btn" onclick="deleteTask(${t.id})">🗑️</button><button class="action-btn icon-only-btn" onclick="openEditTask(${t.id})">✎</button></div>`;
-        if(t.status === 'victory') leftActions = `<div class="action-group"><button class="action-btn icon-only-btn" onclick="openEditTask(${t.id})">✎</button></div>`;
+        // SLIM LEFT ACTIONS
+        let leftActions = `<div class="action-group"><button class="action-btn btn-ghost btn-abort" onclick="deleteTask(${t.id})">ABORT</button><button class="action-btn btn-ghost" onclick="openEditTask(${t.id})">EDIT</button></div>`;
+        if(t.status === 'victory') leftActions = `<div class="action-group"><button class="action-btn btn-ghost" onclick="openEditTask(${t.id})">EDIT</button></div>`;
 
         div.innerHTML = `<h3>${t.title}</h3>${tagsHtml}<div class="card-meta"><span class="prio-badge ${t.priority}">${t.priority}</span><span>${dateStr ? '📅 ' + dateStr : ''}</span></div>${subHtml}<div class="card-actions">${leftActions}<div class="action-group">${btns}</div></div>`;
         return div;
