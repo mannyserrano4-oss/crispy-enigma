@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>QuestBoard RPG</title>
     <style>
-        /* --- GLOBAL BASE VARIABLES (Defaults) --- */
+        /* --- GLOBAL BASE VARIABLES --- */
         :root {
             --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             --radius: 16px;
@@ -30,8 +30,7 @@
             --prio-low: #74b9ff; --prio-med: #00b894; --prio-high: #ff7675;
         }
 
-        /* --- 1. DEFAULT THEME (Pastel/Midnight) --- */
-        body { /* Light Mode is Root */ }
+        /* --- 1. DARK MODE (Midnight Neon) --- */
         body.dark-mode {
             --bg-color: #13131f; --column-bg: #1e1e2e; --card-bg: #2a2a3c;
             --text-color: #e0e0ff; --text-sub: #a0a0c0;
@@ -42,7 +41,7 @@
             --prio-low: #4facfe; --prio-med: #00e5ff; --prio-high: #ff0055;
         }
 
-        /* --- 2. THEME: WOLF (Natural/Earth) --- */
+        /* --- 2. THEME: WOLF (Natural) --- */
         body.theme-wolf {
             --bg-color: #e8e4d9; --column-bg: #dcd6c5; --card-bg: #f4f1ea;
             --text-color: #4a4036; --text-sub: #786b59;
@@ -60,7 +59,7 @@
             --group-objectives-bg: rgba(165, 42, 42, 0.1); --group-objectives-border: #8b4513;
         }
 
-        /* --- 3. THEME: NEON (Cyber/Night) --- */
+        /* --- 3. THEME: NEON (Cyber) --- */
         body.theme-neon {
             --bg-color: #f0f0f0; --column-bg: #ffffff; --card-bg: #fff;
             --text-color: #111; --accent: #ff00ff; --danger: #ff0000;
@@ -76,30 +75,30 @@
             --group-objectives-bg: rgba(0, 255, 255, 0.1); --group-objectives-border: #00ffff;
         }
 
-        /* --- 4. THEME: APERTURE (Science/Clean) --- */
+        /* --- 4. THEME: APERTURE (Science) --- */
         body.theme-aperture {
             --bg-color: #dce0e6; --column-bg: #edf2f7; --card-bg: #ffffff;
             --text-color: #2d3748; --text-sub: #718096;
-            --accent: #ed8936; /* Aperture Orange */ --accent-glow: #f6ad55; --danger: #e53e3e;
+            --accent: #ed8936; --accent-glow: #f6ad55; --danger: #e53e3e;
             --input-bg: #f7fafc; --input-border: #cbd5e0;
             --group-logistics-bg: #ebf8ff; --group-logistics-border: #bee3f8;
             --group-objectives-bg: #fffff0; --group-objectives-border: #fbd38d;
-            --radius: 4px; /* Boxy look */
+            --radius: 4px;
         }
         body.theme-aperture.dark-mode {
             --bg-color: #1a202c; --column-bg: #2d3748; --card-bg: #4a5568;
             --text-color: #edf2f7; --text-sub: #a0aec0;
-            --accent: #4299e1; /* Science Blue */
+            --accent: #4299e1;
             --input-bg: #2d3748; --input-border: #4a5568;
             --group-logistics-bg: rgba(66, 153, 225, 0.15); --group-logistics-border: #3182ce;
             --group-objectives-bg: rgba(237, 137, 54, 0.1); --group-objectives-border: #dd6b20;
         }
 
-        /* --- 5. THEME: ELDRITCH (Horror/Old) --- */
+        /* --- 5. THEME: ELDRITCH (Horror) --- */
         body.theme-eldritch {
-            --bg-color: #e3dac9; /* Parchment */ --column-bg: #dcd0b8; --card-bg: #f3e9d7;
+            --bg-color: #e3dac9; --column-bg: #dcd0b8; --card-bg: #f3e9d7;
             --text-color: #3e2723; --text-sub: #5d4037;
-            --accent: #880e4f; /* Blood Red */ --accent-glow: #ad1457; --danger: #b71c1c;
+            --accent: #880e4f; --accent-glow: #ad1457; --danger: #b71c1c;
             --input-bg: #fff8e1; --input-border: #8d6e63;
             --group-logistics-bg: #efebe9; --group-logistics-border: #8d6e63;
             --group-objectives-bg: #e0f2f1; --group-objectives-border: #4db6ac;
@@ -108,13 +107,13 @@
         body.theme-eldritch.dark-mode {
             --bg-color: #1a0518; --column-bg: #2a0a25; --card-bg: #35102e;
             --text-color: #a464a4; --text-sub: #7b4b7b;
-            --accent: #00ff00; /* Madness Green */ --danger: #ff0033;
+            --accent: #00ff00; --danger: #ff0033;
             --input-bg: #120310; --input-border: #4a144a;
             --group-logistics-bg: rgba(74, 20, 74, 0.5); --group-logistics-border: #880e4f;
             --group-objectives-bg: rgba(0, 50, 0, 0.5); --group-objectives-border: #006400;
         }
 
-        /* --- 6. THEME: VAPORWAVE (Retro 80s) --- */
+        /* --- 6. THEME: VAPORWAVE (Retro) --- */
         body.theme-vaporwave {
             --bg-color: #ffecf2; --column-bg: #e0f7fa; --card-bg: #ffffff;
             --text-color: #6a1b9a; --text-sub: #8e24aa;
@@ -149,13 +148,12 @@
             --group-logistics-bg: rgba(255, 255, 255, 0.1); --group-logistics-border: #ffffff;
             --group-objectives-bg: rgba(100, 180, 255, 0.1); --group-objectives-border: #66b3ff;
         }
-        /* Dashed Border Effect for Blueprint */
         body.theme-blueprint .card { border-style: dashed; border-width: 2px; }
 
         /* --- 8. THEME: TERMINAL (Hacker) --- */
         body.theme-terminal {
             --bg-color: #2b2b2b; --column-bg: #333; --card-bg: #444;
-            --text-color: #ffb000; /* Amber */ --text-sub: #cc8800;
+            --text-color: #ffb000; --text-sub: #cc8800;
             --accent: #ffb000; --danger: #ff3300;
             --input-bg: #222; --input-border: #ffb000;
             --group-logistics-bg: #222; --group-logistics-border: #cc8800;
@@ -200,9 +198,13 @@
         #hud { flex-shrink: 0; padding: 15px; background: var(--card-bg); z-index: 100; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;}
         .hud-top { display: flex; justify-content: space-between; align-items: center; }
         .level-badge { font-weight: 800; font-size: 1.4rem; color: var(--accent); letter-spacing: -0.5px; text-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        .progress-container { width: 100%; height: 12px; background: rgba(0,0,0,0.1); border-radius: 6px; overflow: hidden; margin-top: 5px; position: relative; }
-        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-glow)); width: 0%; transition: width 0.5s ease; border-radius: 6px; }
+        
+        /* XP Bar with Text */
+        .progress-container { width: 100%; height: 16px; background: rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; margin-top: 5px; position: relative; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-glow)); width: 0%; transition: width 0.5s ease; border-radius: 8px; }
         .progress-bar.glowing { animation: glowPulse 0.8s ease-in-out infinite; }
+        .xp-text { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 900; color: rgba(0,0,0,0.5); z-index: 2; letter-spacing: 0.5px; }
+        
         @keyframes glowPulse { 0% { box-shadow: 0 0 5px var(--accent); filter: brightness(1); } 50% { box-shadow: 0 0 15px var(--accent), 0 0 5px white; filter: brightness(1.3); } 100% { box-shadow: 0 0 5px var(--accent); filter: brightness(1); } }
 
         /* FAB */
@@ -255,6 +257,7 @@
         .objective-box { background: rgba(0,0,0,0.03); border: 1px solid var(--input-border); padding: 10px; margin-bottom: 8px; border-radius: 8px; display: flex; align-items: center; gap: 10px; font-size: 0.95rem; color: var(--text-color); }
         .objective-check { width: 22px; height: 22px; cursor: pointer; accent-color: var(--accent); flex-shrink: 0; }
 
+        /* Action Buttons */
         .card-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; height: 32px; gap: 15px; flex-wrap: nowrap; }
         .action-group { display: flex; gap: 5px; align-items: center; }
         .action-btn { font-size: 0.65rem; padding: 8px 10px; border-radius: 12px; letter-spacing: 0.5px; }
@@ -293,10 +296,6 @@
         .xp-gain { color: #ffeaa7; animation: floatUp 1.5s forwards; }
         .xp-loss { color: var(--danger); animation: sinkDown 1.5s forwards; }
 
-        /* Zen */
-        body.zen-mode #hud, body.zen-mode .board, body.zen-mode .fab { display: none; }
-        body.zen-mode #zen-active-container { display: flex; flex-direction: column; align-items: center; padding: 20px; height: 100vh; background: var(--bg-color); }
-        #zen-exit { position: fixed; bottom: 30px; left: 30px; opacity: 0.5; width: 50px; height: 50px; cursor: pointer; border: 2px solid var(--text-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text-color); font-size: 20px; }
         #confetti-canvas { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 2000; }
         .story-text { font-family: "Georgia", serif; line-height: 1.6; font-size: 1.1rem; white-space: pre-wrap; color: var(--text-color); }
     </style>
@@ -321,6 +320,7 @@
     </div>
     <div class="progress-container">
         <div id="xp-bar" class="progress-bar"></div>
+        <div id="xp-text" class="xp-text">0 / 500 XP</div>
     </div>
     <input type="text" id="search-bar" placeholder="Scan Tags, Missions, Objectives..." onkeyup="renderBoard()">
 </div>
@@ -340,12 +340,6 @@
     </div>
 </div>
 
-<div id="zen-active-container" style="display:none;">
-    <h2 style="opacity:0.5; margin-bottom:30px; letter-spacing:2px; color:var(--text-color);">FOCUS MODE</h2>
-    <div id="zen-list" style="width:100%;"></div>
-    <div id="zen-exit" onclick="toggleZen(false)">✕</div>
-</div>
-
 <div class="modal-overlay" id="menu-modal">
     <div class="modal">
         <h2>System Config</h2>
@@ -356,7 +350,6 @@
             <p>Prestige Rank: <span id="stat-prestige">0</span></p>
         </div>
         <h3>Visuals</h3>
-        <button class="secondary" onclick="toggleZen(true)" id="btn-zen" style="display:none; width:100%; margin-bottom:10px;">Engage Zen Mode</button>
         <select id="theme-selector" onchange="changeTheme(this.value)" style="width:100%; margin-bottom:10px;">
             <option value="default">Pastel / Midnight (Default)</option>
             <option value="wolf" disabled>🔒 Lvl 5: Wolf</option>
@@ -535,14 +528,13 @@
     function checkUnlocks() {
         const unlocks = [
             { lvl: 2, id: 'utility-stats', type: 'el' }, { lvl: 5, val: 'wolf', type: 'theme' },
-            { lvl: 8, id: 'btn-zen', type: 'el' }, { lvl: 10, val: 'neon', type: 'theme' },
+            { lvl: 10, val: 'neon', type: 'theme' },
             { lvl: 12, val: 'aperture', type: 'theme' }, { lvl: 15, val: 'eldritch', type: 'theme' },
             { lvl: 18, val: 'vaporwave', type: 'theme' }, { lvl: 20, val: 'blueprint', type: 'theme' },
             { lvl: 25, val: 'terminal', type: 'theme' }, { lvl: 30, val: 'gold', type: 'theme' },
             { lvl: 50, id: 'prestige-section', type: 'el' }
         ];
 
-        // Prestige Themes Logic
         if(player.prestige >= 1) enableThemeOption('nebula');
         if(player.prestige >= 2) enableThemeOption('midas');
         if(player.prestige >= 3) enableThemeOption('glitch');
@@ -613,7 +605,6 @@
     function moveTask(id, dest) {
         const t = tasks.find(x => x.id === id);
         
-        // RETREAT LOGIC
         if (t.status === 'victory' && dest !== 'victory') {
             customConfirm("CONFIRM PROTOCOL: Retreat? XP penalty will be applied.", () => {
                 addXP(- (t.winXP + 50));
@@ -626,7 +617,6 @@
             return;
         }
 
-        // VICTORY LOGIC
         if (dest === 'victory' && t.status !== 'victory') {
             let base = t.priority === 'High' ? 200 : t.priority === 'Med' ? 150 : 100;
             if(t.deadline) {
@@ -682,8 +672,6 @@
         const filter = document.getElementById('search-bar').value.toLowerCase();
         ['staging', 'active', 'victory'].forEach(col => {
             const container = document.getElementById(`list-${col}`);
-            const zenContainer = document.getElementById('zen-list');
-            if(col === 'active') zenContainer.innerHTML = ''; 
             container.innerHTML = '';
             
             const colTasks = tasks.filter(t => t.status === col);
@@ -700,7 +688,6 @@
                 if(!match) return;
                 const card = createCardHTML(t);
                 container.appendChild(card);
-                if(col === 'active') zenContainer.appendChild(createCardHTML(t));
             });
         });
     }
@@ -727,13 +714,11 @@
         });
         subHtml += '</ul>';
 
-        // COMPACT ACTION BUTTONS
         let btns = '';
         if(t.status === 'staging') btns = `<button class="action-btn" onclick="moveTask(${t.id}, 'active')">Engage</button>`;
         if(t.status === 'active') btns = `<button class="action-btn secondary" onclick="moveTask(${t.id}, 'staging')">Standby</button><button class="action-btn" onclick="moveTask(${t.id}, 'victory')">Complete</button>`;
         if(t.status === 'victory') btns = `<button class="action-btn danger" onclick="moveTask(${t.id}, 'active')">Retreat</button>`;
         
-        // SLIM LEFT ACTIONS
         let leftActions = `<div class="action-group"><button class="action-btn btn-ghost btn-abort" onclick="deleteTask(${t.id})">ABORT</button><button class="action-btn btn-ghost" onclick="openEditTask(${t.id})">EDIT</button></div>`;
         if(t.status === 'victory') leftActions = `<div class="action-group"><button class="action-btn btn-ghost" onclick="openEditTask(${t.id})">EDIT</button></div>`;
 
@@ -745,6 +730,7 @@
         document.getElementById('level-display').innerText = `LVL ${player.level} ${player.prestige > 0 ? '✪'.repeat(player.prestige) : ''}`;
         const req = getXpRequired(player.level);
         document.getElementById('xp-bar').style.width = `${(player.xp / req) * 100}%`;
+        document.getElementById('xp-text').innerText = `${player.xp} / ${req} XP`;
         document.getElementById('stat-total-xp').innerText = player.totalXpEarned;
         document.getElementById('stat-tasks').innerText = player.completedTasks;
         document.getElementById('stat-prestige').innerText = player.prestige;
@@ -759,11 +745,6 @@
         if(player.settings.theme !== 'default') body.classList.add(`theme-${player.settings.theme}`);
         document.getElementById('theme-selector').value = player.settings.theme;
         if(player.settings.darkMode) body.classList.add('dark-mode');
-    }
-
-    function toggleZen(active) {
-        if(active) document.body.classList.add('zen-mode'); else document.body.classList.remove('zen-mode');
-        closeModal('menu-modal');
     }
 
     function openAddTask() {
@@ -858,28 +839,10 @@
         ctx.lineTo(cx, cy - outerRadius); ctx.closePath();
     }
     const stories = {
-        1: `<h3>Chapter I: The Frost and the Flame</h3>
-<p>The wind howled outside the obsidian walls of the Bastion, a sound like a thousand dying wolves. You stood at the parapet, looking out over the endless white. They called it the Long Silence—the winter that had lasted a generation. But you were not just a watcher anymore. You had begun the climb.</p>
-<p>In the old texts, preserved by the Orders of Ink and Bone, it was written that authority is not given, but forged. Like the Valyrian steel of old, or the Shardplate of the Radiants, your will had to be hammered into shape. Every task you completed was a strike of that hammer.</p>
-<p>You remembered the Alchemist's words: "When you want something, all the universe conspires in helping you to achieve it." But the universe was cold here. It did not care. You had to <i>make</i> it care. You had to burn bright enough to melt the snow.</p>
-<p>The nebula overhead swirled with colors unseen by common men—violets and deep, bruising blues. You felt the surge of something ancient in your blood. The First Oath. Life before death. Strength before weakness. Journey before destination. You had taken the first step out of the staging area of your life. The mission was active.</p>`,
-        
-        2: `<h3>Chapter II: The Golden Cage</h3>
-<p>You had ascended. The world below looked like a map drawn by a child, small and insignificant. With the Midas touch, everything you handled turned to success, but gold is a heavy metal. It weighs down the soul.</p>
-<p>The court of the High Lords was a viper's nest. They smiled with teeth of pearl and eyes of flint. You navigated their treachery not with swords, but with completed objectives. High Priority tasks were your shield; Critical Successes your dagger.</p>
-<p>"Power resides where men believe it resides," the eunuch had once whispered. You built your power brick by brick, checkmark by checkmark. But the cold was still there. The impact winter had not ended; it had merely moved inside your heart.</p>
-<p>You looked at your hands. They were glowing, not with warmth, but with the cold light of efficiency. You were becoming something more than human. Something inevitable.</p>`,
-        
-        3: `<h3>Chapter III: The Glitch in the Weave</h3>
-<p>The sky flickered. For a moment, the sun was a square of dead pixels, black against the azure. You blinked, and it was gone, but you knew what you saw. The simulation was straining under the weight of your progress.</p>
-<p>You had pushed too far. Like an Edgedancer sliding on friction-less light, you were moving faster than the world could render. The logic of the universe—the +10 XPs, the Penalties, the Levels—was laying bare before you. You saw the strings.</p>
-<p>It was terrifying. It was exhilarating. You were the storm now. You were the one who knocks. The reality of the board was bending to your will. Tasks completed themselves before you even touched them. But the void was watching. And the void was hungry.</p>`,
-        
-        4: `<h3>Finale: The Architect</h3>
-<p>There is no snow anymore. There is no gold. There is no glitch. There is only the Board. You stand in the center of infinity, the white space of the Staging Area stretching out forever.</p>
-<p>You realize now that the Victory column was never a destination. It was a graveyard of ambition. The joy was never in the having, but in the doing. The Alchemist found his treasure under the tree where he started. You found yours in the daily grind.</p>
-<p>You are the Herald of your own destiny. You have spoken the final oaths. You have survived the winter. You are the master of the two worlds.</p>
-<p>Now... what is your next task?</p>`
+        1: `<h3>Chapter I: The Frost and the Flame</h3><p>The wind howled outside the obsidian walls of the Bastion, a sound like a thousand dying wolves. You stood at the parapet, looking out over the endless white. They called it the Long Silence—the winter that had lasted a generation. But you were not just a watcher anymore. You had begun the climb.</p><p>In the old texts, preserved by the Orders of Ink and Bone, it was written that authority is not given, but forged. Like the Valyrian steel of old, or the Shardplate of the Radiants, your will had to be hammered into shape. Every task you completed was a strike of that hammer.</p><p>You remembered the Alchemist's words: "When you want something, all the universe conspires in helping you to achieve it." But the universe was cold here. It did not care. You had to <i>make</i> it care. You had to burn bright enough to melt the snow.</p><p>The nebula overhead swirled with colors unseen by common men—violets and deep, bruising blues. You felt the surge of something ancient in your blood. The First Oath. Life before death. Strength before weakness. Journey before destination. You had taken the first step out of the staging area of your life. The mission was active.</p>`,
+        2: `<h3>Chapter II: The Golden Cage</h3><p>You had ascended. The world below looked like a map drawn by a child, small and insignificant. With the Midas touch, everything you handled turned to success, but gold is a heavy metal. It weighs down the soul.</p><p>The court of the High Lords was a viper's nest. They smiled with teeth of pearl and eyes of flint. You navigated their treachery not with swords, but with completed objectives. High Priority tasks were your shield; Critical Successes your dagger.</p><p>"Power resides where men believe it resides," the eunuch had once whispered. You built your power brick by brick, checkmark by checkmark. But the cold was still there. The impact winter had not ended; it had merely moved inside your heart.</p><p>You looked at your hands. They were glowing, not with warmth, but with the cold light of efficiency. You were becoming something more than human. Something inevitable.</p>`,
+        3: `<h3>Chapter III: The Glitch in the Weave</h3><p>The sky flickered. For a moment, the sun was a square of dead pixels, black against the azure. You blinked, and it was gone, but you knew what you saw. The simulation was straining under the weight of your progress.</p><p>You had pushed too far. Like an Edgedancer sliding on friction-less light, you were moving faster than the world could render. The logic of the universe—the +10 XPs, the Penalties, the Levels—was laying bare before you. You saw the strings.</p><p>It was terrifying. It was exhilarating. You were the storm now. You were the one who knocks. The reality of the board was bending to your will. Tasks completed themselves before you even touched them. But the void was watching. And the void was hungry.</p>`,
+        4: `<h3>Finale: The Architect</h3><p>There is no snow anymore. There is no gold. There is no glitch. There is only the Board. You stand in the center of infinity, the white space of the Staging Area stretching out forever.</p><p>You realize now that the Victory column was never a destination. It was a graveyard of ambition. The joy was never in the having, but in the doing. The Alchemist found his treasure under the tree where he started. You found yours in the daily grind.</p><p>You are the Herald of your own destiny. You have spoken the final oaths. You have survived the winter. You are the master of the two worlds.</p><p>Now... what is your next task?</p>`
     };
     function openStoryModal() {
         let content = "";
