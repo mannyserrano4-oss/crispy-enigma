@@ -343,10 +343,6 @@
         .xp-gain { color: #ffeaa7; animation: floatUp 1.5s forwards; }
         .xp-loss { color: var(--danger); animation: sinkDown 1.5s forwards; }
 
-        /* Zen */
-        body.zen-mode #hud, body.zen-mode .board, body.zen-mode .fab { display: none; }
-        body.zen-mode #zen-active-container { display: flex; flex-direction: column; align-items: center; padding: 20px; height: 100vh; background: var(--bg-color); }
-        #zen-exit { position: fixed; bottom: 30px; left: 30px; opacity: 0.5; width: 50px; height: 50px; cursor: pointer; border: 2px solid var(--text-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text-color); font-size: 20px; }
         #confetti-canvas { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 2000; }
         .story-text { font-family: "Georgia", serif; line-height: 1.6; font-size: 1.1rem; white-space: pre-wrap; color: var(--text-color); }
     </style>
@@ -565,7 +561,10 @@
         setTimeout(() => div.remove(), 1500);
     }
 
-    function getXpRequired(lvl) { return 500 + ((lvl - 1) * 50); }
+    function getXpRequired(lvl) {
+        // Curve: Base 500 + (Level * 100) + (Level^1.5 * 20)
+        return Math.floor(500 + (lvl * 100) + (Math.pow(lvl, 1.5) * 20));
+    }
 
     function unlockAllThemes() {
         const opts = document.getElementById('theme-selector').options;
