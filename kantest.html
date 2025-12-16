@@ -186,10 +186,60 @@
             --group-objectives-bg: rgba(255, 215, 0, 0.05); --group-objectives-border: #ffd700;
         }
 
-        /* --- PRESTIGE THEMES --- */
-        body.theme-nebula { --bg-color: #1a0b2e; --column-bg: #2d1b4e; --card-bg: #432c7a; --text-color: #e0d4fc; --text-sub: #9a8cba; --accent: #764ba2; --accent-glow: #667eea; --input-bg: #2d1b4e; --input-border: #764ba2; --group-logistics-bg: rgba(118, 75, 162, 0.2); --group-logistics-border: #764ba2; --group-objectives-bg: rgba(102, 126, 234, 0.1); --group-objectives-border: #667eea; }
-        body.theme-midas { --bg-color: #fcfbf4; --column-bg: #fffbf0; --card-bg: #ffffff; --text-color: #8a6d3b; --text-sub: #aa8e5b; --accent: #d4af37; --accent-glow: #fdb931; --input-bg: #fff; --input-border: #d4af37; --group-logistics-bg: #fffbf0; --group-logistics-border: #d4af37; --group-objectives-bg: #fff; --group-objectives-border: #fdb931; }
-        body.theme-glitch { --bg-color: #000; --column-bg: #050505; --card-bg: #0f0f0f; --text-color: #00ff41; --text-sub: #008f11; --accent: #00ff41; --input-bg: #000; --input-border: #00ff41; --group-logistics-bg: #000; --group-logistics-border: #00ff41; --group-objectives-bg: #000; --group-objectives-border: #003b00; font-family: "Courier New", monospace; }
+        /* --- PRESTIGE 1: NEBULA (Space) --- */
+        body.theme-nebula { 
+            --bg-color: #f3e7ff; --column-bg: #eaddff; --card-bg: #ffffff;
+            --text-color: #4a148c; --text-sub: #7c4dff; 
+            --accent: #6200ea; --accent-glow: #b388ff; --danger: #ff4081;
+            --input-bg: #f8f0ff; --input-border: #d1c4e9;
+            --group-logistics-bg: #ede7f6; --group-logistics-border: #b39ddb;
+            --group-objectives-bg: #f3e5f5; --group-objectives-border: #ce93d8;
+        }
+        body.theme-nebula.dark-mode {
+            --bg-color: #1a0b2e; --column-bg: #2d1b4e; --card-bg: #432c7a; 
+            --text-color: #e0d4fc; --text-sub: #9a8cba; 
+            --accent: #764ba2; --accent-glow: #667eea;
+            --input-bg: #2d1b4e; --input-border: #764ba2;
+            --group-logistics-bg: rgba(118, 75, 162, 0.2); --group-logistics-border: #764ba2;
+            --group-objectives-bg: rgba(102, 126, 234, 0.1); --group-objectives-border: #667eea;
+        }
+
+        /* --- PRESTIGE 2: MIDAS (Divine) --- */
+        body.theme-midas {
+            --bg-color: #fdfdfd; --column-bg: #fdfcf5; --card-bg: #ffffff;
+            --text-color: #bfa15f; --text-sub: #d4c59a;
+            --accent: #d4af37; --accent-glow: #f9d77e; --danger: #c0392b;
+            --input-bg: #fff; --input-border: #e6d6ad;
+            --group-logistics-bg: #fffbf2; --group-logistics-border: #e6d6ad;
+            --group-objectives-bg: #ffffff; --group-objectives-border: #f0e68c;
+        }
+        body.theme-midas.dark-mode {
+            --bg-color: #050505; --column-bg: #0f0f0f; --card-bg: #141414; 
+            --text-color: #cfb53b; --text-sub: #8a6d3b; 
+            --accent: #d4af37; --accent-glow: #ffed4a;
+            --input-bg: #0a0a0a; --input-border: #8a6d3b; 
+            --group-logistics-bg: rgba(212, 175, 55, 0.05); --group-logistics-border: #8a6d3b; 
+            --group-objectives-bg: rgba(255, 255, 255, 0.02); --group-objectives-border: #d4af37;
+        }
+
+        /* --- PRESTIGE 3: GLITCH (System Failure) --- */
+        body.theme-glitch {
+            --bg-color: #ffffff; --column-bg: #f0f0f0; --card-bg: #fff;
+            --text-color: #000; --text-sub: #444;
+            --accent: #ff0055; --accent-glow: #00ff99; --danger: #ff0000;
+            --input-bg: #f8f8f8; --input-border: #000;
+            --group-logistics-bg: #fff0f5; --group-logistics-border: #ff0055;
+            --group-objectives-bg: #f0fff5; --group-objectives-border: #00ff99;
+            font-family: "Courier New", monospace;
+        }
+        body.theme-glitch.dark-mode {
+            --bg-color: #000; --column-bg: #050505; --card-bg: #0f0f0f; 
+            --text-color: #00ff41; --text-sub: #008f11; 
+            --accent: #00ff41; --accent-glow: #ffffff;
+            --input-bg: #000; --input-border: #00ff41; 
+            --group-logistics-bg: #000; --group-logistics-border: #00ff41; 
+            --group-objectives-bg: #000; --group-objectives-border: #003b00;
+        }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body { margin: 0; padding: 0; font-family: var(--font); background: var(--bg-color); color: var(--text-color); transition: background 0.3s, color 0.3s; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
@@ -198,13 +248,10 @@
         #hud { flex-shrink: 0; padding: 15px; background: var(--card-bg); z-index: 100; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;}
         .hud-top { display: flex; justify-content: space-between; align-items: center; }
         .level-badge { font-weight: 800; font-size: 1.4rem; color: var(--accent); letter-spacing: -0.5px; text-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        
-        /* XP Bar with Text */
         .progress-container { width: 100%; height: 16px; background: rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; margin-top: 5px; position: relative; }
         .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-glow)); width: 0%; transition: width 0.5s ease; border-radius: 8px; }
         .progress-bar.glowing { animation: glowPulse 0.8s ease-in-out infinite; }
         .xp-text { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 900; color: rgba(0,0,0,0.5); z-index: 2; letter-spacing: 0.5px; }
-        
         @keyframes glowPulse { 0% { box-shadow: 0 0 5px var(--accent); filter: brightness(1); } 50% { box-shadow: 0 0 15px var(--accent), 0 0 5px white; filter: brightness(1.3); } 100% { box-shadow: 0 0 5px var(--accent); filter: brightness(1); } }
 
         /* FAB */
@@ -296,6 +343,10 @@
         .xp-gain { color: #ffeaa7; animation: floatUp 1.5s forwards; }
         .xp-loss { color: var(--danger); animation: sinkDown 1.5s forwards; }
 
+        /* Zen */
+        body.zen-mode #hud, body.zen-mode .board, body.zen-mode .fab { display: none; }
+        body.zen-mode #zen-active-container { display: flex; flex-direction: column; align-items: center; padding: 20px; height: 100vh; background: var(--bg-color); }
+        #zen-exit { position: fixed; bottom: 30px; left: 30px; opacity: 0.5; width: 50px; height: 50px; cursor: pointer; border: 2px solid var(--text-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text-color); font-size: 20px; }
         #confetti-canvas { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 2000; }
         .story-text { font-family: "Georgia", serif; line-height: 1.6; font-size: 1.1rem; white-space: pre-wrap; color: var(--text-color); }
     </style>
