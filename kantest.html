@@ -5,81 +5,193 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>QuestBoard RPG</title>
     <style>
+        /* --- GLOBAL BASE VARIABLES (Defaults) --- */
         :root {
-            /* --- THEME: LIGHT (Pastel Dream) --- */
+            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --radius: 16px;
+            --shadow: 0 4px 6px rgba(0,0,0,0.05);
+            
+            /* Fallbacks (Pastel Dream) */
             --bg-color: #fff0f5;
             --column-bg: #e6e6fa;
             --card-bg: #fff9fb;
             --text-color: #2d3436;
             --text-sub: #636e72;
-            
-            --prio-low: #74b9ff;
-            --prio-med: #00b894;
-            --prio-high: #ff7675;
-            
             --accent: #00b894;
             --accent-glow: #55efc4;
             --danger: #ff7675;
-            
             --input-bg: #ffffff;
             --input-border: #dfe6e9;
-            --group-logistics-bg: #e3f2fd; 
+            --group-logistics-bg: #e3f2fd;
             --group-logistics-border: #90caf9;
             --group-objectives-bg: #e8f5e9;
             --group-objectives-border: #a5d6a7;
-            
             --modal-text: #2d3436;
-            --shadow: 0 4px 6px rgba(0,0,0,0.05);
-            --radius: 16px;
-            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --prio-low: #74b9ff; --prio-med: #00b894; --prio-high: #ff7675;
         }
 
-        /* --- THEME: DARK (Midnight Neon) --- */
+        /* --- 1. DEFAULT THEME (Pastel/Midnight) --- */
+        body { /* Light Mode is Root */ }
         body.dark-mode {
-            --bg-color: #13131f;
-            --column-bg: #1e1e2e;
-            --card-bg: #2a2a3c;
-            --text-color: #e0e0ff;     
-            --text-sub: #a0a0c0;
-            --prio-low: #4facfe; --prio-med: #00e5ff; --prio-high: #ff0055;
+            --bg-color: #13131f; --column-bg: #1e1e2e; --card-bg: #2a2a3c;
+            --text-color: #e0e0ff; --text-sub: #a0a0c0;
             --accent: #00e5ff; --accent-glow: #00e5ff; --danger: #ff4757;
             --input-bg: #1a1a26; --input-border: #404055;
-            --group-logistics-bg: rgba(0, 100, 255, 0.15); --group-logistics-border: #0056b3;
-            --group-objectives-bg: rgba(0, 255, 127, 0.1); --group-objectives-border: #00b894;
-            --modal-text: #f5f6fa;
+            --group-logistics-bg: rgba(0, 100, 255, 0.1); --group-logistics-border: #0056b3;
+            --group-objectives-bg: rgba(0, 255, 127, 0.05); --group-objectives-border: #00b894;
+            --prio-low: #4facfe; --prio-med: #00e5ff; --prio-high: #ff0055;
         }
 
-        /* --- THEME OVERRIDES --- */
-        /* Legacy Unlockables */
-        body.theme-wolf { --bg-color: #3e3b36; --column-bg: #5c5549; --card-bg: #4a453d; --text-color: #dcdccc; --prio-med: #dcdccc; --accent: #8c7b6c; --text-sub: #c0c0b0; }
-        body.theme-neon { --bg-color: #050505; --column-bg: #111; --card-bg: #1a1a1a; --text-color: #e0e0e0; --accent: #0ff; --danger: #f0f; }
-        body.theme-gold { --bg-color: #1a1a1a; --column-bg: #2a2a2a; --card-bg: #000; --text-color: #d4af37; --accent: #ffd700; --input-bg: #111; }
-
-        /* PRESTIGE THEMES */
-        /* Prestige 1: Nebula (Deep Space Purple/Blue) */
-        body.theme-nebula { 
-            --bg-color: #1a0b2e; --column-bg: #2d1b4e; --card-bg: #432c7a; 
-            --text-color: #e0d4fc; --text-sub: #9a8cba; 
-            --accent: #764ba2; --accent-glow: #667eea; --danger: #ff7171;
-            --prio-low: #a18cd1; --prio-med: #fbc2eb; --prio-high: #ff9a9e;
+        /* --- 2. THEME: WOLF (Natural/Earth) --- */
+        body.theme-wolf {
+            --bg-color: #e8e4d9; --column-bg: #dcd6c5; --card-bg: #f4f1ea;
+            --text-color: #4a4036; --text-sub: #786b59;
+            --accent: #556b2f; --accent-glow: #8fbc8f; --danger: #a52a2a;
+            --input-bg: #fffbf0; --input-border: #b8b09b;
+            --group-logistics-bg: #e6e2d3; --group-logistics-border: #aead98;
+            --group-objectives-bg: #e1e6d3; --group-objectives-border: #8f9c78;
+            --prio-low: #7daea3; --prio-med: #556b2f; --prio-high: #a52a2a;
+        }
+        body.theme-wolf.dark-mode {
+            --bg-color: #2b2520; --column-bg: #3d352e; --card-bg: #4a4036;
+            --text-color: #dcd6c5; --text-sub: #a89f91;
+            --accent: #8fbc8f; --input-bg: #362f29; --input-border: #5c5045;
+            --group-logistics-bg: rgba(143, 188, 143, 0.1); --group-logistics-border: #556b2f;
+            --group-objectives-bg: rgba(165, 42, 42, 0.1); --group-objectives-border: #8b4513;
         }
 
-        /* Prestige 2: Midas (Divine White & Pure Gold) */
-        body.theme-midas {
-            --bg-color: #fcfbf4; --column-bg: #fffbf0; --card-bg: #ffffff;
-            --text-color: #8a6d3b; --text-sub: #aa8e5b;
-            --accent: #d4af37; --accent-glow: #fdb931; --danger: #c0392b;
-            --input-border: #d4af37; --shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+        /* --- 3. THEME: NEON (Cyber/Night) --- */
+        body.theme-neon {
+            --bg-color: #f0f0f0; --column-bg: #ffffff; --card-bg: #fff;
+            --text-color: #111; --accent: #ff00ff; --danger: #ff0000;
+            --group-logistics-bg: #ffe6ff; --group-logistics-border: #ff00ff;
+            --group-objectives-bg: #e6ffff; --group-objectives-border: #00ffff;
+        }
+        body.theme-neon.dark-mode {
+            --bg-color: #050505; --column-bg: #111; --card-bg: #1a1a1a;
+            --text-color: #e0e0e0; --text-sub: #888;
+            --accent: #0ff; --accent-glow: #f0f; --danger: #f0f;
+            --input-bg: #000; --input-border: #333;
+            --group-logistics-bg: rgba(255, 0, 255, 0.1); --group-logistics-border: #ff00ff;
+            --group-objectives-bg: rgba(0, 255, 255, 0.1); --group-objectives-border: #00ffff;
         }
 
-        /* Prestige 3: Glitch (Hacker Green/Black Matrix) */
-        body.theme-glitch {
-            --bg-color: #000000; --column-bg: #0a0a0a; --card-bg: #0f0f0f;
-            --text-color: #00ff41; --text-sub: #008f11;
-            --accent: #00ff41; --accent-glow: #003b00; --danger: #ff0055;
-            --input-bg: #000; --input-border: #00ff41;
+        /* --- 4. THEME: APERTURE (Science/Clean) --- */
+        body.theme-aperture {
+            --bg-color: #dce0e6; --column-bg: #edf2f7; --card-bg: #ffffff;
+            --text-color: #2d3748; --text-sub: #718096;
+            --accent: #ed8936; /* Aperture Orange */ --accent-glow: #f6ad55; --danger: #e53e3e;
+            --input-bg: #f7fafc; --input-border: #cbd5e0;
+            --group-logistics-bg: #ebf8ff; --group-logistics-border: #bee3f8;
+            --group-objectives-bg: #fffff0; --group-objectives-border: #fbd38d;
+            --radius: 4px; /* Boxy look */
+        }
+        body.theme-aperture.dark-mode {
+            --bg-color: #1a202c; --column-bg: #2d3748; --card-bg: #4a5568;
+            --text-color: #edf2f7; --text-sub: #a0aec0;
+            --accent: #4299e1; /* Science Blue */
+            --input-bg: #2d3748; --input-border: #4a5568;
+            --group-logistics-bg: rgba(66, 153, 225, 0.15); --group-logistics-border: #3182ce;
+            --group-objectives-bg: rgba(237, 137, 54, 0.1); --group-objectives-border: #dd6b20;
+        }
+
+        /* --- 5. THEME: ELDRITCH (Horror/Old) --- */
+        body.theme-eldritch {
+            --bg-color: #e3dac9; /* Parchment */ --column-bg: #dcd0b8; --card-bg: #f3e9d7;
+            --text-color: #3e2723; --text-sub: #5d4037;
+            --accent: #880e4f; /* Blood Red */ --accent-glow: #ad1457; --danger: #b71c1c;
+            --input-bg: #fff8e1; --input-border: #8d6e63;
+            --group-logistics-bg: #efebe9; --group-logistics-border: #8d6e63;
+            --group-objectives-bg: #e0f2f1; --group-objectives-border: #4db6ac;
+            font-family: "Georgia", serif;
+        }
+        body.theme-eldritch.dark-mode {
+            --bg-color: #1a0518; --column-bg: #2a0a25; --card-bg: #35102e;
+            --text-color: #a464a4; --text-sub: #7b4b7b;
+            --accent: #00ff00; /* Madness Green */ --danger: #ff0033;
+            --input-bg: #120310; --input-border: #4a144a;
+            --group-logistics-bg: rgba(74, 20, 74, 0.5); --group-logistics-border: #880e4f;
+            --group-objectives-bg: rgba(0, 50, 0, 0.5); --group-objectives-border: #006400;
+        }
+
+        /* --- 6. THEME: VAPORWAVE (Retro 80s) --- */
+        body.theme-vaporwave {
+            --bg-color: #ffecf2; --column-bg: #e0f7fa; --card-bg: #ffffff;
+            --text-color: #6a1b9a; --text-sub: #8e24aa;
+            --accent: #00bcd4; --accent-glow: #e1bee7; --danger: #ff4081;
+            --input-bg: #fff; --input-border: #e1bee7;
+            --group-logistics-bg: #f3e5f5; --group-logistics-border: #ce93d8;
+            --group-objectives-bg: #e0f7fa; --group-objectives-border: #80deea;
+        }
+        body.theme-vaporwave.dark-mode {
+            --bg-color: #2b0f36; --column-bg: #3f1a52; --card-bg: #4c2063;
+            --text-color: #00d9ff; --text-sub: #ff79c6;
+            --accent: #ff00ff; --input-bg: #220a2e; --input-border: #7b4b96;
+            --group-logistics-bg: rgba(255, 0, 255, 0.1); --group-logistics-border: #bd93f9;
+            --group-objectives-bg: rgba(0, 217, 255, 0.1); --group-objectives-border: #8be9fd;
+        }
+
+        /* --- 7. THEME: BLUEPRINT (Architect) --- */
+        body.theme-blueprint {
+            --bg-color: #f0f4f8; --column-bg: #d9e2ec; --card-bg: #ffffff;
+            --text-color: #102a43; --text-sub: #334e68;
+            --accent: #0055ff; --danger: #d0021b;
+            --input-bg: #fff; --input-border: #0055ff;
+            --group-logistics-bg: #dceefb; --group-logistics-border: #334e68;
+            --group-objectives-bg: #f0f4f8; --group-objectives-border: #829ab1;
+            --radius: 2px;
+        }
+        body.theme-blueprint.dark-mode {
+            --bg-color: #003366; --column-bg: #004488; --card-bg: #002244;
+            --text-color: #ffffff; --text-sub: #bcccdc;
+            --accent: #66b3ff;
+            --input-bg: #002244; --input-border: #ffffff;
+            --group-logistics-bg: rgba(255, 255, 255, 0.1); --group-logistics-border: #ffffff;
+            --group-objectives-bg: rgba(100, 180, 255, 0.1); --group-objectives-border: #66b3ff;
+        }
+        /* Dashed Border Effect for Blueprint */
+        body.theme-blueprint .card { border-style: dashed; border-width: 2px; }
+
+        /* --- 8. THEME: TERMINAL (Hacker) --- */
+        body.theme-terminal {
+            --bg-color: #2b2b2b; --column-bg: #333; --card-bg: #444;
+            --text-color: #ffb000; /* Amber */ --text-sub: #cc8800;
+            --accent: #ffb000; --danger: #ff3300;
+            --input-bg: #222; --input-border: #ffb000;
+            --group-logistics-bg: #222; --group-logistics-border: #cc8800;
+            --group-objectives-bg: #222; --group-objectives-border: #ffb000;
             font-family: "Courier New", monospace;
         }
+        body.theme-terminal.dark-mode {
+            --bg-color: #000; --column-bg: #0a0a0a; --card-bg: #111;
+            --text-color: #0f0; --text-sub: #008f11;
+            --accent: #0f0; --danger: #f00;
+            --input-bg: #000; --input-border: #0f0;
+            --group-logistics-bg: #050505; --group-logistics-border: #003b00;
+            --group-objectives-bg: #050505; --group-objectives-border: #0f0;
+        }
+
+        /* --- 9. THEME: GOLD (Luxury) --- */
+        body.theme-gold {
+            --bg-color: #fafafa; --column-bg: #f5f5f5; --card-bg: #fff;
+            --text-color: #b8860b; --text-sub: #d4af37;
+            --accent: #daa520; --danger: #8b0000;
+            --input-bg: #fff; --input-border: #d4af37;
+            --group-logistics-bg: #fffff0; --group-logistics-border: #daa520;
+            --group-objectives-bg: #fffaf0; --group-objectives-border: #b8860b;
+        }
+        body.theme-gold.dark-mode {
+            --bg-color: #121212; --column-bg: #1c1c1c; --card-bg: #000;
+            --text-color: #ffd700; --text-sub: #b8860b;
+            --accent: #ffd700; --input-bg: #111; --input-border: #ffd700;
+            --group-logistics-bg: rgba(212, 175, 55, 0.1); --group-logistics-border: #b8860b;
+            --group-objectives-bg: rgba(255, 215, 0, 0.05); --group-objectives-border: #ffd700;
+        }
+
+        /* --- PRESTIGE THEMES --- */
+        body.theme-nebula { --bg-color: #1a0b2e; --column-bg: #2d1b4e; --card-bg: #432c7a; --text-color: #e0d4fc; --text-sub: #9a8cba; --accent: #764ba2; --accent-glow: #667eea; --input-bg: #2d1b4e; --input-border: #764ba2; --group-logistics-bg: rgba(118, 75, 162, 0.2); --group-logistics-border: #764ba2; --group-objectives-bg: rgba(102, 126, 234, 0.1); --group-objectives-border: #667eea; }
+        body.theme-midas { --bg-color: #fcfbf4; --column-bg: #fffbf0; --card-bg: #ffffff; --text-color: #8a6d3b; --text-sub: #aa8e5b; --accent: #d4af37; --accent-glow: #fdb931; --input-bg: #fff; --input-border: #d4af37; --group-logistics-bg: #fffbf0; --group-logistics-border: #d4af37; --group-objectives-bg: #fff; --group-objectives-border: #fdb931; }
+        body.theme-glitch { --bg-color: #000; --column-bg: #050505; --card-bg: #0f0f0f; --text-color: #00ff41; --text-sub: #008f11; --accent: #00ff41; --input-bg: #000; --input-border: #00ff41; --group-logistics-bg: #000; --group-logistics-border: #00ff41; --group-objectives-bg: #000; --group-objectives-border: #003b00; font-family: "Courier New", monospace; }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body { margin: 0; padding: 0; font-family: var(--font); background: var(--bg-color); color: var(--text-color); transition: background 0.3s, color 0.3s; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
@@ -98,35 +210,33 @@
             position: fixed; bottom: 30px; right: 25px;
             width: 65px; height: 65px;
             background: var(--accent); color: white;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
             font-size: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.3);
             z-index: 500; cursor: pointer; transition: transform 0.2s; border: none;
         }
         .fab:active { transform: scale(0.9); }
 
-        /* Buttons & Interactions */
+        /* Buttons */
         button { background: var(--accent); color: #fff; border: none; padding: 10px 16px; border-radius: var(--radius); font-weight: 700; cursor: pointer; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
-        button.secondary { background: var(--column-bg); color: var(--text-color); border: 1px solid rgba(0,0,0,0.1); }
+        button.secondary { background: var(--column-bg); color: var(--text-color); border: 1px solid var(--input-border); }
         button.danger { background: var(--danger); color: white; }
         .icon-btn { padding: 8px; font-size: 1.2rem; background: transparent; color: var(--text-color); border: none; text-transform: none;}
 
         /* Search */
-        #search-bar { width: 100%; padding: 12px; border-radius: var(--radius); border: 1px solid transparent; background: var(--column-bg); color: var(--text-color); font-size: 1rem; }
+        #search-bar { width: 100%; padding: 12px; border-radius: var(--radius); border: 1px solid var(--input-border); background: var(--column-bg); color: var(--text-color); font-size: 1rem; }
         #search-bar:focus { border-color: var(--accent); background: var(--card-bg); }
 
         /* Board Layout */
         .board { flex-grow: 1; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 15px; padding: 15px; scroll-behavior: smooth; height: 100%; }
-        .column { min-width: 85vw; background: var(--column-bg); border-radius: var(--radius); padding: 15px; display: flex; flex-direction: column; scroll-snap-align: center; height: 100%; max-height: 100%; }
+        .column { min-width: 85vw; background: var(--column-bg); border-radius: var(--radius); padding: 15px; display: flex; flex-direction: column; scroll-snap-align: center; height: 100%; max-height: 100%; border: 1px solid var(--input-border); }
         .column-header { flex-shrink: 0; font-weight: 800; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-color); opacity: 0.8; }
         .task-list { overflow-y: auto; flex-grow: 1; padding-bottom: 80px; padding-right: 5px; }
 
         /* Empty State */
-        .empty-state { opacity: 0.4; text-align: center; padding: 40px 20px; font-style: italic; font-weight: bold; border: 2px dashed rgba(0,0,0,0.1); border-radius: var(--radius); margin-top: 20px; }
-        body.dark-mode .empty-state { border-color: rgba(255,255,255,0.1); }
+        .empty-state { opacity: 0.4; text-align: center; padding: 40px 20px; font-style: italic; font-weight: bold; border: 2px dashed var(--text-sub); border-radius: var(--radius); margin-top: 20px; color: var(--text-color); }
 
         /* Cards */
-        .card { background: var(--card-bg); padding: 18px; margin-bottom: 15px; border-radius: var(--radius); box-shadow: var(--shadow); position: relative; border-left: 8px solid transparent; }
+        .card { background: var(--card-bg); padding: 18px; margin-bottom: 15px; border-radius: var(--radius); box-shadow: var(--shadow); position: relative; border-left: 8px solid transparent; color: var(--text-color); }
         .card.priority-High { border-left-color: var(--prio-high); }
         .card.priority-Med { border-left-color: var(--prio-med); }
         .card.priority-Low { border-left-color: var(--prio-low); }
@@ -138,29 +248,25 @@
         .prio-badge.Med { background: var(--prio-med); }
         .prio-badge.Low { background: var(--prio-low); }
 
-        /* Tags */
         .tag-container { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
-        .tag-pill { border-radius: 12px; padding: 3px 10px; font-size: 0.75rem; color: #333; font-weight: 700; border: 1px solid rgba(0,0,0,0.05); }
+        .tag-pill { border-radius: 12px; padding: 3px 10px; font-size: 0.75rem; color: var(--text-color); font-weight: 700; border: 1px solid var(--text-sub); opacity: 0.8; }
 
-        /* Objectives */
         .objective-list { list-style: none; padding: 0; margin: 15px 0; }
-        .objective-box { background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05); padding: 10px; margin-bottom: 8px; border-radius: 8px; display: flex; align-items: center; gap: 10px; font-size: 0.95rem; color: var(--text-color); }
-        body.dark-mode .objective-box { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
+        .objective-box { background: rgba(0,0,0,0.03); border: 1px solid var(--input-border); padding: 10px; margin-bottom: 8px; border-radius: 8px; display: flex; align-items: center; gap: 10px; font-size: 0.95rem; color: var(--text-color); }
         .objective-check { width: 22px; height: 22px; cursor: pointer; accent-color: var(--accent); flex-shrink: 0; }
 
-        /* Balanced Action Buttons */
         .card-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; height: 32px; gap: 15px; flex-wrap: nowrap; }
         .action-group { display: flex; gap: 5px; align-items: center; }
         .action-btn { font-size: 0.65rem; padding: 8px 10px; border-radius: 12px; letter-spacing: 0.5px; }
         
-        .btn-ghost { background: transparent; color: var(--text-sub); border: 1px solid rgba(0,0,0,0.15); }
+        .btn-ghost { background: transparent; color: var(--text-sub); border: 1px solid var(--input-border); }
         .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
-        .btn-abort { color: var(--danger); border-color: rgba(255, 118, 117, 0.3); }
-        .btn-abort:hover { background: var(--danger); color: white; border-color: var(--danger); }
+        .btn-abort { color: var(--danger); border-color: var(--danger); opacity: 0.7; }
+        .btn-abort:hover { background: var(--danger); color: white; opacity: 1; }
 
         /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; }
-        .modal { background: var(--card-bg); width: 90%; max-width: 500px; padding: 25px; border-radius: 25px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.4); color: var(--modal-text); }
+        .modal { background: var(--card-bg); width: 90%; max-width: 500px; padding: 25px; border-radius: 25px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.4); color: var(--modal-text); border: 1px solid var(--input-border); }
         
         .field-group { padding: 15px; border-radius: 12px; margin-bottom: 15px; border-width: 1px; border-style: solid; }
         .group-logistics { background: var(--group-logistics-bg); border-color: var(--group-logistics-border); }
@@ -173,7 +279,7 @@
         /* Custom Confirm Modal */
         #confirm-modal .modal { text-align: center; border: 2px solid var(--accent); }
         .confirm-btn-group { display: flex; gap: 15px; justify-content: center; margin-top: 20px; }
-        .confirm-msg { font-size: 1.1rem; margin: 15px 0; font-weight: 600; }
+        .confirm-msg { font-size: 1.1rem; margin: 15px 0; font-weight: 600; color: var(--text-color); }
 
         /* Toasts & FX */
         #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 5000; pointer-events: none; width: 90%; max-width: 400px; }
@@ -602,7 +708,6 @@
     function createCardHTML(t) {
         const div = document.createElement('div');
         div.className = `card priority-${t.priority}`;
-        if(player.settings.theme === 'blueprint') div.style.borderStyle = "dashed";
         let dateStr = "";
         if(t.deadline) {
             const parts = t.deadline.split('-');
