@@ -242,7 +242,12 @@
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { margin: 0; padding: 0; font-family: var(--font); background: var(--bg-color); color: var(--text-color); transition: background 0.3s, color 0.3s; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        body { 
+            margin: 0; padding: 0; font-family: var(--font); background: var(--bg-color); color: var(--text-color); 
+            transition: background 0.3s, color 0.3s; height: 100vh; overflow: hidden; display: flex; flex-direction: column; 
+            /* Enable fast click response on iOS */
+            touch-action: manipulation;
+        }
 
         /* HUD */
         #hud { flex-shrink: 0; padding: 15px; background: var(--card-bg); z-index: 100; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;}
@@ -261,15 +266,27 @@
             background: var(--accent); color: white;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             font-size: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-            z-index: 500; cursor: pointer; transition: transform 0.2s; border: none;
+            z-index: 500; cursor: pointer; transition: transform 0.1s; border: none;
         }
         .fab:active { transform: scale(0.9); }
 
-        /* Buttons */
-        button { background: var(--accent); color: #fff; border: none; padding: 10px 16px; border-radius: var(--radius); font-weight: 700; cursor: pointer; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+        /* BUTTONS - TACTILE FEEDBACK ADDED HERE */
+        button { 
+            background: var(--accent); color: #fff; border: none; 
+            padding: 10px 16px; border-radius: var(--radius); font-weight: 700; 
+            cursor: pointer; font-size: 0.85rem; text-transform: uppercase; 
+            letter-spacing: 0.5px; white-space: nowrap; 
+            transition: transform 0.1s; /* Smooth press */
+        }
+        button:active {
+            transform: scale(0.95); /* THE SQUISH EFFECT */
+        }
+
         button.secondary { background: var(--column-bg); color: var(--text-color); border: 1px solid var(--input-border); }
         button.danger { background: var(--danger); color: white; }
+        
         .icon-btn { padding: 8px; font-size: 1.2rem; background: transparent; color: var(--text-color); border: none; text-transform: none;}
+        .icon-btn:active { transform: scale(0.9); }
 
         /* Search */
         #search-bar { width: 100%; padding: 12px; border-radius: var(--radius); border: 1px solid var(--input-border); background: var(--column-bg); color: var(--text-color); font-size: 1rem; }
@@ -343,10 +360,6 @@
         .xp-gain { color: #ffeaa7; animation: floatUp 1.5s forwards; }
         .xp-loss { color: var(--danger); animation: sinkDown 1.5s forwards; }
 
-        /* Zen */
-        body.zen-mode #hud, body.zen-mode .board, body.zen-mode .fab { display: none; }
-        body.zen-mode #zen-active-container { display: flex; flex-direction: column; align-items: center; padding: 20px; height: 100vh; background: var(--bg-color); }
-        #zen-exit { position: fixed; bottom: 30px; left: 30px; opacity: 0.5; width: 50px; height: 50px; cursor: pointer; border: 2px solid var(--text-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text-color); font-size: 20px; }
         #confetti-canvas { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 2000; }
         .story-text { font-family: "Georgia", serif; line-height: 1.6; font-size: 1.1rem; white-space: pre-wrap; color: var(--text-color); }
     </style>
@@ -495,6 +508,9 @@
     let tasks = [];
     let editingId = null;
     let pendingCallback = null;
+
+    // Force touchstart logic for iOS active states
+    document.addEventListener("touchstart", function() {}, true);
 
     window.onload = function() {
         if(localStorage.getItem('qb_player')) {
