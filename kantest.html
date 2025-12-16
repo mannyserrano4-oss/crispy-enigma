@@ -131,15 +131,28 @@
         body.dark-mode .objective-box { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
         .objective-check { width: 22px; height: 22px; cursor: pointer; accent-color: var(--accent); flex-shrink: 0; }
 
-        /* Action Buttons */
+        /* Balanced Action Buttons */
         .card-actions { 
             display: flex; justify-content: space-between; align-items: center; 
-            margin-top: 15px; height: 32px; 
-            gap: 15px; /* Added Safe Gap between groups */
+            margin-top: 15px; 
+            /* No fixed height, let padding handle it */
+            flex-wrap: nowrap; /* Force single line */
         }
-        .action-group { display: flex; gap: 8px; align-items: center; }
         
-        .action-btn { font-size: 0.7rem; padding: 8px 10px; border-radius: 10px; letter-spacing: 0.5px; }
+        /* Internal Groups */
+        .action-group { 
+            display: flex; 
+            gap: 5px; /* TIGHT GAP between buttons inside the same group */
+            align-items: center; 
+        }
+        
+        /* Button sizing for mobile */
+        .action-btn { 
+            font-size: 0.65rem; /* Slightly smaller text to ensure fit */
+            padding: 8px 10px; /* Balanced padding */
+            border-radius: 12px; 
+            letter-spacing: 0.5px;
+        }
         
         .btn-ghost { background: transparent; color: var(--text-sub); border: 1px solid rgba(0,0,0,0.15); }
         .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
@@ -580,7 +593,7 @@
         });
         subHtml += '</ul>';
 
-        // COMPACT ACTION BUTTONS
+        // ACTION BUTTONS
         let btns = '';
         if(t.status === 'staging') btns = `<button class="action-btn" onclick="moveTask(${t.id}, 'active')">Engage</button>`;
         if(t.status === 'active') btns = `<button class="action-btn secondary" onclick="moveTask(${t.id}, 'staging')">Standby</button><button class="action-btn" onclick="moveTask(${t.id}, 'victory')">Complete</button>`;
