@@ -41,28 +41,45 @@
             --card-bg: #2a2a3c;
             --text-color: #e0e0ff;     
             --text-sub: #a0a0c0;
-            
-            --prio-low: #4facfe;
-            --prio-med: #00e5ff;
-            --prio-high: #ff0055;
-            
-            --accent: #00e5ff;
-            --accent-glow: #00e5ff;
-            --danger: #ff4757;
-
-            --input-bg: #1a1a26;
-            --input-border: #404055;
-            
-            --group-logistics-bg: rgba(0, 100, 255, 0.15);
-            --group-logistics-border: #0056b3;
-            --group-objectives-bg: rgba(0, 255, 127, 0.1);
-            --group-objectives-border: #00b894;
-            
+            --prio-low: #4facfe; --prio-med: #00e5ff; --prio-high: #ff0055;
+            --accent: #00e5ff; --accent-glow: #00e5ff; --danger: #ff4757;
+            --input-bg: #1a1a26; --input-border: #404055;
+            --group-logistics-bg: rgba(0, 100, 255, 0.15); --group-logistics-border: #0056b3;
+            --group-objectives-bg: rgba(0, 255, 127, 0.1); --group-objectives-border: #00b894;
             --modal-text: #f5f6fa;
         }
 
-        /* Theme Overrides */
+        /* --- THEME OVERRIDES --- */
+        /* Legacy Unlockables */
         body.theme-wolf { --bg-color: #3e3b36; --column-bg: #5c5549; --card-bg: #4a453d; --text-color: #dcdccc; --prio-med: #dcdccc; --accent: #8c7b6c; --text-sub: #c0c0b0; }
+        body.theme-neon { --bg-color: #050505; --column-bg: #111; --card-bg: #1a1a1a; --text-color: #e0e0e0; --accent: #0ff; --danger: #f0f; }
+        body.theme-gold { --bg-color: #1a1a1a; --column-bg: #2a2a2a; --card-bg: #000; --text-color: #d4af37; --accent: #ffd700; --input-bg: #111; }
+
+        /* PRESTIGE THEMES */
+        /* Prestige 1: Nebula (Deep Space Purple/Blue) */
+        body.theme-nebula { 
+            --bg-color: #1a0b2e; --column-bg: #2d1b4e; --card-bg: #432c7a; 
+            --text-color: #e0d4fc; --text-sub: #9a8cba; 
+            --accent: #764ba2; --accent-glow: #667eea; --danger: #ff7171;
+            --prio-low: #a18cd1; --prio-med: #fbc2eb; --prio-high: #ff9a9e;
+        }
+
+        /* Prestige 2: Midas (Divine White & Pure Gold) */
+        body.theme-midas {
+            --bg-color: #fcfbf4; --column-bg: #fffbf0; --card-bg: #ffffff;
+            --text-color: #8a6d3b; --text-sub: #aa8e5b;
+            --accent: #d4af37; --accent-glow: #fdb931; --danger: #c0392b;
+            --input-border: #d4af37; --shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+        }
+
+        /* Prestige 3: Glitch (Hacker Green/Black Matrix) */
+        body.theme-glitch {
+            --bg-color: #000000; --column-bg: #0a0a0a; --card-bg: #0f0f0f;
+            --text-color: #00ff41; --text-sub: #008f11;
+            --accent: #00ff41; --accent-glow: #003b00; --danger: #ff0055;
+            --input-bg: #000; --input-border: #00ff41;
+            font-family: "Courier New", monospace;
+        }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body { margin: 0; padding: 0; font-family: var(--font); background: var(--bg-color); color: var(--text-color); transition: background 0.3s, color 0.3s; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
@@ -132,31 +149,12 @@
         .objective-check { width: 22px; height: 22px; cursor: pointer; accent-color: var(--accent); flex-shrink: 0; }
 
         /* Balanced Action Buttons */
-        .card-actions { 
-            display: flex; justify-content: space-between; align-items: center; 
-            margin-top: 15px; 
-            /* No fixed height, let padding handle it */
-            flex-wrap: nowrap; /* Force single line */
-        }
-        
-        /* Internal Groups */
-        .action-group { 
-            display: flex; 
-            gap: 5px; /* TIGHT GAP between buttons inside the same group */
-            align-items: center; 
-        }
-        
-        /* Button sizing for mobile */
-        .action-btn { 
-            font-size: 0.65rem; /* Slightly smaller text to ensure fit */
-            padding: 8px 10px; /* Balanced padding */
-            border-radius: 12px; 
-            letter-spacing: 0.5px;
-        }
+        .card-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; height: 32px; gap: 15px; flex-wrap: nowrap; }
+        .action-group { display: flex; gap: 5px; align-items: center; }
+        .action-btn { font-size: 0.65rem; padding: 8px 10px; border-radius: 12px; letter-spacing: 0.5px; }
         
         .btn-ghost { background: transparent; color: var(--text-sub); border: 1px solid rgba(0,0,0,0.15); }
         .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
-        
         .btn-abort { color: var(--danger); border-color: rgba(255, 118, 117, 0.3); }
         .btn-abort:hover { background: var(--danger); color: white; border-color: var(--danger); }
 
@@ -263,6 +261,9 @@
             <option value="blueprint" disabled>🔒 Lvl 20: Blueprint</option>
             <option value="terminal" disabled>🔒 Lvl 25: Terminal</option>
             <option value="gold" disabled>🔒 Lvl 30: Gold</option>
+            <option value="nebula" disabled>🔒 Prestige 1: Nebula</option>
+            <option value="midas" disabled>🔒 Prestige 2: Midas</option>
+            <option value="glitch" disabled>🔒 Prestige 3: Glitch</option>
         </select>
         <h3>Data Management</h3>
         <div style="display:flex; gap:10px; margin-bottom:20px;">
@@ -273,6 +274,16 @@
         <div id="prestige-section" style="display:none; border-top:1px solid var(--text-color); padding-top:20px;">
             <button class="danger" style="width:100%" onclick="prestigeReset()">🎖️ PRESTIGE RESET</button>
         </div>
+        
+        <div style="border-top:1px dashed var(--text-sub); margin-top:10px; padding-top:10px;">
+            <h3 style="font-size:0.9rem; opacity:0.7">🚧 DEBUG / CHEATS</h3>
+            <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                <button class="secondary" style="font-size:0.7rem;" onclick="addXP(1000)">+1000 XP</button>
+                <button class="secondary" style="font-size:0.7rem;" onclick="player.level=50; player.xp=0; saveData(); location.reload();">Force Lvl 50</button>
+                <button class="secondary" style="font-size:0.7rem;" onclick="unlockAllThemes()">Unlock All</button>
+            </div>
+        </div>
+
         <div id="story-library-btn" style="display:none; margin-top:15px;">
             <button style="width:100%; background: purple;" onclick="openStoryModal()">📖 The Archives</button>
         </div>
@@ -406,6 +417,15 @@
 
     function getXpRequired(lvl) { return 500 + ((lvl - 1) * 50); }
 
+    function unlockAllThemes() {
+        const opts = document.getElementById('theme-selector').options;
+        for(let i=0; i<opts.length; i++) {
+            opts[i].disabled = false;
+            opts[i].text = opts[i].text.replace('🔒 ', '');
+        }
+        showToast("DEV MODE: All Themes Unlocked");
+    }
+
     function checkUnlocks() {
         const unlocks = [
             { lvl: 2, id: 'utility-stats', type: 'el' }, { lvl: 5, val: 'wolf', type: 'theme' },
@@ -415,16 +435,25 @@
             { lvl: 25, val: 'terminal', type: 'theme' }, { lvl: 30, val: 'gold', type: 'theme' },
             { lvl: 50, id: 'prestige-section', type: 'el' }
         ];
+
+        // Prestige Themes Logic
+        if(player.prestige >= 1) enableThemeOption('nebula');
+        if(player.prestige >= 2) enableThemeOption('midas');
+        if(player.prestige >= 3) enableThemeOption('glitch');
+
         if(player.prestige >= 1) document.getElementById('story-library-btn').style.display = 'block';
+
         unlocks.forEach(u => {
             if (player.level >= u.lvl) {
                 if(u.type === 'el') document.getElementById(u.id).style.display = 'block';
-                if(u.type === 'theme') {
-                    let opt = document.querySelector(`option[value="${u.val}"]`);
-                    if(opt) { opt.disabled = false; opt.text = opt.text.replace('🔒 ', ''); }
-                }
+                if(u.type === 'theme') enableThemeOption(u.val);
             }
         });
+    }
+
+    function enableThemeOption(val) {
+        let opt = document.querySelector(`option[value="${val}"]`);
+        if(opt) { opt.disabled = false; opt.text = opt.text.replace('🔒 ', ''); }
     }
 
     function addObjectiveInput(value = "") {
@@ -593,7 +622,7 @@
         });
         subHtml += '</ul>';
 
-        // ACTION BUTTONS
+        // COMPACT ACTION BUTTONS
         let btns = '';
         if(t.status === 'staging') btns = `<button class="action-btn" onclick="moveTask(${t.id}, 'active')">Engage</button>`;
         if(t.status === 'active') btns = `<button class="action-btn secondary" onclick="moveTask(${t.id}, 'staging')">Standby</button><button class="action-btn" onclick="moveTask(${t.id}, 'victory')">Complete</button>`;
@@ -723,10 +752,37 @@
         }
         ctx.lineTo(cx, cy - outerRadius); ctx.closePath();
     }
-    const stories = { 1: `<h3>Chapter I: The Frost and the Flame</h3><p>The wind howled outside...</p>` };
+    const stories = {
+        1: `<h3>Chapter I: The Frost and the Flame</h3>
+<p>The wind howled outside the obsidian walls of the Bastion, a sound like a thousand dying wolves. You stood at the parapet, looking out over the endless white. They called it the Long Silence—the winter that had lasted a generation. But you were not just a watcher anymore. You had begun the climb.</p>
+<p>In the old texts, preserved by the Orders of Ink and Bone, it was written that authority is not given, but forged. Like the Valyrian steel of old, or the Shardplate of the Radiants, your will had to be hammered into shape. Every task you completed was a strike of that hammer.</p>
+<p>You remembered the Alchemist's words: "When you want something, all the universe conspires in helping you to achieve it." But the universe was cold here. It did not care. You had to <i>make</i> it care. You had to burn bright enough to melt the snow.</p>
+<p>The nebula overhead swirled with colors unseen by common men—violets and deep, bruising blues. You felt the surge of something ancient in your blood. The First Oath. Life before death. Strength before weakness. Journey before destination. You had taken the first step out of the staging area of your life. The mission was active.</p>`,
+        
+        2: `<h3>Chapter II: The Golden Cage</h3>
+<p>You had ascended. The world below looked like a map drawn by a child, small and insignificant. With the Midas touch, everything you handled turned to success, but gold is a heavy metal. It weighs down the soul.</p>
+<p>The court of the High Lords was a viper's nest. They smiled with teeth of pearl and eyes of flint. You navigated their treachery not with swords, but with completed objectives. High Priority tasks were your shield; Critical Successes your dagger.</p>
+<p>"Power resides where men believe it resides," the eunuch had once whispered. You built your power brick by brick, checkmark by checkmark. But the cold was still there. The impact winter had not ended; it had merely moved inside your heart.</p>
+<p>You looked at your hands. They were glowing, not with warmth, but with the cold light of efficiency. You were becoming something more than human. Something inevitable.</p>`,
+        
+        3: `<h3>Chapter III: The Glitch in the Weave</h3>
+<p>The sky flickered. For a moment, the sun was a square of dead pixels, black against the azure. You blinked, and it was gone, but you knew what you saw. The simulation was straining under the weight of your progress.</p>
+<p>You had pushed too far. Like an Edgedancer sliding on friction-less light, you were moving faster than the world could render. The logic of the universe—the +10 XPs, the Penalties, the Levels—was laying bare before you. You saw the strings.</p>
+<p>It was terrifying. It was exhilarating. You were the storm now. You were the one who knocks. The reality of the board was bending to your will. Tasks completed themselves before you even touched them. But the void was watching. And the void was hungry.</p>`,
+        
+        4: `<h3>Finale: The Architect</h3>
+<p>There is no snow anymore. There is no gold. There is no glitch. There is only the Board. You stand in the center of infinity, the white space of the Staging Area stretching out forever.</p>
+<p>You realize now that the Victory column was never a destination. It was a graveyard of ambition. The joy was never in the having, but in the doing. The Alchemist found his treasure under the tree where he started. You found yours in the daily grind.</p>
+<p>You are the Herald of your own destiny. You have spoken the final oaths. You have survived the winter. You are the master of the two worlds.</p>
+<p>Now... what is your next task?</p>`
+    };
     function openStoryModal() {
         let content = "";
         if(player.prestige >= 1) content += stories[1];
+        if(player.prestige >= 2) content += stories[2];
+        if(player.prestige >= 3) content += stories[3];
+        if(player.prestige >= 4) content += stories[4];
+        
         document.getElementById('story-content').innerHTML = content || "<p>You must Prestige to unlock the Archives.</p>";
         document.getElementById('story-modal').style.display = 'flex';
     }
