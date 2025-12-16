@@ -30,7 +30,7 @@
             --prio-low: #74b9ff; --prio-med: #00b894; --prio-high: #ff7675;
         }
 
-        /* --- 1. DARK MODE (Midnight Neon) --- */
+        /* --- 1. DARK MODE (High Contrast) --- */
         body.dark-mode {
             --bg-color: #0d0d15; --column-bg: #161622; --card-bg: #1e1e2e;
             --text-color: #ffffff; --text-sub: #b0b0c0;
@@ -39,220 +39,53 @@
             --group-logistics-bg: rgba(0, 100, 255, 0.1); --group-logistics-border: #0056b3;
             --group-objectives-bg: rgba(0, 255, 127, 0.05); --group-objectives-border: #00b894;
             --prio-low: #4facfe; --prio-med: #00e5ff; --prio-high: #ff0055;
+            --prio-boss: #d63031;
         }
 
-        /* --- 2. THEME: WOLF (Natural) --- */
-        body.theme-wolf {
-            --bg-color: #e8e4d9; --column-bg: #dcd6c5; --card-bg: #f4f1ea;
-            --text-color: #4a4036; --text-sub: #786b59;
-            --accent: #556b2f; --accent-glow: #8fbc8f; --danger: #a52a2a;
-            --input-bg: #fffbf0; --input-border: #b8b09b;
-            --group-logistics-bg: #e6e2d3; --group-logistics-border: #aead98;
-            --group-objectives-bg: #e1e6d3; --group-objectives-border: #8f9c78;
-            --prio-low: #7daea3; --prio-med: #556b2f; --prio-high: #a52a2a;
-        }
-        body.theme-wolf.dark-mode {
-            --bg-color: #1c1815; --column-bg: #2b2520; --card-bg: #362f29;
-            --text-color: #f0e6d2; --text-sub: #bfb5a3;
-            --accent: #8fbc8f; --input-bg: #241f1b; --input-border: #5c5045;
-            --group-logistics-bg: rgba(143, 188, 143, 0.1); --group-logistics-border: #556b2f;
-            --group-objectives-bg: rgba(165, 42, 42, 0.1); --group-objectives-border: #8b4513;
-        }
+        /* --- THEME OVERRIDES (Condensed) --- */
+        body.theme-wolf { --bg-color: #e8e4d9; --column-bg: #dcd6c5; --card-bg: #f4f1ea; --text-color: #4a4036; --accent: #556b2f; }
+        body.theme-wolf.dark-mode { --bg-color: #1c1815; --column-bg: #2b2520; --card-bg: #362f29; --text-color: #f0e6d2; --accent: #8fbc8f; }
+        
+        body.theme-neon { --bg-color: #f0f0f0; --column-bg: #ffffff; --card-bg: #fff; --text-color: #111; --accent: #ff00ff; }
+        body.theme-neon.dark-mode { --bg-color: #000; --column-bg: #0a0a0a; --card-bg: #141414; --text-color: #fff; --accent: #0ff; }
 
-        /* --- 3. THEME: NEON (Cyber) --- */
-        body.theme-neon {
-            --bg-color: #f0f0f0; --column-bg: #ffffff; --card-bg: #fff;
-            --text-color: #111; --accent: #ff00ff; --danger: #ff0000;
-            --group-logistics-bg: #ffe6ff; --group-logistics-border: #ff00ff;
-            --group-objectives-bg: #e6ffff; --group-objectives-border: #00ffff;
-        }
-        body.theme-neon.dark-mode {
-            --bg-color: #000000; --column-bg: #0a0a0a; --card-bg: #141414;
-            --text-color: #ffffff; --text-sub: #aaaaaa;
-            --accent: #0ff; --accent-glow: #f0f; --danger: #f0f;
-            --input-bg: #000; --input-border: #333;
-            --group-logistics-bg: rgba(255, 0, 255, 0.1); --group-logistics-border: #ff00ff;
-            --group-objectives-bg: rgba(0, 255, 255, 0.1); --group-objectives-border: #00ffff;
-        }
+        body.theme-aperture { --bg-color: #dce0e6; --column-bg: #edf2f7; --card-bg: #fff; --text-color: #2d3748; --accent: #ed8936; --radius: 4px; }
+        body.theme-aperture.dark-mode { --bg-color: #11151c; --column-bg: #1a202c; --card-bg: #2d3748; --text-color: #fff; --accent: #4299e1; }
 
-        /* --- 4. THEME: APERTURE (Science) --- */
-        body.theme-aperture {
-            --bg-color: #dce0e6; --column-bg: #edf2f7; --card-bg: #ffffff;
-            --text-color: #2d3748; --text-sub: #718096;
-            --accent: #ed8936; --accent-glow: #f6ad55; --danger: #e53e3e;
-            --input-bg: #f7fafc; --input-border: #cbd5e0;
-            --group-logistics-bg: #ebf8ff; --group-logistics-border: #bee3f8;
-            --group-objectives-bg: #fffff0; --group-objectives-border: #fbd38d;
-            --radius: 4px;
-        }
-        body.theme-aperture.dark-mode {
-            --bg-color: #11151c; --column-bg: #1a202c; --card-bg: #2d3748;
-            --text-color: #ffffff; --text-sub: #cbd5e0;
-            --accent: #4299e1;
-            --input-bg: #171923; --input-border: #4a5568;
-            --group-logistics-bg: rgba(66, 153, 225, 0.15); --group-logistics-border: #3182ce;
-            --group-objectives-bg: rgba(237, 137, 54, 0.1); --group-objectives-border: #dd6b20;
-        }
+        body.theme-eldritch { --bg-color: #e3dac9; --column-bg: #dcd0b8; --card-bg: #f3e9d7; --text-color: #3e2723; --accent: #880e4f; font-family: "Georgia", serif; }
+        body.theme-eldritch.dark-mode { --bg-color: #0f020e; --column-bg: #1f051d; --card-bg: #2d0a2a; --text-color: #e0c0e0; --accent: #00ff66; }
 
-        /* --- 5. THEME: ELDRITCH (Horror) --- */
-        body.theme-eldritch {
-            --bg-color: #e3dac9; --column-bg: #dcd0b8; --card-bg: #f3e9d7;
-            --text-color: #3e2723; --text-sub: #5d4037;
-            --accent: #880e4f; --accent-glow: #ad1457; --danger: #b71c1c;
-            --input-bg: #fff8e1; --input-border: #8d6e63;
-            --group-logistics-bg: #efebe9; --group-logistics-border: #8d6e63;
-            --group-objectives-bg: #e0f2f1; --group-objectives-border: #4db6ac;
-            font-family: "Georgia", serif;
-        }
-        body.theme-eldritch.dark-mode {
-            --bg-color: #0f020e; --column-bg: #1f051d; --card-bg: #2d0a2a;
-            --text-color: #e0c0e0; --text-sub: #bca0bc;
-            --accent: #00ff66; --danger: #ff3333;
-            --input-bg: #120310; --input-border: #5e1c5e;
-            --group-logistics-bg: rgba(74, 20, 74, 0.5); --group-logistics-border: #880e4f;
-            --group-objectives-bg: rgba(0, 50, 0, 0.5); --group-objectives-border: #006400;
-        }
+        body.theme-vaporwave { --bg-color: #ffecf2; --column-bg: #e0f7fa; --card-bg: #fff; --text-color: #6a1b9a; --accent: #00bcd4; }
+        body.theme-vaporwave.dark-mode { --bg-color: #1a0524; --column-bg: #2b0f36; --card-bg: #3f1a52; --text-color: #8affff; --accent: #ff00ff; }
 
-        /* --- 6. THEME: VAPORWAVE (Retro) --- */
-        body.theme-vaporwave {
-            --bg-color: #ffecf2; --column-bg: #e0f7fa; --card-bg: #ffffff;
-            --text-color: #6a1b9a; --text-sub: #8e24aa;
-            --accent: #00bcd4; --accent-glow: #e1bee7; --danger: #ff4081;
-            --input-bg: #fff; --input-border: #e1bee7;
-            --group-logistics-bg: #f3e5f5; --group-logistics-border: #ce93d8;
-            --group-objectives-bg: #e0f7fa; --group-objectives-border: #80deea;
-        }
-        body.theme-vaporwave.dark-mode {
-            --bg-color: #1a0524; --column-bg: #2b0f36; --card-bg: #3f1a52;
-            --text-color: #8affff; --text-sub: #ffb3e6;
-            --accent: #ff00ff; --input-bg: #220a2e; --input-border: #7b4b96;
-            --group-logistics-bg: rgba(255, 0, 255, 0.1); --group-logistics-border: #bd93f9;
-            --group-objectives-bg: rgba(0, 217, 255, 0.1); --group-objectives-border: #8be9fd;
-        }
-
-        /* --- 7. THEME: BLUEPRINT (Architect) --- */
-        body.theme-blueprint {
-            --bg-color: #f0f4f8; --column-bg: #d9e2ec; --card-bg: #ffffff;
-            --text-color: #102a43; --text-sub: #334e68;
-            --accent: #0055ff; --danger: #d0021b;
-            --input-bg: #fff; --input-border: #0055ff;
-            --group-logistics-bg: #dceefb; --group-logistics-border: #334e68;
-            --group-objectives-bg: #f0f4f8; --group-objectives-border: #829ab1;
-            --radius: 2px;
-        }
-        body.theme-blueprint.dark-mode {
-            --bg-color: #002244; --column-bg: #003366; --card-bg: #004488;
-            --text-color: #ffffff; --text-sub: #d0e0f0;
-            --accent: #66b3ff;
-            --input-bg: #002244; --input-border: #ffffff;
-            --group-logistics-bg: rgba(255, 255, 255, 0.1); --group-logistics-border: #ffffff;
-            --group-objectives-bg: rgba(100, 180, 255, 0.1); --group-objectives-border: #66b3ff;
-        }
+        body.theme-blueprint { --bg-color: #f0f4f8; --column-bg: #d9e2ec; --card-bg: #fff; --text-color: #102a43; --accent: #0055ff; --radius: 2px; }
+        body.theme-blueprint.dark-mode { --bg-color: #002244; --column-bg: #003366; --card-bg: #004488; --text-color: #fff; --accent: #66b3ff; }
         body.theme-blueprint .card { border-style: dashed; border-width: 2px; }
 
-        /* --- 8. THEME: TERMINAL (Hacker) --- */
-        body.theme-terminal {
-            --bg-color: #2b2b2b; --column-bg: #333; --card-bg: #444;
-            --text-color: #ffb000; --text-sub: #cc8800;
-            --accent: #ffb000; --danger: #ff3300;
-            --input-bg: #222; --input-border: #ffb000;
-            --group-logistics-bg: #222; --group-logistics-border: #cc8800;
-            --group-objectives-bg: #222; --group-objectives-border: #ffb000;
-            font-family: "Courier New", monospace;
-        }
-        body.theme-terminal.dark-mode {
-            --bg-color: #000; --column-bg: #0a0a0a; --card-bg: #111;
-            --text-color: #00ff00; --text-sub: #00cc00;
-            --accent: #00ff00; --danger: #f00;
-            --input-bg: #000; --input-border: #00ff00;
-            --group-logistics-bg: #050505; --group-logistics-border: #003b00;
-            --group-objectives-bg: #050505; --group-objectives-border: #00ff00;
-        }
+        body.theme-terminal { --bg-color: #2b2b2b; --column-bg: #333; --card-bg: #444; --text-color: #ffb000; --accent: #ffb000; font-family: "Courier New", monospace; }
+        body.theme-terminal.dark-mode { --bg-color: #000; --column-bg: #0a0a0a; --card-bg: #111; --text-color: #0f0; --accent: #0f0; }
 
-        /* --- 9. THEME: GOLD (Luxury) --- */
-        body.theme-gold {
-            --bg-color: #fafafa; --column-bg: #f5f5f5; --card-bg: #fff;
-            --text-color: #b8860b; --text-sub: #d4af37;
-            --accent: #daa520; --danger: #8b0000;
-            --input-bg: #fff; --input-border: #d4af37;
-            --group-logistics-bg: #fffff0; --group-logistics-border: #daa520;
-            --group-objectives-bg: #fffaf0; --group-objectives-border: #b8860b;
-        }
-        body.theme-gold.dark-mode {
-            --bg-color: #0a0a0a; --column-bg: #141414; --card-bg: #1c1c1c;
-            --text-color: #ffe066; --text-sub: #d4c56e;
-            --accent: #ffd700; --input-bg: #111; --input-border: #ffd700;
-            --group-logistics-bg: rgba(212, 175, 55, 0.1); --group-logistics-border: #b8860b;
-            --group-objectives-bg: rgba(255, 215, 0, 0.05); --group-objectives-border: #ffd700;
-        }
+        body.theme-gold { --bg-color: #fafafa; --column-bg: #f5f5f5; --card-bg: #fff; --text-color: #b8860b; --accent: #daa520; }
+        body.theme-gold.dark-mode { --bg-color: #0a0a0a; --column-bg: #141414; --card-bg: #1c1c1c; --text-color: #ffe066; --accent: #ffd700; }
 
-        /* --- PRESTIGE 1: NEBULA (Space) --- */
-        body.theme-nebula { 
-            --bg-color: #f3e7ff; --column-bg: #eaddff; --card-bg: #ffffff;
-            --text-color: #4a148c; --text-sub: #7c4dff; 
-            --accent: #6200ea; --accent-glow: #b388ff; --danger: #ff4081;
-            --input-bg: #f8f0ff; --input-border: #d1c4e9;
-            --group-logistics-bg: #ede7f6; --group-logistics-border: #b39ddb;
-            --group-objectives-bg: #f3e5f5; --group-objectives-border: #ce93d8;
-        }
-        body.theme-nebula.dark-mode {
-            --bg-color: #120621; --column-bg: #200f36; --card-bg: #2d164d;
-            --text-color: #ffffff; --text-sub: #d1c4e9; 
-            --accent: #b388ff; --accent-glow: #7c4dff;
-            --input-bg: #1a0b2e; --input-border: #7c4dff;
-            --group-logistics-bg: rgba(124, 77, 255, 0.2); --group-logistics-border: #7c4dff;
-            --group-objectives-bg: rgba(179, 136, 255, 0.1); --group-objectives-border: #b388ff;
-        }
+        body.theme-nebula { --bg-color: #f3e7ff; --column-bg: #eaddff; --card-bg: #fff; --text-color: #4a148c; --accent: #6200ea; }
+        body.theme-nebula.dark-mode { --bg-color: #120621; --column-bg: #200f36; --card-bg: #2d164d; --text-color: #fff; --accent: #b388ff; }
+        
+        body.theme-midas { --bg-color: #fdfdfd; --column-bg: #fdfcf5; --card-bg: #fff; --text-color: #bfa15f; --accent: #d4af37; }
+        body.theme-midas.dark-mode { --bg-color: #000; --column-bg: #0a0a0a; --card-bg: #141414; --text-color: #ffed4a; --accent: #d4af37; }
+        
+        body.theme-glitch { --bg-color: #fff; --column-bg: #f0f0f0; --card-bg: #fff; --text-color: #000; --accent: #ff0055; font-family: "Courier New", monospace; }
+        body.theme-glitch.dark-mode { --bg-color: #000; --column-bg: #050505; --card-bg: #0f0f0f; --text-color: #00ff41; --accent: #00ff41; }
 
-        /* --- PRESTIGE 2: MIDAS (Divine) --- */
-        body.theme-midas {
-            --bg-color: #fdfdfd; --column-bg: #fdfcf5; --card-bg: #ffffff;
-            --text-color: #bfa15f; --text-sub: #d4c59a;
-            --accent: #d4af37; --accent-glow: #f9d77e; --danger: #c0392b;
-            --input-bg: #fff; --input-border: #e6d6ad;
-            --group-logistics-bg: #fffbf2; --group-logistics-border: #e6d6ad;
-            --group-objectives-bg: #ffffff; --group-objectives-border: #f0e68c;
-        }
-        body.theme-midas.dark-mode {
-            --bg-color: #000000; --column-bg: #0a0a0a; --card-bg: #141414; 
-            --text-color: #ffed4a; --text-sub: #d4af37;
-            --accent: #d4af37; --accent-glow: #ffffff;
-            --input-bg: #0a0a0a; --input-border: #d4af37; 
-            --group-logistics-bg: rgba(212, 175, 55, 0.1); --group-logistics-border: #d4af37; 
-            --group-objectives-bg: rgba(255, 255, 255, 0.05); --group-objectives-border: #ffed4a;
-        }
-
-        /* --- PRESTIGE 3: GLITCH (System Failure) --- */
-        body.theme-glitch {
-            --bg-color: #ffffff; --column-bg: #f0f0f0; --card-bg: #fff;
-            --text-color: #000; --text-sub: #444;
-            --accent: #ff0055; --accent-glow: #00ff99; --danger: #ff0000;
-            --input-bg: #f8f8f8; --input-border: #000;
-            --group-logistics-bg: #fff0f5; --group-logistics-border: #ff0055;
-            --group-objectives-bg: #f0fff5; --group-objectives-border: #00ff99;
-            font-family: "Courier New", monospace;
-        }
-        body.theme-glitch.dark-mode {
-            --bg-color: #000; --column-bg: #050505; --card-bg: #0f0f0f; 
-            --text-color: #00ff41; --text-sub: #00cc33; 
-            --accent: #00ff41; --accent-glow: #ffffff;
-            --input-bg: #000; --input-border: #00ff41; 
-            --group-logistics-bg: #000; --group-logistics-border: #00ff41; 
-            --group-objectives-bg: #000; --group-objectives-border: #003b00;
-        }
-
+        /* --- LAYOUT & UTILS --- */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { 
-            margin: 0; padding: 0; font-family: var(--font); background: var(--bg-color); color: var(--text-color); 
-            transition: background 0.3s, color 0.3s; height: 100vh; overflow: hidden; display: flex; flex-direction: column; 
-            /* Enable fast click response on iOS */
-            touch-action: manipulation;
-        }
+        body { margin: 0; padding: 0; font-family: var(--font); background: var(--bg-color); color: var(--text-color); transition: background 0.3s, color 0.3s; height: 100vh; overflow: hidden; display: flex; flex-direction: column; touch-action: manipulation; }
 
         /* HUD */
         #hud { flex-shrink: 0; padding: 15px; background: var(--card-bg); z-index: 100; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;}
         .hud-top { display: flex; justify-content: space-between; align-items: center; }
         .level-badge { font-weight: 800; font-size: 1.4rem; color: var(--accent); letter-spacing: -0.5px; text-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .streak-display { font-size: 0.9rem; font-weight: bold; color: var(--danger); display: flex; align-items: center; gap: 5px; }
         .progress-container { width: 100%; height: 16px; background: rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; margin-top: 5px; position: relative; }
         .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-glow)); width: 0%; transition: width 0.5s ease; border-radius: 8px; }
         .progress-bar.glowing { animation: glowPulse 0.8s ease-in-out infinite; }
@@ -260,45 +93,26 @@
         @keyframes glowPulse { 0% { box-shadow: 0 0 5px var(--accent); filter: brightness(1); } 50% { box-shadow: 0 0 15px var(--accent), 0 0 5px white; filter: brightness(1.3); } 100% { box-shadow: 0 0 5px var(--accent); filter: brightness(1); } }
 
         /* FAB */
-        .fab {
-            position: fixed; bottom: 30px; right: 25px;
-            width: 65px; height: 65px;
-            background: var(--accent); color: white;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-            z-index: 500; cursor: pointer; transition: transform 0.1s; border: none;
-        }
+        .fab { position: fixed; bottom: 30px; right: 25px; width: 65px; height: 65px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); z-index: 500; cursor: pointer; transition: transform 0.1s; border: none; }
         .fab:active { transform: scale(0.9); }
 
-        /* BUTTONS - TACTILE FEEDBACK ADDED HERE */
-        button { 
-            background: var(--accent); color: #fff; border: none; 
-            padding: 10px 16px; border-radius: var(--radius); font-weight: 700; 
-            cursor: pointer; font-size: 0.85rem; text-transform: uppercase; 
-            letter-spacing: 0.5px; white-space: nowrap; 
-            transition: transform 0.1s; /* Smooth press */
-        }
-        button:active {
-            transform: scale(0.98); /* THE SQUISH EFFECT */
-        }
-
+        /* Buttons */
+        button { background: var(--accent); color: #fff; border: none; padding: 10px 16px; border-radius: var(--radius); font-weight: 700; cursor: pointer; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; transition: transform 0.1s ease; }
+        button:active { transform: scale(0.95); }
         button.secondary { background: var(--column-bg); color: var(--text-color); border: 1px solid var(--input-border); }
         button.danger { background: var(--danger); color: white; }
-        
-        .icon-btn { padding: 8px; font-size: 1.2rem; background: transparent; color: var(--text-color); border: none; text-transform: none;}
+        .icon-btn { padding: 8px; font-size: 1.2rem; background: transparent; color: var(--text-color); border: none; text-transform: none; transition: transform 0.1s ease;}
         .icon-btn:active { transform: scale(0.9); }
 
         /* Search */
         #search-bar { width: 100%; padding: 12px; border-radius: var(--radius); border: 1px solid var(--input-border); background: var(--column-bg); color: var(--text-color); font-size: 1rem; }
         #search-bar:focus { border-color: var(--accent); background: var(--card-bg); }
 
-        /* Board Layout */
+        /* Board */
         .board { flex-grow: 1; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 15px; padding: 15px; scroll-behavior: smooth; height: 100%; }
         .column { min-width: 85vw; background: var(--column-bg); border-radius: var(--radius); padding: 15px; display: flex; flex-direction: column; scroll-snap-align: center; height: 100%; max-height: 100%; border: 1px solid var(--input-border); }
         .column-header { flex-shrink: 0; font-weight: 800; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-color); opacity: 0.8; }
         .task-list { overflow-y: auto; flex-grow: 1; padding-bottom: 80px; padding-right: 5px; }
-
-        /* Empty State */
         .empty-state { opacity: 0.4; text-align: center; padding: 40px 20px; font-style: italic; font-weight: bold; border: 2px dashed var(--text-sub); border-radius: var(--radius); margin-top: 20px; color: var(--text-color); }
 
         /* Cards */
@@ -306,6 +120,8 @@
         .card.priority-High { border-left-color: var(--prio-high); }
         .card.priority-Med { border-left-color: var(--prio-med); }
         .card.priority-Low { border-left-color: var(--prio-low); }
+        .card.priority-Boss { border-left-color: var(--prio-boss); box-shadow: 0 0 15px var(--prio-boss); border: 2px solid var(--prio-boss); } 
+
         .card h3 { margin: 0 0 8px 0; font-size: 1.15rem; color: var(--text-color); word-wrap: break-word; }
         .card-meta { font-size: 0.85rem; color: var(--text-sub); font-weight: 600; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         
@@ -313,6 +129,7 @@
         .prio-badge.High { background: var(--prio-high); }
         .prio-badge.Med { background: var(--prio-med); }
         .prio-badge.Low { background: var(--prio-low); }
+        .prio-badge.Boss { background: var(--prio-boss); letter-spacing: 1px; }
 
         .tag-container { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
         .tag-pill { border-radius: 12px; padding: 3px 10px; font-size: 0.75rem; color: var(--text-color); font-weight: 700; border: 1px solid var(--text-sub); opacity: 0.8; }
@@ -338,12 +155,17 @@
         .field-group { padding: 15px; border-radius: 12px; margin-bottom: 15px; border-width: 1px; border-style: solid; }
         .group-logistics { background: var(--group-logistics-bg); border-color: var(--group-logistics-border); }
         .group-objectives { background: var(--group-objectives-bg); border-color: var(--group-objectives-border); }
-        .field-group label { display: block; margin-bottom: 8px; font-weight: 800; font-size: 0.85rem; text-transform: uppercase; color: var(--accent); letter-spacing: 0.5px; }
+        
+        /* Label Styling */
+        .field-group label { display: block; margin-bottom: 8px; font-weight: 800; font-size: 0.8rem; text-transform: uppercase; color: var(--accent); letter-spacing: 0.5px; opacity: 0.9; }
+        .sub-label { display: block; font-size: 0.75rem; color: var(--text-sub); margin-bottom: 4px; font-weight: 600; }
+
         input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); font-size: 1rem; box-sizing: border-box; max-width: 100%; }
         .dyn-input-row { display: flex; gap: 5px; margin-bottom: 8px; }
-        .dyn-del-btn { background: var(--danger); color: white; width: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; flex-shrink: 0; }
+        .dyn-del-btn { background: var(--danger); color: white; width: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; flex-shrink: 0; transition: transform 0.1s ease; }
+        .dyn-del-btn:active { transform: scale(0.95); }
 
-        /* Custom Confirm Modal */
+        /* Custom Confirm */
         #confirm-modal .modal { text-align: center; border: 2px solid var(--accent); }
         .confirm-btn-group { display: flex; gap: 15px; justify-content: center; margin-top: 20px; }
         .confirm-msg { font-size: 1.1rem; margin: 15px 0; font-weight: 600; color: var(--text-color); }
@@ -368,6 +190,7 @@
 
 <script>
     window.onerror = function(msg, url, line, col, error) { alert("SYSTEM MALFUNCTION:\n" + msg + "\nLine: " + line); return false; };
+    document.addEventListener("touchstart", function() {}, true);
 </script>
 
 <canvas id="confetti-canvas"></canvas>
@@ -376,7 +199,10 @@
 
 <div id="hud">
     <div class="hud-top">
-        <div id="level-display" class="level-badge">LVL 1</div>
+        <div style="display:flex; align-items:center; gap:10px;">
+            <div id="level-display" class="level-badge">LVL 1</div>
+            <div id="streak-display" class="streak-display">🔥 0</div>
+        </div>
         <div style="display:flex; gap:10px;">
              <button class="icon-btn" onclick="toggleThemeMode()">◑</button>
              <button class="icon-btn" onclick="openMenu()">☰</button>
@@ -412,6 +238,7 @@
             <p>Total XP: <span id="stat-total-xp">0</span></p>
             <p>Missions Completed: <span id="stat-tasks">0</span></p>
             <p>Prestige Rank: <span id="stat-prestige">0</span></p>
+            <p>Current Streak: <span id="stat-streak">0</span> Days</p>
         </div>
         <h3>Visuals</h3>
         <select id="theme-selector" onchange="changeTheme(this.value)" style="width:100%; margin-bottom:10px;">
@@ -457,26 +284,38 @@
 <div class="modal-overlay" id="task-modal">
     <div class="modal">
         <h2 id="modal-title" style="color:var(--accent); margin-top:0;">New Mission</h2>
+        
         <div class="field-group group-logistics">
             <label>Logistics</label>
-            <div style="margin-bottom:10px;"><input type="text" id="inp-title" placeholder="Mission Name"></div>
-            <div style="margin-bottom:10px;"><input type="text" id="inp-tags" placeholder="Tags (comma separated)..."></div>
-            <div style="margin-bottom:10px;">
-                <select id="inp-priority">
-                    <option value="Low">Low Priority (100 XP)</option>
-                    <option value="Med">Med Priority (150 XP)</option>
-                    <option value="High">High Priority (200 XP)</option>
-                </select>
-            </div>
-            <div>
-                <input type="date" id="inp-deadline">
-            </div>
+            <input type="text" id="inp-title" placeholder="Mission Name" style="margin-bottom:10px;">
+            <input type="text" id="inp-tags" placeholder="Tags (comma separated)..." style="margin-bottom:15px;">
+            
+            <span class="sub-label">Priority Level</span>
+            <select id="inp-priority" style="margin-bottom:10px;">
+                <option value="Low">Low Priority (100 XP)</option>
+                <option value="Med">Med Priority (150 XP)</option>
+                <option value="High">High Priority (200 XP)</option>
+                <option value="Boss">☠️ BOSS (500 XP)</option>
+            </select>
+
+            <span class="sub-label">Repetition Mode</span>
+            <select id="inp-recurrence" style="margin-bottom:10px;">
+                <option value="none">One-Time Mission</option>
+                <option value="daily">Daily Reset 🔄</option>
+                <option value="weekly">Weekly Reset 🔄</option>
+                <option value="monthly">Monthly Reset 🔄</option>
+            </select>
+
+            <span class="sub-label">Deadline</span>
+            <input type="date" id="inp-deadline">
         </div>
+
         <div class="field-group group-objectives">
             <label>Objectives</label>
             <div id="objectives-container"></div>
             <button class="secondary" style="width:100%; margin-top:5px; font-size:0.8rem;" onclick="addObjectiveInput()">+ Add Objective</button>
         </div>
+
         <div style="display:flex; justify-content:flex-end; gap:10px;">
             <button class="secondary" onclick="closeModal('task-modal')">Disengage</button>
             <button onclick="saveTask()">Initialize</button>
@@ -504,19 +343,17 @@
 </div>
 
 <script>
-    let player = { level: 1, xp: 0, prestige: 0, totalXpEarned: 0, completedTasks: 0, settings: { darkMode: false, theme: 'default' } };
+    let player = { level: 1, xp: 0, prestige: 0, totalXpEarned: 0, completedTasks: 0, streak: 0, lastLogin: null, settings: { darkMode: false, theme: 'default' } };
     let tasks = [];
     let editingId = null;
     let pendingCallback = null;
-
-    // Force touchstart logic for iOS active states
-    document.addEventListener("touchstart", function() {}, true);
 
     window.onload = function() {
         if(localStorage.getItem('qb_player')) {
             player = JSON.parse(localStorage.getItem('qb_player'));
             tasks = JSON.parse(localStorage.getItem('qb_tasks'));
         }
+        checkStreak();
         applySettings();
         checkUnlocks();
         renderBoard();
@@ -530,27 +367,34 @@
         updateStats();
     }
 
+    // --- STREAK LOGIC ---
+    function checkStreak() {
+        const today = new Date().toDateString();
+        if (player.lastLogin !== today) {
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            
+            if (player.lastLogin === yesterday.toDateString()) {
+                player.streak++;
+                showToast(`Daily Streak: ${player.streak} Days! 🔥`);
+            } else {
+                if(player.streak > 0) showToast("Streak Lost! Reset to 1.");
+                player.streak = 1;
+            }
+            player.lastLogin = today;
+            saveData();
+        }
+    }
+
     // --- CALENDAR LOGIC ---
     function addToCalendar(taskId) {
         const t = tasks.find(x => x.id === taskId);
         if(!t.deadline) return;
-
         const title = `QuestBoard: ${t.title}`;
         const desc = t.subtasks.map(s => `[${s.done ? 'x' : ' '}] ${s.text}`).join('\\n');
-        const startDate = t.deadline.replace(/-/g, '') + 'T090000'; // Default 9 AM
+        const startDate = t.deadline.replace(/-/g, '') + 'T090000';
         const endDate = t.deadline.replace(/-/g, '') + 'T100000';
-
-        const icsContent = 
-`BEGIN:VCALENDAR
-VERSION:2.0
-BEGIN:VEVENT
-SUMMARY:${title}
-DESCRIPTION:${desc}
-DTSTART:${startDate}
-DTEND:${endDate}
-END:VEVENT
-END:VCALENDAR`;
-
+        const icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:${title}\nDESCRIPTION:${desc}\nDTSTART:${startDate}\nDTEND:${endDate}\nEND:VEVENT\nEND:VCALENDAR`;
         const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
         const link = document.createElement('a');
         link.href = window.URL.createObjectURL(blob);
@@ -560,20 +404,16 @@ END:VCALENDAR`;
         document.body.removeChild(link);
     }
 
-    // --- SYSTEM ALERT LOGIC ---
     function customConfirm(msg, callback) {
         document.getElementById('confirm-text').innerText = msg;
         pendingCallback = callback;
         document.getElementById('confirm-modal').style.display = 'flex';
     }
-
     function closeConfirm(result) {
         document.getElementById('confirm-modal').style.display = 'none';
         if(result && pendingCallback) pendingCallback();
         pendingCallback = null;
     }
-
-    // --- UTILS ---
     function getTagColor(str) {
         let hash = 0;
         for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
@@ -582,7 +422,9 @@ END:VCALENDAR`;
     }
 
     function addXP(amount) {
-        let mult = 1 + (player.prestige * 0.1);
+        let streakBonus = Math.min(player.streak, 10) * 0.01;
+        let mult = 1 + (player.prestige * 0.1) + streakBonus;
+        
         let finalAmount = Math.floor(amount * mult);
         if(amount > 0 && Math.random() < 0.05) { finalAmount += 50; showToast("CRITICAL SUCCESS! +50 XP"); }
         
@@ -627,19 +469,15 @@ END:VCALENDAR`;
     function checkUnlocks() {
         const unlocks = [
             { lvl: 2, id: 'utility-stats', type: 'el' }, { lvl: 5, val: 'wolf', type: 'theme' },
-            { lvl: 10, val: 'neon', type: 'theme' },
-            { lvl: 12, val: 'aperture', type: 'theme' }, { lvl: 15, val: 'eldritch', type: 'theme' },
-            { lvl: 18, val: 'vaporwave', type: 'theme' }, { lvl: 20, val: 'blueprint', type: 'theme' },
-            { lvl: 25, val: 'terminal', type: 'theme' }, { lvl: 30, val: 'gold', type: 'theme' },
-            { lvl: 50, id: 'prestige-section', type: 'el' }
+            { lvl: 10, val: 'neon', type: 'theme' }, { lvl: 12, val: 'aperture', type: 'theme' },
+            { lvl: 15, val: 'eldritch', type: 'theme' }, { lvl: 18, val: 'vaporwave', type: 'theme' },
+            { lvl: 20, val: 'blueprint', type: 'theme' }, { lvl: 25, val: 'terminal', type: 'theme' },
+            { lvl: 30, val: 'gold', type: 'theme' }, { lvl: 50, id: 'prestige-section', type: 'el' }
         ];
-
         if(player.prestige >= 1) enableThemeOption('nebula');
         if(player.prestige >= 2) enableThemeOption('midas');
         if(player.prestige >= 3) enableThemeOption('glitch');
-
         if(player.prestige >= 1) document.getElementById('story-library-btn').style.display = 'block';
-
         unlocks.forEach(u => {
             if (player.level >= u.lvl) {
                 if(u.type === 'el') document.getElementById(u.id).style.display = 'block';
@@ -686,6 +524,7 @@ END:VCALENDAR`;
             title: title,
             tags: tags,
             priority: document.getElementById('inp-priority').value,
+            recurrence: document.getElementById('inp-recurrence').value,
             deadline: document.getElementById('inp-deadline').value,
             subtasks: subtasks,
             status: editingId ? tasks.find(t => t.id === editingId).status : 'staging',
@@ -703,7 +542,6 @@ END:VCALENDAR`;
 
     function moveTask(id, dest) {
         const t = tasks.find(x => x.id === id);
-        
         if (t.status === 'victory' && dest !== 'victory') {
             customConfirm("CONFIRM PROTOCOL: Retreat? XP penalty will be applied.", () => {
                 addXP(- (t.winXP + 50));
@@ -718,6 +556,8 @@ END:VCALENDAR`;
 
         if (dest === 'victory' && t.status !== 'victory') {
             let base = t.priority === 'High' ? 200 : t.priority === 'Med' ? 150 : 100;
+            if(t.priority === 'Boss') base = 500; 
+
             if(t.deadline) {
                 const now = new Date(); const due = new Date(t.deadline); now.setHours(0,0,0,0); due.setHours(0,0,0,0);
                 const diffDays = Math.ceil((due - now) / (1000 * 60 * 60 * 24)); 
@@ -729,6 +569,24 @@ END:VCALENDAR`;
             player.completedTasks++;
             let fx = player.level >= 30 ? 'gem' : player.level >= 20 ? 'coin' : player.level >= 10 ? 'star' : 'paper';
             fireConfetti(fx);
+
+            if(t.recurrence && t.recurrence !== 'none') {
+                const nextTask = JSON.parse(JSON.stringify(t)); 
+                nextTask.id = Date.now(); 
+                nextTask.status = 'staging';
+                nextTask.winXP = 0;
+                nextTask.completedDate = null;
+                nextTask.subtasks.forEach(s => s.done = false); 
+                if(t.deadline) {
+                    const d = new Date(t.deadline);
+                    if(t.recurrence === 'daily') d.setDate(d.getDate() + 1);
+                    if(t.recurrence === 'weekly') d.setDate(d.getDate() + 7);
+                    if(t.recurrence === 'monthly') d.setMonth(d.getMonth() + 1);
+                    nextTask.deadline = d.toISOString().split('T')[0];
+                }
+                tasks.push(nextTask);
+                showToast("Recurring Mission Rescheduled 🔄");
+            }
         }
 
         t.status = dest;
@@ -760,6 +618,7 @@ END:VCALENDAR`;
         document.getElementById('inp-title').value = t.title;
         document.getElementById('inp-tags').value = t.tags ? t.tags.join(', ') : "";
         document.getElementById('inp-priority').value = t.priority;
+        document.getElementById('inp-recurrence').value = t.recurrence || 'none';
         document.getElementById('inp-deadline').value = t.deadline;
         const container = document.getElementById('objectives-container');
         container.innerHTML = "";
@@ -774,16 +633,21 @@ END:VCALENDAR`;
             container.innerHTML = '';
             
             const colTasks = tasks.filter(t => t.status === col);
+            
+            const emptyMsgs = [
+                "The realm is at peace...", "No objectives currently active.", 
+                "Awaiting command input...", "The board is clear.", "Silence in the archives."
+            ];
+            
             if(colTasks.length === 0 && !filter) {
-                let msg = col === 'staging' ? "Quest Log Empty" : col === 'active' ? "No Current Objective" : "Hall of Heroes Empty";
-                container.innerHTML = `<div class="empty-state">${msg}</div>`;
+                const randomMsg = emptyMsgs[Math.floor(Math.random() * emptyMsgs.length)];
+                container.innerHTML = `<div class="empty-state">${randomMsg}</div>`;
             }
 
             colTasks.forEach(t => {
                 let match = t.title.toLowerCase().includes(filter);
                 t.subtasks.forEach(s => { if(s.text.toLowerCase().includes(filter)) match = true; });
                 if(t.tags) t.tags.forEach(tag => { if(tag.toLowerCase().includes(filter)) match = true; });
-                
                 if(!match) return;
                 const card = createCardHTML(t);
                 container.appendChild(card);
@@ -801,8 +665,12 @@ END:VCALENDAR`;
         if(t.deadline) {
             const parts = t.deadline.split('-');
             if(parts.length === 3) dateStr = new Date(parts[0], parts[1]-1, parts[2]).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            // Add Calendar Button
             calBtn = `<button class="icon-btn" style="font-size:0.9rem; padding:2px 6px; border:1px solid var(--text-sub); border-radius:6px; margin-left:8px;" onclick="addToCalendar(${t.id})">📅</button>`;
+        }
+        
+        let recurIcon = "";
+        if(t.recurrence && t.recurrence !== 'none') {
+            recurIcon = `<span style="margin-left:5px; font-size:0.9rem" title="Recurring: ${t.recurrence}">🔄</span>`;
         }
         
         let tagsHtml = "";
@@ -826,18 +694,20 @@ END:VCALENDAR`;
         let leftActions = `<div class="action-group"><button class="action-btn btn-ghost btn-abort" onclick="deleteTask(${t.id})">ABORT</button><button class="action-btn btn-ghost" onclick="openEditTask(${t.id})">EDIT</button></div>`;
         if(t.status === 'victory') leftActions = `<div class="action-group"><button class="action-btn btn-ghost" onclick="openEditTask(${t.id})">EDIT</button></div>`;
 
-        div.innerHTML = `<h3>${t.title}</h3>${tagsHtml}<div class="card-meta"><div><span class="prio-badge ${t.priority}">${t.priority}</span></div><div style="display:flex; align-items:center;"><span>${dateStr ? dateStr : ''}</span>${calBtn}</div></div>${subHtml}<div class="card-actions">${leftActions}<div class="action-group">${btns}</div></div>`;
+        div.innerHTML = `<h3>${t.title} ${recurIcon}</h3>${tagsHtml}<div class="card-meta"><div><span class="prio-badge ${t.priority}">${t.priority}</span></div><div style="display:flex; align-items:center;"><span>${dateStr ? dateStr : ''}</span>${calBtn}</div></div>${subHtml}<div class="card-actions">${leftActions}<div class="action-group">${btns}</div></div>`;
         return div;
     }
 
     function updateStats() {
         document.getElementById('level-display').innerText = `LVL ${player.level} ${player.prestige > 0 ? '✪'.repeat(player.prestige) : ''}`;
+        document.getElementById('streak-display').innerText = `🔥 ${player.streak || 0}`;
         const req = getXpRequired(player.level);
         document.getElementById('xp-bar').style.width = `${(player.xp / req) * 100}%`;
         document.getElementById('xp-text').innerText = `${player.xp} / ${req} XP`;
         document.getElementById('stat-total-xp').innerText = player.totalXpEarned;
         document.getElementById('stat-tasks').innerText = player.completedTasks;
         document.getElementById('stat-prestige').innerText = player.prestige;
+        document.getElementById('stat-streak').innerText = player.streak || 0;
     }
 
     function toggleThemeMode() { player.settings.darkMode = !player.settings.darkMode; applySettings(); saveData(); }
@@ -856,6 +726,7 @@ END:VCALENDAR`;
         document.getElementById('inp-title').value = "";
         document.getElementById('inp-tags').value = "";
         document.getElementById('inp-priority').value = "Med";
+        document.getElementById('inp-recurrence').value = "none";
         document.getElementById('inp-deadline').value = "";
         document.getElementById('objectives-container').innerHTML = ""; 
         addObjectiveInput();
@@ -943,10 +814,10 @@ END:VCALENDAR`;
         ctx.lineTo(cx, cy - outerRadius); ctx.closePath();
     }
     const stories = {
-        1: `<h3>Chapter I: The Frost and the Flame</h3><p>The wind howled outside the obsidian walls of the Bastion, a sound like a thousand dying wolves. You stood at the parapet, looking out over the endless white. They called it the Long Silence—the winter that had lasted a generation. But you were not just a watcher anymore. You had begun the climb.</p><p>In the old texts, preserved by the Orders of Ink and Bone, it was written that authority is not given, but forged. Like the Valyrian steel of old, or the Shardplate of the Radiants, your will had to be hammered into shape. Every task you completed was a strike of that hammer.</p><p>You remembered the Alchemist's words: "When you want something, all the universe conspires in helping you to achieve it." But the universe was cold here. It did not care. You had to <i>make</i> it care. You had to burn bright enough to melt the snow.</p><p>The nebula overhead swirled with colors unseen by common men—violets and deep, bruising blues. You felt the surge of something ancient in your blood. The First Oath. Life before death. Strength before weakness. Journey before destination. You had taken the first step out of the staging area of your life. The mission was active.</p>`,
-        2: `<h3>Chapter II: The Golden Cage</h3><p>You had ascended. The world below looked like a map drawn by a child, small and insignificant. With the Midas touch, everything you handled turned to success, but gold is a heavy metal. It weighs down the soul.</p><p>The court of the High Lords was a viper's nest. They smiled with teeth of pearl and eyes of flint. You navigated their treachery not with swords, but with completed objectives. High Priority tasks were your shield; Critical Successes your dagger.</p><p>"Power resides where men believe it resides," the eunuch had once whispered. You built your power brick by brick, checkmark by checkmark. But the cold was still there. The impact winter had not ended; it had merely moved inside your heart.</p><p>You looked at your hands. They were glowing, not with warmth, but with the cold light of efficiency. You were becoming something more than human. Something inevitable.</p>`,
-        3: `<h3>Chapter III: The Glitch in the Weave</h3><p>The sky flickered. For a moment, the sun was a square of dead pixels, black against the azure. You blinked, and it was gone, but you knew what you saw. The simulation was straining under the weight of your progress.</p><p>You had pushed too far. Like an Edgedancer sliding on friction-less light, you were moving faster than the world could render. The logic of the universe—the +10 XPs, the Penalties, the Levels—was laying bare before you. You saw the strings.</p><p>It was terrifying. It was exhilarating. You were the storm now. You were the one who knocks. The reality of the board was bending to your will. Tasks completed themselves before you even touched them. But the void was watching. And the void was hungry.</p>`,
-        4: `<h3>Finale: The Architect</h3><p>There is no snow anymore. There is no gold. There is no glitch. There is only the Board. You stand in the center of infinity, the white space of the Staging Area stretching out forever.</p><p>You realize now that the Victory column was never a destination. It was a graveyard of ambition. The joy was never in the having, but in the doing. The Alchemist found his treasure under the tree where he started. You found yours in the daily grind.</p><p>You are the Herald of your own destiny. You have spoken the final oaths. You have survived the winter. You are the master of the two worlds.</p><p>Now... what is your next task?</p>`
+        1: `<h3>Chapter I: The Frost and the Flame</h3><p>The wind howled outside the obsidian walls of the Bastion...</p>`,
+        2: `<h3>Chapter II: The Golden Cage</h3><p>You had ascended. The world below looked like a map...</p>`,
+        3: `<h3>Chapter III: The Glitch in the Weave</h3><p>The sky flickered. For a moment...</p>`,
+        4: `<h3>Finale: The Architect</h3><p>There is no snow anymore. There is no gold...</p>`
     };
     function openStoryModal() {
         let content = "";
