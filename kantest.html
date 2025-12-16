@@ -136,9 +136,11 @@
         .objective-check { width: 22px; height: 22px; cursor: pointer; accent-color: var(--accent); flex-shrink: 0; }
 
         /* Action Buttons */
-        .card-actions { display: flex; flex-wrap: wrap; gap: 15px; justify-content: space-between; margin-top: 15px; }
-        .action-group { display: flex; gap: 8px; }
-        .action-btn { font-size: 0.75rem; padding: 8px 12px; border-radius: 20px;}
+        .card-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; height: 32px; }
+        .action-group { display: flex; gap: 10px; align-items: center; }
+        .action-btn { font-size: 0.75rem; padding: 8px 12px; border-radius: 12px; }
+        .icon-only-btn { font-size: 1.1rem; padding: 5px 10px; background: transparent; color: var(--text-sub); border: 1px solid rgba(0,0,0,0.1); }
+        .icon-only-btn:hover { background: rgba(0,0,0,0.05); color: var(--text-color); }
 
         /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; }
@@ -153,12 +155,15 @@
             width: 100%; padding: 12px; border-radius: 8px; 
             border: 1px solid var(--input-border); background: var(--input-bg); 
             color: var(--text-color); font-size: 1rem; 
-            box-sizing: border-box; /* Fix overflow */
-            max-width: 100%;
+            box-sizing: border-box; max-width: 100%;
         }
-        
         .dyn-input-row { display: flex; gap: 5px; margin-bottom: 8px; }
         .dyn-del-btn { background: var(--danger); color: white; width: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; flex-shrink: 0; }
+
+        /* Custom Confirm Modal */
+        #confirm-modal .modal { text-align: center; border: 2px solid var(--accent); }
+        .confirm-btn-group { display: flex; gap: 15px; justify-content: center; margin-top: 20px; }
+        .confirm-msg { font-size: 1.1rem; margin: 15px 0; font-weight: 600; }
 
         /* Toasts & FX */
         #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 5000; pointer-events: none; width: 90%; max-width: 400px; }
@@ -183,11 +188,7 @@
 <body>
 
 <script>
-    // Global Error Handler
-    window.onerror = function(msg, url, line, col, error) {
-        alert("SYSTEM MALFUNCTION:\n" + msg + "\nLine: " + line);
-        return false;
-    };
+    window.onerror = function(msg, url, line, col, error) { alert("SYSTEM MALFUNCTION:\n" + msg + "\nLine: " + line); return false; };
 </script>
 
 <canvas id="confetti-canvas"></canvas>
@@ -295,6 +296,17 @@
     </div>
 </div>
 
+<div class="modal-overlay" id="confirm-modal">
+    <div class="modal">
+        <h2 style="color:var(--danger); margin-top:0;">SYSTEM ALERT</h2>
+        <p id="confirm-text" class="confirm-msg">Are you sure?</p>
+        <div class="confirm-btn-group">
+            <button class="secondary" onclick="closeConfirm(false)">DENY</button>
+            <button id="confirm-yes-btn" onclick="closeConfirm(true)">CONFIRM</button>
+        </div>
+    </div>
+</div>
+
 <div class="modal-overlay" id="story-modal">
     <div class="modal">
         <h2>The Archives</h2>
@@ -307,6 +319,7 @@
     let player = { level: 1, xp: 0, prestige: 0, totalXpEarned: 0, completedTasks: 0, settings: { darkMode: false, theme: 'default' } };
     let tasks = [];
     let editingId = null;
+    let pendingCallback = null;
 
     window.onload = function() {
         if(localStorage.getItem('qb_player')) {
@@ -324,6 +337,19 @@
         localStorage.setItem('qb_tasks', JSON.stringify(tasks));
         checkUnlocks();
         updateStats();
+    }
+
+    // --- SYSTEM ALERT LOGIC ---
+    function customConfirm(msg, callback) {
+        document.getElementById('confirm-text').innerText = msg;
+        pendingCallback = callback;
+        document.getElementById('confirm-modal').style.display = 'flex';
+    }
+
+    function closeConfirm(result) {
+        document.getElementById('confirm-modal').style.display = 'none';
+        if(result && pendingCallback) pendingCallback();
+        pendingCallback = null;
     }
 
     // --- UTILS ---
@@ -439,20 +465,28 @@
 
     function moveTask(id, dest) {
         const t = tasks.find(x => x.id === id);
+        
+        // RETREAT LOGIC
         if (t.status === 'victory' && dest !== 'victory') {
-            if(!confirm("CONFIRM PROTOCOL: Retreat? XP penalty will be applied.")) return;
-            addXP(- (t.winXP + 50));
-            t.winXP = 0; t.completedDate = null; player.completedTasks--;
+            customConfirm("CONFIRM PROTOCOL: Retreat? XP penalty will be applied.", () => {
+                addXP(- (t.winXP + 50));
+                t.winXP = 0; t.completedDate = null; player.completedTasks--;
+                t.status = dest;
+                saveData(); renderBoard();
+                const destCol = document.getElementById(`col-${dest}`);
+                setTimeout(() => { destCol.scrollIntoView({ behavior: 'smooth', inline: 'center' }); }, 100);
+            });
+            return;
         }
 
+        // VICTORY LOGIC
         if (dest === 'victory' && t.status !== 'victory') {
             let base = t.priority === 'High' ? 200 : t.priority === 'Med' ? 150 : 100;
-            let bonusMsg = "";
             if(t.deadline) {
                 const now = new Date(); const due = new Date(t.deadline); now.setHours(0,0,0,0); due.setHours(0,0,0,0);
                 const diffDays = Math.ceil((due - now) / (1000 * 60 * 60 * 24)); 
-                if (diffDays >= 1) { base = Math.floor(base * 1.2); bonusMsg += " (Early)"; }
-                else if (diffDays < 0) { base = Math.floor(base * 0.8); bonusMsg += " (Late)"; }
+                if (diffDays >= 1) base = Math.floor(base * 1.2); 
+                else if (diffDays < 0) base = Math.floor(base * 0.8); 
             }
             addXP(base);
             t.winXP = base; t.completedDate = new Date().toISOString();
@@ -477,10 +511,10 @@
     }
 
     function deleteTask(id) {
-        if(confirm("CONFIRM PROTOCOL: Abort Mission Permanently?")) {
+        customConfirm("CONFIRM PROTOCOL: Abort Mission Permanently?", () => {
             tasks = tasks.filter(t => t.id !== id);
             saveData(); renderBoard();
-        }
+        });
     }
 
     function openEditTask(id) {
@@ -547,13 +581,15 @@
         });
         subHtml += '</ul>';
 
+        // Action Buttons
         let btns = '';
         if(t.status === 'staging') btns = `<button class="action-btn" onclick="moveTask(${t.id}, 'active')">Engage</button>`;
         if(t.status === 'active') btns = `<button class="action-btn secondary" onclick="moveTask(${t.id}, 'staging')">Standby</button><button class="action-btn" onclick="moveTask(${t.id}, 'victory')">Complete</button>`;
         if(t.status === 'victory') btns = `<button class="action-btn danger" onclick="moveTask(${t.id}, 'active')">Retreat</button>`;
         
-        let leftActions = `<div class="action-group"><button class="action-btn secondary" onclick="deleteTask(${t.id})">Abort</button><button class="action-btn secondary" onclick="openEditTask(${t.id})">✎</button></div>`;
-        if(t.status === 'victory') leftActions = `<div class="action-group"><button class="action-btn secondary" onclick="openEditTask(${t.id})">✎</button></div>`;
+        // Left Actions (Compact Icons)
+        let leftActions = `<div class="action-group"><button class="action-btn icon-only-btn" onclick="deleteTask(${t.id})">🗑️</button><button class="action-btn icon-only-btn" onclick="openEditTask(${t.id})">✎</button></div>`;
+        if(t.status === 'victory') leftActions = `<div class="action-group"><button class="action-btn icon-only-btn" onclick="openEditTask(${t.id})">✎</button></div>`;
 
         div.innerHTML = `<h3>${t.title}</h3>${tagsHtml}<div class="card-meta"><span class="prio-badge ${t.priority}">${t.priority}</span><span>${dateStr ? '📅 ' + dateStr : ''}</span></div>${subHtml}<div class="card-actions">${leftActions}<div class="action-group">${btns}</div></div>`;
         return div;
@@ -629,8 +665,9 @@
         reader.readAsText(file);
     }
     function prestigeReset() {
-        if(!confirm("⚠️ FINAL WARNING ⚠️\nReset Level to 1 & XP to 0?\n+10% XP multiplier.\nConfirm?")) return;
-        player.level = 1; player.xp = 0; player.prestige++; saveData(); location.reload();
+        customConfirm("⚠️ RESET LEVEL & XP? +10% MULTIPLIER", () => {
+            player.level = 1; player.xp = 0; player.prestige++; saveData(); location.reload();
+        });
     }
 
     // --- FX ---
