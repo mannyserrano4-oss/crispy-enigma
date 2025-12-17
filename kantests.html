@@ -480,29 +480,55 @@
         document.body.removeChild(link);
     }
 
-    function addXP(amount) {
-        let streakBonus = Math.min(player.streak, 10) * 0.01;
-        let mult = 1 + (player.prestige * 0.1) + streakBonus;
-        let finalAmount = Math.floor(amount * mult);
-        if(amount > 0 && Math.random() < 0.05) { finalAmount += 50; showToast("CRITICAL SUCCESS! +50 XP"); }
-        
-        player.xp += finalAmount;
-        if(amount > 0) player.totalXpEarned += finalAmount;
-        if(player.xp < 0) player.xp = 0;
-
-        const bar = document.getElementById('xp-bar');
-        bar.classList.add('glowing');
-        setTimeout(() => bar.classList.remove('glowing'), 1500);
-        spawnFloatingXP(finalAmount, finalAmount > 0 ? 'gain' : 'loss');
-
-        let req = getXpRequired(player.level);
-        if (player.xp >= req) {
-            player.xp -= req; player.level++;
-            showToast(`LEVEL UP! WELCOME TO LEVEL ${player.level}`);
-            fireConfetti('level');
+     function addXP(amount) {
+            // Calculate Multiplier (Prestige + Streak)
+            // Streak is capped at 10 days (10%)
+            let streakBonus = Math.min(player.streak, 10) * 0.01;
+            
+            // Base Multiplier starts at 1.0 (Normal) + Prestige + Streak
+            let mult = 1 + (player.prestige * 0.1) + streakBonus;
+            
+            let finalAmount;
+            
+            if (amount > 0) {
+                // GAINING XP: Round down
+                finalAmount = Math.floor(amount * mult);
+                
+                // Critical Success Chance
+                if (Math.random() < 0.05) { 
+                    finalAmount += 50; 
+                    showToast("CRITICAL SUCCESS! +50 XP"); 
+                }
+            } else {
+                // LOSING XP: Round UP towards zero to match gains
+                finalAmount = Math.ceil(amount * mult);
+            }
+            
+            player.xp += finalAmount;
+            
+            // FIX: Now we update Total XP for both gains AND losses
+            player.totalXpEarned += finalAmount;
+            
+            // Prevent negative stats
+            if (player.xp < 0) player.xp = 0;
+            if (player.totalXpEarned < 0) player.totalXpEarned = 0;
+    
+            // Visual Effects
+            const bar = document.getElementById('xp-bar');
+            bar.classList.add('glowing');
+            setTimeout(() => bar.classList.remove('glowing'), 1500);
+            
+            spawnFloatingXP(finalAmount, finalAmount > 0 ? 'gain' : 'loss');
+    
+            // Level Up Check
+            let req = getXpRequired(player.level);
+            if (player.xp >= req) {
+                player.xp -= req; player.level++;
+                showToast(`LEVEL UP! WELCOME TO LEVEL ${player.level}`);
+                fireConfetti('level');
+            }
+            saveData();
         }
-        saveData();
-    }
     
     function spawnFloatingXP(amount, type) {
         const div = document.createElement('div');
