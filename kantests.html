@@ -278,20 +278,34 @@
 
 <div class="modal-overlay" id="help-modal">
     <div class="modal">
-        <h2 style="color:var(--accent);">Manual</h2>
-        <div style="font-size:0.9rem; line-height:1.5;">
-            <p><strong>1. The Board:</strong> Move tasks from <em>Staging</em> (Backlog) to <em>Active</em> (Doing) to <em>Victory</em> (Done).</p>
-            <p><strong>2. XP & Levels:</strong> 
-                <br>• Low Prio: 100 XP
-                <br>• Med Prio: 150 XP
-                <br>• High Prio: 200 XP
-                <br>• Boss: 500 XP
-                <br>• <em>Subtask:</em> 10 XP each.
-            </p>
-            <p><strong>3. Streaks:</strong> Open the app daily to build your 🔥 Streak. Each day adds a 1% XP bonus (max 10%).</p>
-            <p><strong>4. Prestige:</strong> At Level 50, you can reset to Level 1. You keep badges and gain a permanent +10% XP multiplier.</p>
+        <h2 style="color:var(--accent); border-bottom: 2px solid var(--accent); padding-bottom: 10px;">The Operator's Manual</h2>
+        <div style="font-size:0.9rem; line-height:1.6; max-height: 60vh; overflow-y: auto;">
+            <p><strong>1. The Board Protocol</strong><br>
+            Your life is a Kanban board. Move tasks from <em>Staging</em> (Backlog) to <em>Active</em> (Doing). Once the objective is met, drag it to <em>Victory</em> to claim your XP.</p>
+            
+            <p><strong>2. Experience & Rewards</strong><br>
+            • <strong>Low Priority:</strong> 100 XP (The grunt work)<br>
+            • <strong>Med Priority:</strong> 150 XP (Standard operations)<br>
+            • <strong>High Priority:</strong> 200 XP (Critical mission)<br>
+            • <strong>☠️ BOSS:</strong> 500 XP (Life-changing events)<br>
+            • <em>Subtasks:</em> +10 XP for checking, -10 XP for unchecking.</p>
+            
+            <p><strong>3. The Streak (🔥)</strong><br>
+            Consistency is power. Every consecutive day you log in grants a <strong>+1% XP Multiplier</strong> to all actions (Capped at +10%). Miss a day, and the fire dies.</p>
+            
+            <p><strong>4. ⚠️ Penalties & Retreat</strong><br>
+            War has costs. If you move a task <em>back</em> from Victory (Retreat), you lose the XP you gained <strong>PLUS a 50 XP penalty</strong> tax. Do not claim victory unless it is absolute.</p>
+            
+            <p><strong>5. Prestige (Ascension)</strong><br>
+            At Level 50, the board constrains you. You may <strong>Prestige</strong> to reset to Level 1.
+            <br><br>
+            <strong>YOU KEEP:</strong> Your Badges, your Streak, and your <strong>Prestige Themes</strong> (Nebula, Midas).
+            <br>
+            <strong>YOU RESET:</strong> Your Level and Standard Themes (Wolf, Neon).
+            <br><br>
+            In exchange, you gain a permanent <strong>+10% XP Multiplier</strong>. This stacks infinitely.</p>
         </div>
-        <button onclick="closeModal('help-modal')" style="width:100%; margin-top:20px;">Got it</button>
+        <button onclick="closeModal('help-modal')" style="width:100%; margin-top:20px;">Acknowledge</button>
     </div>
 </div>
 
@@ -868,12 +882,49 @@
         for (let i = 0; i < spikes; i++) { x = cx + Math.cos(rot) * outerRadius; y = cy + Math.sin(rot) * outerRadius; ctx.lineTo(x, y); rot += step; x = cx + Math.cos(rot) * innerRadius; y = cy + Math.sin(rot) * innerRadius; ctx.lineTo(x, y); rot += step; }
         ctx.lineTo(cx, cy - outerRadius); ctx.closePath();
     }
-    const stories = { 1: `<h3>Chapter I: The Frost and the Flame</h3><p>The wind howled outside...</p>`, 2: `<h3>Chapter II: The Golden Cage</h3><p>You had ascended...</p>`, 3: `<h3>Chapter III: The Glitch in the Weave</h3><p>The sky flickered...</p>`, 4: `<h3>Finale: The Architect</h3><p>There is no snow anymore...</p>` };
+    ///const stories = { 1: `<h3>Chapter I: The Frost and the Flame</h3><p>The wind howled outside...</p>`, 2: `<h3>Chapter II: The Golden Cage</h3><p>You had ascended...</p>`, 3: `<h3>Chapter III: The Glitch in the Weave</h3><p>The sky flickered...</p>`, 4: `<h3>Finale: The Architect</h3><p>There is no snow anymore...</p>` };
+    //function openStoryModal() {
+        //let content = ""; if(player.prestige >= 1) content += stories[1]; if(player.prestige >= 2) content += stories[2]; if(player.prestige >= 3) content += stories[3]; if(player.prestige >= 4) content += stories[4];
+       // document.getElementById('story-content').innerHTML = content || "<p>You must Prestige to unlock the Archives.</p>";
+       // document.getElementById('story-modal').style.display = 'flex';
+  //  }
+
+const stories = {
+        1: `<h3>Chapter I: The First Ideal</h3>
+        <p>The wind howled across the shattered plains of your ambition, a sound like a thousand dying spren. You stood at the edge of the Staging Area, looking out over the endless white void of the tasks undone. They called this the Long Silence—the procrastination that had lasted a generation.</p>
+        <p>"Life before death," the voice whispered in your mind. It was faint, like a distant highstorm. "Focus before distraction. Journey before destination."</p>
+        <p>You looked at your hands. They were not the hands of a King or a Khaleesi yet. They were the hands of a novice, cracked from the cold. But you remembered the old texts. Authority is not given; it is forged. Like Valyrian steel, your will had to be hammered into shape, folded over a thousand times in the fires of discipline.</p>
+        <p>You took the first step. The snow crunched under your boots. A single task moved from Staging to Active. The ground shook. Somewhere, deep in the cognitive realm of the machine, a gear turned. The Desolation was coming, but you would not be found sleeping. You are a Radiant in the making.</p>`,
+        
+        2: `<h3>Chapter II: The Golden Cage</h3>
+        <p>You have ascended. The world below looks like a map drawn by a child, small and insignificant. With the Midas touch (Prestige 1), everything you handle turns to success, but gold is a heavy metal. It weighs down the soul.</p>
+        <p>You sit upon the Iron Throne of your own productivity, but the court is full of vipers. Burnout whispers in the shadows. Complacency sharpens its dagger. You navigate the treachery not with swords, but with checkboxes.</p>
+        <p>"When you want something, all the universe conspires in helping you to achieve it," the Alchemist had said. But the Alchemist never had to deal with a backlog of 50 recurring dailies. The universe is not conspiring to help you; it is testing you. It wants to see if you are worthy of your Legend.</p>
+        <p>You realize now that the Victory column is not a destination. It is a graveyard of conquered enemies. You do not mourn them. You simply look to the horizon, where the next storm is gathering. Winter is here.</p>`,
+        
+        3: `<h3>Chapter III: The Glitch in the Weave</h3>
+        <p>The sky flickered. For a moment, the sun was a square of dead pixels, black against the azure. You blinked, and it was gone, but you knew what you saw. The simulation is straining under the weight of your progress.</p>
+        <p>You have pushed too far. Like an Edgedancer sliding on frictionless light, you are moving faster than the world can render. The logic of the universe—the +10 XPs, the Penalties, the Levels—is laying bare before you. You see the matrix. You see the Spren of Code dancing around the buttons.</p>
+        <p>It is terrifying. It is exhilarating. You are the Storm now. You are the one who knocks. The reality of the board bends to your will. Tasks complete themselves before you even touch them. But the void is watching. And the void is hungry.</p>`,
+        
+        4: `<h3>Finale: The Architect</h3>
+        <p>There is no snow anymore. There is no gold. There is no glitch. There is only the Board.</p>
+        <p>You stand in the center of infinity. You realize now that the "Victory" column was never the prize. The joy was never in the having, but in the doing. The Alchemist found his treasure under the tree where he started. You found yours in the daily grind.</p>
+        <p>You are the Herald of your own destiny. You have spoken the final oaths. You have survived the Long Night. You are the master of two worlds: the digital and the physical.</p>
+        <p>The board is clear. The pen is in your hand. Write the next age.</p>`
+    };
+
     function openStoryModal() {
-        let content = ""; if(player.prestige >= 1) content += stories[1]; if(player.prestige >= 2) content += stories[2]; if(player.prestige >= 3) content += stories[3]; if(player.prestige >= 4) content += stories[4];
-        document.getElementById('story-content').innerHTML = content || "<p>You must Prestige to unlock the Archives.</p>";
+        let content = "";
+        if(player.prestige >= 1) content += stories[1];
+        if(player.prestige >= 2) content += stories[2];
+        if(player.prestige >= 3) content += stories[3];
+        if(player.prestige >= 4) content += stories[4];
+        
+        document.getElementById('story-content').innerHTML = content || "<p style='text-align:center; padding:20px; font-style:italic;'>The Archives are sealed. You must Prestige to break the lock.</p>";
         document.getElementById('story-modal').style.display = 'flex';
     }
+    
 </script>
 </body>
 </html>
