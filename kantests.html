@@ -260,7 +260,8 @@
         <div id="prestige-section" style="display:none; border-top:1px solid var(--text-color); padding-top:20px;">
             <button class="danger" style="width:100%" onclick="prestigeReset()">🎖️ PRESTIGE RESET</button>
         </div>
-        <div style="display:none; border-top:1px dashed var(--text-sub); margin-top:10px; padding-top:10px;">
+        <!-- to show/hide debugging menu, add/delete this phrase display:none; in the <div style="" part, right before border -->
+        <div style="border-top:1px dashed var(--text-sub); margin-top:10px; padding-top:10px;">
             <h3 style="font-size:0.9rem; opacity:0.7">🚧 DEBUG / CHEATS</h3>
             <div style="display:flex; gap:5px; flex-wrap:wrap;">
                 <button class="secondary" style="font-size:0.7rem;" onclick="addXP(1000)">+1000 XP</button>
