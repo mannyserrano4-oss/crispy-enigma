@@ -47,7 +47,7 @@
             --prio-low: #4facfe; --prio-med: #00e5ff; --prio-high: #ff0055; --prio-boss: #d63031;
         }
 
-        /* --- THEMES (Condensed) --- */
+        /* --- THEME OVERRIDES --- */
         body.theme-wolf { --bg-color: #e8e4d9; --column-bg: #dcd6c5; --card-bg: #f4f1ea; --text-color: #4a4036; --accent: #556b2f; --prio-boss: #800000; }
         body.theme-wolf.dark-mode { --bg-color: #1c1815; --column-bg: #2b2520; --card-bg: #362f29; --text-color: #f0e6d2; --accent: #8fbc8f; }
         
@@ -447,6 +447,20 @@
     }
 
     function openHelp() { document.getElementById('help-modal').style.display = 'flex'; }
+
+    function openAddTask() {
+        document.getElementById('modal-title').innerText = "New Mission";
+        document.getElementById('inp-title').value = "";
+        document.getElementById('inp-tags').value = "";
+        document.getElementById('inp-priority').value = "Med";
+        document.getElementById('inp-recurrence').value = "none";
+        document.getElementById('inp-deadline').value = "";
+        document.getElementById('objectives-container').innerHTML = ""; 
+        addObjectiveInput();
+        editingId = null;
+        document.getElementById('task-modal').style.display = 'flex';
+        document.getElementById('inp-title').focus();
+    }
 
     function addToCalendar(taskId) {
         const t = tasks.find(x => x.id === taskId);
