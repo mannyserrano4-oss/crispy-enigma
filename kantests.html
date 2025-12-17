@@ -301,7 +301,7 @@
         <div class="field-group group-logistics">
             <label>Logistics</label>
             <input type="text" id="inp-title" placeholder="Mission Name" style="margin-bottom:10px;">
-            <input type="text" id="inp-tags" placeholder="Tags (comma separated)..." style="margin-bottom:15px;">
+            <input type="text" id="inp-tags" placeholder="Tags (Dot separated)..." style="margin-bottom:15px;">
             <span class="sub-label">Priority Level</span>
             <select id="inp-priority" style="margin-bottom:10px;">
                 <option value="Low">Low Priority (100 XP)</option>
@@ -398,13 +398,51 @@
         updateStats(); // 4. Update UI
     }
 
+    //The shit below is in case the other tag logic is fucked.
+//    function getTagColor(str) {
+//        let hash = 0;
+//        for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+//        const hue = Math.abs(hash % 360);
+//        return `hsl(${hue}, 85%, 80%)`;
+//    }
+
     function getTagColor(str) {
+        // 1. Generate a unique number from the tag name
         let hash = 0;
         for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
-        const hue = Math.abs(hash % 360);
-        return `hsl(${hue}, 85%, 80%)`;
-    }
+        
+        // 2. Create a "Scattered" Base Hue (0-360) so tags look distinct
+        const baseHue = Math.abs((hash * 137) % 360); 
 
+        // 3. Adjust Style based on the Current Theme
+        const t = player.settings.theme;
+
+        // --- GROUP A: MATRIX / HACKER (Monochrome) ---
+        if (t === 'terminal' || t === 'glitch') {
+            // Keep the Hue fixed (Green for Terminal, Pink for Glitch)
+            // But vary the Brightness so tags are distinct
+            const monoHue = (t === 'terminal') ? 120 : 330; 
+            const brightness = 25 + (baseHue % 50); // Random brightness 25-75%
+            return `hsl(${monoHue}, 100%, ${brightness}%)`; 
+        }
+        
+        // --- GROUP B: EARTHY / DARK (Wolf, Eldritch, Gold, Midas) ---
+        if (t === 'wolf' || t === 'eldritch' || t === 'gold' || t === 'midas') {
+            // Lower saturation for a "Muted/Classy" look
+            return `hsl(${baseHue}, 40%, 60%)`;
+        }
+
+        // --- GROUP C: ELECTRIC (Neon, Vaporwave, Nebula) ---
+        if (t === 'neon' || t === 'vaporwave' || t === 'nebula') {
+            // Maximum Saturation for that "Cyber" pop
+            return `hsl(${baseHue}, 100%, 70%)`;
+        }
+
+        // --- GROUP D: DEFAULT (Pastel, Aperture, Blueprint) ---
+        // Soft colors that are easy to read on white backgrounds
+        return `hsl(${baseHue}, 70%, 80%)`;
+    }
+    
     function checkStreak() {
         const today = new Date().toDateString();
         if (player.lastLogin !== today) {
@@ -580,7 +618,7 @@
         }
 
         const tagStr = document.getElementById('inp-tags').value;
-        const tags = tagStr.split(',').map(t => t.trim()).filter(t => t !== "");
+        const tags = tagStr.split('.').map(t => t.trim()).filter(t => t !== "");
 
         const newTask = {
             id: editingId || Date.now(),
