@@ -627,6 +627,23 @@
     }
 
     function renderBoard() {
+
+        // If it breaks, delete this block
+        
+            // --- AUTO-ARCHIVE LOGIC ---
+        // Keep only the last 20 Victories to prevent lag
+        const victoryTasks = tasks.filter(t => t.status === 'victory');
+        if (victoryTasks.length > 20) {
+            // Sort by completion date (oldest first)
+            victoryTasks.sort((a, b) => new Date(a.completedDate) - new Date(b.completedDate));
+            // Identify the ones to remove (all but the last 20)
+            const toRemove = victoryTasks.slice(0, victoryTasks.length - 20);
+            // Filter them out of the main list
+            tasks = tasks.filter(t => !toRemove.includes(t));
+            saveData(); // Save the cleaner list
+        }
+        // --------------------------
+        
         const filter = document.getElementById('search-bar').value.toLowerCase();
         ['staging', 'active', 'victory'].forEach(col => {
             const container = document.getElementById(`list-${col}`);
