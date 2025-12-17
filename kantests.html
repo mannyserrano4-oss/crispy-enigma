@@ -47,7 +47,7 @@
             --prio-low: #4facfe; --prio-med: #00e5ff; --prio-high: #ff0055; --prio-boss: #d63031;
         }
 
-        /* --- THEME OVERRIDES --- */
+        /* --- THEMES (Condensed) --- */
         body.theme-wolf { --bg-color: #e8e4d9; --column-bg: #dcd6c5; --card-bg: #f4f1ea; --text-color: #4a4036; --accent: #556b2f; --prio-boss: #800000; }
         body.theme-wolf.dark-mode { --bg-color: #1c1815; --column-bg: #2b2520; --card-bg: #362f29; --text-color: #f0e6d2; --accent: #8fbc8f; }
         
@@ -388,11 +388,13 @@
         updateStats();
     };
 
+    // FIXED: LINEAR LOGIC (No Loop)
     function saveData() {
-        localStorage.setItem('qb_player', JSON.stringify(player));
+        checkAchievements(); // 1. Check for awards first
+        localStorage.setItem('qb_player', JSON.stringify(player)); // 2. Save data
         localStorage.setItem('qb_tasks', JSON.stringify(tasks));
-        checkUnlocks();
-        updateStats();
+        checkUnlocks(); // 3. Update UI
+        updateStats(); // 4. Update UI
     }
 
     function getTagColor(str) {
@@ -402,7 +404,6 @@
         return `hsl(${hue}, 85%, 80%)`;
     }
 
-    // --- CORE LOGIC ---
     function checkStreak() {
         const today = new Date().toDateString();
         if (player.lastLogin !== today) {
@@ -429,7 +430,7 @@
                 fireConfetti('star');
             }
         });
-        saveData();
+        // REMOVED recursive saveData() call here
     }
 
     function openAchievements() {
@@ -563,7 +564,6 @@
 
     function moveTask(id, dest) {
         const t = tasks.find(x => x.id === id);
-        
         if (t.status === 'victory' && dest !== 'victory') {
             customConfirm("CONFIRM PROTOCOL: Retreat? XP penalty will be applied.", () => {
                 addXP(- (t.winXP + 50));
@@ -619,7 +619,6 @@
         const filter = document.getElementById('search-bar').value.toLowerCase();
         const emptyMsgMap = { 'staging': "Quest Log Empty. Awaiting new orders.", 'active': "The realm is at peace.", 'victory': "No legends recorded yet." };
 
-        // AUTO-ARCHIVE CLEANUP
         const victoryTasks = tasks.filter(t => t.status === 'victory');
         if (victoryTasks.length > 20) {
             victoryTasks.sort((a, b) => new Date(a.completedDate) - new Date(b.completedDate));
@@ -704,6 +703,16 @@
         t.subtasks.forEach(s => addObjectiveInput(s.text));
         document.getElementById('task-modal').style.display = 'flex';
     }
+    function addObjectiveInput(value = "") {
+        const container = document.getElementById('objectives-container');
+        const div = document.createElement('div'); div.className = 'dyn-input-row';
+        div.innerHTML = `<input type="text" class="obj-input" placeholder="Objective data..." value="${value}"><div class="dyn-del-btn" onclick="this.parentElement.remove()">✕</div>`;
+        container.appendChild(div);
+        const inp = div.querySelector('input'); if(value === "") inp.focus();
+        inp.addEventListener('keydown', function(e) { if(e.key === 'Enter') { e.preventDefault(); addObjectiveInput(); }});
+    }
+    
+    // UPDATED: No recursive loop
     function updateStats() {
         document.getElementById('level-display').innerText = `LVL ${player.level} ${player.prestige > 0 ? '✪'.repeat(player.prestige) : ''}`;
         document.getElementById('streak-display').innerText = `🔥 ${player.streak || 0}`;
@@ -714,8 +723,8 @@
         document.getElementById('stat-tasks').innerText = player.completedTasks;
         document.getElementById('stat-prestige').innerText = player.prestige;
         document.getElementById('stat-streak').innerText = player.streak || 0;
-        checkAchievements();
     }
+    
     function toggleThemeMode() { player.settings.darkMode = !player.settings.darkMode; applySettings(); saveData(); }
     function changeTheme(val) { player.settings.theme = val; applySettings(); saveData(); }
     function applySettings() {
