@@ -634,14 +634,17 @@
             
             const colTasks = tasks.filter(t => t.status === col);
             
-            const emptyMsgs = [
-                "The realm is at peace...", "No objectives currently active.", 
-                "No awards to display...", "The board is clear.", "Silence in the archives."
-            ];
+                        // --- PASTE THIS INSTEAD ---
+            const emptyMsgMap = {
+                'staging': "Quest Log Empty. Awaiting new orders.",
+                'active': "The realm is at peace.",
+                'victory': "No legends recorded yet."
+            };
             
             if(colTasks.length === 0 && !filter) {
-                const randomMsg = emptyMsgs[Math.floor(Math.random() * emptyMsgs.length)];
-                container.innerHTML = `<div class="empty-state">${randomMsg}</div>`;
+                // Pick the message based on the current column name
+                const msg = emptyMsgMap[col] || "Area Clear";
+                container.innerHTML = `<div class="empty-state">${msg}</div>`;
             }
 
             colTasks.forEach(t => {
