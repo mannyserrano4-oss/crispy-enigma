@@ -346,7 +346,7 @@
         </div>
 
         <div class="tabs">
-            <button class="tab-btn active" onclick="setTab('all', this)">All</button>
+            "tab-btn active" onclick="setTab('all', this)">All</button>
             <button class="tab-btn" onclick="setTab('due', this)">Due</button>
             <button class="tab-btn" onclick="setTab('overdue', this)">Overdue</button>
         </div>
@@ -541,6 +541,9 @@
         </div>
     </div>
 
+
+    <!-- replace this if the other one fucks everything up, theres some script too, at line: 1102-1122 -->
+    <!--
     <div id="settingsModal" class="overlay">
         <div class="sheet">
             <h3>Settings</h3>
@@ -556,7 +559,39 @@
             <button class="btn btn-red" onclick="closeModal('settingsModal')">Close</button>
         </div>
     </div>
+    -->
 
+    <div id="settingsModal" class="overlay">
+        <div class="sheet">
+            <h3>Settings</h3>
+            <label>Shop Location</label>
+            <input type="text" id="setLoc" placeholder="Address">
+            <button class="btn btn-primary" onclick="saveSettings()">Save</button>
+            
+            <hr style="border-color:var(--border); margin:20px 0;">
+            
+            <button class="btn btn-green" onclick="openHistory()">View Transaction History</button>
+            
+            <button class="btn btn-primary" style="margin-top:15px;" onclick="exportRobustExcel()">
+                <i class="fas fa-file-excel"></i> Download Visual Report (.xls)
+            </button>
+
+            <button class="btn btn-ghost" onclick="exportSimpleCSV()">
+                <i class="fas fa-file-csv"></i> Download Simple CSV
+            </button>
+
+            <button class="btn btn-ghost" style="border: 2px solid var(--p-green-dark); color:var(--p-green-dark);" onclick="exportData()">
+                <i class="fas fa-save"></i> Save Full Backup (.json)
+            </button>
+
+            <hr style="border-color:var(--border); margin:20px 0;">
+
+            <input type="file" id="restoreFile" hidden onchange="restoreData(this)">
+            <button class="btn btn-ghost" onclick="document.getElementById('restoreFile').click()">Restore From Backup</button>
+            <button class="btn btn-red" onclick="closeModal('settingsModal')">Close</button>
+        </div>
+    </div>
+    
     <script>
 
         // --- CRASH GUARD START ---
@@ -1063,6 +1098,29 @@ END:VCALENDAR`;
             };
             r.readAsText(input.files[0]);
         }
+
+            // --- SIMPLE CSV EXPORT (For Accountants) ---
+        function exportSimpleCSV() {
+            let csv = "Name,Phone,Status,Total_Spent,Last_Cut,Next_Due\n";
+            
+            clients.forEach(c => {
+                // Calculate status simply for text
+                const stat = getStatus(c); 
+                // Escape commas in names so it doesn't break the file
+                const safeName = c.name.replace(/,/g, " "); 
+                const next = getDueStr(c);
+                
+                csv += `${safeName},${c.phone},${stat.toUpperCase()},${c.spent},${c.last},${next}\n`;
+            });
+        
+            const blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'BlackBook_Simple.csv';
+            a.click();
+        }
+                
     </script>
 </body>
 </html>
