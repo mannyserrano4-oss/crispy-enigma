@@ -582,7 +582,7 @@
             const totalGive = clients.reduce((s,c) => s + (c.giveback || 0), 0);
             
             // Calculate Today's Take
-            const todayStr = new Date().toISOString().split('T')[0];
+            const todayStr = new Date().toLocaleDateString('en-CA');
             const todayRev = history.filter(h => h.date === todayStr).reduce((s,h) => s + h.amount, 0);
 
             document.getElementById('mToday').innerText = '$' + todayRev.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
@@ -755,7 +755,7 @@
             c.spent = (c.spent || 0) + checkoutTotal;
             c.giveback = (c.giveback || 0) + checkoutGiveback;
             c.cuts = (c.cuts || 0) + 1;
-            c.last = new Date().toISOString().split('T')[0];
+            c.last = new Date().toLocaleDateString('en-CA');
 
             // Record History
             history.push({
@@ -795,7 +795,7 @@
             document.getElementById('ePrice').value = 35;
             document.getElementById('eFreq').value = 4;
             document.getElementById('eDob').value = '';
-            document.getElementById('eFirst').value = new Date().toISOString().split('T')[0];
+            document.getElementById('eFirst').value = new Date().toLocaleDateString('en-CA');
             
             openModal('editModal');
         }
