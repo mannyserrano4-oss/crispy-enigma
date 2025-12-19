@@ -291,9 +291,35 @@
         }
         .confirm-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 10px; }
         .confirm-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+
+        /* CRASH GUARD STYLES */
+        #crashModal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #1a1a1a; color: #ff6b6b; z-index: 9999;
+            flex-direction: column; align-items: center; justify-content: center;
+            padding: 30px; box-sizing: border-box; text-align: center;
+        }
+        .crash-btn {
+            background: #ff6b6b; color: black; padding: 15px; width: 100%;
+            border: none; border-radius: 10px; font-weight: bold; margin-top: 15px;
+            font-size: 1rem; cursor: pointer;
+        }
+                
     </style>
 </head>
 <body class="">
+
+    <!-- Delete this if it doesnt work, it is the error notifier thing. line 295-306 is the style for this. the JS starts at 562 -->
+    <div id="crashModal" style="display:none;">
+        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px;"></i>
+        <h2 style="margin:0;">App Crash Detected</h2>
+        <p style="color:#aaa; font-size:0.9rem;">Something went wrong. Your data is likely safe.</p>
+        <p id="crashMsg" style="background:#333; padding:10px; border-radius:8px; font-family:monospace; font-size:0.7rem; color:#ff6b6b; word-break: break-all;"></p>
+        
+        <button class="crash-btn" onclick="emergencyCopy()">1. Copy Raw Data (Save this!)</button>
+        <button class="crash-btn" style="background:#444; color:white;" onclick="factoryReset()">2. Factory Reset</button>
+        <button class="crash-btn" style="background:transparent; color:#888; border:1px solid #555;" onclick="location.reload()">3. Try Reloading</button>
+    </div>
 
     <div class="header">
         <div class="top-row">
@@ -532,6 +558,31 @@
     </div>
 
     <script>
+
+        // --- CRASH GUARD START ---
+    window.onerror = function(msg, url, line) {
+        document.getElementById('crashModal').style.display = 'flex';
+        document.getElementById('crashMsg').innerText = msg + " (Line " + line + ")";
+        return false; // Let default error run too so you can see console if needed
+    };
+
+    function emergencyCopy() {
+        const raw = localStorage.getItem('bbClients');
+        if(navigator.clipboard) {
+            navigator.clipboard.writeText(raw).then(() => alert("Data copied to clipboard! Paste it in Notes immediately."));
+        } else {
+            prompt("Copy this manually:", raw);
+        }
+    }
+
+    function factoryReset() {
+        if(confirm("WARNING: This will wipe the app to fix the crash. Did you copy your data first?")) {
+            localStorage.clear();
+            location.reload();
+        }
+    }
+    // --- CRASH GUARD END ---
+        
         // --- DATA ---
         let clients = JSON.parse(localStorage.getItem('bbClients')) || [];
         let history = JSON.parse(localStorage.getItem('bbHistory')) || []; 
@@ -563,7 +614,7 @@
             const totalGive = clients.reduce((s,c) => s + (c.giveback || 0), 0);
             
             // Calculate Today's Take
-            const todayStr = new Date().toISOString().split('T')[0];
+            const todayStr = new Date().toLocaleDateString('en-CA');
             const todayRev = history.filter(h => h.date === todayStr).reduce((s,h) => s + h.amount, 0);
 
             document.getElementById('mToday').innerText = '$' + todayRev.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
@@ -755,7 +806,7 @@
             c.spent = (c.spent || 0) + checkoutTotal;
             c.giveback = (c.giveback || 0) + checkoutGiveback;
             c.cuts = (c.cuts || 0) + 1;
-            c.last = new Date().toISOString().split('T')[0];
+            c.last = new Date().toLocaleDateString('en-CA');
 
             // Record History
             history.push({
@@ -797,7 +848,7 @@
             document.getElementById('ePrice').value = 35;
             document.getElementById('eFreq').value = 4;
             document.getElementById('eDob').value = '';
-            document.getElementById('eFirst').value = new Date().toISOString().split('T')[0];
+            document.getElementById('eFirst').value = new Date().toLocaleDateString('en-CA');
             
             openModal('editModal');
         }
