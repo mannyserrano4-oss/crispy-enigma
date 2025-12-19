@@ -213,6 +213,8 @@
             border-radius: 25px 25px 0 0; padding: 25px;
             box-sizing: border-box; max-height: 90vh; overflow-y: auto;
             animation: slideUp 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+            /* ADD THIS LINE FOR SMOOTH SCROLLING: */
+            -webkit-overflow-scrolling: touch;
         }
         @keyframes slideUp { from {transform: translateY(100%);} to {transform: translateY(0);} }
 
@@ -402,6 +404,10 @@
             <button class="btn btn-green" onclick="openCheckout()"><i class="fas fa-cash-register"></i> Record Cut / Checkout</button>
             <button class="btn btn-ghost" style="color:var(--status-overdue); border-color:var(--status-overdue); margin-top:10px;" onclick="addStrike()">
                 <i class="fas fa-ban"></i> Record No-Show (Add Strike)
+            </button>
+
+            <button id="btnRemStrike" class="btn btn-ghost" style="color:var(--text-sub); border-color:var(--border); margin-top:10px; display:none;" onclick="removeStrike()">
+                <i class="fas fa-eraser"></i> Remove Strike
             </button>
             
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px;">
@@ -771,6 +777,9 @@
             document.getElementById('btnCall').href = `tel:${c.phone}`;
             document.getElementById('btnInsta').style.display = c.insta ? 'block' : 'none';
 
+            // Show Remove button only if they have strikes
+            document.getElementById('btnRemStrike').style.display = (c.strikes > 0) ? 'flex' : 'none';
+            
             openModal('viewModal');
         }
 
@@ -902,6 +911,16 @@
             const c = getClient(activeId);
             if(await customConfirm(`Mark ${c.name} as a No-Show? \n\nThis will add a Strike 🚩 to their profile.`)) {
                 c.strikes = (c.strikes || 0) + 1;
+                saveData();
+                closeModal('viewModal');
+                render();
+            }
+        }
+
+        async function removeStrike() {
+            const c = getClient(activeId);
+            if(await customConfirm("Remove one Strike 🚩 from this client?")) {
+                c.strikes = Math.max(0, (c.strikes || 0) - 1); // Remove 1, but don't go below 0
                 saveData();
                 closeModal('viewModal');
                 render();
@@ -1068,9 +1087,12 @@
         function openSettings() { openModal('settingsModal'); }
         
         function openHistory() {
+            // FIX: Close settings first so they don't overlap
+            closeModal('settingsModal'); 
+            
             const div = document.getElementById('historyList');
             div.innerHTML = '';
-            // Show recent last
+            
             const revHist = [...history].reverse();
             if(revHist.length === 0) div.innerHTML = "No transactions yet.";
             
@@ -1117,63 +1139,65 @@ END:VCALENDAR`;
             const a = document.createElement('a'); a.href = s; a.download = 'backup.json'; a.click();
         }
         
-        // --- NEW ROBUST EXCEL EXPORT (VISUAL) ---
+        // --- VISUAL REPORT (Works on iPhone) ---
         function exportRobustExcel() {
-            let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">';
-            html += '<head></head>';
-            html += '<body>';
+            // We use a standard HTML structure that iPhone opens beautifully
+            let html = '<!DOCTYPE html><html><head><meta charset="UTF-8">';
+            html += '<style>body{font-family:sans-serif; padding:20px;} table{width:100%; border-collapse:collapse; margin-bottom:20px;} th{background:#4472C4; color:white; padding:10px; text-align:left;} td{border:1px solid #ddd; padding:8px;} tr:nth-child(even){background:#f2f2f2;} .due{color:#e67e22; font-weight:bold;} .overdue{color:#e74c3c; font-weight:bold;}</style>';
+            html += '</head><body>';
+            
+            html += '<h1>Black Book Report</h1>';
+            html += '<p>Generated: ' + new Date().toLocaleDateString() + '</p>';
             
             // SECTION 1: CLIENT DATABASE
             html += '<h2>Active Client Database</h2>';
-            html += '<table border="1" style="border-collapse: collapse;">';
-            html += '<tr style="background-color: #4472C4; color: white; font-weight: bold;">';
-            html += '<td>Name</td><td>Phone</td><td>Status</td><td>Strikes</td><td>LTV (Revenue)</td><td>Last Cut</td><td>Next Due</td><td>The Formula</td></tr>';
+            html += '<table>';
+            html += '<tr><th>Name</th><th>Phone</th><th>Status</th><th>Strikes</th><th>LTV</th><th>Last Cut</th><th>The Formula</th></tr>';
             
             clients.forEach(c => {
                 const stat = getStatus(c);
-                let color = 'black';
-                if(stat === 'due') color = '#FF9900'; // Orange
-                if(stat === 'overdue') color = '#FF0000'; // Red
+                let statClass = '';
+                if(stat === 'due') statClass = 'due';
+                if(stat === 'overdue') statClass = 'overdue';
                 
                 const dueStr = (c.last || c.first) ? getDueStr(c) : 'N/A';
                 
                 html += `<tr>
-                    <td>${c.name}</td>
+                    <td><b>${c.name}</b></td>
                     <td>${c.phone || ''}</td>
-                    <td style="color:${color}; font-weight:bold;">${stat.toUpperCase()}</td>
-                    <td style="color:red;">${'🚩'.repeat(c.strikes || 0)}</td>
+                    <td class="${statClass}">${stat.toUpperCase()}</td>
+                    <td>${'🚩'.repeat(c.strikes || 0)}</td>
                     <td>$${(c.spent||0).toFixed(2)}</td>
                     <td>${c.last||''}</td>
-                    <td>${dueStr}</td>
                     <td>${c.formula||''}</td>
                 </tr>`;
             });
             html += '</table>';
-            html += '<br><br>';
 
             // SECTION 2: TRANSACTION HISTORY
             html += '<h2>Transaction History</h2>';
-            html += '<table border="1" style="border-collapse: collapse;">';
-            html += '<tr style="background-color: #4472C4; color: white; font-weight: bold;">';
-            html += '<td>Date</td><td>Client Name</td><td>Amount</td></tr>';
+            html += '<table>';
+            html += '<tr><th>Date</th><th>Client Name</th><th>Amount</th></tr>';
             
             history.forEach(h => {
                 html += `<tr>
                     <td>${h.date}</td>
                     <td>${h.clientName || 'Unknown'}</td>
-                    <td style="font-weight:bold;">$${h.amount.toFixed(2)}</td>
+                    <td><b>$${h.amount.toFixed(2)}</b></td>
                 </tr>`;
             });
             html += '</table>';
             html += '</body></html>';
 
-            const blob = new Blob([html], {type: 'application/vnd.ms-excel'});
+            // Save as HTML
+            const blob = new Blob([html], {type: 'text/html'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'BlackBook_Report.xls';
+            a.download = 'BlackBook_Report.html'; // Changed extension
             a.click();
         }
+ 
 
         // --- SIMPLE CSV EXPORT (For Accountants) ---
         function exportSimpleCSV() {
