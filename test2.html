@@ -402,6 +402,11 @@
             </div>
 
             <button class="btn btn-green" onclick="openCheckout()"><i class="fas fa-cash-register"></i> Record Cut / Checkout</button>
+
+            <button class="btn btn-green" onclick="openCheckout()"><i class="fas fa-cash-register"></i> Record Cut / Checkout</button>
+            <button class="btn btn-ghost" style="color:var(--status-overdue); border-color:var(--status-overdue); margin-top:10px;" onclick="addStrike()">
+                <i class="fas fa-ban"></i> Record No-Show (Add Strike)
+            </button>
             
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                 <button class="btn btn-primary" onclick="openSchedule()"><i class="fas fa-calendar"></i> Schedule</button>
@@ -866,6 +871,17 @@
             closeModal('checkoutModal');
             closeModal('viewModal');
             render();
+        }
+
+        // --- STRIKE SYSTEM ---
+        async function addStrike() {
+            const c = getClient(activeId);
+            if(await customConfirm(`Mark ${c.name} as a No-Show? \n\nThis will add a Strike 🚩 to their profile.`)) {
+                c.strikes = (c.strikes || 0) + 1;
+                saveData();
+                closeModal('viewModal');
+                render();
+            }
         }
 
         // --- EDIT/SAVE CLIENT ---
