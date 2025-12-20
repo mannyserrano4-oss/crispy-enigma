@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The World Smith</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #1e1e1e;
+            --bg-panel: #252526;
+            --bg-input: #3c3c3c;
+            --accent: #d4af37; /* Gold for Fantasy feel */
+            --accent-dim: #8a7324;
+            --text-main: #d4d4d4;
+            --text-muted: #858585;
+            --border: #333;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* --- SIDEBAR NAV --- */
+        .sidebar {
+            width: 60px;
+            background: var(--bg-panel);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+            z-index: 100;
+        }
+        .nav-btn {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .nav-btn:hover { color: var(--text-main); background: var(--bg-input); }
+        .nav-btn.active { color: var(--accent); background: #333; box-shadow: -2px 0 0 var(--accent) inset; }
+
+        /* --- MAIN AREA --- */
+        .main-stage {
+            flex: 1;
+            position: relative;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* --- TABS --- */
+        .view-section {
+            display: none;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        .view-section.active { display: block; }
+
+        /* --- WRITING DESK --- */
+        #view-write { display: none; width:100%; height:100%; padding: 0; }
+        .writer-layout { display: flex; height: 100%; }
+        
+        .editor-container {
+            flex: 1;
+            padding: 40px 15%; /* Margins for focus */
+            overflow-y: auto;
+            background: var(--bg-dark);
+        }
+        .editor-title {
+            width: 100%; background: transparent; border: none;
+            color: var(--accent); font-size: 2rem; font-family: 'Georgia', serif;
+            font-weight: bold; margin-bottom: 20px; outline: none;
+        }
+        .editor-area {
+            width: 100%; height: 80vh;
+            background: transparent; border: none;
+            color: var(--text-main); font-size: 1.2rem; line-height: 1.8;
+            font-family: 'Georgia', serif; resize: none; outline: none;
+        }
+
+        /* --- THE WIKI SIDEBAR (Slide out) --- */
+        .wiki-panel {
+            width: 300px;
+            background: var(--bg-panel);
+            border-left: 1px solid var(--border);
+            display: flex; flex-direction: column;
+            padding: 15px;
+            transition: margin-right 0.3s;
+        }
+        .wiki-hidden { margin-right: -300px; }
+        
+        .wiki-search {
+            width: 100%; padding: 10px; background: var(--bg-input);
+            border: 1px solid var(--border); color: white; border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .wiki-card {
+            background: var(--bg-input); padding: 10px; border-radius: 5px;
+            margin-bottom: 10px; border-left: 3px solid var(--accent);
+            cursor: pointer;
+        }
+        .wiki-card h4 { margin: 0 0 5px 0; color: var(--accent); }
+        .wiki-card small { display: block; color: var(--text-muted); font-size: 0.8rem; }
+
+        /* --- WORLD BUILDER GRID --- */
+        .wb-grid {
+            display: grid; grid-template-columns: 250px 1fr; gap: 20px; height: 100%;
+        }
+        .wb-list {
+            background: var(--bg-panel); border-radius: 8px; padding: 10px; overflow-y: auto;
+        }
+        .wb-detail {
+            background: var(--bg-panel); border-radius: 8px; padding: 30px; overflow-y: auto;
+        }
+        .category-header {
+            font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;
+            color: var(--text-muted); margin-top: 15px; margin-bottom: 5px;
+        }
+        .entity-item {
+            padding: 10px; cursor: pointer; border-radius: 5px;
+        }
+        .entity-item:hover { background: var(--bg-input); }
+        .entity-item.active { background: var(--bg-input); color: var(--accent); border-left: 3px solid var(--accent); }
+
+        /* --- FORMS --- */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; color: var(--accent); font-size: 0.9rem; margin-bottom: 5px; }
+        input, select, textarea {
+            width: 100%; padding: 10px; background: var(--bg-input); border: 1px solid #444;
+            color: white; border-radius: 5px; box-sizing: border-box; font-family: inherit;
+        }
+        input:focus, textarea:focus { border-color: var(--accent); outline: none; }
+        
+        .tag-container { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
+        .tag { background: #333; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; border: 1px solid var(--accent-dim); }
+
+        /* --- TIMELINE / STORYBOARD --- */
+        .timeline-container {
+            display: flex; gap: 20px; padding: 20px; overflow-x: auto; height: 100%; align-items: flex-start;
+        }
+        .timeline-card {
+            min-width: 250px; background: var(--bg-panel); border-top: 3px solid var(--accent);
+            padding: 15px; border-radius: 5px; position: relative;
+        }
+        .timeline-line {
+            position: absolute; top: 20px; right: -20px; width: 20px; height: 2px; background: var(--border);
+        }
+
+        /* --- UTILS --- */
+        .btn { padding: 8px 15px; background: var(--accent-dim); border: none; color: white; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn:hover { background: var(--accent); }
+        .btn-small { padding: 4px 8px; font-size: 0.8rem; }
+        .btn-new { width: 100%; margin-bottom: 10px; background: #333; border: 1px dashed #666; }
+
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div style="color:var(--accent); font-size:1.5rem; margin-bottom:30px;"><i class="fas fa-dragon"></i></div>
+        <button class="nav-btn active" onclick="setTab('write')"><i class="fas fa-pen-nib"></i></button>
+        <button class="nav-btn" onclick="setTab('world')"><i class="fas fa-globe-americas"></i></button>
+        <button class="nav-btn" onclick="setTab('chars')"><i class="fas fa-users"></i></button>
+        <button class="nav-btn" onclick="setTab('plot')"><i class="fas fa-project-diagram"></i></button>
+        <button class="nav-btn" onclick="saveToDisk()" style="margin-top:auto;"><i class="fas fa-save"></i></button>
+        <button class="nav-btn" onclick="document.getElementById('loadInput').click()"><i class="fas fa-upload"></i></button>
+        <input type="file" id="loadInput" hidden onchange="loadFromDisk(this)">
+    </div>
+
+    <div class="main-stage">
+        
+        <div id="view-write" class="view-section active" style="padding:0;">
+            <div class="writer-layout">
+                <div class="editor-container">
+                    <input type="text" id="chapterTitle" class="editor-title" placeholder="Chapter Title..." oninput="autoSave()">
+                    <textarea id="chapterContent" class="editor-area" placeholder="Start writing..." oninput="autoSave()"></textarea>
+                </div>
+                <div class="wiki-panel" id="wikiPanel">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <h4 style="margin:0;">Quick Ref</h4>
+                        <button class="btn-small" onclick="toggleWiki()"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <input type="text" class="wiki-search" placeholder="Search world..." oninput="searchWiki(this.value)">
+                    <div id="wikiResults"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-world" class="view-section">
+            <div class="wb-grid">
+                <div class="wb-list">
+                    <button class="btn btn-new" onclick="createNewEntity('world')">+ New Entry</button>
+                    <div id="worldList"></div>
+                </div>
+                <div class="wb-detail">
+                    <form id="worldForm" onsubmit="event.preventDefault(); saveEntity('world');">
+                        <input type="hidden" id="wId">
+                        <div style="display:flex; justify-content:space-between;">
+                            <h2 style="margin-top:0;">World Entry</h2>
+                            <button class="btn">Save</button>
+                        </div>
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" id="wName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Type</label>
+                            <select id="wType">
+                                <option value="Race">Race / Species</option>
+                                <option value="Location">Location / Kingdom</option>
+                                <option value="Religion">Religion / Deity</option>
+                                <option value="Faction">Faction / Politics</option>
+                                <option value="Magic">Magic System</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Region / Origin</label>
+                            <input type="text" id="wRegion" placeholder="e.g. The Northern Wastes">
+                        </div>
+                        <div class="form-group">
+                            <label>Relationships / Conflicts</label>
+                            <textarea id="wRelations" rows="3" placeholder="Who do they hate? Who are they allied with?"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Description & Lore</label>
+                            <textarea id="wDesc" rows="10" placeholder="Physical traits, beliefs, political ties..."></textarea>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-chars" class="view-section">
+            <div class="wb-grid">
+                <div class="wb-list">
+                    <button class="btn btn-new" onclick="createNewEntity('char')">+ New Character</button>
+                    <div id="charList"></div>
+                </div>
+                <div class="wb-detail">
+                    <form id="charForm" onsubmit="event.preventDefault(); saveEntity('char');">
+                        <input type="hidden" id="cId">
+                        <div style="display:flex; justify-content:space-between;">
+                            <h2 style="margin-top:0;">Character Profile</h2>
+                            <button class="btn">Save</button>
+                        </div>
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" id="cName" required>
+                        </div>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                            <div class="form-group">
+                                <label>Race</label>
+                                <input type="text" id="cRace" placeholder="e.g. Elf">
+                            </div>
+                            <div class="form-group">
+                                <label>Role</label>
+                                <input type="text" id="cRole" placeholder="e.g. Protagonist">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Goal (Point B)</label>
+                            <input type="text" id="cGoal" placeholder="What do they want?">
+                        </div>
+                        <div class="form-group">
+                            <label>The Lie (Point A)</label>
+                            <input type="text" id="cLie" placeholder="What false belief do they start with?">
+                        </div>
+                        <div class="form-group">
+                            <label>Deity / Beliefs</label>
+                            <input type="text" id="cGod" placeholder="Who do they worship?">
+                        </div>
+                        <div class="form-group">
+                            <label>Connections</label>
+                            <textarea id="cConn" rows="3" placeholder="Links to other characters..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Notes</label>
+                            <textarea id="cNotes" rows="8"></textarea>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-plot" class="view-section">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2>Timeline & Storyboard</h2>
+                <button class="btn" onclick="addEvent()">+ Add Event</button>
+            </div>
+            <div class="timeline-container" id="timelineList">
+                </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- DATA STORE ---
+        let db = {
+            writing: { title: '', content: '' },
+            world: [],
+            chars: [],
+            timeline: []
+        };
+
+        // --- INIT ---
+        window.onload = () => {
+            const saved = localStorage.getItem('worldSmithDB');
+            if(saved) db = JSON.parse(saved);
+            
+            // Load Writing
+            document.getElementById('chapterTitle').value = db.writing.title;
+            document.getElementById('chapterContent').value = db.writing.content;
+            
+            refreshLists();
+            renderTimeline();
+            searchWiki(''); // Init wiki
+        };
+
+        // --- NAVIGATION ---
+        function setTab(tabId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById('view-' + tabId).classList.add('active');
+            
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            if(tabId === 'write') searchWiki(''); // Refresh wiki when returning to write
+        }
+
+        // --- CORE LOGIC (Save/Load/Edit) ---
+        function autoSave() {
+            db.writing.title = document.getElementById('chapterTitle').value;
+            db.writing.content = document.getElementById('chapterContent').value;
+            persist();
+        }
+
+        function persist() {
+            localStorage.setItem('worldSmithDB', JSON.stringify(db));
+        }
+
+        function createNewEntity(type) {
+            const id = Date.now().toString();
+            const empty = type === 'world' 
+                ? { id, name: 'New Entry', type: 'Location', region: '', relations: '', desc: '' }
+                : { id, name: 'New Character', race: '', role: '', goal: '', lie: '', god: '', conn: '', notes: '' };
+            
+            if(type === 'world') db.world.push(empty);
+            else db.chars.push(empty);
+            
+            persist();
+            refreshLists();
+            loadEntity(type, id);
+        }
+
+        function saveEntity(type) {
+            if(type === 'world') {
+                const id = document.getElementById('wId').value;
+                const idx = db.world.findIndex(x => x.id === id);
+                if(idx > -1) {
+                    db.world[idx] = {
+                        id,
+                        name: document.getElementById('wName').value,
+                        type: document.getElementById('wType').value,
+                        region: document.getElementById('wRegion').value,
+                        relations: document.getElementById('wRelations').value,
+                        desc: document.getElementById('wDesc').value
+                    };
+                }
+            } else {
+                const id = document.getElementById('cId').value;
+                const idx = db.chars.findIndex(x => x.id === id);
+                if(idx > -1) {
+                    db.chars[idx] = {
+                        id,
+                        name: document.getElementById('cName').value,
+                        race: document.getElementById('cRace').value,
+                        role: document.getElementById('cRole').value,
+                        goal: document.getElementById('cGoal').value,
+                        lie: document.getElementById('cLie').value,
+                        god: document.getElementById('cGod').value,
+                        conn: document.getElementById('cConn').value,
+                        notes: document.getElementById('cNotes').value
+                    };
+                }
+            }
+            persist();
+            refreshLists();
+            alert('Saved!');
+        }
+
+        function loadEntity(type, id) {
+            const data = type === 'world' ? db.world.find(x => x.id === id) : db.chars.find(x => x.id === id);
+            if(!data) return;
+
+            if(type === 'world') {
+                document.getElementById('wId').value = data.id;
+                document.getElementById('wName').value = data.name;
+                document.getElementById('wType').value = data.type;
+                document.getElementById('wRegion').value = data.region;
+                document.getElementById('wRelations').value = data.relations;
+                document.getElementById('wDesc').value = data.desc;
+            } else {
+                document.getElementById('cId').value = data.id;
+                document.getElementById('cName').value = data.name;
+                document.getElementById('cRace').value = data.race;
+                document.getElementById('cRole').value = data.role;
+                document.getElementById('cGoal').value = data.goal;
+                document.getElementById('cLie').value = data.lie;
+                document.getElementById('cGod').value = data.god;
+                document.getElementById('cConn').value = data.conn;
+                document.getElementById('cNotes').value = data.notes;
+            }
+        }
+
+        function refreshLists() {
+            // World List
+            const wList = document.getElementById('worldList');
+            wList.innerHTML = '';
+            // Group by Type
+            const types = ['Race', 'Location', 'Religion', 'Faction', 'Magic'];
+            types.forEach(t => {
+                const items = db.world.filter(x => x.type === t);
+                if(items.length > 0) {
+                    wList.innerHTML += `<div class="category-header">${t}s</div>`;
+                    items.forEach(item => {
+                        wList.innerHTML += `<div class="entity-item" onclick="loadEntity('world', '${item.id}')">${item.name}</div>`;
+                    });
+                }
+            });
+
+            // Char List
+            const cList = document.getElementById('charList');
+            cList.innerHTML = '';
+            db.chars.forEach(item => {
+                cList.innerHTML += `<div class="entity-item" onclick="loadEntity('char', '${item.id}')">${item.name} <small style="color:var(--text-muted)">(${item.race})</small></div>`;
+            });
+        }
+
+        // --- TIMELINE LOGIC ---
+        function addEvent() {
+            const title = prompt("Event Title:");
+            if(title) {
+                db.timeline.push({ id: Date.now(), title, desc: 'Description...' });
+                persist();
+                renderTimeline();
+            }
+        }
+
+        function deleteEvent(id) {
+            if(confirm("Delete event?")) {
+                db.timeline = db.timeline.filter(x => x.id !== id);
+                persist();
+                renderTimeline();
+            }
+        }
+
+        function renderTimeline() {
+            const div = document.getElementById('timelineList');
+            div.innerHTML = '';
+            db.timeline.forEach((ev, i) => {
+                div.innerHTML += `
+                    <div class="timeline-card">
+                        <div class="timeline-line"></div>
+                        <h4 style="margin-top:0; color:var(--accent);">${ev.title}</h4>
+                        <textarea style="width:100%; height:80px; font-size:0.9rem;" onchange="updateEvent(${ev.id}, this.value)">${ev.desc}</textarea>
+                        <button class="btn-small" style="background:#444; margin-top:5px;" onclick="deleteEvent(${ev.id})">Delete</button>
+                    </div>
+                `;
+            });
+        }
+
+        function updateEvent(id, val) {
+            const ev = db.timeline.find(x => x.id === id);
+            if(ev) { ev.desc = val; persist(); }
+        }
+
+        // --- WIKI SIDEBAR ---
+        function toggleWiki() {
+            const p = document.getElementById('wikiPanel');
+            if(p.style.marginRight === '-300px') p.style.marginRight = '0';
+            else p.style.marginRight = '-300px';
+        }
+
+        function searchWiki(term) {
+            const res = document.getElementById('wikiResults');
+            res.innerHTML = '';
+            term = term.toLowerCase();
+
+            // Search World
+            db.world.forEach(w => {
+                if(w.name.toLowerCase().includes(term) || w.type.toLowerCase().includes(term)) {
+                    res.innerHTML += `
+                        <div class="wiki-card">
+                            <h4>${w.name} <small>${w.type}</small></h4>
+                            <small>${w.desc.substring(0, 60)}...</small>
+                            <div style="font-size:0.8rem; margin-top:5px; color:#aaa;">${w.relations.substring(0,50)}</div>
+                        </div>
+                    `;
+                }
+            });
+
+            // Search Chars
+            db.chars.forEach(c => {
+                if(c.name.toLowerCase().includes(term) || c.race.toLowerCase().includes(term)) {
+                    res.innerHTML += `
+                        <div class="wiki-card" style="border-left-color: #d45d37;">
+                            <h4>${c.name} <small>${c.race}</small></h4>
+                            <small>Goal: ${c.goal}</small>
+                            <div style="font-size:0.8rem; margin-top:5px; color:#aaa;">Worships: ${c.god}</div>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        // --- IMPORT / EXPORT ---
+        function saveToDisk() {
+            const blob = new Blob([JSON.stringify(db)], {type: 'application/json'});
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+            a.download = 'MyStoryWorld.json'; a.click();
+        }
+
+        function loadFromDisk(input) {
+            const r = new FileReader();
+            r.onload = (e) => {
+                db = JSON.parse(e.target.result);
+                persist(); location.reload();
+            };
+            r.readAsText(input.files[0]);
+        }
+    </script>
+</body>
+</html>
