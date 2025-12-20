@@ -696,7 +696,9 @@
         function exportSimpleCSV() {
             let csv = "Name,Phone,Status,Strikes,Total_Spent,Last_Cut\n";
             clients.forEach(c => {
-                csv += `${c.name.replace(/,/g," ")},${c.phone},${getStatus(c)},${c.strikes||0},${c.spent},${c.last}\n`;
+                // We add a quote and tab to force Excel to read phone as Text, not Math
+                const safePhone = `\t${c.phone}`;
+                csv += `${c.name.replace(/,/g," ")},${safePhone},${getStatus(c)},${c.strikes||0},${c.spent},${c.last}\n`;
             });
             downloadCSV(csv, 'BlackBook_Clients.csv');
         }
@@ -743,15 +745,61 @@
         function getLoyaltyVisual(n) { n = n || 0; let s = ''; for(let i=0; i<5; i++) { s += (i < n) ? '✂️' : '⚪'; } return s; }
         
         // Export Robust Excel
-        function exportRobustExcel() {
-            let html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:sans-serif; padding:20px;} table{width:100%; border-collapse:collapse; margin-bottom:20px;} th{background:#4472C4; color:white; padding:10px; text-align:left;} td{border:1px solid #ddd; padding:8px;} tr:nth-child(even){background:#f2f2f2;} .due{color:#e67e22; font-weight:bold;} .overdue{color:#e74c3c; font-weight:bold;}</style></head><body>';
+    function exportRobustExcel() {
+            let html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:sans-serif; padding:20px;} table{width:100%; border-collapse:collapse; margin-bottom:40px;} th{background:#4472C4; color:white; padding:10px; text-align:left;} td{border:1px solid #ddd; padding:8px;} tr:nth-child(even){background:#f2f2f2;} .due{color:#e67e22; font-weight:bold;} .overdue{color:#e74c3c; font-weight:bold;} .archived-row{color:#999; font-style:italic;}</style></head><body>';
+            
             html += '<h1>Black Book Report</h1><p>Generated: ' + new Date().toLocaleDateString() + '</p>';
+            
+            // --- TABLE 1: ACTIVE CLIENTS ---
             html += '<h2>Active Client Database</h2><table><tr><th>Name</th><th>Phone</th><th>Status</th><th>Strikes</th><th>LTV</th><th>Last Cut</th><th>The Formula</th></tr>';
-            clients.forEach(c => { const stat = getStatus(c); let statClass = ''; if(stat === 'due') statClass = 'due'; if(stat === 'overdue') statClass = 'overdue'; html += `<tr><td><b>${c.name}</b></td><td>${c.phone || ''}</td><td class="${statClass}">${stat.toUpperCase()}</td><td>${'🚩'.repeat(c.strikes || 0)}</td><td>$${(c.spent||0).toFixed(2)}</td><td>${formatPretty(c.last)||''}</td><td>${c.formula||''}</td></tr>`; });
-            html += '</table><h2>Transaction History</h2><table><tr><th>Date</th><th>Client Name</th><th>Amount</th></tr>';
-            history.forEach(h => { html += `<tr><td>${formatPretty(h.date)}</td><td>${h.clientName || 'Unknown'}</td><td><b>$${h.amount.toFixed(2)}</b></td></tr>`; });
+            
+            let hasActive = false;
+            clients.forEach(c => { 
+                if(c.archived) return; // Skip archived people here
+                hasActive = true;
+                
+                const stat = getStatus(c); 
+                let statClass = ''; 
+                if(stat === 'due') statClass = 'due'; 
+                if(stat === 'overdue') statClass = 'overdue'; 
+                
+                html += `<tr><td><b>${c.name}</b></td><td>${c.phone || ''}</td><td class="${statClass}">${stat.toUpperCase()}</td><td>${'🚩'.repeat(c.strikes || 0)}</td><td>$${(c.spent||0).toFixed(2)}</td><td>${formatPretty(c.last)||''}</td><td>${c.formula||''}</td></tr>`; 
+            });
+            if(!hasActive) html += '<tr><td colspan="7" style="text-align:center; padding:20px;">No active clients found.</td></tr>';
+            html += '</table>';
+
+            // --- TABLE 2: ARCHIVED CLIENTS (THE NEW SECTION) ---
+            // We verify if there are any archived clients first to avoid an empty table
+            const archivedList = clients.filter(c => c.archived);
+            
+            if(archivedList.length > 0) {
+                html += '<h2 style="color:#666;">Archived / Inactive Clients</h2><table style="border:1px solid #ccc;">';
+                html += '<tr style="background:#999;"><th>Name</th><th>Phone</th><th>LTV (Final)</th><th>Last Cut</th></tr>';
+                
+                archivedList.forEach(c => {
+                    html += `<tr class="archived-row">
+                        <td>${c.name}</td>
+                        <td>${c.phone || ''}</td>
+                        <td>$${(c.spent||0).toFixed(2)}</td>
+                        <td>${formatPretty(c.last)||''}</td>
+                    </tr>`;
+                });
+                html += '</table>';
+            }
+
+            // --- TABLE 3: TRANSACTION HISTORY ---
+            html += '<h2>Transaction History</h2><table><tr><th>Date</th><th>Client Name</th><th>Amount</th></tr>';
+            history.forEach(h => { 
+                html += `<tr><td>${formatPretty(h.date)}</td><td>${h.clientName || 'Unknown'}</td><td><b>$${h.amount.toFixed(2)}</b></td></tr>`; 
+            });
             html += '</table></body></html>';
-            const blob = new Blob([html], {type: 'text/html'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'BlackBook_Report.html'; a.click();
+
+            const blob = new Blob([html], {type: 'text/html'}); 
+            const url = URL.createObjectURL(blob); 
+            const a = document.createElement('a'); 
+            a.href = url; 
+            a.download = 'BlackBook_Report.html'; 
+            a.click();
         }
 
         // Crash Guard Logic
