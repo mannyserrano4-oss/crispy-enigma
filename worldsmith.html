@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="WorldSmith">
@@ -12,56 +13,30 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     
     <style>
-        /* --- PASTEL THEME VARIABLES --- */
+        /* --- THEME --- */
         :root {
-            /* DARK MODE (Default) */
-            --bg-body: #23242a;
-            --bg-panel: #2d2e36;
-            --bg-input: #383942;
-            --text-main: #e0e0e0;
-            --text-muted: #9496a8;
-            --border: #4a4c58;
-            --accent: #b59af7;      /* Lavender */
-            --accent-dim: #7d6bb0;
-            --accent-sec: #ffb7b2;  /* Coral */
+            --bg-body: #23242a; --bg-panel: #2d2e36; --bg-input: #383942;
+            --text-main: #e0e0e0; --text-muted: #9496a8; --border: #4a4c58;
+            --accent: #b59af7; --accent-dim: #7d6bb0; --accent-sec: #ffb7b2;
             --card-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
-
         body.light-mode {
-            /* LIGHT MODE */
-            --bg-body: #fdf6e3;
-            --bg-panel: #eee8d5;
-            --bg-input: #ffffff;
-            --text-main: #586e75;
-            --text-muted: #93a1a1;
-            --border: #d3d0c2;
-            --accent: #2aa198;      /* Teal */
-            --accent-dim: #6c71c4;
-            --accent-sec: #cb4b16;  /* Orange */
+            --bg-body: #fdf6e3; --bg-panel: #eee8d5; --bg-input: #ffffff;
+            --text-main: #586e75; --text-muted: #93a1a1; --border: #d3d0c2;
+            --accent: #2aa198; --accent-dim: #6c71c4; --accent-sec: #cb4b16;
             --card-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
-
-        body {
-            margin: 0; background-color: var(--bg-body); color: var(--text-main);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            height: 100vh; display: flex; overflow: hidden;
-            transition: background 0.3s ease;
-        }
+        body { margin: 0; background-color: var(--bg-body); color: var(--text-main); font-family: 'Segoe UI', sans-serif; height: 100vh; display: flex; overflow: hidden; transition: background 0.3s ease; }
 
         /* --- SIDEBAR --- */
-        .sidebar {
-            width: 70px; background: var(--bg-panel); border-right: 1px solid var(--border);
-            display: flex; flex-direction: column; align-items: center; padding-top: 20px; z-index: 100;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1); flex-shrink: 0;
-        }
-        .nav-btn {
-            width: 48px; height: 48px; border-radius: 14px; border: none; background: transparent;
-            color: var(--text-muted); font-size: 1.3rem; margin-bottom: 15px; cursor: pointer; transition: 0.2s;
-        }
+        .sidebar { width: 70px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 20px; z-index: 100; box-shadow: 2px 0 10px rgba(0,0,0,0.1); flex-shrink: 0; }
+        .nav-btn { width: 48px; height: 48px; border-radius: 14px; border: none; background: transparent; color: var(--text-muted); font-size: 1.3rem; margin-bottom: 15px; cursor: pointer; transition: 0.2s; }
         .nav-btn:hover { color: var(--accent); background: var(--bg-input); }
         .nav-btn.active { color: var(--bg-panel); background: var(--accent); box-shadow: 0 4px 12px var(--accent-dim); }
+        .library-btn { border: 2px solid var(--accent-sec); color: var(--accent-sec); }
 
         /* --- LAYOUT --- */
         .main-stage { flex: 1; position: relative; display: flex; overflow: hidden; }
@@ -69,70 +44,35 @@
         .view-section.active { display: block; }
 
         /* --- WRITING DESK --- */
-        #view-write { display: none; width:100%; height:100%; padding: 0; }
+        #view-write { padding: 0; }
         .writer-layout { display: flex; height: 100%; width: 100%; }
+        .editor-container { flex: 1; padding: 40px 10%; overflow-y: auto; background: var(--bg-body); transition: background 0.3s; }
+        .editor-title { width: 100%; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--accent); font-size: 1.8rem; padding: 15px; box-sizing: border-box; font-family: 'Georgia', serif; font-weight: bold; margin-bottom: 20px; outline: none; }
+        .editor-area { width: 100%; height: 70vh; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--text-main); font-size: 1.1rem; line-height: 1.6; padding: 20px; box-sizing: border-box; font-family: 'Georgia', serif; resize: none; outline: none; }
         
-        .editor-container { 
-            flex: 1; padding: 40px 10%; overflow-y: auto; 
-            background: var(--bg-body); transition: background 0.3s; 
-        }
-        
-        /* High Contrast Inputs */
-        .editor-title {
-            width: 100%; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px;
-            color: var(--accent); font-size: 1.8rem; padding: 15px; box-sizing: border-box;
-            font-family: 'Georgia', serif; font-weight: bold; margin-bottom: 20px; outline: none;
-        }
-        .editor-title:focus { border-color: var(--accent); }
-        
-        .editor-area {
-            width: 100%; height: 70vh; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px;
-            color: var(--text-main); font-size: 1.1rem; line-height: 1.6; padding: 20px; box-sizing: border-box;
-            font-family: 'Georgia', serif; resize: none; outline: none;
-        }
-        .editor-area:focus { border-color: var(--accent); }
-
         /* --- WIKI PANEL --- */
-        .wiki-panel {
-            width: 350px; background: var(--bg-panel); border-left: 1px solid var(--border);
-            display: flex; flex-direction: column; padding: 15px; flex-shrink: 0;
-            transition: margin-right 0.3s;
-        }
-        
+        .wiki-panel { width: 350px; background: var(--bg-panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; padding: 15px; flex-shrink: 0; transition: margin-right 0.3s; }
         .wiki-tabs { display: flex; gap: 5px; margin-bottom: 10px; }
-        .w-tab {
-            flex: 1; padding: 8px; background: var(--bg-input); border: 1px solid var(--border);
-            color: var(--text-muted); cursor: pointer; border-radius: 6px; font-size: 0.8rem; font-weight: bold;
-        }
+        .w-tab { flex: 1; padding: 8px; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; border-radius: 6px; font-size: 0.8rem; font-weight: bold; }
         .w-tab.active { background: var(--accent); color: var(--bg-panel); border-color: var(--accent); }
-
-        .wiki-search {
-            width: 100%; padding: 12px; background: var(--bg-input); border: 1px solid var(--border);
-            color: var(--text-main); border-radius: 8px; margin-bottom: 15px;
-        }
+        .wiki-search { width: 100%; padding: 12px; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); border-radius: 8px; margin-bottom: 15px; }
         .wiki-results { flex: 1; overflow-y: auto; }
+        .wiki-card { background: var(--bg-input); padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid var(--accent); cursor: pointer; box-shadow: var(--card-shadow); }
         
-        .wiki-card {
-            background: var(--bg-input); padding: 12px; border-radius: 8px; margin-bottom: 10px;
-            border-left: 4px solid var(--accent); cursor: pointer; box-shadow: var(--card-shadow);
-        }
-        .wiki-card h4 { margin: 0 0 5px 0; color: var(--accent); }
-        .wiki-card small { display: block; color: var(--text-muted); font-size: 0.85rem; }
+        /* --- WEB / GRAPH VIEW --- */
+        #network-container { width: 100%; height: 80vh; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; }
 
-        /* --- MOBILE TWEAKS --- */
+        /* --- MOBILE --- */
         @media (max-width: 768px) {
             .writer-layout { flex-direction: column; }
-            .wiki-panel { 
-                width: 100%; height: 40vh; border-left: none; border-top: 2px solid var(--accent);
-                position: absolute; bottom: 0; left: 0; z-index: 200; display: none; 
-            }
+            .wiki-panel { width: 100%; height: 40vh; border-left: none; border-top: 2px solid var(--accent); position: absolute; bottom: 0; left: 0; z-index: 200; display: none; }
             .editor-container { padding: 20px; padding-bottom: 100px; }
             .sidebar { width: 60px; }
             .wb-grid { display: flex; flex-direction: column; }
             .wb-list { height: 200px; }
         }
 
-        /* --- OTHER STYLES (Grid, Forms, Timeline) --- */
+        /* --- UTILS --- */
         .wb-grid { display: grid; grid-template-columns: 280px 1fr; gap: 20px; height: 100%; }
         .wb-list, .wb-detail { background: var(--bg-panel); border-radius: 12px; padding: 15px; overflow-y: auto; border: 1px solid var(--border); }
         .wb-detail { padding: 30px; }
@@ -144,24 +84,32 @@
         label { display: block; color: var(--accent); font-size: 0.85rem; margin-bottom: 8px; font-weight: 700; text-transform: uppercase; }
         input, select, textarea { width: 100%; padding: 12px; background: var(--bg-input); border: 2px solid var(--border); color: var(--text-main); border-radius: 8px; box-sizing: border-box; font-family: inherit; font-size:16px; transition: border-color 0.2s; }
         input:focus, select:focus, textarea:focus { border-color: var(--accent); outline: none; }
-        .timeline-container { display: flex; gap: 20px; padding: 20px; overflow-x: auto; height: 100%; align-items: flex-start; }
-        .timeline-card { min-width: 280px; width: 280px; background: var(--bg-panel); border-top: 4px solid var(--accent-sec); padding: 20px; border-radius: 12px; position: relative; box-shadow: var(--card-shadow); cursor: grab; flex-shrink: 0; border: 1px solid var(--border); }
         .btn { padding: 10px 20px; background: var(--accent); border: none; color: var(--bg-panel); border-radius: 8px; cursor: pointer; font-weight: 800; }
         .btn-new { width: 100%; margin-bottom: 15px; background: var(--bg-input); color: var(--text-muted); border: 2px dashed var(--border); }
         
-        /* --- CRASH GUARD --- */
-        #crashModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a1a; color: #ff6b6b; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; box-sizing: border-box; text-align: center; font-family: monospace; }
-        .crash-btn { background: #ff6b6b; color: black; padding: 15px; width: 100%; border: none; border-radius: 10px; font-weight: bold; margin-top: 15px; font-size: 1rem; cursor: pointer; }
+        /* --- TIMELINE --- */
+        .timeline-container { display: flex; gap: 20px; padding: 20px; overflow-x: auto; height: 100%; align-items: flex-start; }
+        .timeline-card { min-width: 280px; width: 280px; background: var(--bg-panel); border-top: 4px solid var(--accent-sec); padding: 20px; border-radius: 12px; position: relative; box-shadow: var(--card-shadow); border: 1px solid var(--border); flex-shrink: 0; }
+        .timeline-handle { position: absolute; top: 10px; right: 10px; color: var(--text-muted); cursor: grab; padding: 10px; font-size: 1.2rem; }
+        .date-badge { background: var(--bg-input); color: var(--accent); font-size: 0.8rem; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-bottom: 5px; font-weight: bold; border: 1px solid var(--border); }
+
+        /* --- LIBRARY MODAL --- */
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 500; align-items: center; justify-content: center; }
+        .modal-box { background: var(--bg-panel); padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; border: 1px solid var(--accent); }
     </style>
 </head>
-<body class="">
+<body>
 
     <div class="sidebar">
-        <div style="color:var(--accent); font-size:1.6rem; margin-bottom:30px;"><i class="fas fa-dragon"></i></div>
+        <button class="nav-btn library-btn" onclick="openLibrary()" title="Switch World / Story"><i class="fas fa-book-journal-whills"></i></button>
+        <hr style="width:50%; border:0; border-bottom:1px solid var(--border); margin:10px 0;">
+        
         <button class="nav-btn active" onclick="setTab('write')"><i class="fas fa-pen-nib"></i></button>
         <button class="nav-btn" onclick="setTab('world')"><i class="fas fa-globe-americas"></i></button>
         <button class="nav-btn" onclick="setTab('chars')"><i class="fas fa-users"></i></button>
         <button class="nav-btn" onclick="setTab('plot')"><i class="fas fa-project-diagram"></i></button>
+        <button class="nav-btn" onclick="setTab('web')"><i class="fas fa-circle-nodes"></i></button>
+        
         <div style="margin-top:auto;"></div>
         <button class="nav-btn" onclick="toggleTheme()"><i class="fas fa-adjust"></i></button>
         <button class="nav-btn" onclick="saveToDisk()"><i class="fas fa-save"></i></button>
@@ -171,29 +119,26 @@
 
     <div class="main-stage">
         
-        <div id="view-write" class="view-section active" style="padding:0;">
+        <div id="view-write" class="view-section active">
             <div class="writer-layout">
                 <div class="editor-container">
+                    <div id="storyHeader" style="margin-bottom:10px; color:var(--text-muted); font-size:0.8rem; text-transform:uppercase;"></div>
                     <input type="text" id="chapterTitle" class="editor-title" placeholder="Chapter Title" oninput="autoSave()">
-                    <textarea id="chapterContent" class="editor-area" placeholder="Write your story here..." oninput="autoSave()"></textarea>
+                    <textarea id="chapterContent" class="editor-area" placeholder="Write your story..." oninput="autoSave()"></textarea>
                 </div>
-                
                 <div class="wiki-panel" id="wikiPanel">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <h4 style="margin:0; color:var(--accent);">Wiki Reference</h4>
+                        <h4 style="margin:0; color:var(--accent);">Wiki</h4>
                         <button class="btn" style="padding:4px 10px; font-size:0.8rem;" onclick="toggleWiki()">Close</button>
                     </div>
-                    
                     <div class="wiki-tabs">
                         <button class="w-tab active" onclick="filterWiki('all', this)">ALL</button>
                         <button class="w-tab" onclick="filterWiki('world', this)">WORLD</button>
                         <button class="w-tab" onclick="filterWiki('char', this)">CHARS</button>
                     </div>
-
                     <input type="text" class="wiki-search" placeholder="Search..." oninput="searchWiki(this.value)">
                     <div id="wikiResults" class="wiki-results"></div>
                 </div>
-                
                 <button onclick="toggleWiki()" style="position:absolute; top:20px; right:20px; z-index:50; background:var(--bg-panel); color:var(--accent); border:2px solid var(--accent); border-radius:50%; width:44px; height:44px; display:none; justify-content:center; align-items:center;" id="mobWikiBtn"><i class="fas fa-book"></i></button>
             </div>
         </div>
@@ -214,7 +159,6 @@
                         <hr style="border:0; border-bottom:1px solid var(--border); margin:20px 0;">
                         <div class="form-group"><label>Name</label><input type="text" id="wName" required></div>
                         <div class="form-group"><label>Type</label><select id="wType"><option value="Race">Race / Species</option><option value="Location">Location / Kingdom</option><option value="Religion">Religion / Deity</option><option value="Faction">Faction / Politics</option><option value="Magic">Magic System</option></select></div>
-                        <div class="form-group"><label>Region</label><input type="text" id="wRegion"></div>
                         <div class="form-group"><label>Lore & Desc</label><textarea id="wDesc" rows="10"></textarea></div>
                     </form>
                 </div>
@@ -236,12 +180,24 @@
                         </div>
                         <hr style="border:0; border-bottom:1px solid var(--border); margin:20px 0;">
                         <div class="form-group"><label>Name</label><input type="text" id="cName" required></div>
+                        
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                            <div class="form-group"><label>Race</label><input type="text" id="cRace"></div>
-                            <div class="form-group"><label>Role</label><input type="text" id="cRole"></div>
+                            <div class="form-group">
+                                <label>Race</label>
+                                <select id="cRace"><option value="">- Select -</option></select>
+                            </div>
+                            <div class="form-group">
+                                <label>Faction / Role</label>
+                                <select id="cRole"><option value="">- Select -</option></select>
+                            </div>
                         </div>
+                        <div class="form-group">
+                            <label>Religion / Deity</label>
+                            <select id="cGod"><option value="">- Select -</option></select>
+                        </div>
+                        
                         <div class="form-group"><label>Goal</label><input type="text" id="cGoal"></div>
-                        <div class="form-group"><label>Notes</label><textarea id="cNotes" rows="8"></textarea></div>
+                        <div class="form-group"><label>Notes</label><textarea id="cNotes" rows="6"></textarea></div>
                     </form>
                 </div>
             </div>
@@ -249,174 +205,352 @@
 
         <div id="view-plot" class="view-section">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h2 style="margin:0; color:var(--accent);">Timeline (Drag to Reorder)</h2>
+                <h2 style="margin:0; color:var(--accent);">Timeline</h2>
                 <button class="btn" onclick="addEvent()">+ Event</button>
             </div>
             <div class="timeline-container" id="timelineList"></div>
         </div>
 
+        <div id="view-web" class="view-section">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2 style="margin:0; color:var(--accent);">The Web (Connections)</h2>
+                <button class="btn" onclick="renderWeb()">Refresh Graph</button>
+            </div>
+            <div id="network-container"></div>
+            <p style="color:var(--text-muted); font-size:0.8rem; text-align:center;">
+                Visualizes connections between Characters and their Race, Religion, and Factions.
+            </p>
+        </div>
+
     </div>
 
-    <div id="crashModal">
-        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px;"></i>
-        <h2 style="margin:0;">System Failure</h2>
-        <div id="crashMsg" style="background:#333; padding:15px; border-radius:8px; font-size:0.8rem; color:#ff9999; text-align:left; width:100%; margin-bottom:20px;"></div>
-        <button class="crash-btn" onclick="emergencyCopy()">Copy Data</button>
-        <button class="crash-btn" style="background:transparent; color:#888; border:1px solid #555;" onclick="location.reload()">Reload</button>
+    <div id="libModal" class="overlay">
+        <div class="modal-box">
+            <h2 style="color:var(--accent);">World Library</h2>
+            <div id="libList" style="margin-bottom:20px; max-height:200px; overflow-y:auto; text-align:left;"></div>
+            <button class="btn btn-new" onclick="createWorld()">+ Create New World</button>
+            <button class="btn" style="background:transparent; border:1px solid var(--text-muted);" onclick="document.getElementById('libModal').style.display='none'">Close</button>
+        </div>
     </div>
 
     <script>
-        // --- DATA & STATE ---
-        let db = { writing: { title: '', content: '' }, world: [], chars: [], timeline: [] };
+        // --- CALENDAR SYSTEM ---
+        const MONTHS = [
+            "Aether", "Borean", "Cygnus", "Dormus", "Eon", 
+            "Fyre", "Glacies", "Harvest", "Ignis", "Juras", 
+            "Kryos", "Lux", "Mirus", "Nox", "Omen"
+        ];
+
+        // --- STATE MANAGEMENT ---
+        let appData = {
+            activeId: null,
+            worlds: []
+        };
+        let currentWorld = null; // Shortcut to active world object
         let isLight = false;
-        let wikiFilter = 'all'; // 'all', 'world', 'char'
+        let wikiFilter = 'all';
 
         // --- INIT ---
         window.onload = () => {
-            try {
-                const saved = localStorage.getItem('worldSmithDB');
-                if(saved) db = JSON.parse(saved);
-                if(localStorage.getItem('wsTheme') === 'light') toggleTheme(true);
-                
-                // Load Writing
-                document.getElementById('chapterTitle').value = db.writing.title || '';
-                document.getElementById('chapterContent').value = db.writing.content || '';
-                
-                refreshLists();
-                renderTimeline();
-                searchWiki('');
-                initSortable();
-
-                // Mobile Setup
-                if(window.innerWidth < 768) document.getElementById('mobWikiBtn').style.display = 'flex';
-                
-            } catch(e) { console.error(e); }
+            if(localStorage.getItem('wsTheme') === 'light') toggleTheme(true);
+            
+            const saved = localStorage.getItem('worldSmithMultiverse');
+            if(saved) {
+                appData = JSON.parse(saved);
+            } else {
+                // Check for old version data
+                const old = localStorage.getItem('worldSmithDB');
+                if(old) {
+                    // Upgrade Path
+                    const oldDB = JSON.parse(old);
+                    appData.worlds.push({ id: 'w1', name: 'Legacy World', data: oldDB });
+                    appData.activeId = 'w1';
+                } else {
+                    // Fresh Start
+                    createWorld("First World", true);
+                }
+            }
+            
+            loadActiveWorld();
+            initSortable();
+            if(window.innerWidth < 768) document.getElementById('mobWikiBtn').style.display = 'flex';
         };
 
-        // --- WIKI LOGIC ---
-        function filterWiki(type, btn) {
-            wikiFilter = type;
+        // --- WORLD MANAGEMENT ---
+        function createWorld(name, autoLoad=false) {
+            if(!name) name = prompt("Name of new World / Story:");
+            if(!name) return;
+            const id = 'w' + Date.now();
+            const newW = {
+                id: id,
+                name: name,
+                data: { writing: {title:'', content:''}, world: [], chars: [], timeline: [] }
+            };
+            appData.worlds.push(newW);
+            saveAll();
+            if(autoLoad) switchWorld(id);
+            renderLib();
+        }
+
+        function switchWorld(id) {
+            appData.activeId = id;
+            saveAll();
+            loadActiveWorld();
+            document.getElementById('libModal').style.display = 'none';
+        }
+
+        function loadActiveWorld() {
+            currentWorld = appData.worlds.find(w => w.id === appData.activeId);
+            if(!currentWorld) return;
+
             // Update UI
-            document.querySelectorAll('.w-tab').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            // Re-run search
-            searchWiki(document.querySelector('.wiki-search').value);
+            document.getElementById('storyHeader').innerText = `Current Story: ${currentWorld.name}`;
+            document.getElementById('chapterTitle').value = currentWorld.data.writing.title || '';
+            document.getElementById('chapterContent').value = currentWorld.data.writing.content || '';
+            
+            refreshLists();
+            renderTimeline();
+            searchWiki('');
         }
 
-        function searchWiki(term) {
-            const res = document.getElementById('wikiResults'); 
-            res.innerHTML = ''; 
-            term = term.toLowerCase();
-
-            // RENDER WORLD ITEMS
-            if(wikiFilter === 'all' || wikiFilter === 'world') {
-                db.world.forEach(w => {
-                    if(w.name.toLowerCase().includes(term) || w.type.toLowerCase().includes(term)) {
-                        res.innerHTML += `<div class="wiki-card"><h4>${w.name} <small>${w.type}</small></h4><small>${w.desc.substring(0, 60)}...</small></div>`;
-                    }
-                });
-            }
-
-            // RENDER CHARACTERS
-            if(wikiFilter === 'all' || wikiFilter === 'char') {
-                db.chars.forEach(c => {
-                    if(c.name.toLowerCase().includes(term) || c.race.toLowerCase().includes(term)) {
-                        res.innerHTML += `<div class="wiki-card" style="border-left-color: var(--accent-sec);"><h4>${c.name} <small>${c.race}</small></h4><small>Goal: ${c.goal}</small></div>`;
-                    }
-                });
-            }
+        function openLibrary() {
+            renderLib();
+            document.getElementById('libModal').style.display = 'flex';
         }
 
-        function toggleWiki() {
-            const p = document.getElementById('wikiPanel');
-            if(window.innerWidth < 768) {
-                p.style.display = p.style.display === 'flex' ? 'none' : 'flex';
+        function renderLib() {
+            const div = document.getElementById('libList');
+            div.innerHTML = '';
+            appData.worlds.forEach(w => {
+                const isActive = w.id === appData.activeId ? 'border:1px solid var(--accent); color:var(--accent);' : '';
+                div.innerHTML += `<div style="padding:10px; background:var(--bg-input); margin-bottom:5px; cursor:pointer; border-radius:5px; ${isActive}" onclick="switchWorld('${w.id}')">${w.name}</div>`;
+            });
+        }
+
+        // --- SMART DROPDOWNS ---
+        function populateDropdowns() {
+            const races = currentWorld.data.world.filter(x => x.type === 'Race');
+            const rels = currentWorld.data.world.filter(x => x.type === 'Religion');
+            const facs = currentWorld.data.world.filter(x => x.type === 'Faction');
+
+            fillSelect('cRace', races);
+            fillSelect('cGod', rels);
+            fillSelect('cRole', facs);
+        }
+
+        function fillSelect(id, items) {
+            const sel = document.getElementById(id);
+            const currentVal = sel.value; // preserve selection if re-rendering
+            sel.innerHTML = '<option value="">- Select -</option>';
+            items.forEach(i => {
+                sel.innerHTML += `<option value="${i.name}">${i.name}</option>`;
+            });
+            // Also allow manual typing by keeping input capability? 
+            // For now, let's append "Other" logic or just strict selection.
+            // Strict selection requested for speed.
+        }
+
+        // --- WEB (GRAPH) VISUALIZATION ---
+        function renderWeb() {
+            if(!currentWorld) return;
+            const nodes = [];
+            const edges = [];
+            const ids = new Set(); // track IDs to prevent dupes
+
+            // 1. Add World Entities (Races, Gods, Factions) as Nodes
+            currentWorld.data.world.forEach(w => {
+                let color = '#999';
+                if(w.type === 'Race') color = '#b59af7';
+                if(w.type === 'Religion') color = '#ffb7b2';
+                if(w.type === 'Faction') color = '#81c784';
+                
+                nodes.push({ id: w.name, label: w.name, color: color, shape: 'box' });
+                ids.add(w.name);
+            });
+
+            // 2. Add Characters and Links
+            currentWorld.data.chars.forEach(c => {
+                nodes.push({ id: c.name, label: c.name, color: '#4fc3f7', shape: 'ellipse' });
+                
+                // Link to Race
+                if(c.race && ids.has(c.race)) edges.push({ from: c.name, to: c.race });
+                // Link to Religion
+                if(c.god && ids.has(c.god)) edges.push({ from: c.name, to: c.god });
+                // Link to Faction
+                if(c.role && ids.has(c.role)) edges.push({ from: c.name, to: c.role });
+            });
+
+            const container = document.getElementById('network-container');
+            const data = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) };
+            const options = {
+                physics: { stabilization: true },
+                nodes: { font: { color: '#ffffff' } },
+                edges: { color: '#555' }
+            };
+            new vis.Network(container, data, options);
+        }
+
+        // --- TIMELINE WITH CALENDAR ---
+        function renderTimeline() {
+            const div = document.getElementById('timelineList'); div.innerHTML = '';
+            currentWorld.data.timeline.forEach((ev) => {
+                // Build Month Options
+                let monthOpts = '';
+                MONTHS.forEach((m, i) => {
+                    const sel = ev.month === (i+1) ? 'selected' : '';
+                    monthOpts += `<option value="${i+1}" ${sel}>${i+1}. ${m}</option>`;
+                });
+
+                div.innerHTML += `
+                    <div class="timeline-card" data-id="${ev.id}">
+                        <div class="timeline-handle"><i class="fas fa-grip-lines"></i></div>
+                        
+                        <div style="display:flex; gap:5px; margin-bottom:10px;">
+                            <input type="number" placeholder="Day" value="${ev.day||''}" style="width:50px; padding:5px;" onchange="updateEventDate(${ev.id}, 'day', this.value)">
+                            <select style="padding:5px; font-size:0.8rem;" onchange="updateEventDate(${ev.id}, 'month', this.value)">
+                                <option value="">Month</option>
+                                ${monthOpts}
+                            </select>
+                            <input type="number" placeholder="Year" value="${ev.year||''}" style="width:60px; padding:5px;" onchange="updateEventDate(${ev.id}, 'year', this.value)">
+                        </div>
+
+                        <input type="text" value="${ev.title}" style="font-weight:bold; margin-bottom:5px;" onchange="updateEventText(${ev.id}, 'title', this.value)">
+                        <textarea style="width:100%; height:60px; font-size:0.9rem;" placeholder="Description..." onchange="updateEventText(${ev.id}, 'desc', this.value)">${ev.desc}</textarea>
+                        
+                        <button class="btn" style="background:var(--bg-input); color:var(--text-muted); margin-top:5px; font-size:0.7rem; padding:4px 8px;" onclick="deleteEvent(${ev.id})">Delete</button>
+                    </div>`;
+            });
+        }
+
+        function updateEventDate(id, field, val) {
+            const ev = currentWorld.data.timeline.find(x => x.id === id);
+            if(ev) { ev[field] = parseInt(val); saveAll(); }
+        }
+        function updateEventText(id, field, val) {
+            const ev = currentWorld.data.timeline.find(x => x.id === id);
+            if(ev) { ev[field] = val; saveAll(); }
+        }
+
+        // --- STANDARD DATA OPS ---
+        function saveAll() {
+            // Save current writing buffer to object before persisting
+            if(currentWorld) {
+                currentWorld.data.writing.title = document.getElementById('chapterTitle').value;
+                currentWorld.data.writing.content = document.getElementById('chapterContent').value;
+            }
+            localStorage.setItem('worldSmithMultiverse', JSON.stringify(appData));
+        }
+
+        function createNewEntity(type) {
+            const id = Date.now().toString();
+            const empty = type === 'world' 
+                ? { id, name: 'New Entry', type: 'Location', desc: '' } 
+                : { id, name: 'New Character', race:'', role:'', god: '', goal:'', notes:'' };
+            
+            if(type === 'world') currentWorld.data.world.push(empty); 
+            else currentWorld.data.chars.push(empty);
+            
+            saveAll(); refreshLists(); loadEntity(type, id);
+        }
+
+        function saveEntity(type) {
+            if(type === 'world') {
+                const id = document.getElementById('wId').value;
+                const idx = currentWorld.data.world.findIndex(x => x.id === id);
+                if(idx > -1) {
+                    currentWorld.data.world[idx] = { 
+                        id, name: document.getElementById('wName').value, 
+                        type: document.getElementById('wType').value, 
+                        desc: document.getElementById('wDesc').value 
+                    };
+                }
             } else {
-                p.style.marginRight = p.style.marginRight === '-350px' ? '0' : '-350px';
+                const id = document.getElementById('cId').value;
+                const idx = currentWorld.data.chars.findIndex(x => x.id === id);
+                if(idx > -1) {
+                    currentWorld.data.chars[idx] = { 
+                        id, name: document.getElementById('cName').value, 
+                        race: document.getElementById('cRace').value, 
+                        role: document.getElementById('cRole').value, 
+                        god: document.getElementById('cGod').value, 
+                        goal: document.getElementById('cGoal').value, 
+                        notes: document.getElementById('cNotes').value 
+                    };
+                }
+            }
+            saveAll(); refreshLists(); searchWiki('');
+        }
+
+        function loadEntity(type, id) {
+            const data = type === 'world' ? currentWorld.data.world.find(x => x.id === id) : currentWorld.data.chars.find(x => x.id === id);
+            if(!data) return;
+            if(type === 'world') {
+                document.getElementById('wId').value = data.id; document.getElementById('wName').value = data.name; 
+                document.getElementById('wType').value = data.type; document.getElementById('wDesc').value = data.desc;
+            } else {
+                document.getElementById('cId').value = data.id; document.getElementById('cName').value = data.name; 
+                document.getElementById('cRace').value = data.race; document.getElementById('cRole').value = data.role; 
+                document.getElementById('cGod').value = data.god;
+                document.getElementById('cGoal').value = data.goal; document.getElementById('cNotes').value = data.notes;
             }
         }
 
-        // --- STANDARD FUNCTIONS ---
+        function refreshLists() {
+            const wList = document.getElementById('worldList'); wList.innerHTML = '';
+            ['Race', 'Location', 'Religion', 'Faction', 'Magic'].forEach(t => {
+                const items = currentWorld.data.world.filter(x => x.type === t);
+                if(items.length > 0) { wList.innerHTML += `<div class="category-header">${t}s</div>`; items.forEach(item => wList.innerHTML += `<div class="entity-item" onclick="loadEntity('world', '${item.id}')">${item.name}</div>`); }
+            });
+            const cList = document.getElementById('charList'); cList.innerHTML = '';
+            currentWorld.data.chars.forEach(item => cList.innerHTML += `<div class="entity-item" onclick="loadEntity('char', '${item.id}')">${item.name}</div>`);
+            
+            // REFRESH DROPDOWNS
+            populateDropdowns();
+        }
+
+        // --- BASIC UTILS ---
         function setTab(tabId) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.getElementById('view-' + tabId).classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
             event.currentTarget.classList.add('active');
+            if(tabId === 'web') renderWeb();
+            if(tabId === 'write') searchWiki('');
         }
-        function toggleTheme(forceLight) {
-            if(forceLight || !isLight) { document.body.classList.add('light-mode'); isLight = true; } 
-            else { document.body.classList.remove('light-mode'); isLight = false; }
-            localStorage.setItem('wsTheme', isLight ? 'light' : 'dark');
-        }
-        function autoSave() {
-            db.writing.title = document.getElementById('chapterTitle').value;
-            db.writing.content = document.getElementById('chapterContent').value;
-            persist();
-        }
-        function persist() { localStorage.setItem('worldSmithDB', JSON.stringify(db)); }
-        function createNewEntity(type) {
-            const id = Date.now().toString();
-            const empty = type === 'world' ? { id, name: 'New Entry', type: 'Location', region:'', desc:'' } : { id, name: 'New Character', race:'', role:'', goal:'', notes:'' };
-            if(type === 'world') db.world.push(empty); else db.chars.push(empty);
-            persist(); refreshLists(); loadEntity(type, id);
-        }
-        function saveEntity(type) {
-            if(type === 'world') {
-                const id = document.getElementById('wId').value;
-                const idx = db.world.findIndex(x => x.id === id);
-                if(idx > -1) db.world[idx] = { id, name: document.getElementById('wName').value, type: document.getElementById('wType').value, region: document.getElementById('wRegion').value, desc: document.getElementById('wDesc').value };
-            } else {
-                const id = document.getElementById('cId').value;
-                const idx = db.chars.findIndex(x => x.id === id);
-                if(idx > -1) db.chars[idx] = { id, name: document.getElementById('cName').value, race: document.getElementById('cRace').value, role: document.getElementById('cRole').value, goal: document.getElementById('cGoal').value, notes: document.getElementById('cNotes').value };
-            }
-            persist(); refreshLists(); alert('Saved!'); searchWiki('');
-        }
-        function loadEntity(type, id) {
-            const data = type === 'world' ? db.world.find(x => x.id === id) : db.chars.find(x => x.id === id);
-            if(!data) return;
-            if(type === 'world') {
-                document.getElementById('wId').value = data.id; document.getElementById('wName').value = data.name; document.getElementById('wType').value = data.type; document.getElementById('wRegion').value = data.region; document.getElementById('wDesc').value = data.desc;
-            } else {
-                document.getElementById('cId').value = data.id; document.getElementById('cName').value = data.name; document.getElementById('cRace').value = data.race; document.getElementById('cRole').value = data.role; document.getElementById('cGoal').value = data.goal; document.getElementById('cNotes').value = data.notes;
-            }
-        }
-        function refreshLists() {
-            const wList = document.getElementById('worldList'); wList.innerHTML = '';
-            ['Race', 'Location', 'Religion', 'Faction', 'Magic'].forEach(t => {
-                const items = db.world.filter(x => x.type === t);
-                if(items.length > 0) { wList.innerHTML += `<div class="category-header">${t}s</div>`; items.forEach(item => wList.innerHTML += `<div class="entity-item" onclick="loadEntity('world', '${item.id}')">${item.name}</div>`); }
-            });
-            const cList = document.getElementById('charList'); cList.innerHTML = '';
-            db.chars.forEach(item => cList.innerHTML += `<div class="entity-item" onclick="loadEntity('char', '${item.id}')">${item.name}</div>`);
-        }
+        function toggleTheme(forceLight) { if(forceLight || !isLight) { document.body.classList.add('light-mode'); isLight = true; } else { document.body.classList.remove('light-mode'); isLight = false; } localStorage.setItem('wsTheme', isLight ? 'light' : 'dark'); }
+        function autoSave() { saveAll(); }
+        
         function initSortable() {
             new Sortable(document.getElementById('timelineList'), {
-                animation: 150, delay: 100, delayOnTouchOnly: true,
+                animation: 150, delay: 100, delayOnTouchOnly: true, handle: '.timeline-handle',
                 onEnd: function (evt) {
                     const newOrder = [];
                     document.querySelectorAll('.timeline-card').forEach(card => {
                         const id = parseInt(card.getAttribute('data-id'));
-                        const item = db.timeline.find(x => x.id === id);
+                        const item = currentWorld.data.timeline.find(x => x.id === id);
                         if(item) newOrder.push(item);
                     });
-                    db.timeline = newOrder; persist();
+                    currentWorld.data.timeline = newOrder; saveAll();
                 }
             });
         }
-        function addEvent() { const title = prompt("Event Title:"); if(title) { db.timeline.push({ id: Date.now(), title, desc: '...' }); persist(); renderTimeline(); } }
-        function deleteEvent(id) { if(confirm("Delete?")) { db.timeline = db.timeline.filter(x => x.id !== id); persist(); renderTimeline(); } }
-        function updateEvent(id, val) { const ev = db.timeline.find(x => x.id === id); if(ev) { ev.desc = val; persist(); } }
-        function renderTimeline() {
-            const div = document.getElementById('timelineList'); div.innerHTML = '';
-            db.timeline.forEach((ev) => {
-                div.innerHTML += `<div class="timeline-card" data-id="${ev.id}"><div class="timeline-handle"><i class="fas fa-grip-lines"></i></div><h4>${ev.title}</h4><textarea style="width:100%; height:80px; font-size:0.9rem;" onchange="updateEvent(${ev.id}, this.value)">${ev.desc}</textarea><button class="btn" style="background:var(--bg-input); color:var(--text-muted); margin-top:5px; font-size:0.7rem; padding:4px 8px;" onclick="deleteEvent(${ev.id})">Delete</button></div>`;
-            });
+        function addEvent() { db = currentWorld.data; db.timeline.push({ id: Date.now(), title: 'New Event', desc: '', day:1, month:1, year:1 }); saveAll(); renderTimeline(); }
+        function deleteEvent(id) { if(confirm("Delete?")) { currentWorld.data.timeline = currentWorld.data.timeline.filter(x => x.id !== id); saveAll(); renderTimeline(); } }
+        
+        function filterWiki(type, btn) {
+            wikiFilter = type; document.querySelectorAll('.w-tab').forEach(b => b.classList.remove('active')); btn.classList.add('active'); searchWiki(document.querySelector('.wiki-search').value);
         }
-        function saveToDisk() { const blob = new Blob([JSON.stringify(db)], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'WorldSmith_Backup.json'; a.click(); }
-        function loadFromDisk(input) { const r = new FileReader(); r.onload = (e) => { try { db = JSON.parse(e.target.result); persist(); location.reload(); } catch(err) { alert("Invalid File"); } }; r.readAsText(input.files[0]); }
-        function emergencyCopy() { const raw = localStorage.getItem('worldSmithDB'); if(navigator.clipboard) { navigator.clipboard.writeText(raw).then(() => alert("Copied!")); } else { prompt("Copy manually:", raw); } }
-        window.onerror = function(msg, url, line) { document.getElementById('crashMsg').innerHTML = `<strong>Error:</strong> ${msg}<br><strong>Line:</strong> ${line}`; document.getElementById('crashModal').style.display = 'flex'; return false; };
+        function searchWiki(term) {
+            const res = document.getElementById('wikiResults'); res.innerHTML = ''; term = term.toLowerCase();
+            if(wikiFilter === 'all' || wikiFilter === 'world') { currentWorld.data.world.forEach(w => { if(w.name.toLowerCase().includes(term) || w.type.toLowerCase().includes(term)) res.innerHTML += `<div class="wiki-card"><h4>${w.name} <small>${w.type}</small></h4><small>${w.desc.substring(0, 60)}...</small></div>`; }); }
+            if(wikiFilter === 'all' || wikiFilter === 'char') { currentWorld.data.chars.forEach(c => { if(c.name.toLowerCase().includes(term)) res.innerHTML += `<div class="wiki-card" style="border-left-color: var(--accent-sec);"><h4>${c.name}</h4><small>${c.race || ''}</small></div>`; }); }
+        }
+        function toggleWiki() {
+            const p = document.getElementById('wikiPanel');
+            if(window.innerWidth < 768) { p.style.display = p.style.display === 'flex' ? 'none' : 'flex'; } else { p.style.marginRight = p.style.marginRight === '-350px' ? '0' : '-350px'; }
+        }
+        function saveToDisk() { const blob = new Blob([JSON.stringify(appData)], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'WorldSmith_Multiverse.json'; a.click(); }
+        function loadFromDisk(input) { const r = new FileReader(); r.onload = (e) => { try { appData = JSON.parse(e.target.result); switchWorld(appData.activeId); location.reload(); } catch(err) { alert("Invalid File"); } }; r.readAsText(input.files[0]); }
     </script>
 </body>
 </html>
