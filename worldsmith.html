@@ -21,6 +21,12 @@
             --text-main: #e0e0e0; --text-muted: #9496a8; --border: #4a4c58;
             --accent: #b59af7; --accent-dim: #7d6bb0; --accent-sec: #ffb7b2;
             --card-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            
+            /* Sticky Note Colors */
+            --note-major: #ffb7b2; /* Coral (Major) */
+            --note-sub: #a0c4ff;   /* Blue (Subplot) */
+            --note-filler: #b9fbc0; /* Green (Filler) */
+            --note-default: #fdffb6; /* Yellow (Default) */
         }
         body.light-mode {
             --bg-body: #fdf6e3; --bg-panel: #eee8d5; --bg-input: #ffffff;
@@ -42,61 +48,54 @@
         .view-section { display: none; width: 100%; height: 100%; padding: 20px; box-sizing: border-box; overflow-y: auto; }
         .view-section.active { display: block; }
 
-        /* --- WRITING DESK (3 COLUMN LAYOUT) --- */
+        /* --- WRITING DESK --- */
         #view-write { padding: 0; display:none; }
-        #view-write.active { display: flex; overflow: hidden; } /* Flex container to hold columns */
-        
-        /* 1. Chapter List (Left) */
+        #view-write.active { display: flex; overflow: hidden; }
         .chapter-sidebar { width: 200px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 10px; flex-shrink: 0; overflow-y: auto; }
         .chapter-item { padding: 10px; border-radius: 6px; cursor: pointer; margin-bottom: 5px; color: var(--text-muted); font-size: 0.9rem; }
         .chapter-item:hover { background: var(--bg-input); }
         .chapter-item.active { background: var(--bg-input); color: var(--accent); border-left: 3px solid var(--accent); font-weight: bold; }
-        
-        /* 2. Editor (Center) */
         .editor-container { flex: 1; padding: 40px 10%; overflow-y: auto; background: var(--bg-body); transition: background 0.3s; position: relative; }
         .editor-title { width: 100%; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--accent); font-size: 1.8rem; padding: 15px; box-sizing: border-box; font-family: 'Georgia', serif; font-weight: bold; margin-bottom: 20px; outline: none; }
         .editor-area { width: 100%; height: 70vh; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--text-main); font-size: 1.1rem; line-height: 1.6; padding: 20px; box-sizing: border-box; font-family: 'Georgia', serif; resize: none; outline: none; }
         
-        /* 3. Right Panel (Wiki/Notes) */
+        /* --- RIGHT PANEL --- */
         .right-panel { width: 350px; background: var(--bg-panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; padding: 15px; flex-shrink: 0; transition: margin-right 0.3s ease-in-out; margin-right: 0; }
-        .right-panel.collapsed { margin-right: -381px; } /* Hides fully */
-        
+        .right-panel.collapsed { margin-right: -381px; }
         .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .panel-toggle-tabs { display: flex; gap: 5px; }
         .p-tab { padding: 5px 10px; font-size: 0.75rem; border: 1px solid var(--border); border-radius: 4px; cursor: pointer; color: var(--text-muted); }
         .p-tab.active { background: var(--accent); color: var(--bg-panel); border-color: var(--accent); }
-
-        /* WIKI CONTENT */
-        #panel-wiki { display: none; flex-direction: column; height: 100%; }
-        #panel-wiki.active { display: flex; }
+        #panel-wiki, #panel-notes { display: none; flex-direction: column; height: 100%; }
+        #panel-wiki.active, #panel-notes.active { display: flex; }
         .wiki-tabs { display: flex; gap: 5px; margin-bottom: 10px; }
         .w-tab { flex: 1; padding: 8px; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; border-radius: 6px; font-size: 0.8rem; font-weight: bold; }
         .w-tab.active { background: var(--accent); color: var(--bg-panel); border-color: var(--accent); }
         .wiki-search { width: 100%; padding: 12px; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); border-radius: 8px; margin-bottom: 15px; }
         .wiki-results { flex: 1; overflow-y: auto; }
         .wiki-card { background: var(--bg-input); padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid var(--accent); cursor: pointer; box-shadow: var(--card-shadow); }
-        
-        /* NOTES CONTENT */
-        #panel-notes { display: none; flex-direction: column; height: 100%; }
-        #panel-notes.active { display: flex; }
         .notes-area { flex: 1; width: 100%; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); padding: 10px; box-sizing: border-box; border-radius: 8px; resize: none; font-family: sans-serif; }
 
-        /* --- WEB / GRAPH VIEW --- */
-        #network-container { width: 100%; height: 85vh; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; }
-
-        /* --- MOBILE --- */
-        @media (max-width: 768px) {
-            .chapter-sidebar { display: none; position: absolute; left: 0; top: 0; height: 100%; z-index: 200; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
-            .chapter-sidebar.show { display: flex; }
-            .right-panel { width: 100%; height: 40vh; border-left: none; border-top: 2px solid var(--accent); position: absolute; bottom: 0; left: 0; z-index: 200; display: none; margin-right: 0; }
-            .right-panel.mobile-show { display: flex; }
-            .editor-container { padding: 20px; padding-bottom: 100px; }
-            .sidebar { width: 60px; }
-            .wb-grid { display: flex; flex-direction: column; }
-            .wb-list { height: 200px; }
-            /* Mobile Buttons */
-            #mobChaptersBtn, #mobWikiBtn { display: flex !important; }
+        /* --- THE BOARD (CORKBOARD) --- */
+        .board-container { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; padding-bottom: 100px; }
+        .board-card {
+            width: 200px; min-height: 180px; background: var(--note-default); color: #333;
+            border-radius: 4px; padding: 15px; box-shadow: 2px 4px 10px rgba(0,0,0,0.2);
+            position: relative; display: flex; flex-direction: column; cursor: grab;
+            transition: transform 0.2s;
         }
+        .board-card:hover { transform: scale(1.02); z-index: 10; }
+        .board-card.major { background: var(--note-major); }
+        .board-card.sub { background: var(--note-sub); }
+        .board-card.filler { background: var(--note-filler); }
+        
+        .bc-header { font-weight: bold; font-family: 'Georgia', serif; font-size: 1.1rem; margin-bottom: 10px; line-height: 1.2; outline: none; border-bottom: 1px dashed rgba(0,0,0,0.2); padding-bottom: 5px; }
+        .bc-body { font-size: 0.85rem; flex: 1; margin-bottom: 10px; overflow: hidden; }
+        .bc-meta { font-size: 0.75rem; color: rgba(0,0,0,0.6); margin-top: auto; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 5px; }
+        .bc-actions { position: absolute; top: 5px; right: 5px; opacity: 0; transition: opacity 0.2s; }
+        .board-card:hover .bc-actions { opacity: 1; }
+        .bc-btn { background: rgba(255,255,255,0.5); border: none; border-radius: 4px; padding: 4px 6px; cursor: pointer; font-size: 0.7rem; }
+        .bc-btn:hover { background: rgba(255,255,255,0.9); }
 
         /* --- UTILS --- */
         .wb-grid { display: grid; grid-template-columns: 280px 1fr; gap: 20px; height: 100%; }
@@ -112,15 +111,25 @@
         input:focus, select:focus, textarea:focus { border-color: var(--accent); outline: none; }
         .btn { padding: 10px 20px; background: var(--accent); border: none; color: var(--bg-panel); border-radius: 8px; cursor: pointer; font-weight: 800; }
         .btn-new { width: 100%; margin-bottom: 15px; background: var(--bg-input); color: var(--text-muted); border: 2px dashed var(--border); }
-        
-        /* --- TIMELINE --- */
-        .timeline-container { display: flex; gap: 20px; padding: 20px; overflow-x: auto; height: 100%; align-items: flex-start; }
-        .timeline-card { min-width: 280px; width: 280px; background: var(--bg-panel); border-top: 4px solid var(--accent-sec); padding: 20px; border-radius: 12px; position: relative; box-shadow: var(--card-shadow); border: 1px solid var(--border); flex-shrink: 0; }
-        .timeline-handle { position: absolute; top: 10px; right: 10px; color: var(--text-muted); cursor: grab; padding: 10px; font-size: 1.2rem; }
+        #network-container { width: 100%; height: 85vh; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; }
 
-        /* --- LIBRARY MODAL --- */
+        /* --- MODALS --- */
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 500; align-items: center; justify-content: center; }
-        .modal-box { background: var(--bg-panel); padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; border: 1px solid var(--accent); }
+        .modal-box { background: var(--bg-panel); padding: 30px; border-radius: 12px; width: 90%; max-width: 500px; text-align: left; border: 1px solid var(--accent); max-height: 90vh; overflow-y: auto; }
+
+        /* --- MOBILE --- */
+        @media (max-width: 768px) {
+            .chapter-sidebar { display: none; position: absolute; left: 0; top: 0; height: 100%; z-index: 200; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
+            .chapter-sidebar.show { display: flex; }
+            .right-panel { width: 100%; height: 40vh; border-left: none; border-top: 2px solid var(--accent); position: absolute; bottom: 0; left: 0; z-index: 200; display: none; margin-right: 0; }
+            .right-panel.mobile-show { display: flex; }
+            .editor-container { padding: 20px; padding-bottom: 100px; }
+            .sidebar { width: 60px; }
+            .wb-grid { display: flex; flex-direction: column; }
+            .wb-list { height: 200px; }
+            #mobChaptersBtn, #mobWikiBtn { display: flex !important; }
+            .board-container { justify-content: center; }
+        }
     </style>
 </head>
 <body>
@@ -131,8 +140,7 @@
         <button class="nav-btn active" onclick="setTab('write')"><i class="fas fa-pen-nib"></i></button>
         <button class="nav-btn" onclick="setTab('world')"><i class="fas fa-globe-americas"></i></button>
         <button class="nav-btn" onclick="setTab('chars')"><i class="fas fa-users"></i></button>
-        <button class="nav-btn" onclick="setTab('plot')"><i class="fas fa-project-diagram"></i></button>
-        <button class="nav-btn" onclick="setTab('web')"><i class="fas fa-circle-nodes"></i></button>
+        <button class="nav-btn" onclick="setTab('board')"><i class="fas fa-th-large"></i></button> <button class="nav-btn" onclick="setTab('web')"><i class="fas fa-circle-nodes"></i></button>
         <div style="margin-top:auto;"></div>
         <button class="nav-btn" onclick="toggleTheme()"><i class="fas fa-adjust"></i></button>
         <button class="nav-btn" onclick="saveToDisk()"><i class="fas fa-save"></i></button>
@@ -143,22 +151,18 @@
     <div class="main-stage">
         
         <div id="view-write" class="view-section active">
-            
             <div class="chapter-sidebar" id="chapterSidebar">
                 <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Chapters</div>
                 <div id="chapterList"></div>
                 <button class="btn-new" onclick="createChapter()" style="margin-top:10px;">+ New Chapter</button>
             </div>
-
             <div class="editor-container">
                 <div id="storyHeader" style="margin-bottom:10px; color:var(--text-muted); font-size:0.8rem; text-transform:uppercase;"></div>
                 <input type="text" id="chapterTitle" class="editor-title" placeholder="Chapter Title" oninput="autoSave()">
                 <textarea id="chapterContent" class="editor-area" placeholder="Write your story..." oninput="autoSave()"></textarea>
-                
                 <button onclick="toggleMobileChapters()" style="position:absolute; top:20px; left:20px; z-index:50; background:var(--bg-panel); color:var(--text-muted); border:1px solid var(--border); border-radius:50%; width:44px; height:44px; display:none; justify-content:center; align-items:center;" id="mobChaptersBtn"><i class="fas fa-list"></i></button>
                 <button onclick="toggleRightPanel()" style="position:absolute; top:20px; right:20px; z-index:50; background:var(--bg-panel); color:var(--accent); border:2px solid var(--accent); border-radius:50%; width:44px; height:44px; display:none; justify-content:center; align-items:center;" id="mobWikiBtn"><i class="fas fa-book"></i></button>
             </div>
-
             <div class="right-panel" id="rightPanel">
                 <div class="panel-header">
                     <div class="panel-toggle-tabs">
@@ -167,36 +171,21 @@
                     </div>
                     <button class="btn" style="padding:4px 10px; font-size:0.8rem;" onclick="toggleRightPanel()">Close</button>
                 </div>
-
                 <div id="panel-wiki" class="active">
-                    <div class="wiki-tabs">
-                        <button class="w-tab active" onclick="filterWiki('all', this)">ALL</button>
-                        <button class="w-tab" onclick="filterWiki('world', this)">WORLD</button>
-                        <button class="w-tab" onclick="filterWiki('char', this)">CHARS</button>
-                    </div>
+                    <div class="wiki-tabs"><button class="w-tab active" onclick="filterWiki('all', this)">ALL</button><button class="w-tab" onclick="filterWiki('world', this)">WORLD</button><button class="w-tab" onclick="filterWiki('char', this)">CHARS</button></div>
                     <input type="text" class="wiki-search" placeholder="Search..." oninput="searchWiki(this.value)">
                     <div id="wikiResults" class="wiki-results"></div>
                 </div>
-
-                <div id="panel-notes">
-                    <textarea class="notes-area" id="chapterNotes" placeholder="Scratchpad for this chapter..." oninput="autoSave()"></textarea>
-                </div>
+                <div id="panel-notes"><textarea class="notes-area" id="chapterNotes" placeholder="Scratchpad..." oninput="autoSave()"></textarea></div>
             </div>
         </div>
 
         <div id="view-world" class="view-section">
             <div class="wb-grid">
-                <div class="wb-list">
-                    <button class="btn btn-new" onclick="createNewEntity('world')">+ New Entry</button>
-                    <div id="worldList"></div>
-                </div>
+                <div class="wb-list"><button class="btn btn-new" onclick="createNewEntity('world')">+ New Entry</button><div id="worldList"></div></div>
                 <div class="wb-detail">
-                    <form onsubmit="event.preventDefault(); saveEntity('world');">
-                        <input type="hidden" id="wId">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <h2 style="margin:0; color:var(--accent);">World Entry</h2>
-                            <button class="btn">Save</button>
-                        </div>
+                    <form onsubmit="event.preventDefault(); saveEntity('world');"><input type="hidden" id="wId">
+                        <div style="display:flex; justify-content:space-between; align-items:center;"><h2 style="margin:0; color:var(--accent);">World Entry</h2><button class="btn">Save</button></div>
                         <hr style="border:0; border-bottom:1px solid var(--border); margin:20px 0;">
                         <div class="form-group"><label>Name</label><input type="text" id="wName" required></div>
                         <div class="form-group"><label>Type</label><select id="wType"><option value="Race">Race / Species</option><option value="Location">Location / Kingdom</option><option value="Religion">Religion / Deity</option><option value="Faction">Faction / Politics</option><option value="Magic">Magic System</option></select></div>
@@ -208,23 +197,13 @@
 
         <div id="view-chars" class="view-section">
             <div class="wb-grid">
-                <div class="wb-list">
-                    <button class="btn btn-new" onclick="createNewEntity('char')">+ New Character</button>
-                    <div id="charList"></div>
-                </div>
+                <div class="wb-list"><button class="btn btn-new" onclick="createNewEntity('char')">+ New Character</button><div id="charList"></div></div>
                 <div class="wb-detail">
-                    <form onsubmit="event.preventDefault(); saveEntity('char');">
-                        <input type="hidden" id="cId">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <h2 style="margin:0; color:var(--accent);">Character</h2>
-                            <button class="btn">Save</button>
-                        </div>
+                    <form onsubmit="event.preventDefault(); saveEntity('char');"><input type="hidden" id="cId">
+                        <div style="display:flex; justify-content:space-between; align-items:center;"><h2 style="margin:0; color:var(--accent);">Character</h2><button class="btn">Save</button></div>
                         <hr style="border:0; border-bottom:1px solid var(--border); margin:20px 0;">
                         <div class="form-group"><label>Name</label><input type="text" id="cName" required></div>
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                            <div class="form-group"><label>Race</label><select id="cRace"><option value="">- Select -</option></select></div>
-                            <div class="form-group"><label>Faction</label><select id="cRole"><option value="">- Select -</option></select></div>
-                        </div>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Race</label><select id="cRace"><option value="">- Select -</option></select></div><div class="form-group"><label>Faction</label><select id="cRole"><option value="">- Select -</option></select></div></div>
                         <div class="form-group"><label>Religion</label><select id="cGod"><option value="">- Select -</option></select></div>
                         <div class="form-group"><label>Goal</label><input type="text" id="cGoal"></div>
                         <div class="form-group"><label>Notes</label><textarea id="cNotes" rows="6"></textarea></div>
@@ -233,19 +212,17 @@
             </div>
         </div>
 
-        <div id="view-plot" class="view-section">
+        <div id="view-board" class="view-section">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h2 style="margin:0; color:var(--accent);">Timeline</h2>
-                <button class="btn" onclick="addEvent()">+ Event</button>
+                <h2 style="margin:0; color:var(--accent);">Story Board</h2>
+                <button class="btn" onclick="addEvent()">+ Add Card</button>
             </div>
-            <div class="timeline-container" id="timelineList"></div>
+            <div class="board-container" id="boardList">
+                </div>
         </div>
 
         <div id="view-web" class="view-section">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h2 style="margin:0; color:var(--accent);">The Web</h2>
-                <button class="btn" onclick="renderWeb()">Refresh Graph</button>
-            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;"><h2 style="margin:0; color:var(--accent);">The Web</h2><button class="btn" onclick="renderWeb()">Refresh Graph</button></div>
             <div id="network-container"></div>
         </div>
 
@@ -260,9 +237,36 @@
         </div>
     </div>
 
+    <div id="eventModal" class="overlay">
+        <div class="modal-box">
+            <h3 style="color:var(--accent); margin-top:0;">Card Details</h3>
+            <input type="hidden" id="evId">
+            <div class="form-group">
+                <label>Plot Type</label>
+                <select id="evType">
+                    <option value="default">Standard Scene</option>
+                    <option value="major">Major Plot Point / Climax</option>
+                    <option value="sub">Subplot / B-Story</option>
+                    <option value="filler">Filler / Bonding / Travel</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Who (Characters)</label><input type="text" id="evWho" placeholder="e.g. Aragorn, Gimli"></div>
+            <div class="form-group"><label>Where (Location)</label><input type="text" id="evWhere" placeholder="e.g. Helm's Deep"></div>
+            
+            <label>Time</label>
+            <div style="display:flex; gap:5px; margin-bottom:15px;">
+                <input type="number" id="evDay" placeholder="Day" style="width:60px;">
+                <select id="evMonth" style="flex:1;"><option value="">Month</option></select>
+                <input type="number" id="evYear" placeholder="Year" style="width:70px;">
+            </div>
+            
+            <button class="btn" onclick="saveEventDetails()">Save Details</button>
+            <button class="btn" style="background:transparent; border:1px solid var(--text-muted); margin-left:10px;" onclick="document.getElementById('eventModal').style.display='none'">Cancel</button>
+        </div>
+    </div>
+
     <script>
         const MONTHS = ["Aether", "Borean", "Cygnus", "Dormus", "Eon", "Fyre", "Glacies", "Harvest", "Ignis", "Juras", "Kryos", "Lux", "Mirus", "Nox", "Omen"];
-        
         let appData = { activeId: null, worlds: [] };
         let currentWorld = null;
         let activeChapterId = null;
@@ -272,201 +276,157 @@
         window.onload = () => {
             if(localStorage.getItem('wsTheme') === 'light') toggleTheme(true);
             const saved = localStorage.getItem('worldSmithMultiverse');
-            if(saved) {
-                appData = JSON.parse(saved);
-            } else {
-                createWorld("First World", true);
-            }
+            if(saved) { appData = JSON.parse(saved); } else { createWorld("First World", true); }
             loadActiveWorld();
-            initSortable();
+            initBoardSortable();
         };
 
-        // --- WORLD & DATA LOGIC ---
+        // --- CORE LOGIC ---
         function createWorld(name, autoLoad=false) {
-            if(!name) name = prompt("Name of new World / Story:");
-            if(!name) return;
+            if(!name) name = prompt("Name:"); if(!name) return;
             const id = 'w' + Date.now();
-            const newW = {
-                id: id, name: name,
-                data: { 
-                    chapters: [{id: 'ch1', title: 'Chapter 1', content: '', notes: ''}], 
-                    world: [], chars: [], timeline: [] 
-                }
-            };
-            appData.worlds.push(newW);
-            saveAll();
-            if(autoLoad) switchWorld(id);
-            renderLib();
+            appData.worlds.push({ id: id, name: name, data: { chapters: [{id: 'ch1', title: 'Chapter 1', content: '', notes: ''}], world: [], chars: [], timeline: [] } });
+            saveAll(); if(autoLoad) switchWorld(id); renderLib();
         }
         function switchWorld(id) { appData.activeId = id; saveAll(); loadActiveWorld(); document.getElementById('libModal').style.display = 'none'; }
         
         function loadActiveWorld() {
             currentWorld = appData.worlds.find(w => w.id === appData.activeId);
             if(!currentWorld) return;
+            // Legacy Migration
+            if(!currentWorld.data.chapters) currentWorld.data.chapters = [{ id: 'legacy', title: 'Chapter 1', content: currentWorld.data.writing?.content || '', notes: '' }];
             
-            // Migrate legacy data if needed
-            if(!currentWorld.data.chapters) {
-                currentWorld.data.chapters = [{
-                    id: 'legacy', 
-                    title: currentWorld.data.writing.title || 'Chapter 1', 
-                    content: currentWorld.data.writing.content || '',
-                    notes: ''
-                }];
-            }
-
             document.getElementById('storyHeader').innerText = `Current Story: ${currentWorld.name}`;
-            
-            // Load first chapter if none active
-            if(!activeChapterId || !currentWorld.data.chapters.find(c => c.id === activeChapterId)) {
-                activeChapterId = currentWorld.data.chapters[0].id;
-            }
-            
+            if(!activeChapterId || !currentWorld.data.chapters.find(c => c.id === activeChapterId)) activeChapterId = currentWorld.data.chapters[0].id;
             loadChapter(activeChapterId);
-            renderChapterList();
-            refreshLists();
-            renderTimeline();
-            searchWiki('');
+            refreshLists(); renderBoard(); searchWiki('');
         }
 
-        // --- CHAPTER SYSTEM ---
         function createChapter() {
             const newCh = { id: 'ch'+Date.now(), title: 'New Chapter', content: '', notes: '' };
-            currentWorld.data.chapters.push(newCh);
-            saveAll();
-            renderChapterList();
-            loadChapter(newCh.id);
+            currentWorld.data.chapters.push(newCh); saveAll(); renderChapterList(); loadChapter(newCh.id);
         }
-        
         function loadChapter(id) {
-            saveCurrentBuffer(); // Save whatever is on screen before switching
-            activeChapterId = id;
+            saveCurrentBuffer(); activeChapterId = id;
             const ch = currentWorld.data.chapters.find(c => c.id === id);
-            if(!ch) return;
-            
-            document.getElementById('chapterTitle').value = ch.title;
-            document.getElementById('chapterContent').value = ch.content;
-            document.getElementById('chapterNotes').value = ch.notes || '';
+            document.getElementById('chapterTitle').value = ch.title; document.getElementById('chapterContent').value = ch.content; document.getElementById('chapterNotes').value = ch.notes || '';
             renderChapterList();
         }
-
         function saveCurrentBuffer() {
             if(!currentWorld || !activeChapterId) return;
             const ch = currentWorld.data.chapters.find(c => c.id === activeChapterId);
-            if(ch) {
-                ch.title = document.getElementById('chapterTitle').value;
-                ch.content = document.getElementById('chapterContent').value;
-                ch.notes = document.getElementById('chapterNotes').value;
-            }
+            if(ch) { ch.title = document.getElementById('chapterTitle').value; ch.content = document.getElementById('chapterContent').value; ch.notes = document.getElementById('chapterNotes').value; }
         }
-
         function renderChapterList() {
-            const list = document.getElementById('chapterList');
-            list.innerHTML = '';
-            currentWorld.data.chapters.forEach(ch => {
-                const isActive = ch.id === activeChapterId ? 'active' : '';
-                list.innerHTML += `<div class="chapter-item ${isActive}" onclick="loadChapter('${ch.id}')">${ch.title}</div>`;
+            const list = document.getElementById('chapterList'); list.innerHTML = '';
+            currentWorld.data.chapters.forEach(ch => { list.innerHTML += `<div class="chapter-item ${ch.id === activeChapterId ? 'active' : ''}" onclick="loadChapter('${ch.id}')">${ch.title}</div>`; });
+        }
+
+        // --- CORKBOARD ---
+        function initBoardSortable() {
+            new Sortable(document.getElementById('boardList'), {
+                animation: 150, delay: 100, delayOnTouchOnly: true,
+                onEnd: function (evt) {
+                    const newOrder = [];
+                    document.querySelectorAll('.board-card').forEach(card => {
+                        const id = parseInt(card.getAttribute('data-id'));
+                        const item = currentWorld.data.timeline.find(x => x.id === id);
+                        if(item) newOrder.push(item);
+                    });
+                    currentWorld.data.timeline = newOrder; saveAll();
+                }
             });
         }
 
-        // --- PANEL UI LOGIC ---
-        function setRightPanel(view) {
-            document.getElementById('panel-wiki').className = view === 'wiki' ? 'active' : '';
-            document.getElementById('panel-notes').className = view === 'notes' ? 'active' : '';
-            document.getElementById('tabWikiBtn').className = view === 'wiki' ? 'p-tab active' : 'p-tab';
-            document.getElementById('tabNotesBtn').className = view === 'notes' ? 'p-tab active' : 'p-tab';
+        function renderBoard() {
+            const div = document.getElementById('boardList'); div.innerHTML = '';
+            currentWorld.data.timeline.forEach((ev) => {
+                const typeClass = ev.type || 'default';
+                const timeStr = ev.day ? `Day ${ev.day}, ${MONTHS[ev.month-1] || '?'}` : '';
+                
+                div.innerHTML += `
+                    <div class="board-card ${typeClass}" data-id="${ev.id}">
+                        <div class="bc-actions">
+                            <button class="bc-btn" onclick="openEventDetails(${ev.id})"><i class="fas fa-edit"></i></button>
+                            <button class="bc-btn" onclick="deleteEvent(${ev.id})"><i class="fas fa-trash"></i></button>
+                        </div>
+                        <input class="bc-header" style="background:transparent; border:none; width:100%;" value="${ev.title}" onchange="updateEventText(${ev.id}, 'title', this.value)">
+                        <textarea class="bc-body" style="background:transparent; border:none; resize:none; width:100%; outline:none; font-family:sans-serif;" onchange="updateEventText(${ev.id}, 'desc', this.value)">${ev.desc}</textarea>
+                        <div class="bc-meta">
+                            ${ev.who ? '<i class="fas fa-user"></i> '+ev.who + '<br>' : ''}
+                            ${ev.where ? '<i class="fas fa-map-marker-alt"></i> '+ev.where + '<br>' : ''}
+                            ${timeStr}
+                        </div>
+                    </div>`;
+            });
         }
 
-        function toggleRightPanel() {
-            const p = document.getElementById('rightPanel');
-            if(window.innerWidth < 768) {
-                // Mobile
-                p.classList.toggle('mobile-show');
-            } else {
-                // Desktop
-                p.classList.toggle('collapsed');
+        function addEvent() {
+            currentWorld.data.timeline.push({ id: Date.now(), title: 'New Scene', desc: '', type: 'default' });
+            saveAll(); renderBoard();
+        }
+        function deleteEvent(id) {
+            if(confirm("Delete card?")) { currentWorld.data.timeline = currentWorld.data.timeline.filter(x => x.id !== id); saveAll(); renderBoard(); }
+        }
+        function updateEventText(id, field, val) {
+            const ev = currentWorld.data.timeline.find(x => x.id === id); if(ev) { ev[field] = val; saveAll(); }
+        }
+
+        // --- EVENT DETAILS MODAL ---
+        function openEventDetails(id) {
+            const ev = currentWorld.data.timeline.find(x => x.id === id);
+            document.getElementById('evId').value = id;
+            document.getElementById('evType').value = ev.type || 'default';
+            document.getElementById('evWho').value = ev.who || '';
+            document.getElementById('evWhere').value = ev.where || '';
+            document.getElementById('evDay').value = ev.day || '';
+            document.getElementById('evYear').value = ev.year || '';
+            
+            // Populate months
+            const mSel = document.getElementById('evMonth'); mSel.innerHTML = '<option value="">Month</option>';
+            MONTHS.forEach((m, i) => { mSel.innerHTML += `<option value="${i+1}" ${ev.month === (i+1) ? 'selected' : ''}>${m}</option>`; });
+            
+            document.getElementById('eventModal').style.display = 'flex';
+        }
+
+        function saveEventDetails() {
+            const id = parseInt(document.getElementById('evId').value);
+            const ev = currentWorld.data.timeline.find(x => x.id === id);
+            if(ev) {
+                ev.type = document.getElementById('evType').value;
+                ev.who = document.getElementById('evWho').value;
+                ev.where = document.getElementById('evWhere').value;
+                ev.day = parseInt(document.getElementById('evDay').value) || '';
+                ev.month = parseInt(document.getElementById('evMonth').value) || '';
+                ev.year = parseInt(document.getElementById('evYear').value) || '';
+                saveAll(); renderBoard();
+                document.getElementById('eventModal').style.display = 'none';
             }
         }
-        function toggleMobileChapters() {
-            document.getElementById('chapterSidebar').classList.toggle('show');
-        }
 
-        // --- WEB (GRAPH) ---
-        function renderWeb() {
-            if(!currentWorld) return;
-            const nodes = []; const edges = []; const ids = new Set();
-            currentWorld.data.world.forEach(w => {
-                let color = '#999';
-                if(w.type === 'Race') color = '#b59af7'; if(w.type === 'Religion') color = '#ffb7b2'; if(w.type === 'Faction') color = '#81c784';
-                nodes.push({ id: w.name, label: w.name, color: color, shape: 'box', font:{color:'white'} });
-                ids.add(w.name);
-            });
-            currentWorld.data.chars.forEach(c => {
-                nodes.push({ id: c.name, label: c.name, color: '#4fc3f7', shape: 'ellipse', font:{color:'white'} });
-                if(c.race && ids.has(c.race)) edges.push({ from: c.name, to: c.race });
-                if(c.god && ids.has(c.god)) edges.push({ from: c.name, to: c.god });
-                if(c.role && ids.has(c.role)) edges.push({ from: c.name, to: c.role });
-            });
-            const container = document.getElementById('network-container');
-            const data = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) };
-            const options = { 
-                physics: { stabilization: false, barnesHut: { gravitationalConstant: -8000, springConstant: 0.04, springLength: 95 } },
-                nodes: { borderWidth: 2, size: 30 },
-                edges: { width: 2, color: '#555' }
-            };
-            new vis.Network(container, data, options);
-        }
-
-        // --- UTILS & BOILERPLATE ---
+        // --- UTILS ---
         function saveAll() { saveCurrentBuffer(); localStorage.setItem('worldSmithMultiverse', JSON.stringify(appData)); }
         function openLibrary() { renderLib(); document.getElementById('libModal').style.display = 'flex'; }
-        function renderLib() {
-            const div = document.getElementById('libList'); div.innerHTML = '';
-            appData.worlds.forEach(w => {
-                const isActive = w.id === appData.activeId ? 'border:1px solid var(--accent); color:var(--accent);' : '';
-                div.innerHTML += `<div style="padding:10px; background:var(--bg-input); margin-bottom:5px; cursor:pointer; border-radius:5px; ${isActive}" onclick="switchWorld('${w.id}')">${w.name}</div>`;
-            });
-        }
+        function renderLib() { const div = document.getElementById('libList'); div.innerHTML = ''; appData.worlds.forEach(w => { div.innerHTML += `<div style="padding:10px; background:var(--bg-input); margin-bottom:5px; cursor:pointer; border-radius:5px; ${w.id===appData.activeId?'border:1px solid var(--accent);':''}" onclick="switchWorld('${w.id}')">${w.name}</div>`; }); }
+        function setTab(tabId) { document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active')); document.getElementById('view-' + tabId).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active')); event.currentTarget.classList.add('active'); if(tabId === 'web') setTimeout(renderWeb, 100); }
+        function toggleTheme(forceLight) { if(forceLight || !isLight) { document.body.classList.add('light-mode'); isLight = true; } else { document.body.classList.remove('light-mode'); isLight = false; } localStorage.setItem('wsTheme', isLight ? 'light' : 'dark'); }
         function autoSave() { saveAll(); if(activeChapterId) renderChapterList(); }
-        function setTab(tabId) {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            document.getElementById('view-' + tabId).classList.add('active');
-            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-            if(tabId === 'web') setTimeout(renderWeb, 100); 
-            if(tabId === 'write') searchWiki('');
-        }
+        
+        // Entity Logic
         function populateDropdowns() {
-            const races = currentWorld.data.world.filter(x => x.type === 'Race');
-            const rels = currentWorld.data.world.filter(x => x.type === 'Religion');
-            const facs = currentWorld.data.world.filter(x => x.type === 'Faction');
+            const races = currentWorld.data.world.filter(x => x.type === 'Race'); const rels = currentWorld.data.world.filter(x => x.type === 'Religion'); const facs = currentWorld.data.world.filter(x => x.type === 'Faction');
             fillSelect('cRace', races); fillSelect('cGod', rels); fillSelect('cRole', facs);
         }
-        function fillSelect(id, items) {
-            const sel = document.getElementById(id); sel.innerHTML = '<option value="">- Select -</option>';
-            items.forEach(i => { sel.innerHTML += `<option value="${i.name}">${i.name}</option>`; });
-        }
-        function createNewEntity(type) {
-            const id = Date.now().toString();
-            const empty = type === 'world' ? { id, name: 'New Entry', type: 'Location', desc: '' } : { id, name: 'New Character', race:'', role:'', god: '', goal:'', notes:'' };
-            if(type === 'world') currentWorld.data.world.push(empty); else currentWorld.data.chars.push(empty);
-            saveAll(); refreshLists(); loadEntity(type, id);
-        }
+        function fillSelect(id, items) { const sel = document.getElementById(id); sel.innerHTML = '<option value="">- Select -</option>'; items.forEach(i => { sel.innerHTML += `<option value="${i.name}">${i.name}</option>`; }); }
+        function createNewEntity(type) { const id = Date.now().toString(); const empty = type === 'world' ? { id, name: 'New Entry', type: 'Location', desc: '' } : { id, name: 'New Character', race:'', role:'', god: '', goal:'', notes:'' }; if(type === 'world') currentWorld.data.world.push(empty); else currentWorld.data.chars.push(empty); saveAll(); refreshLists(); loadEntity(type, id); }
         function saveEntity(type) {
-            if(type === 'world') {
-                const id = document.getElementById('wId').value;
-                const idx = currentWorld.data.world.findIndex(x => x.id === id);
-                if(idx > -1) currentWorld.data.world[idx] = { id, name: document.getElementById('wName').value, type: document.getElementById('wType').value, desc: document.getElementById('wDesc').value };
-            } else {
-                const id = document.getElementById('cId').value;
-                const idx = currentWorld.data.chars.findIndex(x => x.id === id);
-                if(idx > -1) currentWorld.data.chars[idx] = { id, name: document.getElementById('cName').value, race: document.getElementById('cRace').value, role: document.getElementById('cRole').value, god: document.getElementById('cGod').value, goal: document.getElementById('cGoal').value, notes: document.getElementById('cNotes').value };
-            }
+            if(type === 'world') { const id = document.getElementById('wId').value; const idx = currentWorld.data.world.findIndex(x => x.id === id); if(idx > -1) currentWorld.data.world[idx] = { id, name: document.getElementById('wName').value, type: document.getElementById('wType').value, desc: document.getElementById('wDesc').value }; }
+            else { const id = document.getElementById('cId').value; const idx = currentWorld.data.chars.findIndex(x => x.id === id); if(idx > -1) currentWorld.data.chars[idx] = { id, name: document.getElementById('cName').value, race: document.getElementById('cRace').value, role: document.getElementById('cRole').value, god: document.getElementById('cGod').value, goal: document.getElementById('cGoal').value, notes: document.getElementById('cNotes').value }; }
             saveAll(); refreshLists(); searchWiki('');
         }
         function loadEntity(type, id) {
-            const data = type === 'world' ? currentWorld.data.world.find(x => x.id === id) : currentWorld.data.chars.find(x => x.id === id);
-            if(!data) return;
-            if(type === 'world') { document.getElementById('wId').value = data.id; document.getElementById('wName').value = data.name; document.getElementById('wType').value = data.type; document.getElementById('wDesc').value = data.desc; } 
+            const data = type === 'world' ? currentWorld.data.world.find(x => x.id === id) : currentWorld.data.chars.find(x => x.id === id); if(!data) return;
+            if(type === 'world') { document.getElementById('wId').value = data.id; document.getElementById('wName').value = data.name; document.getElementById('wType').value = data.type; document.getElementById('wDesc').value = data.desc; }
             else { document.getElementById('cId').value = data.id; document.getElementById('cName').value = data.name; document.getElementById('cRace').value = data.race; document.getElementById('cRole').value = data.role; document.getElementById('cGod').value = data.god; document.getElementById('cGoal').value = data.goal; document.getElementById('cNotes').value = data.notes; }
         }
         function refreshLists() {
@@ -475,19 +435,23 @@
             const cList = document.getElementById('charList'); cList.innerHTML = ''; currentWorld.data.chars.forEach(item => cList.innerHTML += `<div class="entity-item" onclick="loadEntity('char', '${item.id}')">${item.name}</div>`);
             populateDropdowns();
         }
-        function initSortable() { new Sortable(document.getElementById('timelineList'), { animation: 150, delay: 100, delayOnTouchOnly: true, handle: '.timeline-handle', onEnd: function (evt) { const newOrder = []; document.querySelectorAll('.timeline-card').forEach(card => { const id = parseInt(card.getAttribute('data-id')); const item = currentWorld.data.timeline.find(x => x.id === id); if(item) newOrder.push(item); }); currentWorld.data.timeline = newOrder; saveAll(); } }); }
-        function addEvent() { currentWorld.data.timeline.push({ id: Date.now(), title: 'New Event', desc: '', day:1, month:1, year:1 }); saveAll(); renderTimeline(); }
-        function deleteEvent(id) { if(confirm("Delete?")) { currentWorld.data.timeline = currentWorld.data.timeline.filter(x => x.id !== id); saveAll(); renderTimeline(); } }
-        function renderTimeline() {
-            const div = document.getElementById('timelineList'); div.innerHTML = '';
-            currentWorld.data.timeline.forEach((ev) => {
-                let monthOpts = ''; MONTHS.forEach((m, i) => { const sel = ev.month === (i+1) ? 'selected' : ''; monthOpts += `<option value="${i+1}" ${sel}>${i+1}. ${m}</option>`; });
-                div.innerHTML += `<div class="timeline-card" data-id="${ev.id}"><div class="timeline-handle"><i class="fas fa-grip-lines"></i></div><div style="display:flex; gap:5px; margin-bottom:10px;"><input type="number" placeholder="Day" value="${ev.day||''}" style="width:50px; padding:5px;" onchange="updateEventDate(${ev.id}, 'day', this.value)"><select style="padding:5px; font-size:0.8rem;" onchange="updateEventDate(${ev.id}, 'month', this.value)"><option value="">Month</option>${monthOpts}</select><input type="number" placeholder="Year" value="${ev.year||''}" style="width:60px; padding:5px;" onchange="updateEventDate(${ev.id}, 'year', this.value)"></div><input type="text" value="${ev.title}" style="font-weight:bold; margin-bottom:5px;" onchange="updateEventText(${ev.id}, 'title', this.value)"><textarea style="width:100%; height:60px; font-size:0.9rem;" placeholder="Description..." onchange="updateEventText(${ev.id}, 'desc', this.value)">${ev.desc}</textarea><button class="btn" style="background:var(--bg-input); color:var(--text-muted); margin-top:5px; font-size:0.7rem; padding:4px 8px;" onclick="deleteEvent(${ev.id})">Delete</button></div>`;
-            });
+
+        // Web Graph
+        function renderWeb() {
+            if(!currentWorld) return;
+            const nodes = []; const edges = []; const ids = new Set();
+            currentWorld.data.world.forEach(w => { let color = '#999'; if(w.type === 'Race') color = '#b59af7'; if(w.type === 'Religion') color = '#ffb7b2'; if(w.type === 'Faction') color = '#81c784'; nodes.push({ id: w.name, label: w.name, color: color, shape: 'box', font:{color:'white'} }); ids.add(w.name); });
+            currentWorld.data.chars.forEach(c => { nodes.push({ id: c.name, label: c.name, color: '#4fc3f7', shape: 'ellipse', font:{color:'white'} }); if(c.race && ids.has(c.race)) edges.push({ from: c.name, to: c.race }); if(c.god && ids.has(c.god)) edges.push({ from: c.name, to: c.god }); if(c.role && ids.has(c.role)) edges.push({ from: c.name, to: c.role }); });
+            new vis.Network(document.getElementById('network-container'), { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) }, { physics: { stabilization: false, barnesHut: { gravitationalConstant: -8000, springConstant: 0.04 } }, nodes: { borderWidth: 2, size: 30 }, edges: { width: 2, color: '#555' } });
         }
-        function updateEventDate(id, field, val) { const ev = currentWorld.data.timeline.find(x => x.id === id); if(ev) { ev[field] = parseInt(val); saveAll(); } }
-        function updateEventText(id, field, val) { const ev = currentWorld.data.timeline.find(x => x.id === id); if(ev) { ev[field] = val; saveAll(); } }
-        function toggleTheme(forceLight) { if(forceLight || !isLight) { document.body.classList.add('light-mode'); isLight = true; } else { document.body.classList.remove('light-mode'); isLight = false; } localStorage.setItem('wsTheme', isLight ? 'light' : 'dark'); }
+
+        // Panel Logic
+        function setRightPanel(view) {
+            document.getElementById('panel-wiki').className = view === 'wiki' ? 'active' : ''; document.getElementById('panel-notes').className = view === 'notes' ? 'active' : '';
+            document.getElementById('tabWikiBtn').className = view === 'wiki' ? 'p-tab active' : 'p-tab'; document.getElementById('tabNotesBtn').className = view === 'notes' ? 'p-tab active' : 'p-tab';
+        }
+        function toggleRightPanel() { const p = document.getElementById('rightPanel'); if(window.innerWidth < 768) { p.classList.toggle('mobile-show'); } else { p.classList.toggle('collapsed'); } }
+        function toggleMobileChapters() { document.getElementById('chapterSidebar').classList.toggle('show'); }
         function filterWiki(type, btn) { wikiFilter = type; document.querySelectorAll('.w-tab').forEach(b => b.classList.remove('active')); btn.classList.add('active'); searchWiki(document.querySelector('.wiki-search').value); }
         function searchWiki(term) {
             const res = document.getElementById('wikiResults'); res.innerHTML = ''; term = term.toLowerCase();
