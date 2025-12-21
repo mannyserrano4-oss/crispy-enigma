@@ -39,6 +39,11 @@
         .nav-btn:hover { color: var(--accent); background: var(--bg-input); }
         .nav-btn.active { color: var(--bg-panel); background: var(--accent); box-shadow: 0 4px 12px var(--accent-dim); }
         .library-btn { border: 2px solid var(--accent-sec); color: var(--accent-sec); }
+        
+        /* BACKUP REMINDER PULSE */
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 107, 107, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); } }
+        .backup-needed { color: #ff6b6b !important; animation: pulse-red 2s infinite; border: 1px solid #ff6b6b; }
+
         .font-ctrl-group { display:flex; flex-direction:column; gap:5px; margin-bottom:15px; border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:10px 0; width:100%; align-items:center; }
         .font-btn { font-size:0.8rem; height:30px; width:48px; }
 
@@ -107,14 +112,12 @@
         .w-tab.active { background: var(--accent); color: var(--bg-panel); border-color: var(--accent); }
         .wiki-search { width: 100%; padding: 12px; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; }
         .wiki-results { flex: 1; overflow-y: auto; padding-right: 5px; }
-        
         .wiki-card { background: var(--bg-input); padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--accent); cursor: pointer; box-shadow: var(--card-shadow); transition: 0.2s; }
         .wiki-card:hover { background: var(--bg-panel); border-color: var(--accent-sec); }
         .wiki-card h4 { margin: 0; color: var(--accent); font-size: 1rem; display: flex; justify-content: space-between; }
         .wiki-card small { color: var(--text-muted); font-size: 0.75rem; font-weight: normal; }
         .wiki-desc { display: none; margin-top: 10px; font-size: 0.85rem; color: var(--text-main); padding-top: 10px; border-top: 1px solid var(--border); white-space: pre-wrap; }
         .wiki-card.expanded .wiki-desc { display: block; }
-        
         .notes-area { flex: 1; width: 100%; height: 100%; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); padding: 15px; box-sizing: border-box; border-radius: 8px; resize: none; font-family: sans-serif; font-size: 1rem; line-height: 1.5; }
 
         /* --- THE BOARD --- */
@@ -176,6 +179,12 @@
         .disp-label { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; font-weight: bold; }
         .disp-val { font-size: 1.1rem; }
         .disp-desc { white-space: pre-wrap; margin-top: 20px; line-height: 1.6; }
+        
+        /* TIPS SECTION */
+        .tip-card { background: var(--bg-input); padding: 20px; margin-bottom: 20px; border-radius: 12px; border-left: 4px solid var(--accent); }
+        .tip-card h3 { margin-top: 0; color: var(--accent); }
+        .color-key-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .key-dot { width: 15px; height: 15px; border-radius: 3px; }
 
         /* --- MOBILE --- */
         @media (max-width: 768px) {
@@ -199,7 +208,7 @@
         <button class="nav-btn" onclick="openRetcon()" title="Retcon (Find/Replace)"><i class="fas fa-magic"></i></button>
         <button class="nav-btn" onclick="openGlobalSearch()" title="Global Search"><i class="fas fa-search"></i></button>
         <button class="nav-btn" onclick="triggerSpark()" title="Spark Idea Generator"><i class="fas fa-dice"></i></button>
-        <hr style="width:50%; border:0; border-bottom:1px solid var(--border); margin:10px 0;">
+        <button class="nav-btn" onclick="setTab('tips')" title="Guide & Tips"><i class="fas fa-question-circle"></i></button> <hr style="width:50%; border:0; border-bottom:1px solid var(--border); margin:10px 0;">
         <button class="nav-btn active" onclick="setTab('write')" title="Writer"><i class="fas fa-pen-nib"></i></button>
         <button class="nav-btn" onclick="setTab('read')" title="Read & Export"><i class="fas fa-book-open"></i></button>
         <button class="nav-btn" onclick="setTab('world')"><i class="fas fa-globe-americas"></i></button>
@@ -209,7 +218,7 @@
         <div style="margin-top:auto;"></div>
         
         <button class="nav-btn" onclick="toggleTheme()"><i class="fas fa-adjust"></i></button>
-        <button class="nav-btn" onclick="saveToDisk()"><i class="fas fa-save"></i></button>
+        <button class="nav-btn" id="saveBtn" onclick="saveToDisk()" title="Backup to Disk"><i class="fas fa-save"></i></button>
         <button class="nav-btn" onclick="document.getElementById('loadInput').click()"><i class="fas fa-upload"></i></button>
         <input type="file" id="loadInput" hidden onchange="loadFromDisk(this)">
     </div>
@@ -234,7 +243,6 @@
                     <button class="fmt-btn" id="btnBold" onmousedown="event.preventDefault(); formatDoc('bold')" title="Bold (Ctrl+B)"><i class="fas fa-bold"></i></button>
                     <button class="fmt-btn" id="btnItalic" onmousedown="event.preventDefault(); formatDoc('italic')" title="Italic (Ctrl+I)"><i class="fas fa-italic"></i></button>
                     <button class="fmt-btn" id="btnUnderline" onmousedown="event.preventDefault(); formatDoc('underline')" title="Underline (Ctrl+U)"><i class="fas fa-underline"></i></button>
-                    
                     <button class="fmt-btn" id="btnSpell" onmousedown="event.preventDefault(); toggleSpellcheck()" title="Toggle Spellcheck (AB Checkmark)"><i class="fas fa-spell-check"></i></button>
                     
                     <div class="divider"></div>
@@ -314,6 +322,46 @@
                 <button class="btn" onclick="copyBook()" style="background:var(--bg-input); color:var(--text-main); border:1px solid var(--border);">Copy Full Book</button>
             </div>
             <div class="book-container" id="bookView"></div>
+        </div>
+
+        <div id="view-tips" class="view-section" style="max-width:800px; margin:0 auto;">
+            <h1 style="color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:10px;">WorldSmith Guide</h1>
+            
+            <div class="tip-card">
+                <h3><i class="fas fa-save"></i> Vital Safety Warning</h3>
+                <p>Your work is saved in your browser's <b>Local Storage</b>. It is safe even if you close the tab, but <b>clearing your browser cookies/cache will wipe it.</b></p>
+                <p><b>Always click the Save Icon (Sidebar) to download a backup file</b> to your computer periodically.</p>
+            </div>
+
+            <div class="tip-card">
+                <h3><i class="fas fa-palette"></i> Wiki Color Key</h3>
+                <div class="color-key-row"><div class="key-dot" style="background:#ffb7b2;"></div> <span>Characters</span></div>
+                <div class="color-key-row"><div class="key-dot" style="background:#66bb6a;"></div> <span>Locations</span></div>
+                <div class="color-key-row"><div class="key-dot" style="background:#ef5350;"></div> <span>History / Eras</span></div>
+                <div class="color-key-row"><div class="key-dot" style="background:#26c6da;"></div> <span>Races / Species</span></div>
+                <div class="color-key-row"><div class="key-dot" style="background:#ab47bc;"></div> <span>Religions / Gods</span></div>
+                <div class="color-key-row"><div class="key-dot" style="background:#ffa726;"></div> <span>Factions / Politics</span></div>
+                <div class="color-key-row"><div class="key-dot" style="background:#42a5f5;"></div> <span>Magic Systems</span></div>
+            </div>
+
+            <div class="tip-card">
+                <h3><i class="fas fa-pen-nib"></i> Writing Desk Features</h3>
+                <ul>
+                    <li><b>Zen Mode (Eye Icon):</b> Hides all sidebars for distraction-free writing.</li>
+                    <li><b>Spellcheck (ABC Icon):</b> Toggles red squiggles on/off.</li>
+                    <li><b>Status Dots:</b> Click the colored dot next to a chapter to cycle status (Red=Draft, Yellow=Edit, Green=Done).</li>
+                    <li><b>Drag & Drop:</b> Drag chapters in the list to reorder them for the final book.</li>
+                </ul>
+            </div>
+
+            <div class="tip-card">
+                <h3><i class="fas fa-globe-americas"></i> World & Characters</h3>
+                <ul>
+                    <li><b>Ghost Text:</b> New entries start blank. Just type a name and hit Save.</li>
+                    <li><b>Connections Web:</b> The "Connections" tab automatically links Characters to their Factions, Religions, and Races.</li>
+                    <li><b>Timeframe:</b> Use the "Timeframe" field in World entries for Eras/History (e.g., "Year 400-500").</li>
+                </ul>
+            </div>
         </div>
 
         <div id="view-world" class="view-section">
@@ -479,6 +527,8 @@
         let wikiFilter = 'all';
         let sessionStartCount = 0;
         let saveTimer = null;
+        let backupTimer = null;
+        let lastBackupTime = Date.now();
         let dailyGoal = 500;
         let currentFontSize = 1.15; // rem
 
@@ -493,6 +543,9 @@
                 e.preventDefault();
                 e.returnValue = '';
             });
+
+            // BACKUP REMINDER LOOP
+            setInterval(checkBackupStatus, 60000); // Check every minute
 
             const editor = document.getElementById('chapterContent');
             editor.addEventListener('keydown', function(e) {
@@ -511,6 +564,14 @@
             ['keyup', 'mouseup', 'click'].forEach(evt => editor.addEventListener(evt, checkFormat));
             setTimeout(() => { sessionStartCount = countWords(document.body.innerText); }, 500);
         };
+
+        // --- BACKUP LOGIC ---
+        function checkBackupStatus() {
+            // Warn if > 30 mins since last save
+            if(Date.now() - lastBackupTime > 30 * 60 * 1000) {
+                document.getElementById('saveBtn').classList.add('backup-needed');
+            }
+        }
 
         // --- SIZE & STYLE PRESETS ---
         function setEditorSize(val) {
@@ -535,12 +596,6 @@
         function setSessionGoal() {
             const val = prompt("Set Daily Word Goal:", dailyGoal);
             if(val && !isNaN(val)) { dailyGoal = parseInt(val); document.getElementById('wc-goal').innerText = dailyGoal; updateWordCount(); }
-        }
-        function changeFontSize(dir) {
-            currentFontSize += (dir * 0.1);
-            if(currentFontSize < 0.8) currentFontSize = 0.8;
-            if(currentFontSize > 2.5) currentFontSize = 2.5;
-            document.documentElement.style.setProperty('--editor-font-size', currentFontSize + 'rem');
         }
         function countWords(str) { return str.trim().split(/\s+/).filter(word => word.length > 0).length; }
 
@@ -754,145 +809,12 @@
         function showSaving() { const ind = document.getElementById('saveIndicator'); ind.innerHTML = '<i class="fas fa-pen"></i> Saving...'; ind.className = 'save-indicator saving'; clearTimeout(saveTimer); saveTimer = setTimeout(() => { saveAll(); ind.innerHTML = '<i class="fas fa-check-circle"></i> Saved'; ind.className = 'save-indicator saved'; }, 1000); }
         function toggleZenMode() { document.body.classList.toggle('zen-mode'); }
 
-        function saveAll() { saveCurrentBuffer(); localStorage.setItem('worldSmithMultiverse', JSON.stringify(appData)); }
-        function openLibrary() { renderLib(); document.getElementById('libModal').style.display = 'flex'; }
-        function renderLib() { const div = document.getElementById('libList'); div.innerHTML = ''; appData.worlds.forEach(w => { div.innerHTML += `<div style="padding:10px; background:var(--bg-input); margin-bottom:5px; cursor:pointer; border-radius:5px; ${w.id===appData.activeId?'border:1px solid var(--accent);':''}" onclick="switchWorld('${w.id}')">${w.name}</div>`; }); }
-        function setTab(tabId) { 
-            if(tabId === 'world' || tabId === 'chars') {
-                createNewEntity(tabId === 'world' ? 'world' : 'char');
-                toggleEditMode(tabId === 'world' ? 'world' : 'char', true);
-            }
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active')); document.getElementById('view-' + tabId).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active')); event.currentTarget.classList.add('active'); if(tabId === 'conn') renderConnections(); if(tabId === 'read') renderBook(); 
+        function saveToDisk() { 
+            const blob = new Blob([JSON.stringify(appData)], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'WorldSmith_Multiverse.json'; a.click(); 
+            // Reset pulse
+            lastBackupTime = Date.now();
+            document.getElementById('saveBtn').classList.remove('backup-needed');
         }
-        function toggleTheme(forceLight) { if(forceLight || !isLight) { document.body.classList.add('light-mode'); isLight = true; } else { document.body.classList.remove('light-mode'); isLight = false; } localStorage.setItem('wsTheme', isLight ? 'light' : 'dark'); }
-        function autoSave() { showSaving(); if(activeChapterId) renderChapterList(); }
-        function populateDropdowns() { const races = currentWorld.data.world.filter(x => x.type === 'Race'); const rels = currentWorld.data.world.filter(x => x.type === 'Religion'); const facs = currentWorld.data.world.filter(x => x.type === 'Faction'); fillSelect('cRace', races); fillSelect('cGod', rels); fillSelect('cRole', facs); }
-        function fillSelect(id, items) { const sel = document.getElementById(id); const current = sel.value; sel.innerHTML = '<option value="">- Select -</option>'; items.forEach(i => { sel.innerHTML += `<option value="${i.name}">${i.name}</option>`; }); if(current) sel.value = current; }
-        
-        function createNewEntity(type) { 
-            document.getElementById(type === 'world' ? 'wId' : 'cId').value = Date.now().toString();
-            if(type === 'world') { document.getElementById('wName').value = ''; document.getElementById('wTime').value = ''; document.getElementById('wDesc').value = ''; }
-            else { document.getElementById('cName').value = ''; document.getElementById('cBirth').value = ''; document.getElementById('cGoal').value = ''; document.getElementById('cNotes').value = ''; }
-            toggleEditMode(type, true);
-        }
-        function deleteEntity(type) {
-            const id = type === 'world' ? document.getElementById('wId').value : document.getElementById('cId').value;
-            if(!id) return;
-            if(confirm("Permanently delete this entry?")) {
-                if(type === 'world') {
-                    const idx = currentWorld.data.world.findIndex(x => x.id === id);
-                    if(idx > -1) currentWorld.data.world.splice(idx, 1);
-                } else {
-                    const idx = currentWorld.data.chars.findIndex(x => x.id === id);
-                    if(idx > -1) currentWorld.data.chars.splice(idx, 1);
-                }
-                saveAll(); refreshLists(); searchWiki();
-                createNewEntity(type);
-            }
-        }
-        function saveEntity(type) { 
-            const id = document.getElementById(type === 'world' ? 'wId' : 'cId').value;
-            if(type === 'world') { 
-                const name = document.getElementById('wName').value || 'Untitled';
-                const idx = currentWorld.data.world.findIndex(x => x.id === id);
-                const data = { id, name, type: document.getElementById('wType').value, time: document.getElementById('wTime').value, desc: document.getElementById('wDesc').value };
-                if(idx > -1) currentWorld.data.world[idx] = data; else currentWorld.data.world.push(data);
-            } else { 
-                const name = document.getElementById('cName').value || 'Untitled';
-                const idx = currentWorld.data.chars.findIndex(x => x.id === id); 
-                const data = { id, name, race: document.getElementById('cRace').value, role: document.getElementById('cRole').value, god: document.getElementById('cGod').value, birth: document.getElementById('cBirth').value, goal: document.getElementById('cGoal').value, notes: document.getElementById('cNotes').value };
-                if(idx > -1) currentWorld.data.chars[idx] = data; else currentWorld.data.chars.push(data);
-            } 
-            saveAll(); refreshLists(); loadEntity(type, id); 
-        }
-        function loadEntity(type, id) { 
-            const data = type === 'world' ? currentWorld.data.world.find(x => x.id === id) : currentWorld.data.chars.find(x => x.id === id); 
-            if(!data) return; 
-            
-            if(type === 'world') {
-                document.getElementById('d-wName').innerText = data.name;
-                document.getElementById('d-wType').innerText = data.type;
-                document.getElementById('d-wTime').innerText = data.time || 'N/A';
-                document.getElementById('d-wDesc').innerText = data.desc;
-                document.getElementById('wId').value = data.id; document.getElementById('wName').value = data.name; document.getElementById('wType').value = data.type; document.getElementById('wTime').value = data.time || ''; document.getElementById('wDesc').value = data.desc;
-            } else {
-                document.getElementById('d-cName').innerText = data.name;
-                document.getElementById('d-cRace').innerText = data.race || '-';
-                document.getElementById('d-cRole').innerText = data.role || '-';
-                document.getElementById('d-cGod').innerText = data.god || '-';
-                document.getElementById('d-cBirth').innerText = data.birth || '-';
-                document.getElementById('d-cGoal').innerText = data.goal || '-';
-                document.getElementById('d-cNotes').innerText = data.notes;
-                document.getElementById('cId').value = data.id; document.getElementById('cName').value = data.name; document.getElementById('cRace').value = data.race; document.getElementById('cRole').value = data.role; document.getElementById('cGod').value = data.god; document.getElementById('cBirth').value = data.birth || ''; document.getElementById('cGoal').value = data.goal; document.getElementById('cNotes').value = data.notes;
-            }
-            toggleEditMode(type, false);
-        }
-        
-        function toggleEditMode(type, edit) {
-            const disp = document.getElementById(type === 'world' ? 'w-display' : 'c-display');
-            const form = document.getElementById(type === 'world' ? 'w-edit' : 'c-edit');
-            if(edit) { disp.style.display = 'none'; form.style.display = 'block'; }
-            else { disp.style.display = 'block'; form.style.display = 'none'; }
-        }
-
-        function refreshLists() { 
-            const wList = document.getElementById('worldList'); wList.innerHTML = ''; 
-            ['Race', 'Location', 'Religion', 'Faction', 'Magic', 'History'].forEach(t => { 
-                const items = currentWorld.data.world.filter(x => x.type === t); 
-                if(items.length > 0) { 
-                    wList.innerHTML += `<div class="category-header">${t}s</div>`; 
-                    items.forEach(item => wList.innerHTML += `<div class="entity-item" onclick="loadEntity('world', '${item.id}')">${item.name || '<span style="opacity:0.5; font-style:italic;">Untitled</span>'}</div>`); 
-                } 
-            }); 
-            const cList = document.getElementById('charList'); cList.innerHTML = ''; 
-            currentWorld.data.chars.forEach(item => cList.innerHTML += `<div class="entity-item" onclick="loadEntity('char', '${item.id}')">${item.name || '<span style="opacity:0.5; font-style:italic;">Untitled</span>'}</div>`); 
-            populateDropdowns(); populateBoardFilter();
-        }
-        
-        function renderConnections() {
-            const div = document.getElementById('conn-container'); div.innerHTML = '';
-            if(!currentWorld) return;
-            const groups = currentWorld.data.world.filter(w => ['Race', 'Religion', 'Faction'].includes(w.type));
-            if(groups.length === 0) div.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-muted);">Create Races, Factions, or Religions in the World tab to see connections here.</div>';
-            
-            groups.forEach(g => {
-                let html = `<div class="conn-group"><div class="conn-title">${g.name || 'Untitled'} <small style="color:var(--text-muted); font-weight:normal;">(${g.type})</small></div><div class="conn-list">`;
-                const members = currentWorld.data.chars.filter(c => c.race === g.name || c.god === g.name || c.role === g.name);
-                if(members.length === 0) html += `<span style="color:var(--text-muted); font-size:0.8rem;">No members found.</span>`;
-                members.forEach(m => { html += `<div class="conn-tag">${m.name || 'Untitled'}</div>`; });
-                html += '</div></div>';
-                div.innerHTML += html;
-            });
-        }
-
-        function setRightPanel(view) { document.getElementById('panel-wiki').className = view === 'wiki' ? 'active' : ''; document.getElementById('panel-notes').className = view === 'notes' ? 'active' : ''; document.getElementById('tabWikiBtn').className = view === 'wiki' ? 'p-tab active' : 'p-tab'; document.getElementById('tabNotesBtn').className = view === 'notes' ? 'p-tab active' : 'p-tab'; }
-        function toggleRightPanel() { const p = document.getElementById('rightPanel'); if(window.innerWidth < 768) { p.classList.toggle('mobile-show'); } else { p.classList.toggle('collapsed'); } }
-        function toggleMobileChapters() { document.getElementById('chapterSidebar').classList.toggle('show'); }
-        function searchWiki() {
-            const typeColors = { "Character": "var(--accent-sec)", "Location": "#66bb6a", "History": "#ef5350", "Race": "#26c6da", "Religion": "#ab47bc", "Faction": "#ffa726", "Magic": "#42a5f5" };
-            const filter = document.getElementById('wikiFilter').value;
-            const term = document.querySelector('.wiki-search').value.toLowerCase();
-            const res = document.getElementById('wikiResults'); res.innerHTML = '';
-            
-            if(filter === 'all' || filter !== 'char') {
-                currentWorld.data.world.forEach(w => {
-                    if((filter === 'all' || filter === 'world' || filter === w.type) && (w.name || '').toLowerCase().includes(term)) {
-                        const timeStr = w.time ? `<br><b>${w.time}</b>` : '';
-                        const color = typeColors[w.type] || 'var(--accent)';
-                        res.innerHTML += `<div class="wiki-card" style="border-left-color: ${color};" onclick="this.classList.toggle('expanded')"><h4>${w.name || 'Untitled'} <small>${w.type}</small></h4>${timeStr}<small>${w.desc.substring(0, 50)}...</small><div class="wiki-desc">${w.desc}</div></div>`;
-                    }
-                });
-            }
-            if(filter === 'all' || filter === 'char') {
-                currentWorld.data.chars.forEach(c => {
-                    if((c.name || '').toLowerCase().includes(term)) {
-                        const color = typeColors["Character"];
-                        res.innerHTML += `<div class="wiki-card" style="border-left-color: ${color};" onclick="this.classList.toggle('expanded')"><h4>${c.name || 'Untitled'}</h4><small>${c.race || ''}</small><div class="wiki-desc">Goal: ${c.goal}<br><br>${c.notes}</div></div>`;
-                    }
-                });
-            }
-        }
-        function saveToDisk() { const blob = new Blob([JSON.stringify(appData)], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'WorldSmith_Multiverse.json'; a.click(); }
         function loadFromDisk(input) { const r = new FileReader(); r.onload = (e) => { try { appData = JSON.parse(e.target.result); switchWorld(appData.activeId); location.reload(); } catch(err) { alert("Invalid File"); } }; r.readAsText(input.files[0]); }
     </script>
 </body>
