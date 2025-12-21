@@ -60,7 +60,7 @@
         .save-indicator.saving { color: #ffd700; }
         .save-indicator.saved { color: #4caf50; }
 
-        .editor-toolbar { display: flex; gap: 5px; background: var(--bg-panel); padding: 5px; border-radius: 8px; width: fit-content; border: 1px solid var(--border); position: sticky; top: 0; z-index: 10; margin-bottom: 10px; }
+        .editor-toolbar { display: flex; gap: 5px; margin-bottom: 10px; background: var(--bg-panel); padding: 5px; border-radius: 8px; width: fit-content; border: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
         .fmt-btn { background: transparent; border: none; color: var(--text-main); width: 30px; height: 30px; cursor: pointer; border-radius: 4px; font-weight: bold; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
         .fmt-btn:hover { background: var(--bg-input); }
         .fmt-btn.active { background: var(--accent); color: var(--bg-panel); box-shadow: 0 0 5px var(--accent); }
@@ -340,7 +340,7 @@
             <h2 style="color:var(--accent);">World Library</h2>
             <div id="libList" style="margin-bottom:20px; max-height:200px; overflow-y:auto; text-align:left;"></div>
             <button class="btn btn-new" onclick="createWorld()">+ Create New World</button>
-            <button class="btn" style="background:transparent; border:1px solid var(--text-muted);" onclick="document.getElementById('libModal').style.display='none'">Close</button>
+            <button class="btn" style="background:transparent; border:1px solid var(--text-muted); color:var(--text-main);" onclick="document.getElementById('libModal').style.display='none'">Close</button>
         </div>
     </div>
 
@@ -368,7 +368,7 @@
             <div class="form-group"><label>Find</label><input type="text" id="retFind" placeholder="e.g. Oakhaven"></div>
             <div class="form-group"><label>Replace With</label><input type="text" id="retRepl" placeholder="e.g. Ironhold"></div>
             <button class="btn" onclick="applyRetcon()">Apply Retcon</button>
-            <button class="btn" style="background:transparent; border:1px solid var(--text-muted); margin-left:10px;" onclick="document.getElementById('retconModal').style.display='none'">Cancel</button>
+            <button class="btn" style="background:transparent; border:1px solid var(--text-muted); color:var(--text-main); margin-left:10px;" onclick="document.getElementById('retconModal').style.display='none'">Cancel</button>
         </div>
     </div>
 
@@ -379,6 +379,7 @@
         let activeChapterId = null;
         let isLight = false;
         let wikiFilter = 'all';
+        let sessionStartCount = 0;
         let saveTimer = null;
 
         window.onload = () => {
@@ -402,6 +403,7 @@
                 }
             });
             ['keyup', 'mouseup', 'click'].forEach(evt => editor.addEventListener(evt, checkFormat));
+            setTimeout(() => { sessionStartCount = countWords(document.body.innerText); }, 500);
         };
 
         function updateWordCount() {
@@ -561,12 +563,54 @@
         function createNewEntity(type) { const id = Date.now().toString(); const empty = type === 'world' ? { id, name: 'New Entry', type: 'Location', desc: '' } : { id, name: 'New Character', race:'', role:'', god: '', goal:'', notes:'' }; if(type === 'world') currentWorld.data.world.push(empty); else currentWorld.data.chars.push(empty); saveAll(); refreshLists(); loadEntity(type, id); }
         function saveEntity(type) { if(type === 'world') { const id = document.getElementById('wId').value; const idx = currentWorld.data.world.findIndex(x => x.id === id); if(idx > -1) currentWorld.data.world[idx] = { id, name: document.getElementById('wName').value, image: document.getElementById('wImage').value, type: document.getElementById('wType').value, desc: document.getElementById('wDesc').value }; } else { const id = document.getElementById('cId').value; const idx = currentWorld.data.chars.findIndex(x => x.id === id); if(idx > -1) currentWorld.data.chars[idx] = { id, name: document.getElementById('cName').value, image: document.getElementById('cImage').value, race: document.getElementById('cRace').value, role: document.getElementById('cRole').value, god: document.getElementById('cGod').value, birth: document.getElementById('cBirth').value, goal: document.getElementById('cGoal').value, notes: document.getElementById('cNotes').value }; } saveAll(); refreshLists(); searchWiki(); }
         function loadEntity(type, id) { const data = type === 'world' ? currentWorld.data.world.find(x => x.id === id) : currentWorld.data.chars.find(x => x.id === id); if(!data) return; if(type === 'world') { document.getElementById('wId').value = data.id; document.getElementById('wName').value = data.name; document.getElementById('wImage').value = data.image || ''; document.getElementById('wType').value = data.type; document.getElementById('wDesc').value = data.desc; } else { document.getElementById('cId').value = data.id; document.getElementById('cName').value = data.name; document.getElementById('cImage').value = data.image || ''; document.getElementById('cRace').value = data.race; document.getElementById('cRole').value = data.role; document.getElementById('cGod').value = data.god; document.getElementById('cBirth').value = data.birth || ''; document.getElementById('cGoal').value = data.goal; document.getElementById('cNotes').value = data.notes; } }
-        function refreshLists() { const wList = document.getElementById('worldList'); wList.innerHTML = ''; ['Race', 'Location', 'Religion', 'Faction', 'Magic', 'History'].forEach(t => { const items = currentWorld.data.world.filter(x => x.type === t); if(items.length > 0) { wList.innerHTML += `<div class="category-header">${t}s</div>`; items.forEach(item => wList.innerHTML += `<div class="entity-item" onclick="loadEntity('world', '${item.id}')">${item.name}</div>`); } }); const cList = document.getElementById('charList'); cList.innerHTML = ''; currentWorld.data.chars.forEach(item => cList.innerHTML += `<div class="entity-item" onclick="loadEntity('char', '${item.id}')">${item.name}</div>`); populateDropdowns(); populateBoardFilter(); }
-        function renderConnections() { const div = document.getElementById('conn-container'); div.innerHTML = ''; if(!currentWorld) return; const groups = currentWorld.data.world.filter(w => ['Race', 'Religion', 'Faction'].includes(w.type)); groups.forEach(g => { let html = `<div class="conn-group"><div class="conn-title">${g.name} <small style="color:var(--text-muted); font-weight:normal;">(${g.type})</small></div><div class="conn-list">`; const members = currentWorld.data.chars.filter(c => c.race === g.name || c.god === g.name || c.role === g.name); members.forEach(m => { html += `<div class="conn-tag">${m.name}</div>`; }); html += '</div></div>'; div.innerHTML += html; }); }
+        function refreshLists() { 
+            const wList = document.getElementById('worldList'); wList.innerHTML = ''; 
+            ['Race', 'Location', 'Religion', 'Faction', 'Magic', 'History'].forEach(t => { const items = currentWorld.data.world.filter(x => x.type === t); if(items.length > 0) { wList.innerHTML += `<div class="category-header">${t}s</div>`; items.forEach(item => wList.innerHTML += `<div class="entity-item" onclick="loadEntity('world', '${item.id}')">${item.name}</div>`); } }); 
+            const cList = document.getElementById('charList'); cList.innerHTML = ''; currentWorld.data.chars.forEach(item => cList.innerHTML += `<div class="entity-item" onclick="loadEntity('char', '${item.id}')">${item.name}</div>`); 
+            populateDropdowns(); populateBoardFilter();
+        }
+        
+        function renderConnections() {
+            const div = document.getElementById('conn-container'); div.innerHTML = '';
+            if(!currentWorld) return;
+            const groups = currentWorld.data.world.filter(w => ['Race', 'Religion', 'Faction'].includes(w.type));
+            if(groups.length === 0) div.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-muted);">Create Races, Factions, or Religions in the World tab to see connections here.</div>';
+            
+            groups.forEach(g => {
+                let html = `<div class="conn-group"><div class="conn-title">${g.name} <small style="color:var(--text-muted); font-weight:normal;">(${g.type})</small></div><div class="conn-list">`;
+                const members = currentWorld.data.chars.filter(c => c.race === g.name || c.god === g.name || c.role === g.name);
+                if(members.length === 0) html += `<span style="color:var(--text-muted); font-size:0.8rem;">No members found.</span>`;
+                members.forEach(m => { html += `<div class="conn-tag">${m.name}</div>`; });
+                html += '</div></div>';
+                div.innerHTML += html;
+            });
+        }
+
         function setRightPanel(view) { document.getElementById('panel-wiki').className = view === 'wiki' ? 'active' : ''; document.getElementById('panel-notes').className = view === 'notes' ? 'active' : ''; document.getElementById('tabWikiBtn').className = view === 'wiki' ? 'p-tab active' : 'p-tab'; document.getElementById('tabNotesBtn').className = view === 'notes' ? 'p-tab active' : 'p-tab'; }
         function toggleRightPanel() { const p = document.getElementById('rightPanel'); if(window.innerWidth < 768) { p.classList.toggle('mobile-show'); } else { p.classList.toggle('collapsed'); } }
         function toggleMobileChapters() { document.getElementById('chapterSidebar').classList.toggle('show'); }
-        function searchWiki() { const filter = document.getElementById('wikiFilter').value; const term = document.querySelector('.wiki-search').value.toLowerCase(); const res = document.getElementById('wikiResults'); res.innerHTML = ''; if(filter === 'all' || filter !== 'char') { currentWorld.data.world.forEach(w => { if((filter === 'all' || filter === 'world' || filter === w.type) && w.name.toLowerCase().includes(term)) { const img = w.image || 'https://placehold.co/600x300/383942/b59af7?text=Image'; res.innerHTML += `<div class="wiki-card" onclick="this.classList.toggle('expanded')"><img src="${img}" class="wiki-card-img"><div class="wiki-card-content"><h4>${w.name} <small>${w.type}</small></h4><small>${w.desc.substring(0, 50)}...</small><div class="wiki-desc">${w.desc}</div></div></div>`; } }); } if(filter === 'all' || filter === 'char') { currentWorld.data.chars.forEach(c => { if(c.name.toLowerCase().includes(term)) { const img = c.image || 'https://placehold.co/600x300/383942/ffb7b2?text=Character'; res.innerHTML += `<div class="wiki-card" style="border-left-color: var(--accent-sec);" onclick="this.classList.toggle('expanded')"><img src="${img}" class="wiki-card-img"><div class="wiki-card-content"><h4>${c.name}</h4><small>${c.race || ''}</small><div class="wiki-desc">Goal: ${c.goal}<br><br>${c.notes}</div></div></div>`; } }); } }
+        function searchWiki() {
+            const filter = document.getElementById('wikiFilter').value;
+            const term = document.querySelector('.wiki-search').value.toLowerCase();
+            const res = document.getElementById('wikiResults'); res.innerHTML = '';
+            
+            if(filter === 'all' || filter !== 'char') {
+                currentWorld.data.world.forEach(w => {
+                    if((filter === 'all' || filter === 'world' || filter === w.type) && w.name.toLowerCase().includes(term)) {
+                        const img = w.image || 'https://placehold.co/600x300/383942/b59af7?text=Image';
+                        res.innerHTML += `<div class="wiki-card" onclick="this.classList.toggle('expanded')"><img src="${img}" class="wiki-card-img"><div class="wiki-card-content"><h4>${w.name} <small>${w.type}</small></h4><small>${w.desc.substring(0, 50)}...</small><div class="wiki-desc">${w.desc}</div></div></div>`;
+                    }
+                });
+            }
+            if(filter === 'all' || filter === 'char') {
+                currentWorld.data.chars.forEach(c => {
+                    if(c.name.toLowerCase().includes(term)) {
+                        const img = c.image || 'https://placehold.co/600x300/383942/ffb7b2?text=Character';
+                        res.innerHTML += `<div class="wiki-card" style="border-left-color: var(--accent-sec);" onclick="this.classList.toggle('expanded')"><img src="${img}" class="wiki-card-img"><div class="wiki-card-content"><h4>${c.name}</h4><small>${c.race || ''}</small><div class="wiki-desc">Goal: ${c.goal}<br><br>${c.notes}</div></div></div>`;
+                    }
+                });
+            }
+        }
         function saveToDisk() { const blob = new Blob([JSON.stringify(appData)], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'WorldSmith_Multiverse.json'; a.click(); }
         function loadFromDisk(input) { const r = new FileReader(); r.onload = (e) => { try { appData = JSON.parse(e.target.result); switchWorld(appData.activeId); location.reload(); } catch(err) { alert("Invalid File"); } }; r.readAsText(input.files[0]); }
     </script>
