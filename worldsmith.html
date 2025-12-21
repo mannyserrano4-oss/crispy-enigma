@@ -12,7 +12,6 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
-    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     
     <style>
         /* --- THEME --- */
@@ -23,7 +22,6 @@
             --card-shadow: 0 4px 6px rgba(0,0,0,0.3);
             --note-major: #ffb7b2; --note-sub: #a0c4ff; --note-filler: #b9fbc0; --note-default: #fdffb6;
             --status-draft: #ff6b6b; --status-edit: #feca57; --status-done: #4caf50;
-            --editor-font-size: 1.15rem;
         }
         body.light-mode {
             --bg-body: #fdf6e3; --bg-panel: #eee8d5; --bg-input: #ffffff;
@@ -54,7 +52,11 @@
         #view-write.active { display: flex; overflow: hidden; }
         .chapter-sidebar { width: 220px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 10px; flex-shrink: 0; overflow-y: auto; transition: width 0.3s, padding 0.3s; }
         
-        .chapter-item { padding: 10px; border-radius: 6px; cursor: grab; margin-bottom: 5px; color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; group; }
+        /* DRAG AND DROP STYLES */
+        .draggable-item { cursor: grab; user-select: none; }
+        .draggable-item.dragging { opacity: 0.5; background: var(--bg-input); }
+        
+        .chapter-item { padding: 10px; border-radius: 6px; margin-bottom: 5px; color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; border: 1px solid transparent; }
         .chapter-item:hover { background: var(--bg-input); }
         .chapter-item.active { background: var(--bg-input); color: var(--accent); border-left: 3px solid var(--accent); font-weight: bold; }
         
@@ -75,7 +77,7 @@
         .save-indicator.saving { color: #ffd700; } .save-indicator.saved { color: #4caf50; }
 
         .editor-toolbar { display: flex; gap: 5px; margin-bottom: 10px; background: var(--bg-panel); padding: 5px; border-radius: 8px; width: fit-content; border: 1px solid var(--border); position: sticky; top: 0; z-index: 10; align-items: center; flex-wrap: wrap; }
-        .fmt-btn { background: transparent; border: none; color: var(--text-main); width: 30px; height: 30px; cursor: pointer; border-radius: 4px; font-weight: bold; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+        .fmt-btn { background: transparent; border: none; color: var(--text-main); width: 30px; height: 30px; cursor: pointer; border-radius: 4px; font-weight: bold; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
         .fmt-btn:hover { background: var(--bg-input); }
         .fmt-btn.active { background: var(--accent); color: var(--bg-panel); box-shadow: 0 0 5px var(--accent); }
         .divider { width: 1px; background: var(--border); height: 20px; margin: 5px 2px; }
@@ -86,14 +88,13 @@
             width: 100%; min-height: 60vh; 
             background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; 
             color: var(--text-main); 
-            font-size: var(--editor-font-size); 
             line-height: 1.8; 
             padding: 30px; padding-bottom: 50vh; 
             box-sizing: border-box; font-family: 'Georgia', serif; outline: none; overflow-y: visible; flex:1; 
         }
         .editor-area b { color: inherit; font-weight: bold; }
         
-        #wikiToggleBtn { position: absolute; top: 20px; right: 20px; z-index: 50; background: var(--bg-panel); color: var(--accent); border: 2px solid var(--accent); border-radius: 50%; width: 44px; height: 44px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s; }
+        #wikiToggleBtn { position: absolute; top: 20px; right: 20px; z-index: 50; background: var(--bg-panel); color: var(--accent); border: 2px solid var(--accent); border-radius: 50%; width: 44px; height: 44px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s; font-size: 1.2rem;}
         #wikiToggleBtn:hover { transform: scale(1.1); }
 
         body.zen-mode .sidebar, body.zen-mode .chapter-sidebar, body.zen-mode .right-panel, body.zen-mode #wikiToggleBtn, body.zen-mode #mobChaptersBtn { display: none !important; }
@@ -121,12 +122,14 @@
         .w-tab.active { background: var(--accent); color: var(--bg-panel); border-color: var(--accent); }
         .wiki-search { width: 100%; padding: 12px; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; }
         .wiki-results { flex: 1; overflow-y: auto; padding-right: 5px; }
+        
         .wiki-card { background: var(--bg-input); padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--accent); cursor: pointer; box-shadow: var(--card-shadow); transition: 0.2s; }
         .wiki-card:hover { background: var(--bg-panel); border-color: var(--accent-sec); }
         .wiki-card h4 { margin: 0; color: var(--accent); font-size: 1rem; display: flex; justify-content: space-between; }
         .wiki-card small { color: var(--text-muted); font-size: 0.75rem; font-weight: normal; }
         .wiki-desc { display: none; margin-top: 10px; font-size: 0.85rem; color: var(--text-main); padding-top: 10px; border-top: 1px solid var(--border); white-space: pre-wrap; }
         .wiki-card.expanded .wiki-desc { display: block; }
+        
         .notes-area { flex: 1; width: 100%; height: 100%; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); padding: 15px; box-sizing: border-box; border-radius: 8px; resize: none; font-family: sans-serif; font-size: 1rem; line-height: 1.5; }
 
         /* --- THE BOARD --- */
@@ -265,11 +268,11 @@
                         <option value="blockquote">Quote</option>
                     </select>
 
-                    <select class="toolbar-select" onchange="setEditorSize(this.value)">
-                        <option value="0.9rem">Small</option>
-                        <option value="1.15rem" selected>Normal</option>
-                        <option value="1.4rem">Large</option>
-                        <option value="1.8rem">Huge</option>
+                    <select class="toolbar-select" onchange="formatDoc('fontSize', this.value); this.value='3';">
+                        <option value="1">Small</option>
+                        <option value="3" selected>Normal</option>
+                        <option value="5">Large</option>
+                        <option value="7">Huge</option>
                     </select>
 
                     <div class="divider"></div>
@@ -361,6 +364,7 @@
                     <li><b>Spellcheck (ABC Icon):</b> Toggles red squiggles on/off.</li>
                     <li><b>Status Dots:</b> Click the colored dot next to a chapter to cycle status (Red=Draft, Yellow=Edit, Green=Done).</li>
                     <li><b>Drag & Drop:</b> Drag chapters in the list to reorder them for the final book.</li>
+                    <li><b>Highlighting:</b> Use the dropdowns to format specific words (bold, large text, headings) without changing the whole page.</li>
                 </ul>
             </div>
 
@@ -537,9 +541,47 @@
         let wikiFilter = 'all';
         let sessionStartCount = 0;
         let saveTimer = null;
+        let backupTimer = null;
         let lastBackupTime = Date.now();
         let dailyGoal = 500;
         let currentFontSize = 1.15; // rem
+
+        // --- NATIVE DRAG AND DROP ---
+        let dragSrcEl = null;
+        function handleDragStart(e) { dragSrcEl = this; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/html', this.innerHTML); this.classList.add('dragging'); }
+        function handleDragOver(e) { if (e.preventDefault) e.preventDefault(); e.dataTransfer.dropEffect = 'move'; return false; }
+        function handleDragEnter(e) { this.classList.add('over'); }
+        function handleDragLeave(e) { this.classList.remove('over'); }
+        function handleDrop(e) {
+            if (e.stopPropagation) e.stopPropagation();
+            if (dragSrcEl !== this) {
+                const container = this.parentNode;
+                const items = Array.from(container.children);
+                const srcIdx = items.indexOf(dragSrcEl);
+                const destIdx = items.indexOf(this);
+                if(container.id === 'chapterList') {
+                    const temp = currentWorld.data.chapters[srcIdx];
+                    currentWorld.data.chapters[srcIdx] = currentWorld.data.chapters[destIdx];
+                    currentWorld.data.chapters[destIdx] = temp;
+                    saveAll(); renderChapterList();
+                } else if(container.id === 'boardList') {
+                    const temp = currentWorld.data.timeline[srcIdx];
+                    currentWorld.data.timeline[srcIdx] = currentWorld.data.timeline[destIdx];
+                    currentWorld.data.timeline[destIdx] = temp;
+                    saveAll(); renderBoard();
+                }
+            }
+            return false;
+        }
+        function handleDragEnd(e) { this.classList.remove('dragging'); this.parentNode.querySelectorAll('.draggable-item').forEach(item => item.classList.remove('over')); }
+        function addDnDHandlers(elem) {
+            elem.addEventListener('dragstart', handleDragStart, false);
+            elem.addEventListener('dragenter', handleDragEnter, false);
+            elem.addEventListener('dragover', handleDragOver, false);
+            elem.addEventListener('dragleave', handleDragLeave, false);
+            elem.addEventListener('drop', handleDrop, false);
+            elem.addEventListener('dragend', handleDragEnd, false);
+        }
 
         window.onload = () => {
             if(localStorage.getItem('wsTheme') === 'light') toggleTheme(true);
@@ -552,7 +594,7 @@
                 createWorld("Recovered World", true);
             }
 
-            loadActiveWorld(); initBoardSortable();
+            loadActiveWorld(); 
             
             // CRASH GUARD
             window.addEventListener('beforeunload', function (e) {
@@ -583,11 +625,6 @@
             if(Date.now() - lastBackupTime > 30 * 60 * 1000) {
                 document.getElementById('saveBtn').classList.add('backup-needed');
             }
-        }
-
-        // --- SIZE & STYLE PRESETS ---
-        function setEditorSize(val) {
-            document.documentElement.style.setProperty('--editor-font-size', val);
         }
 
         function updateWordCount() {
@@ -639,12 +676,7 @@
                 const idx = currentWorld.data.chapters.findIndex(c => c.id === id);
                 currentWorld.data.chapters.splice(idx, 1);
                 if (id === activeChapterId) {
-                    if (currentWorld.data.chapters.length > 0) {
-                        activeChapterId = currentWorld.data.chapters[0].id;
-                        loadChapter(activeChapterId);
-                    } else {
-                        createChapter(); return;
-                    }
+                    if (currentWorld.data.chapters.length > 0) { activeChapterId = currentWorld.data.chapters[0].id; loadChapter(activeChapterId); } else { createChapter(); return; }
                 }
                 saveAll(); renderChapterList();
             }
@@ -663,11 +695,8 @@
             document.getElementById('chapterTitle').value = ch.title;
             document.getElementById('chapterContent').innerHTML = ch.content;
             document.getElementById('chapterNotes').value = ch.notes || '';
-            
-            // Set Spellcheck state if saved, else default to false
             document.getElementById('chapterContent').spellcheck = false;
             document.getElementById('btnSpell').classList.remove('active');
-            
             renderChapterList(); updateWordCount();
         }
         function saveCurrentBuffer() {
@@ -683,36 +712,22 @@
             const list = document.getElementById('chapterList'); list.innerHTML = '';
             currentWorld.data.chapters.forEach(ch => { 
                 const statusClass = ch.status || 'draft';
-                // Calc words
                 const div = document.createElement('div'); div.innerHTML = ch.content;
                 const wc = countWords(div.innerText || "");
-                
                 list.innerHTML += `
-                <div class="chapter-item ${ch.id === activeChapterId ? 'active' : ''}" data-id="${ch.id}" onclick="loadChapter('${ch.id}')">
+                <div class="chapter-item draggable-item ${ch.id === activeChapterId ? 'active' : ''}" draggable="true" onclick="loadChapter('${ch.id}')">
                     <span class="chapter-handle"><i class="fas fa-grip-vertical"></i></span>
                     <div class="chapter-info">
                         <div class="chapter-title-text">${ch.title}</div>
                         <div class="chapter-wc">${wc} words</div>
                     </div>
                     <div class="chapter-actions">
-                        <div class="chapter-status-dot ${statusClass}" onclick="toggleChapterStatus('${ch.id}', event)" title="Status: ${statusClass.toUpperCase()}"></div>
+                        <div class="chapter-status-dot ${statusClass}" onclick="toggleChapterStatus('${ch.id}', event)" title="Status"></div>
                         <span class="chapter-delete-btn" onclick="deleteChapter('${ch.id}', event)"><i class="fas fa-trash"></i></span>
                     </div>
                 </div>`; 
             });
-            // Init Sortable on Chapters
-            new Sortable(list, {
-                handle: '.chapter-handle', animation: 150,
-                onEnd: function() {
-                    const newOrder = [];
-                    list.querySelectorAll('.chapter-item').forEach(el => {
-                        const id = el.getAttribute('data-id');
-                        newOrder.push(currentWorld.data.chapters.find(c => c.id === id));
-                    });
-                    currentWorld.data.chapters = newOrder;
-                    saveAll();
-                }
-            });
+            document.querySelectorAll('#chapterList .draggable-item').forEach(addDnDHandlers);
         }
 
         function renderBook() { saveCurrentBuffer(); const div = document.getElementById('bookView'); div.innerHTML = ''; currentWorld.data.chapters.forEach(ch => { div.innerHTML += `<div class="book-chapter"><div class="book-title">${ch.title}</div><div class="book-body">${ch.content}</div></div>`; }); }
@@ -729,27 +744,10 @@
         }
 
         function formatDoc(cmd, value=null) { document.execCommand(cmd, false, value); document.getElementById('chapterContent').focus(); checkFormat(); }
-        
-        function toggleSpellcheck() {
-            const editor = document.getElementById('chapterContent');
-            const btn = document.getElementById('btnSpell');
-            const current = editor.spellcheck;
-            editor.spellcheck = !current;
-            if(!current) { btn.classList.add('active'); } else { btn.classList.remove('active'); }
-            const text = editor.innerHTML; editor.innerHTML = text; 
-        }
+        function toggleSpellcheck() { const editor = document.getElementById('chapterContent'); const btn = document.getElementById('btnSpell'); const current = editor.spellcheck; editor.spellcheck = !current; if(!current) { btn.classList.add('active'); } else { btn.classList.remove('active'); } const text = editor.innerHTML; editor.innerHTML = text; }
+        function checkFormat() { document.getElementById('btnBold').classList.toggle('active', document.queryCommandState('bold')); document.getElementById('btnItalic').classList.toggle('active', document.queryCommandState('italic')); document.getElementById('btnUnderline').classList.toggle('active', document.queryCommandState('underline')); document.getElementById('btnLeft').classList.toggle('active', document.queryCommandState('justifyLeft')); document.getElementById('btnCenter').classList.toggle('active', document.queryCommandState('justifyCenter')); document.getElementById('btnRight').classList.toggle('active', document.queryCommandState('justifyRight')); document.getElementById('btnJustify').classList.toggle('active', document.queryCommandState('justifyFull')); }
 
-        function checkFormat() {
-            document.getElementById('btnBold').classList.toggle('active', document.queryCommandState('bold'));
-            document.getElementById('btnItalic').classList.toggle('active', document.queryCommandState('italic'));
-            document.getElementById('btnUnderline').classList.toggle('active', document.queryCommandState('underline'));
-            document.getElementById('btnLeft').classList.toggle('active', document.queryCommandState('justifyLeft'));
-            document.getElementById('btnCenter').classList.toggle('active', document.queryCommandState('justifyCenter'));
-            document.getElementById('btnRight').classList.toggle('active', document.queryCommandState('justifyRight'));
-            document.getElementById('btnJustify').classList.toggle('active', document.queryCommandState('justifyFull'));
-        }
-
-        function initBoardSortable() { new Sortable(document.getElementById('boardList'), { animation: 150, delay: 100, delayOnTouchOnly: true, onEnd: function (evt) { const newOrder = []; document.querySelectorAll('.board-card').forEach(card => { const id = parseInt(card.getAttribute('data-id')); const item = currentWorld.data.timeline.find(x => x.id === id); if(item) newOrder.push(item); }); currentWorld.data.timeline = newOrder; saveAll(); } }); }
+        function initBoardSortable() { renderBoard(); }
         function renderBoard() {
             const typeColors = { "Character": "var(--accent-sec)", "Location": "#66bb6a", "History": "#ef5350", "Race": "#26c6da", "Religion": "#ab47bc", "Faction": "#ffa726", "Magic": "#42a5f5" };
             const filter = document.getElementById('boardFilter').value;
@@ -765,15 +763,13 @@
                         const cleanName = n.trim();
                         const charData = currentWorld.data.chars.find(c => c.name.toLowerCase() === cleanName.toLowerCase());
                         let ageStr = '';
-                        if(charData && charData.birth && ev.year) {
-                            const age = parseInt(ev.year) - parseInt(charData.birth);
-                            ageStr = age >= 0 ? ` (Age: ${age})` : ` (Not born)`;
-                        }
+                        if(charData && charData.birth && ev.year) { const age = parseInt(ev.year) - parseInt(charData.birth); ageStr = age >= 0 ? ` (Age: ${age})` : ` (Not born)`; }
                         namesHtml += `<div><i class="fas fa-user"></i> ${cleanName}${ageStr}</div>`;
                     });
                 }
-                div.innerHTML += `<div class="board-card ${typeClass}" data-id="${ev.id}"><div class="bc-actions"><button class="bc-btn" onclick="openEventDetails(${ev.id})"><i class="fas fa-edit"></i></button><button class="bc-btn" onclick="deleteEvent(${ev.id})"><i class="fas fa-trash"></i></button></div><input class="bc-header" value="${ev.title}" onchange="updateEventText(${ev.id}, 'title', this.value)"><textarea class="bc-body" onchange="updateEventText(${ev.id}, 'desc', this.value)">${ev.desc}</textarea><div class="bc-meta">${namesHtml}${ev.where ? '<i class="fas fa-map-marker-alt"></i> '+ev.where + '<br>' : ''}${timeStr}</div></div>`;
+                div.innerHTML += `<div class="board-card draggable-item ${typeClass}" draggable="true"><div class="bc-actions"><button class="bc-btn" onclick="openEventDetails(${ev.id})"><i class="fas fa-edit"></i></button><button class="bc-btn" onclick="deleteEvent(${ev.id})"><i class="fas fa-trash"></i></button></div><input class="bc-header" value="${ev.title}" onchange="updateEventText(${ev.id}, 'title', this.value)"><textarea class="bc-body" onchange="updateEventText(${ev.id}, 'desc', this.value)">${ev.desc}</textarea><div class="bc-meta">${namesHtml}${ev.where ? '<i class="fas fa-map-marker-alt"></i> '+ev.where + '<br>' : ''}${timeStr}</div></div>`;
             });
+            document.querySelectorAll('#boardList .draggable-item').forEach(addDnDHandlers);
         }
         function populateBoardFilter() { const sel = document.getElementById('boardFilter'); const current = sel.value; sel.innerHTML = '<option value="all">Show All</option>'; currentWorld.data.chars.forEach(c => { sel.innerHTML += `<option value="${c.name}">${c.name}</option>`; }); sel.value = current; }
         function addEvent() { currentWorld.data.timeline.push({ id: Date.now(), title: 'New Scene', desc: '', type: 'default' }); saveAll(); renderBoard(); }
@@ -798,7 +794,7 @@
             const term = document.getElementById('globalSearchInput').value.toLowerCase();
             const res = document.getElementById('globalSearchResults'); res.innerHTML = '';
             if(!term) return;
-            currentWorld.data.chapters.forEach(ch => { if(ch.content.toLowerCase().includes(term) || ch.title.toLowerCase().includes(term)) { res.innerHTML += `<div class="search-res-item" onclick="loadChapter('${ch.id}'); document.getElementById('searchModal').style.display='none'; setTab('write', document.querySelector('.sidebar .nav-btn.active'));"><div class="search-highlight">Chapter: ${ch.title}</div><small>Found in text...</small></div>`; } });
+            currentWorld.data.chapters.forEach(ch => { if(ch.content.toLowerCase().includes(term) || ch.title.toLowerCase().includes(term)) { res.innerHTML += `<div class="search-res-item" onclick="loadChapter('${ch.id}'); document.getElementById('searchModal').style.display='none'; setTab('write', document.querySelector('.sidebar .nav-btn:first-child'));"><div class="search-highlight">Chapter: ${ch.title}</div><small>Found in text...</small></div>`; } });
             currentWorld.data.world.forEach(w => { if(w.name.toLowerCase().includes(term) || w.desc.toLowerCase().includes(term)) { res.innerHTML += `<div class="search-res-item" onclick="setTab('world', document.querySelector('.sidebar .nav-btn:nth-child(8)')); document.getElementById('searchModal').style.display='none'; loadEntity('world', '${w.id}')"><div class="search-highlight">World: ${w.name}</div><small>${w.type}</small></div>`; } });
             currentWorld.data.chars.forEach(c => { if(c.name.toLowerCase().includes(term) || c.notes.toLowerCase().includes(term)) { res.innerHTML += `<div class="search-res-item" onclick="setTab('chars', document.querySelector('.sidebar .nav-btn:nth-child(9)')); document.getElementById('searchModal').style.display='none'; loadEntity('char', '${c.id}')"><div class="search-highlight">Character: ${c.name}</div></div>`; } });
         }
@@ -808,25 +804,20 @@
             const chars = currentWorld.data.chars;
             const locs = currentWorld.data.world.filter(w => w.type === 'Location');
             const items = currentWorld.data.world.filter(w => w.type === 'Magic' || w.type === 'Faction');
-            
             if(chars.length === 0 || locs.length === 0) { document.getElementById('sparkOutput').innerText = "Add more Characters and Locations to generate prompts!"; return; }
-            
             const c = chars[Math.floor(Math.random() * chars.length)].name;
             const l = locs[Math.floor(Math.random() * locs.length)].name;
             const i = items.length > 0 ? items[Math.floor(Math.random() * items.length)].name : "a mysterious object";
-            
             const prompts = [`Write a scene where ${c} discovers a secret about ${i} in ${l}.`, `${c} is trapped in ${l}. How do they escape using ${i}?`, `A rival faction ambushes ${c} at ${l}.`, `${c} loses something important in ${l}.`];
             document.getElementById('sparkOutput').innerText = prompts[Math.floor(Math.random() * prompts.length)];
         }
 
-        function showSaving() { const ind = document.getElementById('saveIndicator'); ind.innerHTML = '<i class="fas fa-pen"></i> Saving...'; ind.className = 'save-indicator saving'; clearTimeout(saveTimer); saveTimer = setTimeout(() => { saveAll(); ind.innerHTML = '<i class="fas fa-check-circle"></i> Saved'; ind.className = 'save-indicator saved'; }, 1000); }
+        function showSaving() { const ind = document.getElementById('saveIndicator'); ind.innerHTML = '✔ Saving...'; ind.className = 'save-indicator saving'; clearTimeout(saveTimer); saveTimer = setTimeout(() => { saveAll(); ind.innerHTML = '✔ Saved'; ind.className = 'save-indicator saved'; }, 1000); }
         function toggleZenMode() { document.body.classList.toggle('zen-mode'); }
 
         function saveToDisk() { 
             const blob = new Blob([JSON.stringify(appData)], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'WorldSmith_Multiverse.json'; a.click(); 
-            // Reset pulse
-            lastBackupTime = Date.now();
-            document.getElementById('saveBtn').classList.remove('backup-needed');
+            lastBackupTime = Date.now(); document.getElementById('saveBtn').classList.remove('backup-needed');
         }
         function loadFromDisk(input) { const r = new FileReader(); r.onload = (e) => { try { appData = JSON.parse(e.target.result); switchWorld(appData.activeId); location.reload(); } catch(err) { alert("Invalid File"); } }; r.readAsText(input.files[0]); }
         
@@ -840,15 +831,9 @@
             const id = type === 'world' ? document.getElementById('wId').value : document.getElementById('cId').value;
             if(!id) return;
             if(confirm("Permanently delete this entry?")) {
-                if(type === 'world') {
-                    const idx = currentWorld.data.world.findIndex(x => x.id === id);
-                    if(idx > -1) currentWorld.data.world.splice(idx, 1);
-                } else {
-                    const idx = currentWorld.data.chars.findIndex(x => x.id === id);
-                    if(idx > -1) currentWorld.data.chars.splice(idx, 1);
-                }
-                saveAll(); refreshLists(); searchWiki();
-                createNewEntity(type);
+                if(type === 'world') { const idx = currentWorld.data.world.findIndex(x => x.id === id); if(idx > -1) currentWorld.data.world.splice(idx, 1); } 
+                else { const idx = currentWorld.data.chars.findIndex(x => x.id === id); if(idx > -1) currentWorld.data.chars.splice(idx, 1); }
+                saveAll(); refreshLists(); searchWiki(); createNewEntity(type);
             }
         }
         function saveEntity(type) { 
@@ -869,41 +854,26 @@
         function loadEntity(type, id) { 
             const data = type === 'world' ? currentWorld.data.world.find(x => x.id === id) : currentWorld.data.chars.find(x => x.id === id); 
             if(!data) return; 
-            
             if(type === 'world') {
-                document.getElementById('d-wName').innerText = data.name;
-                document.getElementById('d-wType').innerText = data.type;
-                document.getElementById('d-wTime').innerText = data.time || 'N/A';
-                document.getElementById('d-wDesc').innerText = data.desc;
+                document.getElementById('d-wName').innerText = data.name; document.getElementById('d-wType').innerText = data.type; document.getElementById('d-wTime').innerText = data.time || 'N/A'; document.getElementById('d-wDesc').innerText = data.desc;
                 document.getElementById('wId').value = data.id; document.getElementById('wName').value = data.name; document.getElementById('wType').value = data.type; document.getElementById('wTime').value = data.time || ''; document.getElementById('wDesc').value = data.desc;
             } else {
-                document.getElementById('d-cName').innerText = data.name;
-                document.getElementById('d-cRace').innerText = data.race || '-';
-                document.getElementById('d-cRole').innerText = data.role || '-';
-                document.getElementById('d-cGod').innerText = data.god || '-';
-                document.getElementById('d-cBirth').innerText = data.birth || '-';
-                document.getElementById('d-cGoal').innerText = data.goal || '-';
-                document.getElementById('d-cNotes').innerText = data.notes;
+                document.getElementById('d-cName').innerText = data.name; document.getElementById('d-cRace').innerText = data.race || '-'; document.getElementById('d-cRole').innerText = data.role || '-'; document.getElementById('d-cGod').innerText = data.god || '-'; document.getElementById('d-cBirth').innerText = data.birth || '-'; document.getElementById('d-cGoal').innerText = data.goal || '-'; document.getElementById('d-cNotes').innerText = data.notes;
                 document.getElementById('cId').value = data.id; document.getElementById('cName').value = data.name; document.getElementById('cRace').value = data.race; document.getElementById('cRole').value = data.role; document.getElementById('cGod').value = data.god; document.getElementById('cBirth').value = data.birth || ''; document.getElementById('cGoal').value = data.goal; document.getElementById('cNotes').value = data.notes;
             }
             toggleEditMode(type, false);
         }
-        
         function toggleEditMode(type, edit) {
             const disp = document.getElementById(type === 'world' ? 'w-display' : 'c-display');
             const form = document.getElementById(type === 'world' ? 'w-edit' : 'c-edit');
             if(edit) { disp.style.display = 'none'; form.style.display = 'block'; }
             else { disp.style.display = 'block'; form.style.display = 'none'; }
         }
-
         function refreshLists() { 
             const wList = document.getElementById('worldList'); wList.innerHTML = ''; 
             ['Race', 'Location', 'Religion', 'Faction', 'Magic', 'History'].forEach(t => { 
                 const items = currentWorld.data.world.filter(x => x.type === t); 
-                if(items.length > 0) { 
-                    wList.innerHTML += `<div class="category-header">${t}s</div>`; 
-                    items.forEach(item => wList.innerHTML += `<div class="entity-item" onclick="loadEntity('world', '${item.id}')">${item.name || '<span style="opacity:0.5; font-style:italic;">Untitled</span>'}</div>`); 
-                } 
+                if(items.length > 0) { wList.innerHTML += `<div class="category-header">${t}s</div>`; items.forEach(item => wList.innerHTML += `<div class="entity-item" onclick="loadEntity('world', '${item.id}')">${item.name || '<span style="opacity:0.5; font-style:italic;">Untitled</span>'}</div>`); } 
             }); 
             const cList = document.getElementById('charList'); cList.innerHTML = ''; 
             currentWorld.data.chars.forEach(item => cList.innerHTML += `<div class="entity-item" onclick="loadEntity('char', '${item.id}')">${item.name || '<span style="opacity:0.5; font-style:italic;">Untitled</span>'}</div>`); 
@@ -915,7 +885,6 @@
             if(!currentWorld) return;
             const groups = currentWorld.data.world.filter(w => ['Race', 'Religion', 'Faction'].includes(w.type));
             if(groups.length === 0) div.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-muted);">Create Races, Factions, or Religions in the World tab to see connections here.</div>';
-            
             groups.forEach(g => {
                 let html = `<div class="conn-group"><div class="conn-title">${g.name || 'Untitled'} <small style="color:var(--text-muted); font-weight:normal;">(${g.type})</small></div><div class="conn-list">`;
                 const members = currentWorld.data.chars.filter(c => c.race === g.name || c.god === g.name || c.role === g.name);
@@ -925,28 +894,12 @@
                 div.innerHTML += html;
             });
         }
-
         function setTab(tabId, btn) { 
-            // Reset Detail Views
-            if(tabId === 'world' || tabId === 'chars') {
-                createNewEntity(tabId === 'world' ? 'world' : 'char');
-                toggleEditMode(tabId === 'world' ? 'world' : 'char', true);
-            }
-            
-            // Hide all views
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active')); 
-            // Show target view
-            document.getElementById('view-' + tabId).classList.add('active'); 
-            
-            // Reset Sidebar Buttons
-            document.querySelectorAll('.sidebar .nav-btn').forEach(b => b.classList.remove('active')); 
-            
-            // Set Active Button (if passed)
+            if(tabId === 'world' || tabId === 'chars') { createNewEntity(tabId === 'world' ? 'world' : 'char'); toggleEditMode(tabId === 'world' ? 'world' : 'char', true); }
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active')); document.getElementById('view-' + tabId).classList.add('active'); 
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active')); 
             if(btn) btn.classList.add('active'); 
-            
-            // Specific initializers
-            if(tabId === 'conn') renderConnections(); 
-            if(tabId === 'read') renderBook(); 
+            if(tabId === 'conn') renderConnections(); if(tabId === 'read') renderBook(); 
         }
         function toggleTheme(forceLight) { if(forceLight || !isLight) { document.body.classList.add('light-mode'); isLight = true; } else { document.body.classList.remove('light-mode'); isLight = false; } localStorage.setItem('wsTheme', isLight ? 'light' : 'dark'); }
         function autoSave() { showSaving(); if(activeChapterId) renderChapterList(); }
@@ -955,14 +908,11 @@
         
         function saveToDisk() { const blob = new Blob([JSON.stringify(appData)], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'WorldSmith_Multiverse.json'; a.click(); lastBackupTime = Date.now(); document.getElementById('saveBtn').classList.remove('backup-needed'); }
         function loadFromDisk(input) { const r = new FileReader(); r.onload = (e) => { try { appData = JSON.parse(e.target.result); switchWorld(appData.activeId); location.reload(); } catch(err) { alert("Invalid File"); } }; r.readAsText(input.files[0]); }
-        function toggleRightPanel() { const p = document.getElementById('rightPanel'); if(window.innerWidth < 768) { p.classList.toggle('mobile-show'); } else { p.classList.toggle('collapsed'); } }
-        function toggleMobileChapters() { document.getElementById('chapterSidebar').classList.toggle('show'); }
         function searchWiki() {
             const typeColors = { "Character": "var(--accent-sec)", "Location": "#66bb6a", "History": "#ef5350", "Race": "#26c6da", "Religion": "#ab47bc", "Faction": "#ffa726", "Magic": "#42a5f5" };
             const filter = document.getElementById('wikiFilter').value;
             const term = document.querySelector('.wiki-search').value.toLowerCase();
             const res = document.getElementById('wikiResults'); res.innerHTML = '';
-            
             if(filter === 'all' || filter !== 'char') {
                 currentWorld.data.world.forEach(w => {
                     if((filter === 'all' || filter === 'world' || filter === w.type) && (w.name || '').toLowerCase().includes(term)) {
