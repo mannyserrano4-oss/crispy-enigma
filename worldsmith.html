@@ -23,7 +23,7 @@
             --card-shadow: 0 4px 6px rgba(0,0,0,0.3);
             --note-major: #ffb7b2; --note-sub: #a0c4ff; --note-filler: #b9fbc0; --note-default: #fdffb6;
             --status-draft: #ff6b6b; --status-edit: #feca57; --status-done: #4caf50;
-            --editor-font-size: 1.15rem; /* Dynamic Font Size */
+            --editor-font-size: 1.15rem;
         }
         body.light-mode {
             --bg-body: #fdf6e3; --bg-panel: #eee8d5; --bg-input: #ffffff;
@@ -39,7 +39,6 @@
         .nav-btn:hover { color: var(--accent); background: var(--bg-input); }
         .nav-btn.active { color: var(--bg-panel); background: var(--accent); box-shadow: 0 4px 12px var(--accent-dim); }
         .library-btn { border: 2px solid var(--accent-sec); color: var(--accent-sec); }
-        /* Font Controls */
         .font-ctrl-group { display:flex; flex-direction:column; gap:5px; margin-bottom:15px; border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:10px 0; width:100%; align-items:center; }
         .font-btn { font-size:0.8rem; height:30px; width:48px; }
 
@@ -51,20 +50,22 @@
         /* --- WRITING DESK --- */
         #view-write { padding: 0; display:none; }
         #view-write.active { display: flex; overflow: hidden; }
-        .chapter-sidebar { width: 200px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 10px; flex-shrink: 0; overflow-y: auto; transition: width 0.3s, padding 0.3s; }
+        .chapter-sidebar { width: 220px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 10px; flex-shrink: 0; overflow-y: auto; transition: width 0.3s, padding 0.3s; }
         
         .chapter-item { padding: 10px; border-radius: 6px; cursor: grab; margin-bottom: 5px; color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; group; }
         .chapter-item:hover { background: var(--bg-input); }
         .chapter-item.active { background: var(--bg-input); color: var(--accent); border-left: 3px solid var(--accent); font-weight: bold; }
         
-        .chapter-drag-area { display: flex; align-items: center; flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .chapter-info { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        .chapter-title-text { white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+        .chapter-wc { font-size: 0.7rem; color: var(--text-muted); opacity: 0.7; }
+        
         .chapter-handle { margin-right: 8px; color: var(--text-muted); opacity: 0.5; cursor: grab; flex-shrink: 0; }
-        .chapter-actions { display: flex; align-items: center; gap: 5px; }
-        .chapter-status-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--text-muted); cursor: pointer; border: 1px solid var(--bg-panel); }
+        .chapter-actions { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+        .chapter-status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); cursor: pointer; border: 1px solid var(--bg-panel); }
         .chapter-status-dot.draft { background: var(--status-draft); }
         .chapter-status-dot.edit { background: var(--status-edit); }
         .chapter-status-dot.done { background: var(--status-done); }
-        
         .chapter-delete-btn { color: var(--text-muted); cursor: pointer; opacity: 0; transition: 0.2s; padding: 2px; font-size: 0.8rem; }
         .chapter-item:hover .chapter-delete-btn { opacity: 1; }
         .chapter-delete-btn:hover { color: #ff6b6b; }
@@ -83,23 +84,13 @@
         .divider { width: 1px; background: var(--border); height: 20px; margin: 5px 2px; }
 
         .editor-title { width: 100%; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--accent); font-size: 1.8rem; padding: 15px; box-sizing: border-box; font-family: 'Georgia', serif; font-weight: bold; margin-bottom: 20px; outline: none; }
-        
-        /* EDITOR AREA WITH TYPEWRITER PADDING & DYNAMIC FONT */
-        .editor-area { 
-            width: 100%; min-height: 60vh; 
-            background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; 
-            color: var(--text-main); 
-            font-size: var(--editor-font-size); /* DYNAMIC SIZE */
-            line-height: 1.8; 
-            padding: 30px; padding-bottom: 50vh; /* TYPEWRITER PADDING */
-            box-sizing: border-box; font-family: 'Georgia', serif; outline: none; overflow-y: visible; flex:1; 
-        }
+        .editor-area { width: 100%; min-height: 60vh; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--text-main); font-size: 1.15rem; line-height: 1.8; padding: 30px; padding-bottom: 50vh; box-sizing: border-box; font-family: 'Georgia', serif; outline: none; overflow-y: visible; flex:1; }
         .editor-area b { color: inherit; font-weight: bold; }
         
         #wikiToggleBtn { position: absolute; top: 20px; right: 20px; z-index: 50; background: var(--bg-panel); color: var(--accent); border: 2px solid var(--accent); border-radius: 50%; width: 44px; height: 44px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s; }
         #wikiToggleBtn:hover { transform: scale(1.1); }
 
-        /* ZEN MODE STYLES */
+        /* ZEN MODE */
         body.zen-mode .sidebar { width: 0; padding: 0; overflow: hidden; border: none; }
         body.zen-mode .chapter-sidebar { width: 0; padding: 0; overflow: hidden; border: none; }
         body.zen-mode .right-panel { width: 0; padding: 0; overflow: hidden; border: none; }
@@ -186,6 +177,11 @@
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 500; align-items: center; justify-content: center; }
         .modal-box { background: var(--bg-panel); padding: 30px; border-radius: 12px; width: 90%; max-width: 500px; text-align: left; border: 1px solid var(--accent); max-height: 90vh; overflow-y: auto; }
 
+        /* --- SEARCH RESULTS --- */
+        .search-res-item { background: var(--bg-input); padding: 10px; margin-bottom: 5px; border-radius: 5px; cursor: pointer; }
+        .search-res-item:hover { border-left: 3px solid var(--accent); }
+        .search-highlight { color: var(--accent); font-weight: bold; }
+
         /* --- MOBILE --- */
         @media (max-width: 768px) {
             .chapter-sidebar { display: none; position: absolute; left: 0; top: 0; height: 100%; z-index: 200; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
@@ -206,7 +202,7 @@
     <div class="sidebar">
         <button class="nav-btn library-btn" onclick="openLibrary()" title="Library"><i class="fas fa-book-journal-whills"></i></button>
         <button class="nav-btn" onclick="openRetcon()" title="Retcon (Find/Replace)"><i class="fas fa-magic"></i></button>
-        <hr style="width:50%; border:0; border-bottom:1px solid var(--border); margin:10px 0;">
+        <button class="nav-btn" onclick="openGlobalSearch()" title="Global Search"><i class="fas fa-search"></i></button> <button class="nav-btn" onclick="triggerSpark()" title="Spark Idea Generator"><i class="fas fa-dice"></i></button> <hr style="width:50%; border:0; border-bottom:1px solid var(--border); margin:10px 0;">
         <button class="nav-btn active" onclick="setTab('write')" title="Writer"><i class="fas fa-pen-nib"></i></button>
         <button class="nav-btn" onclick="setTab('read')" title="Read & Export"><i class="fas fa-book-open"></i></button>
         <button class="nav-btn" onclick="setTab('world')"><i class="fas fa-globe-americas"></i></button>
@@ -246,6 +242,7 @@
                     <button class="fmt-btn" id="btnBold" onmousedown="event.preventDefault(); formatDoc('bold')" title="Bold (Ctrl+B)"><i class="fas fa-bold"></i></button>
                     <button class="fmt-btn" id="btnItalic" onmousedown="event.preventDefault(); formatDoc('italic')" title="Italic (Ctrl+I)"><i class="fas fa-italic"></i></button>
                     <button class="fmt-btn" id="btnUnderline" onmousedown="event.preventDefault(); formatDoc('underline')" title="Underline (Ctrl+U)"><i class="fas fa-underline"></i></button>
+                    <button class="fmt-btn" id="btnSpell" onmousedown="event.preventDefault(); toggleSpellcheck()" title="Toggle Spellcheck"><i class="fas fa-spell-check"></i></button>
                     <div class="divider"></div>
                     <button class="fmt-btn" id="btnLeft" onmousedown="event.preventDefault(); formatDoc('justifyLeft')" title="Left (Ctrl+L)"><i class="fas fa-align-left"></i></button>
                     <button class="fmt-btn" id="btnCenter" onmousedown="event.preventDefault(); formatDoc('justifyCenter')" title="Center (Ctrl+E)"><i class="fas fa-align-center"></i></button>
@@ -256,7 +253,7 @@
                     <button class="fmt-btn" onmousedown="event.preventDefault(); exportSingleChapter()" title="Download Current Chapter" style="color:var(--accent);"><i class="fas fa-download"></i></button>
                 </div>
 
-                <div id="chapterContent" class="editor-area" contenteditable="true" oninput="updateWordCount(); showSaving()"></div>
+                <div id="chapterContent" class="editor-area" contenteditable="true" spellcheck="false" oninput="updateWordCount(); showSaving()"></div>
                 
                 <div class="stats-bar" onclick="setSessionGoal()" title="Click to set daily goal">
                     <div class="stat-group">
@@ -406,6 +403,24 @@
         </div>
     </div>
 
+    <div id="searchModal" class="overlay">
+        <div class="modal-box">
+            <h3 style="color:var(--accent); margin-top:0;"><i class="fas fa-search"></i> Global Search</h3>
+            <input type="text" id="globalSearchInput" placeholder="Search entire book..." oninput="runGlobalSearch()" style="margin-bottom:10px;">
+            <div id="globalSearchResults" style="max-height:300px; overflow-y:auto; text-align:left;"></div>
+            <button class="btn" style="background:transparent; border:1px solid var(--text-muted); color:var(--text-main); margin-top:10px;" onclick="document.getElementById('searchModal').style.display='none'">Close</button>
+        </div>
+    </div>
+
+    <div id="sparkModal" class="overlay">
+        <div class="modal-box" style="text-align:center;">
+            <h3 style="color:var(--accent); margin-top:0;"><i class="fas fa-bolt"></i> Inspiration Spark</h3>
+            <p id="sparkOutput" style="font-size:1.2rem; font-style:italic; margin:20px 0; color:var(--text-main);">Thinking...</p>
+            <button class="btn" onclick="generateSpark()">Reroll</button>
+            <button class="btn" style="background:transparent; border:1px solid var(--text-muted); color:var(--text-main); margin-left:10px;" onclick="document.getElementById('sparkModal').style.display='none'">Close</button>
+        </div>
+    </div>
+
     <script>
         const MONTHS = ["Aether", "Borean", "Cygnus", "Dormus", "Eon", "Fyre", "Glacies", "Harvest", "Ignis", "Juras", "Kryos", "Lux", "Mirus", "Nox", "Omen"];
         let appData = { activeId: null, worlds: [] };
@@ -527,6 +542,11 @@
             document.getElementById('chapterTitle').value = ch.title;
             document.getElementById('chapterContent').innerHTML = ch.content;
             document.getElementById('chapterNotes').value = ch.notes || '';
+            
+            // Set Spellcheck state if saved, else default to false
+            document.getElementById('chapterContent').spellcheck = false;
+            document.getElementById('btnSpell').classList.remove('active');
+            
             renderChapterList(); updateWordCount();
         }
         function saveCurrentBuffer() {
@@ -542,11 +562,15 @@
             const list = document.getElementById('chapterList'); list.innerHTML = '';
             currentWorld.data.chapters.forEach(ch => { 
                 const statusClass = ch.status || 'draft';
+                const div = document.createElement('div'); div.innerHTML = ch.content;
+                const wc = countWords(div.innerText || "");
+                
                 list.innerHTML += `
                 <div class="chapter-item ${ch.id === activeChapterId ? 'active' : ''}" data-id="${ch.id}" onclick="loadChapter('${ch.id}')">
-                    <div class="chapter-drag-area">
-                        <span class="chapter-handle"><i class="fas fa-grip-vertical"></i></span>
-                        ${ch.title}
+                    <span class="chapter-handle"><i class="fas fa-grip-vertical"></i></span>
+                    <div class="chapter-info">
+                        <div class="chapter-title-text">${ch.title}</div>
+                        <div class="chapter-wc">${wc} words</div>
                     </div>
                     <div class="chapter-actions">
                         <div class="chapter-status-dot ${statusClass}" onclick="toggleChapterStatus('${ch.id}', event)" title="Status: ${statusClass.toUpperCase()}"></div>
@@ -582,6 +606,20 @@
         }
 
         function formatDoc(cmd, value=null) { document.execCommand(cmd, false, value); document.getElementById('chapterContent').focus(); checkFormat(); }
+        
+        function toggleSpellcheck() {
+            const editor = document.getElementById('chapterContent');
+            const btn = document.getElementById('btnSpell');
+            const current = editor.spellcheck;
+            editor.spellcheck = !current;
+            if(!current) {
+                btn.classList.add('active'); // On
+            } else {
+                btn.classList.remove('active'); // Off
+            }
+            const text = editor.innerHTML; editor.innerHTML = text; 
+        }
+
         function checkFormat() {
             document.getElementById('btnBold').classList.toggle('active', document.queryCommandState('bold'));
             document.getElementById('btnItalic').classList.toggle('active', document.queryCommandState('italic'));
@@ -633,6 +671,61 @@
             currentWorld.data.timeline.forEach(t => { t.title = replaceIn(t.title); t.desc = replaceIn(t.desc); t.who = replaceIn(t.who); t.where = replaceIn(t.where); });
             currentWorld.data.chapters.forEach(ch => { ch.title = replaceIn(ch.title); ch.content = replaceIn(ch.content); ch.notes = replaceIn(ch.notes); });
             saveAll(); location.reload();
+        }
+
+        // --- SEARCH & SPARK ---
+        function openGlobalSearch() { document.getElementById('searchModal').style.display = 'flex'; document.getElementById('globalSearchInput').focus(); }
+        function runGlobalSearch() {
+            const term = document.getElementById('globalSearchInput').value.toLowerCase();
+            const res = document.getElementById('globalSearchResults'); res.innerHTML = '';
+            if(!term) return;
+            
+            // Search Chapters
+            currentWorld.data.chapters.forEach(ch => {
+                if(ch.content.toLowerCase().includes(term) || ch.title.toLowerCase().includes(term)) {
+                    res.innerHTML += `<div class="search-res-item" onclick="loadChapter('${ch.id}'); document.getElementById('searchModal').style.display='none'; setTab('write');"><div class="search-highlight">Chapter: ${ch.title}</div><small>Found in text...</small></div>`;
+                }
+            });
+            // Search Wiki
+            currentWorld.data.world.forEach(w => {
+                if(w.name.toLowerCase().includes(term) || w.desc.toLowerCase().includes(term)) {
+                    res.innerHTML += `<div class="search-res-item" onclick="setTab('world'); document.getElementById('searchModal').style.display='none'; loadEntity('world', '${w.id}')"><div class="search-highlight">World: ${w.name}</div><small>${w.type}</small></div>`;
+                }
+            });
+            // Search Chars
+            currentWorld.data.chars.forEach(c => {
+                if(c.name.toLowerCase().includes(term) || c.notes.toLowerCase().includes(term)) {
+                    res.innerHTML += `<div class="search-res-item" onclick="setTab('chars'); document.getElementById('searchModal').style.display='none'; loadEntity('char', '${c.id}')"><div class="search-highlight">Character: ${c.name}</div></div>`;
+                }
+            });
+        }
+
+        function triggerSpark() {
+            document.getElementById('sparkModal').style.display = 'flex';
+            generateSpark();
+        }
+        function generateSpark() {
+            const chars = currentWorld.data.chars;
+            const locs = currentWorld.data.world.filter(w => w.type === 'Location');
+            const items = currentWorld.data.world.filter(w => w.type === 'Magic' || w.type === 'Faction');
+            
+            if(chars.length === 0 || locs.length === 0) {
+                document.getElementById('sparkOutput').innerText = "Add more Characters and Locations to generate prompts!";
+                return;
+            }
+            
+            const c = chars[Math.floor(Math.random() * chars.length)].name;
+            const l = locs[Math.floor(Math.random() * locs.length)].name;
+            const i = items.length > 0 ? items[Math.floor(Math.random() * items.length)].name : "a mysterious object";
+            
+            const prompts = [
+                `Write a scene where ${c} discovers a secret about ${i} in ${l}.`,
+                `${c} is trapped in ${l}. How do they escape using ${i}?`,
+                `A rival faction ambushes ${c} at ${l}.`,
+                `${c} loses something important in ${l}.`
+            ];
+            
+            document.getElementById('sparkOutput').innerText = prompts[Math.floor(Math.random() * prompts.length)];
         }
 
         function showSaving() {
