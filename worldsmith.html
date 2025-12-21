@@ -86,6 +86,14 @@
         #wikiToggleBtn { position: absolute; top: 20px; right: 20px; z-index: 50; background: var(--bg-panel); color: var(--accent); border: 2px solid var(--accent); border-radius: 50%; width: 44px; height: 44px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s; }
         #wikiToggleBtn:hover { transform: scale(1.1); }
 
+        /* ZEN MODE */
+        body.zen-mode .sidebar { width: 0; padding: 0; overflow: hidden; border: none; }
+        body.zen-mode .chapter-sidebar { width: 0; padding: 0; overflow: hidden; border: none; }
+        body.zen-mode .right-panel { width: 0; padding: 0; overflow: hidden; border: none; }
+        body.zen-mode .editor-container { padding: 40px 20%; }
+        body.zen-mode #wikiToggleBtn { display: none; }
+        body.zen-mode #mobChaptersBtn { display: none; }
+
         /* STATS BAR */
         .stats-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 40px; background: var(--bg-panel); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-sizing: border-box; font-size: 0.8rem; color: var(--text-muted); z-index: 20; cursor: pointer; transition: background 0.2s; }
         .stats-bar:hover { background: var(--bg-input); }
@@ -108,10 +116,8 @@
         .w-tab.active { background: var(--accent); color: var(--bg-panel); border-color: var(--accent); }
         .wiki-search { width: 100%; padding: 12px; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; }
         .wiki-results { flex: 1; overflow-y: auto; padding-right: 5px; }
-        .wiki-card { background: var(--bg-input); padding: 0; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--accent); cursor: pointer; box-shadow: var(--card-shadow); transition: 0.2s; overflow: hidden; }
+        .wiki-card { background: var(--bg-input); padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--accent); cursor: pointer; box-shadow: var(--card-shadow); transition: 0.2s; overflow: hidden; }
         .wiki-card:hover { background: var(--bg-panel); border-color: var(--accent-sec); }
-        .wiki-card-img { width: 100%; height: 120px; object-fit: cover; background: #000; display: block; }
-        .wiki-card-content { padding: 10px; }
         .wiki-card h4 { margin: 0; color: var(--accent); font-size: 1rem; display: flex; justify-content: space-between; }
         .wiki-card small { color: var(--text-muted); font-size: 0.75rem; font-weight: normal; }
         .wiki-desc { display: none; margin-top: 10px; font-size: 0.85rem; color: var(--text-main); padding-top: 10px; border-top: 1px solid var(--border); white-space: pre-wrap; }
@@ -201,6 +207,11 @@
         <button class="nav-btn" onclick="setTab('conn')"><i class="fas fa-link"></i></button>
         <div style="margin-top:auto;"></div>
         
+        <div class="font-ctrl-group">
+            <button class="nav-btn font-btn" onclick="changeFontSize(1)" title="Increase Font">A+</button>
+            <button class="nav-btn font-btn" onclick="changeFontSize(-1)" title="Decrease Font">A-</button>
+        </div>
+
         <button class="nav-btn" onclick="toggleTheme()"><i class="fas fa-adjust"></i></button>
         <button class="nav-btn" onclick="saveToDisk()"><i class="fas fa-save"></i></button>
         <button class="nav-btn" onclick="document.getElementById('loadInput').click()"><i class="fas fa-upload"></i></button>
@@ -305,7 +316,6 @@
                         </div>
                         <hr style="border:0; border-bottom:1px solid var(--border); margin:20px 0;">
                         <div class="form-group"><label>Name</label><input type="text" id="wName" required></div>
-                        <div class="form-group"><label>Image URL (Optional)</label><input type="text" id="wImage" placeholder="https://..."></div>
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                             <div class="form-group"><label>Type</label>
                                 <select id="wType">
@@ -337,7 +347,6 @@
                         </div>
                         <hr style="border:0; border-bottom:1px solid var(--border); margin:20px 0;">
                         <div class="form-group"><label>Name</label><input type="text" id="cName" required></div>
-                        <div class="form-group"><label>Image URL (Optional)</label><input type="text" id="cImage" placeholder="https://..."></div>
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Race</label><select id="cRace"><option value="">- Select -</option></select></div><div class="form-group"><label>Faction</label><select id="cRole"><option value="">- Select -</option></select></div></div>
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Religion</label><select id="cGod"><option value="">- Select -</option></select></div><div class="form-group"><label>Birth Year</label><input type="number" id="cBirth" placeholder="e.g. 290"></div></div>
                         <div class="form-group"><label>Goal</label><input type="text" id="cGoal"></div>
@@ -726,8 +735,8 @@
                 saveAll(); refreshLists(); searchWiki();
             }
         }
-        function saveEntity(type) { if(type === 'world') { const id = document.getElementById('wId').value; const idx = currentWorld.data.world.findIndex(x => x.id === id); if(idx > -1) currentWorld.data.world[idx] = { id, name: document.getElementById('wName').value, image: document.getElementById('wImage').value, type: document.getElementById('wType').value, time: document.getElementById('wTime').value, desc: document.getElementById('wDesc').value }; } else { const id = document.getElementById('cId').value; const idx = currentWorld.data.chars.findIndex(x => x.id === id); if(idx > -1) currentWorld.data.chars[idx] = { id, name: document.getElementById('cName').value, image: document.getElementById('cImage').value, race: document.getElementById('cRace').value, role: document.getElementById('cRole').value, god: document.getElementById('cGod').value, birth: document.getElementById('cBirth').value, goal: document.getElementById('cGoal').value, notes: document.getElementById('cNotes').value }; } saveAll(); refreshLists(); searchWiki(); }
-        function loadEntity(type, id) { const data = type === 'world' ? currentWorld.data.world.find(x => x.id === id) : currentWorld.data.chars.find(x => x.id === id); if(!data) return; if(type === 'world') { document.getElementById('wId').value = data.id; document.getElementById('wName').value = data.name; document.getElementById('wImage').value = data.image || ''; document.getElementById('wType').value = data.type; document.getElementById('wTime').value = data.time || ''; document.getElementById('wDesc').value = data.desc; } else { document.getElementById('cId').value = data.id; document.getElementById('cName').value = data.name; document.getElementById('cImage').value = data.image || ''; document.getElementById('cRace').value = data.race; document.getElementById('cRole').value = data.role; document.getElementById('cGod').value = data.god; document.getElementById('cBirth').value = data.birth || ''; document.getElementById('cGoal').value = data.goal; document.getElementById('cNotes').value = data.notes; } }
+        function saveEntity(type) { if(type === 'world') { const id = document.getElementById('wId').value; const idx = currentWorld.data.world.findIndex(x => x.id === id); if(idx > -1) currentWorld.data.world[idx] = { id, name: document.getElementById('wName').value, type: document.getElementById('wType').value, time: document.getElementById('wTime').value, desc: document.getElementById('wDesc').value }; } else { const id = document.getElementById('cId').value; const idx = currentWorld.data.chars.findIndex(x => x.id === id); if(idx > -1) currentWorld.data.chars[idx] = { id, name: document.getElementById('cName').value, race: document.getElementById('cRace').value, role: document.getElementById('cRole').value, god: document.getElementById('cGod').value, birth: document.getElementById('cBirth').value, goal: document.getElementById('cGoal').value, notes: document.getElementById('cNotes').value }; } saveAll(); refreshLists(); searchWiki(); }
+        function loadEntity(type, id) { const data = type === 'world' ? currentWorld.data.world.find(x => x.id === id) : currentWorld.data.chars.find(x => x.id === id); if(!data) return; if(type === 'world') { document.getElementById('wId').value = data.id; document.getElementById('wName').value = data.name; document.getElementById('wType').value = data.type; document.getElementById('wTime').value = data.time || ''; document.getElementById('wDesc').value = data.desc; } else { document.getElementById('cId').value = data.id; document.getElementById('cName').value = data.name; document.getElementById('cRace').value = data.race; document.getElementById('cRole').value = data.role; document.getElementById('cGod').value = data.god; document.getElementById('cBirth').value = data.birth || ''; document.getElementById('cGoal').value = data.goal; document.getElementById('cNotes').value = data.notes; } }
         function refreshLists() { 
             const wList = document.getElementById('worldList'); wList.innerHTML = ''; 
             ['Race', 'Location', 'Religion', 'Faction', 'Magic', 'History'].forEach(t => { const items = currentWorld.data.world.filter(x => x.type === t); if(items.length > 0) { wList.innerHTML += `<div class="category-header">${t}s</div>`; items.forEach(item => wList.innerHTML += `<div class="entity-item" onclick="loadEntity('world', '${item.id}')">${item.name}</div>`); } }); 
@@ -762,17 +771,15 @@
             if(filter === 'all' || filter !== 'char') {
                 currentWorld.data.world.forEach(w => {
                     if((filter === 'all' || filter === 'world' || filter === w.type) && w.name.toLowerCase().includes(term)) {
-                        const img = w.image || 'https://placehold.co/600x300/383942/b59af7?text=Image';
                         const timeStr = w.time ? `<br><b>${w.time}</b>` : '';
-                        res.innerHTML += `<div class="wiki-card" onclick="this.classList.toggle('expanded')"><img src="${img}" class="wiki-card-img"><div class="wiki-card-content"><h4>${w.name} <small>${w.type}</small></h4>${timeStr}<small>${w.desc.substring(0, 50)}...</small><div class="wiki-desc">${w.desc}</div></div></div>`;
+                        res.innerHTML += `<div class="wiki-card" onclick="this.classList.toggle('expanded')"><div class="wiki-card-content"><h4>${w.name} <small>${w.type}</small></h4>${timeStr}<small>${w.desc.substring(0, 50)}...</small><div class="wiki-desc">${w.desc}</div></div></div>`;
                     }
                 });
             }
             if(filter === 'all' || filter === 'char') {
                 currentWorld.data.chars.forEach(c => {
                     if(c.name.toLowerCase().includes(term)) {
-                        const img = c.image || 'https://placehold.co/600x300/383942/ffb7b2?text=Character';
-                        res.innerHTML += `<div class="wiki-card" style="border-left-color: var(--accent-sec);" onclick="this.classList.toggle('expanded')"><img src="${img}" class="wiki-card-img"><div class="wiki-card-content"><h4>${c.name}</h4><small>${c.race || ''}</small><div class="wiki-desc">Goal: ${c.goal}<br><br>${c.notes}</div></div></div>`;
+                        res.innerHTML += `<div class="wiki-card" style="border-left-color: var(--accent-sec);" onclick="this.classList.toggle('expanded')"><div class="wiki-card-content"><h4>${c.name}</h4><small>${c.race || ''}</small><div class="wiki-desc">Goal: ${c.goal}<br><br>${c.notes}</div></div></div>`;
                     }
                 });
             }
