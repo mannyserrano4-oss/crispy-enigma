@@ -22,6 +22,7 @@
             --accent: #b59af7; --accent-dim: #7d6bb0; --accent-sec: #ffb7b2;
             --card-shadow: 0 4px 6px rgba(0,0,0,0.3);
             --note-major: #ffb7b2; --note-sub: #a0c4ff; --note-filler: #b9fbc0; --note-default: #fdffb6;
+            --status-draft: #ff6b6b; --status-edit: #feca57; --status-done: #4caf50;
         }
         body.light-mode {
             --bg-body: #fdf6e3; --bg-panel: #eee8d5; --bg-input: #ffffff;
@@ -54,7 +55,13 @@
         
         .chapter-drag-area { display: flex; align-items: center; flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
         .chapter-handle { margin-right: 8px; color: var(--text-muted); opacity: 0.5; cursor: grab; flex-shrink: 0; }
-        .chapter-delete-btn { color: var(--text-muted); cursor: pointer; opacity: 0; transition: 0.2s; padding: 5px; }
+        .chapter-actions { display: flex; align-items: center; gap: 5px; }
+        .chapter-status-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--text-muted); cursor: pointer; border: 1px solid var(--bg-panel); }
+        .chapter-status-dot.draft { background: var(--status-draft); }
+        .chapter-status-dot.edit { background: var(--status-edit); }
+        .chapter-status-dot.done { background: var(--status-done); }
+        
+        .chapter-delete-btn { color: var(--text-muted); cursor: pointer; opacity: 0; transition: 0.2s; padding: 2px; font-size: 0.8rem; }
         .chapter-item:hover .chapter-delete-btn { opacity: 1; }
         .chapter-delete-btn:hover { color: #ff6b6b; }
 
@@ -87,7 +94,8 @@
         body.zen-mode #mobChaptersBtn { display: none; }
 
         /* STATS BAR */
-        .stats-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 40px; background: var(--bg-panel); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-sizing: border-box; font-size: 0.8rem; color: var(--text-muted); z-index: 20; }
+        .stats-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 40px; background: var(--bg-panel); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-sizing: border-box; font-size: 0.8rem; color: var(--text-muted); z-index: 20; cursor: pointer; transition: background 0.2s; }
+        .stats-bar:hover { background: var(--bg-input); }
         .stat-group { display: flex; gap: 15px; align-items: center; }
         .stat-val { color: var(--accent); font-weight: bold; }
         .progress-container { width: 150px; height: 6px; background: var(--bg-input); border-radius: 3px; overflow: hidden; display: flex; }
@@ -225,17 +233,18 @@
                     <button class="fmt-btn" id="btnJustify" onmousedown="event.preventDefault(); formatDoc('justifyFull')" title="Justify (Ctrl+J)"><i class="fas fa-align-justify"></i></button>
                     <div class="divider"></div>
                     <button class="fmt-btn" onmousedown="event.preventDefault(); toggleZenMode()" title="Zen Mode"><i class="fas fa-eye"></i></button>
+                    <button class="fmt-btn" onmousedown="event.preventDefault(); exportSingleChapter()" title="Download Current Chapter" style="color:var(--accent);"><i class="fas fa-download"></i></button>
                 </div>
 
                 <div id="chapterContent" class="editor-area" contenteditable="true" oninput="updateWordCount(); showSaving()"></div>
                 
-                <div class="stats-bar">
+                <div class="stats-bar" onclick="setSessionGoal()" title="Click to set daily goal">
                     <div class="stat-group">
                         <span>Chapter: <span class="stat-val" id="wc-chapter">0</span></span>
                         <span>Total: <span class="stat-val" id="wc-total">0</span></span>
                     </div>
                     <div class="stat-group">
-                        <span>Session: <span class="stat-val" id="wc-session">0</span> / 500</span>
+                        <span>Session: <span class="stat-val" id="wc-session">0</span> / <span id="wc-goal">500</span></span>
                         <div class="progress-container"><div class="progress-fill" id="wc-progress"></div></div>
                     </div>
                 </div>
@@ -273,8 +282,8 @@
 
         <div id="view-read" class="view-section">
             <div class="read-actions">
-                <button class="btn" onclick="exportBook()">Download for Word</button>
-                <button class="btn" onclick="copyBook()" style="background:var(--bg-input); color:var(--text-main); border:1px solid var(--border);">Copy for Docs</button>
+                <button class="btn" onclick="exportBook()">Download Full Book (Word)</button>
+                <button class="btn" onclick="copyBook()" style="background:var(--bg-input); color:var(--text-main); border:1px solid var(--border);">Copy Full Book</button>
             </div>
             <div class="book-container" id="bookView"></div>
         </div>
@@ -386,6 +395,7 @@
         let wikiFilter = 'all';
         let sessionStartCount = 0;
         let saveTimer = null;
+        let dailyGoal = 500;
 
         window.onload = () => {
             if(localStorage.getItem('wsTheme') === 'light') toggleTheme(true);
@@ -422,16 +432,20 @@
             });
             document.getElementById('wc-chapter').innerText = chapterWords;
             document.getElementById('wc-total').innerText = total;
-            const progress = Math.min(100, (chapterWords / 500) * 100);
+            const progress = Math.min(100, (chapterWords / dailyGoal) * 100);
             document.getElementById('wc-progress').style.width = progress + "%";
             document.getElementById('wc-session').innerText = chapterWords;
+        }
+        function setSessionGoal() {
+            const val = prompt("Set Daily Word Goal:", dailyGoal);
+            if(val && !isNaN(val)) { dailyGoal = parseInt(val); document.getElementById('wc-goal').innerText = dailyGoal; updateWordCount(); }
         }
         function countWords(str) { return str.trim().split(/\s+/).filter(word => word.length > 0).length; }
 
         function createWorld(name, autoLoad=false) {
             if(!name) name = prompt("Name:"); if(!name) return;
             const id = 'w' + Date.now();
-            appData.worlds.push({ id: id, name: name, data: { chapters: [{id: 'ch1', title: 'Chapter 1', content: '', notes: ''}], world: [], chars: [], timeline: [] } });
+            appData.worlds.push({ id: id, name: name, data: { chapters: [{id: 'ch1', title: 'Chapter 1', content: '', notes: '', status: 'draft'}], world: [], chars: [], timeline: [] } });
             saveAll(); if(autoLoad) switchWorld(id); renderLib();
         }
         function switchWorld(id) { appData.activeId = id; saveAll(); loadActiveWorld(); document.getElementById('libModal').style.display = 'none'; }
@@ -439,7 +453,7 @@
         function loadActiveWorld() {
             currentWorld = appData.worlds.find(w => w.id === appData.activeId);
             if(!currentWorld) return;
-            if(!currentWorld.data.chapters) currentWorld.data.chapters = [{ id: 'legacy', title: 'Chapter 1', content: currentWorld.data.writing?.content || '', notes: '' }];
+            if(!currentWorld.data.chapters) currentWorld.data.chapters = [{ id: 'legacy', title: 'Chapter 1', content: currentWorld.data.writing?.content || '', notes: '', status: 'draft' }];
             document.getElementById('storyHeader').innerText = `Current Story: ${currentWorld.name}`;
             if(!activeChapterId || !currentWorld.data.chapters.find(c => c.id === activeChapterId)) activeChapterId = currentWorld.data.chapters[0].id;
             loadChapter(activeChapterId);
@@ -447,7 +461,7 @@
         }
 
         function createChapter() {
-            const newCh = { id: 'ch'+Date.now(), title: 'New Chapter', content: '', notes: '' };
+            const newCh = { id: 'ch'+Date.now(), title: 'New Chapter', content: '', notes: '', status: 'draft' };
             currentWorld.data.chapters.push(newCh); saveAll(); renderChapterList(); loadChapter(newCh.id);
         }
         function deleteChapter(id, event) {
@@ -465,6 +479,14 @@
                 }
                 saveAll(); renderChapterList();
             }
+        }
+        function toggleChapterStatus(id, event) {
+            event.stopPropagation();
+            const ch = currentWorld.data.chapters.find(c => c.id === id);
+            if(!ch.status || ch.status === 'draft') ch.status = 'edit';
+            else if(ch.status === 'edit') ch.status = 'done';
+            else ch.status = 'draft';
+            saveAll(); renderChapterList();
         }
         function loadChapter(id) {
             saveCurrentBuffer(); activeChapterId = id;
@@ -486,13 +508,17 @@
         function renderChapterList() {
             const list = document.getElementById('chapterList'); list.innerHTML = '';
             currentWorld.data.chapters.forEach(ch => { 
+                const statusClass = ch.status || 'draft';
                 list.innerHTML += `
                 <div class="chapter-item ${ch.id === activeChapterId ? 'active' : ''}" data-id="${ch.id}" onclick="loadChapter('${ch.id}')">
                     <div class="chapter-drag-area">
                         <span class="chapter-handle"><i class="fas fa-grip-vertical"></i></span>
                         ${ch.title}
                     </div>
-                    <span class="chapter-delete-btn" onclick="deleteChapter('${ch.id}', event)"><i class="fas fa-trash"></i></span>
+                    <div class="chapter-actions">
+                        <div class="chapter-status-dot ${statusClass}" onclick="toggleChapterStatus('${ch.id}', event)" title="Status: ${statusClass.toUpperCase()}"></div>
+                        <span class="chapter-delete-btn" onclick="deleteChapter('${ch.id}', event)"><i class="fas fa-trash"></i></span>
+                    </div>
                 </div>`; 
             });
             new Sortable(list, {
@@ -513,6 +539,15 @@
         function exportBook() { renderBook(); const content = document.getElementById('bookView').innerHTML; const html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'><head><meta charset='utf-8'><title>${currentWorld.name}</title></head><body>${content}</body></html>`; const blob = new Blob([html], {type: 'application/msword'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${currentWorld.name}.doc`; a.click(); }
         function copyBook() { renderBook(); const range = document.createRange(); range.selectNode(document.getElementById('bookView')); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); document.execCommand('copy'); window.getSelection().removeAllRanges(); alert("Copied!"); }
         
+        function exportSingleChapter() {
+            saveCurrentBuffer();
+            const ch = currentWorld.data.chapters.find(c => c.id === activeChapterId);
+            if(!ch) return;
+            const html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'><head><meta charset='utf-8'><title>${ch.title}</title></head><body><h1>${ch.title}</h1>${ch.content}</body></html>`;
+            const blob = new Blob([html], {type: 'application/msword'});
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${ch.title}.doc`; a.click();
+        }
+
         function formatDoc(cmd, value=null) { document.execCommand(cmd, false, value); document.getElementById('chapterContent').focus(); checkFormat(); }
         function checkFormat() {
             document.getElementById('btnBold').classList.toggle('active', document.queryCommandState('bold'));
