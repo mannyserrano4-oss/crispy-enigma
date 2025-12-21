@@ -51,23 +51,33 @@
         #view-write { padding: 0; display:none; }
         #view-write.active { display: flex; overflow: hidden; }
         .chapter-sidebar { width: 220px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 10px; flex-shrink: 0; overflow-y: auto; transition: width 0.3s, padding 0.3s; }
+        
         .chapter-item { padding: 10px; border-radius: 6px; cursor: grab; margin-bottom: 5px; color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; group; }
         .chapter-item:hover { background: var(--bg-input); }
         .chapter-item.active { background: var(--bg-input); color: var(--accent); border-left: 3px solid var(--accent); font-weight: bold; }
+        
         .chapter-info { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
         .chapter-title-text { white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
         .chapter-wc { font-size: 0.7rem; color: var(--text-muted); opacity: 0.7; }
+        
         .chapter-handle { margin-right: 8px; color: var(--text-muted); opacity: 0.5; cursor: grab; flex-shrink: 0; }
-        .chapter-actions { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
-        .chapter-status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); cursor: pointer; border: 1px solid var(--bg-panel); }
+        
+        /* UPDATED ACTIONS SPACING */
+        .chapter-actions { display: flex; align-items: center; gap: 15px; flex-shrink: 0; padding-right:5px; }
+        
+        /* BIGGER TRAFFIC LIGHT DOT */
+        .chapter-status-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--text-muted); cursor: pointer; border: 1px solid var(--bg-panel); transition: transform 0.2s; }
+        .chapter-status-dot:hover { transform: scale(1.2); }
         .chapter-status-dot.draft { background: var(--status-draft); }
         .chapter-status-dot.edit { background: var(--status-edit); }
         .chapter-status-dot.done { background: var(--status-done); }
-        .chapter-delete-btn { color: var(--text-muted); cursor: pointer; opacity: 0; transition: 0.2s; padding: 2px; font-size: 0.8rem; }
+        
+        .chapter-delete-btn { color: var(--text-muted); cursor: pointer; opacity: 0; transition: 0.2s; padding: 2px; font-size: 0.9rem; }
         .chapter-item:hover .chapter-delete-btn { opacity: 1; }
         .chapter-delete-btn:hover { color: #ff6b6b; }
 
         .editor-container { flex: 1; padding: 20px 10%; padding-bottom: 60px; overflow-y: auto; background: var(--bg-body); transition: all 0.3s; position: relative; display:flex; flex-direction:column;}
+        
         .editor-header-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
         .save-indicator { font-size: 0.8rem; color: var(--text-muted); margin-left: auto; display: flex; align-items: center; gap: 5px; }
         .save-indicator.saving { color: #ffd700; }
@@ -207,11 +217,6 @@
         <button class="nav-btn" onclick="setTab('conn')"><i class="fas fa-link"></i></button>
         <div style="margin-top:auto;"></div>
         
-        <div class="font-ctrl-group">
-            <button class="nav-btn font-btn" onclick="changeFontSize(1)" title="Increase Font">A+</button>
-            <button class="nav-btn font-btn" onclick="changeFontSize(-1)" title="Decrease Font">A-</button>
-        </div>
-
         <button class="nav-btn" onclick="toggleTheme()"><i class="fas fa-adjust"></i></button>
         <button class="nav-btn" onclick="saveToDisk()"><i class="fas fa-save"></i></button>
         <button class="nav-btn" onclick="document.getElementById('loadInput').click()"><i class="fas fa-upload"></i></button>
@@ -315,7 +320,7 @@
                             <button class="btn">Save</button>
                         </div>
                         <hr style="border:0; border-bottom:1px solid var(--border); margin:20px 0;">
-                        <div class="form-group"><label>Name</label><input type="text" id="wName" required></div>
+                        <div class="form-group"><label>Name</label><input type="text" id="wName" required placeholder="Enter Name..."></div>
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                             <div class="form-group"><label>Type</label>
                                 <select id="wType">
@@ -346,7 +351,7 @@
                             <button class="btn">Save</button>
                         </div>
                         <hr style="border:0; border-bottom:1px solid var(--border); margin:20px 0;">
-                        <div class="form-group"><label>Name</label><input type="text" id="cName" required></div>
+                        <div class="form-group"><label>Name</label><input type="text" id="cName" required placeholder="Enter Name..."></div>
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Race</label><select id="cRace"><option value="">- Select -</option></select></div><div class="form-group"><label>Faction</label><select id="cRole"><option value="">- Select -</option></select></div></div>
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Religion</label><select id="cGod"><option value="">- Select -</option></select></div><div class="form-group"><label>Birth Year</label><input type="number" id="cBirth" placeholder="e.g. 290"></div></div>
                         <div class="form-group"><label>Goal</label><input type="text" id="cGoal"></div>
@@ -720,7 +725,7 @@
         function autoSave() { showSaving(); if(activeChapterId) renderChapterList(); }
         function populateDropdowns() { const races = currentWorld.data.world.filter(x => x.type === 'Race'); const rels = currentWorld.data.world.filter(x => x.type === 'Religion'); const facs = currentWorld.data.world.filter(x => x.type === 'Faction'); fillSelect('cRace', races); fillSelect('cGod', rels); fillSelect('cRole', facs); }
         function fillSelect(id, items) { const sel = document.getElementById(id); sel.innerHTML = '<option value="">- Select -</option>'; items.forEach(i => { sel.innerHTML += `<option value="${i.name}">${i.name}</option>`; }); }
-        function createNewEntity(type) { const id = Date.now().toString(); const empty = type === 'world' ? { id, name: 'New Entry', type: 'Location', desc: '' } : { id, name: 'New Character', race:'', role:'', god: '', goal:'', notes:'' }; if(type === 'world') currentWorld.data.world.push(empty); else currentWorld.data.chars.push(empty); saveAll(); refreshLists(); loadEntity(type, id); }
+        function createNewEntity(type) { const id = Date.now().toString(); const empty = type === 'world' ? { id, name: '', type: 'Location', desc: '' } : { id, name: '', race:'', role:'', god: '', goal:'', notes:'' }; if(type === 'world') currentWorld.data.world.push(empty); else currentWorld.data.chars.push(empty); saveAll(); refreshLists(); loadEntity(type, id); }
         function deleteEntity(type) {
             const id = type === 'world' ? document.getElementById('wId').value : document.getElementById('cId').value;
             if(!id) return;
@@ -739,8 +744,15 @@
         function loadEntity(type, id) { const data = type === 'world' ? currentWorld.data.world.find(x => x.id === id) : currentWorld.data.chars.find(x => x.id === id); if(!data) return; if(type === 'world') { document.getElementById('wId').value = data.id; document.getElementById('wName').value = data.name; document.getElementById('wType').value = data.type; document.getElementById('wTime').value = data.time || ''; document.getElementById('wDesc').value = data.desc; } else { document.getElementById('cId').value = data.id; document.getElementById('cName').value = data.name; document.getElementById('cRace').value = data.race; document.getElementById('cRole').value = data.role; document.getElementById('cGod').value = data.god; document.getElementById('cBirth').value = data.birth || ''; document.getElementById('cGoal').value = data.goal; document.getElementById('cNotes').value = data.notes; } }
         function refreshLists() { 
             const wList = document.getElementById('worldList'); wList.innerHTML = ''; 
-            ['Race', 'Location', 'Religion', 'Faction', 'Magic', 'History'].forEach(t => { const items = currentWorld.data.world.filter(x => x.type === t); if(items.length > 0) { wList.innerHTML += `<div class="category-header">${t}s</div>`; items.forEach(item => wList.innerHTML += `<div class="entity-item" onclick="loadEntity('world', '${item.id}')">${item.name}</div>`); } }); 
-            const cList = document.getElementById('charList'); cList.innerHTML = ''; currentWorld.data.chars.forEach(item => cList.innerHTML += `<div class="entity-item" onclick="loadEntity('char', '${item.id}')">${item.name}</div>`); 
+            ['Race', 'Location', 'Religion', 'Faction', 'Magic', 'History'].forEach(t => { 
+                const items = currentWorld.data.world.filter(x => x.type === t); 
+                if(items.length > 0) { 
+                    wList.innerHTML += `<div class="category-header">${t}s</div>`; 
+                    items.forEach(item => wList.innerHTML += `<div class="entity-item" onclick="loadEntity('world', '${item.id}')">${item.name || '<span style="opacity:0.5; font-style:italic;">Untitled</span>'}</div>`); 
+                } 
+            }); 
+            const cList = document.getElementById('charList'); cList.innerHTML = ''; 
+            currentWorld.data.chars.forEach(item => cList.innerHTML += `<div class="entity-item" onclick="loadEntity('char', '${item.id}')">${item.name || '<span style="opacity:0.5; font-style:italic;">Untitled</span>'}</div>`); 
             populateDropdowns(); populateBoardFilter();
         }
         
@@ -751,10 +763,10 @@
             if(groups.length === 0) div.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-muted);">Create Races, Factions, or Religions in the World tab to see connections here.</div>';
             
             groups.forEach(g => {
-                let html = `<div class="conn-group"><div class="conn-title">${g.name} <small style="color:var(--text-muted); font-weight:normal;">(${g.type})</small></div><div class="conn-list">`;
+                let html = `<div class="conn-group"><div class="conn-title">${g.name || 'Untitled'} <small style="color:var(--text-muted); font-weight:normal;">(${g.type})</small></div><div class="conn-list">`;
                 const members = currentWorld.data.chars.filter(c => c.race === g.name || c.god === g.name || c.role === g.name);
                 if(members.length === 0) html += `<span style="color:var(--text-muted); font-size:0.8rem;">No members found.</span>`;
-                members.forEach(m => { html += `<div class="conn-tag">${m.name}</div>`; });
+                members.forEach(m => { html += `<div class="conn-tag">${m.name || 'Untitled'}</div>`; });
                 html += '</div></div>';
                 div.innerHTML += html;
             });
@@ -770,16 +782,16 @@
             
             if(filter === 'all' || filter !== 'char') {
                 currentWorld.data.world.forEach(w => {
-                    if((filter === 'all' || filter === 'world' || filter === w.type) && w.name.toLowerCase().includes(term)) {
+                    if((filter === 'all' || filter === 'world' || filter === w.type) && (w.name || '').toLowerCase().includes(term)) {
                         const timeStr = w.time ? `<br><b>${w.time}</b>` : '';
-                        res.innerHTML += `<div class="wiki-card" onclick="this.classList.toggle('expanded')"><div class="wiki-card-content"><h4>${w.name} <small>${w.type}</small></h4>${timeStr}<small>${w.desc.substring(0, 50)}...</small><div class="wiki-desc">${w.desc}</div></div></div>`;
+                        res.innerHTML += `<div class="wiki-card" onclick="this.classList.toggle('expanded')"><div class="wiki-card-content"><h4>${w.name || 'Untitled'} <small>${w.type}</small></h4>${timeStr}<small>${w.desc.substring(0, 50)}...</small><div class="wiki-desc">${w.desc}</div></div></div>`;
                     }
                 });
             }
             if(filter === 'all' || filter === 'char') {
                 currentWorld.data.chars.forEach(c => {
-                    if(c.name.toLowerCase().includes(term)) {
-                        res.innerHTML += `<div class="wiki-card" style="border-left-color: var(--accent-sec);" onclick="this.classList.toggle('expanded')"><div class="wiki-card-content"><h4>${c.name}</h4><small>${c.race || ''}</small><div class="wiki-desc">Goal: ${c.goal}<br><br>${c.notes}</div></div></div>`;
+                    if((c.name || '').toLowerCase().includes(term)) {
+                        res.innerHTML += `<div class="wiki-card" style="border-left-color: var(--accent-sec);" onclick="this.classList.toggle('expanded')"><div class="wiki-card-content"><h4>${c.name || 'Untitled'}</h4><small>${c.race || ''}</small><div class="wiki-desc">Goal: ${c.goal}<br><br>${c.notes}</div></div></div>`;
                     }
                 });
             }
