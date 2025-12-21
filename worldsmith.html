@@ -8,11 +8,7 @@
     <meta name="apple-mobile-web-app-title" content="WorldSmith">
     <link rel="apple-touch-icon" href="icon.png">
 
-    <title>The World Smith</title>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
-    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <title>The World Smith (Offline)</title>
     
     <style>
         /* --- THEME --- */
@@ -33,19 +29,23 @@
         }
         body { margin: 0; background-color: var(--bg-body); color: var(--text-main); font-family: 'Segoe UI', sans-serif; height: 100vh; display: flex; overflow: hidden; transition: background 0.3s ease; }
 
+        /* --- ICONS (OFFLINE) --- */
+        .icon { font-style: normal; font-weight: normal; text-decoration: none; display: inline-block; width: 1.2em; text-align: center; }
+        /* Reset emoji colors to monochrome for app-feel */
+        .nav-btn .icon, .fmt-btn .icon { filter: grayscale(100%) brightness(1.5); }
+        body.light-mode .nav-btn .icon, body.light-mode .fmt-btn .icon { filter: grayscale(100%) brightness(0.5); }
+
         /* --- SIDEBAR --- */
         .sidebar { width: 70px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 20px; z-index: 100; box-shadow: 2px 0 10px rgba(0,0,0,0.1); flex-shrink: 0; transition: width 0.3s, padding 0.3s; }
-        .nav-btn { width: 48px; height: 48px; border-radius: 14px; border: none; background: transparent; color: var(--text-muted); font-size: 1.3rem; margin-bottom: 10px; cursor: pointer; transition: 0.2s; }
+        .nav-btn { width: 48px; height: 48px; border-radius: 14px; border: none; background: transparent; color: var(--text-muted); font-size: 1.3rem; margin-bottom: 10px; cursor: pointer; transition: 0.2s; display:flex; align-items:center; justify-content:center; }
         .nav-btn:hover { color: var(--accent); background: var(--bg-input); }
         .nav-btn.active { color: var(--bg-panel); background: var(--accent); box-shadow: 0 4px 12px var(--accent-dim); }
+        .nav-btn.active .icon { filter: grayscale(100%) brightness(0); } /* Black icon on active */
         .library-btn { border: 2px solid var(--accent-sec); color: var(--accent-sec); }
         
         /* BACKUP REMINDER PULSE */
         @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 107, 107, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); } }
         .backup-needed { color: #ff6b6b !important; animation: pulse-red 2s infinite; border: 1px solid #ff6b6b; }
-
-        .font-ctrl-group { display:flex; flex-direction:column; gap:5px; margin-bottom:15px; border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:10px 0; width:100%; align-items:center; }
-        .font-btn { font-size:0.8rem; height:30px; width:48px; }
 
         /* --- LAYOUT --- */
         .main-stage { flex: 1; position: relative; display: flex; overflow: hidden; transition: all 0.3s; }
@@ -56,10 +56,16 @@
         #view-write { padding: 0; display:none; }
         #view-write.active { display: flex; overflow: hidden; }
         .chapter-sidebar { width: 220px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 10px; flex-shrink: 0; overflow-y: auto; transition: width 0.3s, padding 0.3s; }
-        .chapter-item { padding: 10px; border-radius: 6px; cursor: grab; margin-bottom: 5px; color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; group; }
+        
+        /* DRAG AND DROP STYLES */
+        .draggable-item { cursor: grab; user-select: none; }
+        .draggable-item.dragging { opacity: 0.5; background: var(--bg-input); }
+        
+        .chapter-item { padding: 10px; border-radius: 6px; margin-bottom: 5px; color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; border: 1px solid transparent; }
         .chapter-item:hover { background: var(--bg-input); }
         .chapter-item.active { background: var(--bg-input); color: var(--accent); border-left: 3px solid var(--accent); font-weight: bold; }
-        .chapter-info { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        
+        .chapter-info { display: flex; flex-direction: column; flex: 1; overflow: hidden; pointer-events: none; }
         .chapter-title-text { white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
         .chapter-wc { font-size: 0.7rem; color: var(--text-muted); opacity: 0.7; }
         .chapter-handle { margin-right: 8px; color: var(--text-muted); opacity: 0.5; cursor: grab; flex-shrink: 0; }
@@ -76,22 +82,31 @@
         .save-indicator.saving { color: #ffd700; } .save-indicator.saved { color: #4caf50; }
 
         .editor-toolbar { display: flex; gap: 5px; margin-bottom: 10px; background: var(--bg-panel); padding: 5px; border-radius: 8px; width: fit-content; border: 1px solid var(--border); position: sticky; top: 0; z-index: 10; align-items: center; flex-wrap: wrap; }
-        .fmt-btn { background: transparent; border: none; color: var(--text-main); width: 30px; height: 30px; cursor: pointer; border-radius: 4px; font-weight: bold; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+        .fmt-btn { background: transparent; border: none; color: var(--text-main); width: 30px; height: 30px; cursor: pointer; border-radius: 4px; font-weight: bold; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
         .fmt-btn:hover { background: var(--bg-input); }
         .fmt-btn.active { background: var(--accent); color: var(--bg-panel); box-shadow: 0 0 5px var(--accent); }
         .divider { width: 1px; background: var(--border); height: 20px; margin: 5px 2px; }
         .toolbar-select { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); padding: 4px; border-radius: 4px; font-size: 0.8rem; outline: none; margin: 0 5px; cursor: pointer; }
 
         .editor-title { width: 100%; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--accent); font-size: 1.8rem; padding: 15px; box-sizing: border-box; font-family: 'Georgia', serif; font-weight: bold; margin-bottom: 20px; outline: none; }
-        .editor-area { width: 100%; min-height: 60vh; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--text-main); font-size: var(--editor-font-size); line-height: 1.8; padding: 30px; padding-bottom: 50vh; box-sizing: border-box; font-family: 'Georgia', serif; outline: none; overflow-y: visible; flex:1; }
+        .editor-area { 
+            width: 100%; min-height: 60vh; 
+            background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; 
+            color: var(--text-main); 
+            font-size: var(--editor-font-size); 
+            line-height: 1.8; 
+            padding: 30px; padding-bottom: 50vh; 
+            box-sizing: border-box; font-family: 'Georgia', serif; outline: none; overflow-y: visible; flex:1; 
+        }
         .editor-area b { color: inherit; font-weight: bold; }
         
-        #wikiToggleBtn { position: absolute; top: 20px; right: 20px; z-index: 50; background: var(--bg-panel); color: var(--accent); border: 2px solid var(--accent); border-radius: 50%; width: 44px; height: 44px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s; }
+        #wikiToggleBtn { position: absolute; top: 20px; right: 20px; z-index: 50; background: var(--bg-panel); color: var(--accent); border: 2px solid var(--accent); border-radius: 50%; width: 44px; height: 44px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s; font-size:1.5rem; }
         #wikiToggleBtn:hover { transform: scale(1.1); }
 
         body.zen-mode .sidebar, body.zen-mode .chapter-sidebar, body.zen-mode .right-panel, body.zen-mode #wikiToggleBtn, body.zen-mode #mobChaptersBtn { display: none !important; }
         body.zen-mode .editor-container { padding: 40px 20%; }
 
+        /* STATS BAR */
         .stats-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 40px; background: var(--bg-panel); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-sizing: border-box; font-size: 0.8rem; color: var(--text-muted); z-index: 20; cursor: pointer; transition: background 0.2s; }
         .stats-bar:hover { background: var(--bg-input); }
         .stat-group { display: flex; gap: 15px; align-items: center; }
@@ -99,6 +114,7 @@
         .progress-container { width: 150px; height: 6px; background: var(--bg-input); border-radius: 3px; overflow: hidden; display: flex; }
         .progress-fill { height: 100%; background: #4caf50; width: 0%; transition: width 0.3s; }
 
+        /* RIGHT PANEL */
         .right-panel { width: 350px; background: var(--bg-panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; padding: 15px; flex-shrink: 0; transition: margin-right 0.3s ease-in-out; margin-right: 0; }
         .right-panel.collapsed { margin-right: -381px; }
         .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -204,22 +220,23 @@
 <body>
 
     <div class="sidebar">
-        <button class="nav-btn library-btn" onclick="openLibrary()" title="Library"><i class="fas fa-book-journal-whills"></i></button>
-        <button class="nav-btn" onclick="openRetcon()" title="Retcon (Find/Replace)"><i class="fas fa-magic"></i></button>
-        <button class="nav-btn" onclick="openGlobalSearch()" title="Global Search"><i class="fas fa-search"></i></button>
-        <button class="nav-btn" onclick="triggerSpark()" title="Spark Idea Generator"><i class="fas fa-dice"></i></button>
-        <button class="nav-btn" onclick="setTab('tips')" title="Guide & Tips"><i class="fas fa-question-circle"></i></button> <hr style="width:50%; border:0; border-bottom:1px solid var(--border); margin:10px 0;">
-        <button class="nav-btn active" onclick="setTab('write')" title="Writer"><i class="fas fa-pen-nib"></i></button>
-        <button class="nav-btn" onclick="setTab('read')" title="Read & Export"><i class="fas fa-book-open"></i></button>
-        <button class="nav-btn" onclick="setTab('world')"><i class="fas fa-globe-americas"></i></button>
-        <button class="nav-btn" onclick="setTab('chars')"><i class="fas fa-users"></i></button>
-        <button class="nav-btn" onclick="setTab('board')"><i class="fas fa-th-large"></i></button>
-        <button class="nav-btn" onclick="setTab('conn')"><i class="fas fa-link"></i></button>
+        <button class="nav-btn library-btn" onclick="openLibrary()" title="Library"><span class="icon">📚</span></button>
+        <button class="nav-btn" onclick="openRetcon()" title="Retcon"><span class="icon">🪄</span></button>
+        <button class="nav-btn" onclick="openGlobalSearch()" title="Search"><span class="icon">🔍</span></button>
+        <button class="nav-btn" onclick="triggerSpark()" title="Spark"><span class="icon">🎲</span></button>
+        <button class="nav-btn" onclick="setTab('tips')" title="Guide"><span class="icon">❓</span></button>
+        <hr style="width:50%; border:0; border-bottom:1px solid var(--border); margin:10px 0;">
+        <button class="nav-btn active" onclick="setTab('write')" title="Writer"><span class="icon">✎</span></button>
+        <button class="nav-btn" onclick="setTab('read')" title="Read"><span class="icon">📖</span></button>
+        <button class="nav-btn" onclick="setTab('world')" title="World"><span class="icon">🌍</span></button>
+        <button class="nav-btn" onclick="setTab('chars')" title="Characters"><span class="icon">👥</span></button>
+        <button class="nav-btn" onclick="setTab('board')" title="Board"><span class="icon">📋</span></button>
+        <button class="nav-btn" onclick="setTab('conn')" title="Connections"><span class="icon">🕸️</span></button>
         <div style="margin-top:auto;"></div>
         
-        <button class="nav-btn" onclick="toggleTheme()"><i class="fas fa-adjust"></i></button>
-        <button class="nav-btn" id="saveBtn" onclick="saveToDisk()" title="Backup to Disk"><i class="fas fa-save"></i></button>
-        <button class="nav-btn" onclick="document.getElementById('loadInput').click()"><i class="fas fa-upload"></i></button>
+        <button class="nav-btn" onclick="toggleTheme()" title="Theme"><span class="icon">🌗</span></button>
+        <button class="nav-btn" id="saveBtn" onclick="saveToDisk()" title="Backup"><span class="icon">💾</span></button>
+        <button class="nav-btn" onclick="document.getElementById('loadInput').click()" title="Load"><span class="icon">📂</span></button>
         <input type="file" id="loadInput" hidden onchange="loadFromDisk(this)">
     </div>
 
@@ -227,31 +244,31 @@
         
         <div id="view-write" class="view-section active">
             <div class="chapter-sidebar" id="chapterSidebar">
-                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Chapters (Drag to Reorder)</div>
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Chapters</div>
                 <div id="chapterList"></div>
                 <button class="btn-new" onclick="createChapter()" style="margin-top:10px;">+ New Chapter</button>
             </div>
             <div class="editor-container">
                 <div class="editor-header-row">
                     <div id="storyHeader" style="color:var(--text-muted); font-size:0.8rem; text-transform:uppercase;"></div>
-                    <div class="save-indicator" id="saveIndicator"><i class="fas fa-check-circle"></i> Saved</div>
+                    <div class="save-indicator" id="saveIndicator"><span>✔</span> Saved</div>
                 </div>
                 
                 <input type="text" id="chapterTitle" class="editor-title" placeholder="Chapter Title" oninput="showSaving()">
                 
                 <div class="editor-toolbar">
-                    <button class="fmt-btn" id="btnBold" onmousedown="event.preventDefault(); formatDoc('bold')" title="Bold (Ctrl+B)"><i class="fas fa-bold"></i></button>
-                    <button class="fmt-btn" id="btnItalic" onmousedown="event.preventDefault(); formatDoc('italic')" title="Italic (Ctrl+I)"><i class="fas fa-italic"></i></button>
-                    <button class="fmt-btn" id="btnUnderline" onmousedown="event.preventDefault(); formatDoc('underline')" title="Underline (Ctrl+U)"><i class="fas fa-underline"></i></button>
-                    <button class="fmt-btn" id="btnSpell" onmousedown="event.preventDefault(); toggleSpellcheck()" title="Toggle Spellcheck (AB Checkmark)"><i class="fas fa-spell-check"></i></button>
+                    <button class="fmt-btn" id="btnBold" onmousedown="event.preventDefault(); formatDoc('bold')" title="Bold"><b>B</b></button>
+                    <button class="fmt-btn" id="btnItalic" onmousedown="event.preventDefault(); formatDoc('italic')" title="Italic"><i>I</i></button>
+                    <button class="fmt-btn" id="btnUnderline" onmousedown="event.preventDefault(); formatDoc('underline')" title="Underline"><u>U</u></button>
+                    <button class="fmt-btn" id="btnSpell" onmousedown="event.preventDefault(); toggleSpellcheck()" title="Spellcheck">AB✓</button>
                     
                     <div class="divider"></div>
                     
                     <select class="toolbar-select" onchange="formatDoc('formatBlock', this.value); this.value='';">
                         <option value="">Style...</option>
-                        <option value="p">Normal Text</option>
-                        <option value="h2">Heading 1 (Scene)</option>
-                        <option value="h3">Heading 2 (Sub)</option>
+                        <option value="p">Normal</option>
+                        <option value="h2">Heading 1</option>
+                        <option value="h3">Heading 2</option>
                         <option value="blockquote">Quote</option>
                     </select>
 
@@ -263,13 +280,12 @@
                     </select>
 
                     <div class="divider"></div>
-                    <button class="fmt-btn" id="btnLeft" onmousedown="event.preventDefault(); formatDoc('justifyLeft')" title="Left (Ctrl+L)"><i class="fas fa-align-left"></i></button>
-                    <button class="fmt-btn" id="btnCenter" onmousedown="event.preventDefault(); formatDoc('justifyCenter')" title="Center (Ctrl+E)"><i class="fas fa-align-center"></i></button>
-                    <button class="fmt-btn" id="btnRight" onmousedown="event.preventDefault(); formatDoc('justifyRight')" title="Right (Ctrl+R)"><i class="fas fa-align-right"></i></button>
-                    <button class="fmt-btn" id="btnJustify" onmousedown="event.preventDefault(); formatDoc('justifyFull')" title="Justify (Ctrl+J)"><i class="fas fa-align-justify"></i></button>
+                    <button class="fmt-btn" onmousedown="event.preventDefault(); formatDoc('justifyLeft')">L</button>
+                    <button class="fmt-btn" onmousedown="event.preventDefault(); formatDoc('justifyCenter')">C</button>
+                    <button class="fmt-btn" onmousedown="event.preventDefault(); formatDoc('justifyRight')">R</button>
                     <div class="divider"></div>
-                    <button class="fmt-btn" onmousedown="event.preventDefault(); toggleZenMode()" title="Zen Mode"><i class="fas fa-eye"></i></button>
-                    <button class="fmt-btn" onmousedown="event.preventDefault(); exportSingleChapter()" title="Download Current Chapter" style="color:var(--accent);"><i class="fas fa-download"></i></button>
+                    <button class="fmt-btn" onmousedown="event.preventDefault(); toggleZenMode()" title="Zen">👁</button>
+                    <button class="fmt-btn" onmousedown="event.preventDefault(); exportSingleChapter()" title="Download" style="color:var(--accent);">⬇</button>
                 </div>
 
                 <div id="chapterContent" class="editor-area" contenteditable="true" spellcheck="false" oninput="updateWordCount(); showSaving()"></div>
@@ -285,8 +301,8 @@
                     </div>
                 </div>
 
-                <button onclick="toggleMobileChapters()" style="position:absolute; top:20px; left:20px; z-index:50; background:var(--bg-panel); color:var(--text-muted); border:1px solid var(--border); border-radius:50%; width:44px; height:44px; display:none; justify-content:center; align-items:center;" id="mobChaptersBtn"><i class="fas fa-list"></i></button>
-                <button onclick="toggleRightPanel()" id="wikiToggleBtn"><i class="fas fa-book"></i></button>
+                <button onclick="toggleMobileChapters()" style="position:absolute; top:20px; left:20px; z-index:50; background:var(--bg-panel); color:var(--text-muted); border:1px solid var(--border); border-radius:50%; width:44px; height:44px; display:none; justify-content:center; align-items:center;" id="mobChaptersBtn">☰</button>
+                <button onclick="toggleRightPanel()" id="wikiToggleBtn">📖</button>
             </div>
             <div class="right-panel" id="rightPanel">
                 <div class="panel-header"></div>
@@ -299,12 +315,12 @@
                         <select id="wikiFilter" onchange="searchWiki()" style="padding:8px; width:100%; border-radius:6px;">
                             <option value="all">Everything</option>
                             <option value="char">Characters</option>
-                            <option value="world">World (All)</option>
-                            <option value="History">History / Eras</option>
+                            <option value="world">World</option>
+                            <option value="History">History</option>
                             <option value="Location">Locations</option>
                             <option value="Religion">Religions</option>
                             <option value="Faction">Factions</option>
-                            <option value="Magic">Magic Systems</option>
+                            <option value="Magic">Magic</option>
                         </select>
                     </div>
                     <input type="text" class="wiki-search" placeholder="Search..." oninput="searchWiki()">
@@ -328,13 +344,13 @@
             <h1 style="color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:10px;">WorldSmith Guide</h1>
             
             <div class="tip-card">
-                <h3><i class="fas fa-save"></i> Vital Safety Warning</h3>
+                <h3>💾 Vital Safety Warning</h3>
                 <p>Your work is saved in your browser's <b>Local Storage</b>. It is safe even if you close the tab, but <b>clearing your browser cookies/cache will wipe it.</b></p>
                 <p><b>Always click the Save Icon (Sidebar) to download a backup file</b> to your computer periodically.</p>
             </div>
 
             <div class="tip-card">
-                <h3><i class="fas fa-palette"></i> Wiki Color Key</h3>
+                <h3>🎨 Wiki Color Key</h3>
                 <div class="color-key-row"><div class="key-dot" style="background:#ffb7b2;"></div> <span>Characters</span></div>
                 <div class="color-key-row"><div class="key-dot" style="background:#66bb6a;"></div> <span>Locations</span></div>
                 <div class="color-key-row"><div class="key-dot" style="background:#ef5350;"></div> <span>History / Eras</span></div>
@@ -342,25 +358,6 @@
                 <div class="color-key-row"><div class="key-dot" style="background:#ab47bc;"></div> <span>Religions / Gods</span></div>
                 <div class="color-key-row"><div class="key-dot" style="background:#ffa726;"></div> <span>Factions / Politics</span></div>
                 <div class="color-key-row"><div class="key-dot" style="background:#42a5f5;"></div> <span>Magic Systems</span></div>
-            </div>
-
-            <div class="tip-card">
-                <h3><i class="fas fa-pen-nib"></i> Writing Desk Features</h3>
-                <ul>
-                    <li><b>Zen Mode (Eye Icon):</b> Hides all sidebars for distraction-free writing.</li>
-                    <li><b>Spellcheck (ABC Icon):</b> Toggles red squiggles on/off.</li>
-                    <li><b>Status Dots:</b> Click the colored dot next to a chapter to cycle status (Red=Draft, Yellow=Edit, Green=Done).</li>
-                    <li><b>Drag & Drop:</b> Drag chapters in the list to reorder them for the final book.</li>
-                </ul>
-            </div>
-
-            <div class="tip-card">
-                <h3><i class="fas fa-globe-americas"></i> World & Characters</h3>
-                <ul>
-                    <li><b>Ghost Text:</b> New entries start blank. Just type a name and hit Save.</li>
-                    <li><b>Connections Web:</b> The "Connections" tab automatically links Characters to their Factions, Religions, and Races.</li>
-                    <li><b>Timeframe:</b> Use the "Timeframe" field in World entries for Eras/History (e.g., "Year 400-500").</li>
-                </ul>
             </div>
         </div>
 
@@ -381,7 +378,7 @@
                             <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <h2 style="margin:0; color:var(--accent);">World Entry</h2>
                                 <div style="display:flex; gap:10px;">
-                                    <button type="button" class="btn" onclick="deleteEntity('world')" style="background:transparent; color:#ff6b6b; border:1px solid #ff6b6b; padding:5px 10px;"><i class="fas fa-trash"></i></button>
+                                    <button type="button" class="btn" onclick="deleteEntity('world')" style="background:transparent; color:#ff6b6b; border:1px solid #ff6b6b; padding:5px 10px;">🗑</button>
                                     <button class="btn">Save</button>
                                 </div>
                             </div>
@@ -429,7 +426,7 @@
                             <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <h2 style="margin:0; color:var(--accent);">Character</h2>
                                 <div style="display:flex; gap:10px;">
-                                    <button type="button" class="btn" onclick="deleteEntity('char')" style="background:transparent; color:#ff6b6b; border:1px solid #ff6b6b; padding:5px 10px;"><i class="fas fa-trash"></i></button>
+                                    <button type="button" class="btn" onclick="deleteEntity('char')" style="background:transparent; color:#ff6b6b; border:1px solid #ff6b6b; padding:5px 10px;">🗑</button>
                                     <button class="btn">Save</button>
                                 </div>
                             </div>
@@ -491,7 +488,7 @@
 
     <div id="retconModal" class="overlay">
         <div class="modal-box">
-            <h3 style="color:var(--accent); margin-top:0;"><i class="fas fa-magic"></i> Retcon Tool</h3>
+            <h3 style="color:var(--accent); margin-top:0;">Retcon Tool</h3>
             <p style="font-size:0.9rem; color:var(--text-muted);">Find and replace names across your entire world (Chapters, Wiki, Timeline).</p>
             <div class="form-group"><label>Find</label><input type="text" id="retFind" placeholder="e.g. Oakhaven"></div>
             <div class="form-group"><label>Replace With</label><input type="text" id="retRepl" placeholder="e.g. Ironhold"></div>
@@ -502,7 +499,7 @@
 
     <div id="searchModal" class="overlay">
         <div class="modal-box">
-            <h3 style="color:var(--accent); margin-top:0;"><i class="fas fa-search"></i> Global Search</h3>
+            <h3 style="color:var(--accent); margin-top:0;">Global Search</h3>
             <input type="text" id="globalSearchInput" placeholder="Search entire book..." oninput="runGlobalSearch()" style="margin-bottom:10px;">
             <div id="globalSearchResults" style="max-height:300px; overflow-y:auto; text-align:left;"></div>
             <button class="btn" style="background:transparent; border:1px solid var(--text-muted); color:var(--text-main); margin-top:10px;" onclick="document.getElementById('searchModal').style.display='none'">Close</button>
@@ -511,7 +508,7 @@
 
     <div id="sparkModal" class="overlay">
         <div class="modal-box" style="text-align:center;">
-            <h3 style="color:var(--accent); margin-top:0;"><i class="fas fa-bolt"></i> Inspiration Spark</h3>
+            <h3 style="color:var(--accent); margin-top:0;">Inspiration Spark</h3>
             <p id="sparkOutput" style="font-size:1.2rem; font-style:italic; margin:20px 0; color:var(--text-main);">Thinking...</p>
             <button class="btn" onclick="generateSpark()">Reroll</button>
             <button class="btn" style="background:transparent; border:1px solid var(--text-muted); color:var(--text-main); margin-left:10px;" onclick="document.getElementById('sparkModal').style.display='none'">Close</button>
@@ -530,23 +527,69 @@
         let backupTimer = null;
         let lastBackupTime = Date.now();
         let dailyGoal = 500;
-        let currentFontSize = 1.15; // rem
+        let currentFontSize = 1.15;
+
+        // --- NATIVE DRAG AND DROP ---
+        // Simple swap logic for reordering without SortableJS
+        let dragSrcEl = null;
+        function handleDragStart(e) { dragSrcEl = this; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/html', this.innerHTML); this.classList.add('dragging'); }
+        function handleDragOver(e) { if (e.preventDefault) e.preventDefault(); e.dataTransfer.dropEffect = 'move'; return false; }
+        function handleDragEnter(e) { this.classList.add('over'); }
+        function handleDragLeave(e) { this.classList.remove('over'); }
+        function handleDrop(e) {
+            if (e.stopPropagation) e.stopPropagation();
+            if (dragSrcEl !== this) {
+                // Swap logic in data
+                const container = this.parentNode;
+                const items = Array.from(container.children);
+                const srcIdx = items.indexOf(dragSrcEl);
+                const destIdx = items.indexOf(this);
+                
+                // Swap in array
+                if(container.id === 'chapterList') {
+                    const temp = currentWorld.data.chapters[srcIdx];
+                    currentWorld.data.chapters[srcIdx] = currentWorld.data.chapters[destIdx];
+                    currentWorld.data.chapters[destIdx] = temp;
+                    saveAll(); renderChapterList();
+                } else if(container.id === 'boardList') {
+                    const temp = currentWorld.data.timeline[srcIdx];
+                    currentWorld.data.timeline[srcIdx] = currentWorld.data.timeline[destIdx];
+                    currentWorld.data.timeline[destIdx] = temp;
+                    saveAll(); renderBoard();
+                }
+            }
+            return false;
+        }
+        function handleDragEnd(e) { this.classList.remove('dragging'); this.parentNode.querySelectorAll('.draggable-item').forEach(item => item.classList.remove('over')); }
+        function addDnDHandlers(elem) {
+            elem.addEventListener('dragstart', handleDragStart, false);
+            elem.addEventListener('dragenter', handleDragEnter, false);
+            elem.addEventListener('dragover', handleDragOver, false);
+            elem.addEventListener('dragleave', handleDragLeave, false);
+            elem.addEventListener('drop', handleDrop, false);
+            elem.addEventListener('dragend', handleDragEnd, false);
+        }
 
         window.onload = () => {
             if(localStorage.getItem('wsTheme') === 'light') toggleTheme(true);
             const saved = localStorage.getItem('worldSmithMultiverse');
-            if(saved) { appData = JSON.parse(saved); } else { createWorld("First World", true); }
-            loadActiveWorld(); initBoardSortable();
+            
+            try {
+                if(saved) { appData = JSON.parse(saved); } else { createWorld("First World", true); }
+            } catch(e) {
+                console.error(e);
+                createWorld("Recovered World", true);
+            }
+
+            loadActiveWorld(); 
             
             // CRASH GUARD
-            window.addEventListener('beforeunload', function (e) {
-                e.preventDefault();
-                e.returnValue = '';
-            });
+            window.addEventListener('beforeunload', function (e) { e.preventDefault(); e.returnValue = ''; });
 
-            // BACKUP REMINDER LOOP
-            setInterval(checkBackupStatus, 60000); // Check every minute
+            // BACKUP REMINDER
+            setInterval(checkBackupStatus, 60000); 
 
+            // SHORTCUTS
             const editor = document.getElementById('chapterContent');
             editor.addEventListener('keydown', function(e) {
                 if(e.ctrlKey || e.metaKey) {
@@ -554,10 +597,6 @@
                         case 'b': e.preventDefault(); formatDoc('bold'); break;
                         case 'i': e.preventDefault(); formatDoc('italic'); break;
                         case 'u': e.preventDefault(); formatDoc('underline'); break;
-                        case 'e': e.preventDefault(); formatDoc('justifyCenter'); break;
-                        case 'l': e.preventDefault(); formatDoc('justifyLeft'); break;
-                        case 'r': e.preventDefault(); formatDoc('justifyRight'); break;
-                        case 'j': e.preventDefault(); formatDoc('justifyFull'); break;
                     }
                 }
             });
@@ -565,18 +604,11 @@
             setTimeout(() => { sessionStartCount = countWords(document.body.innerText); }, 500);
         };
 
-        // --- BACKUP LOGIC ---
         function checkBackupStatus() {
-            // Warn if > 30 mins since last save
-            if(Date.now() - lastBackupTime > 30 * 60 * 1000) {
-                document.getElementById('saveBtn').classList.add('backup-needed');
-            }
+            if(Date.now() - lastBackupTime > 30 * 60 * 1000) { document.getElementById('saveBtn').classList.add('backup-needed'); }
         }
 
-        // --- SIZE & STYLE PRESETS ---
-        function setEditorSize(val) {
-            document.documentElement.style.setProperty('--editor-font-size', val);
-        }
+        function setEditorSize(val) { document.documentElement.style.setProperty('--editor-font-size', val); }
 
         function updateWordCount() {
             if(!currentWorld || !activeChapterId) return;
@@ -627,12 +659,7 @@
                 const idx = currentWorld.data.chapters.findIndex(c => c.id === id);
                 currentWorld.data.chapters.splice(idx, 1);
                 if (id === activeChapterId) {
-                    if (currentWorld.data.chapters.length > 0) {
-                        activeChapterId = currentWorld.data.chapters[0].id;
-                        loadChapter(activeChapterId);
-                    } else {
-                        createChapter(); return;
-                    }
+                    if (currentWorld.data.chapters.length > 0) { activeChapterId = currentWorld.data.chapters[0].id; loadChapter(activeChapterId); } else { createChapter(); return; }
                 }
                 saveAll(); renderChapterList();
             }
@@ -651,11 +678,8 @@
             document.getElementById('chapterTitle').value = ch.title;
             document.getElementById('chapterContent').innerHTML = ch.content;
             document.getElementById('chapterNotes').value = ch.notes || '';
-            
-            // Set Spellcheck state if saved, else default to false
             document.getElementById('chapterContent').spellcheck = false;
             document.getElementById('btnSpell').classList.remove('active');
-            
             renderChapterList(); updateWordCount();
         }
         function saveCurrentBuffer() {
@@ -671,35 +695,23 @@
             const list = document.getElementById('chapterList'); list.innerHTML = '';
             currentWorld.data.chapters.forEach(ch => { 
                 const statusClass = ch.status || 'draft';
-                // Calc words
                 const div = document.createElement('div'); div.innerHTML = ch.content;
                 const wc = countWords(div.innerText || "");
-                
                 list.innerHTML += `
-                <div class="chapter-item ${ch.id === activeChapterId ? 'active' : ''}" data-id="${ch.id}" onclick="loadChapter('${ch.id}')">
-                    <span class="chapter-handle"><i class="fas fa-grip-vertical"></i></span>
+                <div class="chapter-item draggable-item ${ch.id === activeChapterId ? 'active' : ''}" draggable="true" onclick="loadChapter('${ch.id}')">
+                    <span class="chapter-handle">☰</span>
                     <div class="chapter-info">
                         <div class="chapter-title-text">${ch.title}</div>
                         <div class="chapter-wc">${wc} words</div>
                     </div>
                     <div class="chapter-actions">
-                        <div class="chapter-status-dot ${statusClass}" onclick="toggleChapterStatus('${ch.id}', event)" title="Status: ${statusClass.toUpperCase()}"></div>
-                        <span class="chapter-delete-btn" onclick="deleteChapter('${ch.id}', event)"><i class="fas fa-trash"></i></span>
+                        <div class="chapter-status-dot ${statusClass}" onclick="toggleChapterStatus('${ch.id}', event)"></div>
+                        <span class="chapter-delete-btn" onclick="deleteChapter('${ch.id}', event)">🗑</span>
                     </div>
                 </div>`; 
             });
-            new Sortable(list, {
-                handle: '.chapter-handle', animation: 150,
-                onEnd: function() {
-                    const newOrder = [];
-                    list.querySelectorAll('.chapter-item').forEach(el => {
-                        const id = el.getAttribute('data-id');
-                        newOrder.push(currentWorld.data.chapters.find(c => c.id === id));
-                    });
-                    currentWorld.data.chapters = newOrder;
-                    saveAll();
-                }
-            });
+            // Re-apply drag handlers
+            document.querySelectorAll('#chapterList .draggable-item').forEach(addDnDHandlers);
         }
 
         function renderBook() { saveCurrentBuffer(); const div = document.getElementById('bookView'); div.innerHTML = ''; currentWorld.data.chapters.forEach(ch => { div.innerHTML += `<div class="book-chapter"><div class="book-title">${ch.title}</div><div class="book-body">${ch.content}</div></div>`; }); }
@@ -736,7 +748,7 @@
             document.getElementById('btnJustify').classList.toggle('active', document.queryCommandState('justifyFull'));
         }
 
-        function initBoardSortable() { new Sortable(document.getElementById('boardList'), { animation: 150, delay: 100, delayOnTouchOnly: true, onEnd: function (evt) { const newOrder = []; document.querySelectorAll('.board-card').forEach(card => { const id = parseInt(card.getAttribute('data-id')); const item = currentWorld.data.timeline.find(x => x.id === id); if(item) newOrder.push(item); }); currentWorld.data.timeline = newOrder; saveAll(); } }); }
+        function initBoardSortable() { renderBoard(); }
         function renderBoard() {
             const typeColors = { "Character": "var(--accent-sec)", "Location": "#66bb6a", "History": "#ef5350", "Race": "#26c6da", "Religion": "#ab47bc", "Faction": "#ffa726", "Magic": "#42a5f5" };
             const filter = document.getElementById('boardFilter').value;
@@ -756,11 +768,12 @@
                             const age = parseInt(ev.year) - parseInt(charData.birth);
                             ageStr = age >= 0 ? ` (Age: ${age})` : ` (Not born)`;
                         }
-                        namesHtml += `<div><i class="fas fa-user"></i> ${cleanName}${ageStr}</div>`;
+                        namesHtml += `<div>👤 ${cleanName}${ageStr}</div>`;
                     });
                 }
-                div.innerHTML += `<div class="board-card ${typeClass}" data-id="${ev.id}"><div class="bc-actions"><button class="bc-btn" onclick="openEventDetails(${ev.id})"><i class="fas fa-edit"></i></button><button class="bc-btn" onclick="deleteEvent(${ev.id})"><i class="fas fa-trash"></i></button></div><input class="bc-header" value="${ev.title}" onchange="updateEventText(${ev.id}, 'title', this.value)"><textarea class="bc-body" onchange="updateEventText(${ev.id}, 'desc', this.value)">${ev.desc}</textarea><div class="bc-meta">${namesHtml}${ev.where ? '<i class="fas fa-map-marker-alt"></i> '+ev.where + '<br>' : ''}${timeStr}</div></div>`;
+                div.innerHTML += `<div class="board-card draggable-item ${typeClass}" draggable="true"><div class="bc-actions"><button class="bc-btn" onclick="openEventDetails(${ev.id})">✎</button><button class="bc-btn" onclick="deleteEvent(${ev.id})">🗑</button></div><input class="bc-header" value="${ev.title}" onchange="updateEventText(${ev.id}, 'title', this.value)"><textarea class="bc-body" onchange="updateEventText(${ev.id}, 'desc', this.value)">${ev.desc}</textarea><div class="bc-meta">${namesHtml}${ev.where ? '📍 '+ev.where + '<br>' : ''}${timeStr}</div></div>`;
             });
+            document.querySelectorAll('#boardList .draggable-item').forEach(addDnDHandlers);
         }
         function populateBoardFilter() { const sel = document.getElementById('boardFilter'); const current = sel.value; sel.innerHTML = '<option value="all">Show All</option>'; currentWorld.data.chars.forEach(c => { sel.innerHTML += `<option value="${c.name}">${c.name}</option>`; }); sel.value = current; }
         function addEvent() { currentWorld.data.timeline.push({ id: Date.now(), title: 'New Scene', desc: '', type: 'default' }); saveAll(); renderBoard(); }
@@ -806,7 +819,7 @@
             document.getElementById('sparkOutput').innerText = prompts[Math.floor(Math.random() * prompts.length)];
         }
 
-        function showSaving() { const ind = document.getElementById('saveIndicator'); ind.innerHTML = '<i class="fas fa-pen"></i> Saving...'; ind.className = 'save-indicator saving'; clearTimeout(saveTimer); saveTimer = setTimeout(() => { saveAll(); ind.innerHTML = '<i class="fas fa-check-circle"></i> Saved'; ind.className = 'save-indicator saved'; }, 1000); }
+        function showSaving() { const ind = document.getElementById('saveIndicator'); ind.innerHTML = '✔ Saving...'; ind.className = 'save-indicator saving'; clearTimeout(saveTimer); saveTimer = setTimeout(() => { saveAll(); ind.innerHTML = '✔ Saved'; ind.className = 'save-indicator saved'; }, 1000); }
         function toggleZenMode() { document.body.classList.toggle('zen-mode'); }
 
         function saveToDisk() { 
