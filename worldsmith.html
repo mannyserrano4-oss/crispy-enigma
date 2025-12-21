@@ -46,13 +46,18 @@
         /* --- WRITING DESK --- */
         #view-write { padding: 0; display:none; }
         #view-write.active { display: flex; overflow: hidden; }
-        
         .chapter-sidebar { width: 200px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 10px; flex-shrink: 0; overflow-y: auto; transition: width 0.3s, padding 0.3s; }
-        .chapter-item { padding: 10px; border-radius: 6px; cursor: grab; margin-bottom: 5px; color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; }
+        
+        .chapter-item { padding: 10px; border-radius: 6px; cursor: grab; margin-bottom: 5px; color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; group; }
         .chapter-item:hover { background: var(--bg-input); }
         .chapter-item.active { background: var(--bg-input); color: var(--accent); border-left: 3px solid var(--accent); font-weight: bold; }
-        .chapter-handle { margin-right: 8px; color: var(--text-muted); opacity: 0.5; cursor: grab; }
         
+        .chapter-drag-area { display: flex; align-items: center; flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .chapter-handle { margin-right: 8px; color: var(--text-muted); opacity: 0.5; cursor: grab; flex-shrink: 0; }
+        .chapter-delete-btn { color: var(--text-muted); cursor: pointer; opacity: 0; transition: 0.2s; padding: 5px; }
+        .chapter-item:hover .chapter-delete-btn { opacity: 1; }
+        .chapter-delete-btn:hover { color: #ff6b6b; }
+
         .editor-container { flex: 1; padding: 20px 10%; padding-bottom: 60px; overflow-y: auto; background: var(--bg-body); transition: all 0.3s; position: relative; display:flex; flex-direction:column;}
         
         .editor-header-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
@@ -445,6 +450,22 @@
             const newCh = { id: 'ch'+Date.now(), title: 'New Chapter', content: '', notes: '' };
             currentWorld.data.chapters.push(newCh); saveAll(); renderChapterList(); loadChapter(newCh.id);
         }
+        function deleteChapter(id, event) {
+            event.stopPropagation();
+            if(confirm("Delete this chapter permanently?")) {
+                const idx = currentWorld.data.chapters.findIndex(c => c.id === id);
+                currentWorld.data.chapters.splice(idx, 1);
+                if (id === activeChapterId) {
+                    if (currentWorld.data.chapters.length > 0) {
+                        activeChapterId = currentWorld.data.chapters[0].id;
+                        loadChapter(activeChapterId);
+                    } else {
+                        createChapter(); return;
+                    }
+                }
+                saveAll(); renderChapterList();
+            }
+        }
         function loadChapter(id) {
             saveCurrentBuffer(); activeChapterId = id;
             const ch = currentWorld.data.chapters.find(c => c.id === id);
@@ -464,8 +485,16 @@
         }
         function renderChapterList() {
             const list = document.getElementById('chapterList'); list.innerHTML = '';
-            currentWorld.data.chapters.forEach(ch => { list.innerHTML += `<div class="chapter-item ${ch.id === activeChapterId ? 'active' : ''}" data-id="${ch.id}" onclick="loadChapter('${ch.id}')"><span class="chapter-handle"><i class="fas fa-grip-vertical"></i></span>${ch.title}</div>`; });
-            // Init Sortable on Chapters
+            currentWorld.data.chapters.forEach(ch => { 
+                list.innerHTML += `
+                <div class="chapter-item ${ch.id === activeChapterId ? 'active' : ''}" data-id="${ch.id}" onclick="loadChapter('${ch.id}')">
+                    <div class="chapter-drag-area">
+                        <span class="chapter-handle"><i class="fas fa-grip-vertical"></i></span>
+                        ${ch.title}
+                    </div>
+                    <span class="chapter-delete-btn" onclick="deleteChapter('${ch.id}', event)"><i class="fas fa-trash"></i></span>
+                </div>`; 
+            });
             new Sortable(list, {
                 handle: '.chapter-handle', animation: 150,
                 onEnd: function() {
@@ -538,7 +567,6 @@
             saveAll(); location.reload();
         }
 
-        // --- AUTOSAVE INDICATOR ---
         function showSaving() {
             const ind = document.getElementById('saveIndicator');
             ind.innerHTML = '<i class="fas fa-pen"></i> Saving...';
