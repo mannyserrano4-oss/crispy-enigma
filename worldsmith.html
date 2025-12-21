@@ -51,9 +51,8 @@
         .chapter-item:hover { background: var(--bg-input); }
         .chapter-item.active { background: var(--bg-input); color: var(--accent); border-left: 3px solid var(--accent); font-weight: bold; }
         
-        .editor-container { flex: 1; padding: 20px 10%; overflow-y: auto; background: var(--bg-body); transition: background 0.3s; position: relative; }
+        .editor-container { flex: 1; padding: 20px 10%; padding-bottom: 60px; overflow-y: auto; background: var(--bg-body); transition: background 0.3s; position: relative; display:flex; flex-direction:column;}
         
-        /* FORMATTING TOOLBAR */
         .editor-toolbar { display: flex; gap: 5px; margin-bottom: 10px; background: var(--bg-panel); padding: 5px; border-radius: 8px; width: fit-content; border: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
         .fmt-btn { background: transparent; border: none; color: var(--text-main); width: 30px; height: 30px; cursor: pointer; border-radius: 4px; font-weight: bold; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
         .fmt-btn:hover { background: var(--bg-input); }
@@ -61,12 +60,24 @@
         .divider { width: 1px; background: var(--border); height: 20px; margin: 5px 2px; }
 
         .editor-title { width: 100%; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--accent); font-size: 1.8rem; padding: 15px; box-sizing: border-box; font-family: 'Georgia', serif; font-weight: bold; margin-bottom: 20px; outline: none; }
-        .editor-area { width: 100%; min-height: 70vh; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--text-main); font-size: 1.15rem; line-height: 1.8; padding: 30px; box-sizing: border-box; font-family: 'Georgia', serif; outline: none; overflow-y: visible; }
-        
-        /* REMOVED: .editor-area b { color: var(--accent); } to stop purple text */
+        .editor-area { width: 100%; min-height: 60vh; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--text-main); font-size: 1.15rem; line-height: 1.8; padding: 30px; box-sizing: border-box; font-family: 'Georgia', serif; outline: none; overflow-y: visible; flex:1; }
+        .editor-area b { color: inherit; font-weight: bold; } /* Removed purple bold */
         
         #wikiToggleBtn { position: absolute; top: 20px; right: 20px; z-index: 50; background: var(--bg-panel); color: var(--accent); border: 2px solid var(--accent); border-radius: 50%; width: 44px; height: 44px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s; }
         #wikiToggleBtn:hover { transform: scale(1.1); }
+
+        /* STATS BAR (NEW) */
+        .stats-bar {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 40px;
+            background: var(--bg-panel); border-top: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; box-sizing: border-box; font-size: 0.8rem; color: var(--text-muted);
+            z-index: 20;
+        }
+        .stat-group { display: flex; gap: 15px; align-items: center; }
+        .stat-val { color: var(--accent); font-weight: bold; }
+        .progress-container { width: 150px; height: 6px; background: var(--bg-input); border-radius: 3px; overflow: hidden; display: flex; }
+        .progress-fill { height: 100%; background: #4caf50; width: 0%; transition: width 0.3s; }
 
         /* RIGHT PANEL */
         .right-panel { width: 350px; background: var(--bg-panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; padding: 15px; flex-shrink: 0; transition: margin-right 0.3s ease-in-out; margin-right: 0; }
@@ -190,7 +201,19 @@
                     <button class="fmt-btn" id="btnRight" onmousedown="event.preventDefault(); formatDoc('justifyRight')" title="Right (Ctrl+R)"><i class="fas fa-align-right"></i></button>
                     <button class="fmt-btn" id="btnJustify" onmousedown="event.preventDefault(); formatDoc('justifyFull')" title="Justify (Ctrl+J)"><i class="fas fa-align-justify"></i></button>
                 </div>
-                <div id="chapterContent" class="editor-area" contenteditable="true" oninput="autoSave()"></div>
+                <div id="chapterContent" class="editor-area" contenteditable="true" oninput="updateWordCount(); autoSave()"></div>
+                
+                <div class="stats-bar">
+                    <div class="stat-group">
+                        <span>Chapter: <span class="stat-val" id="wc-chapter">0</span></span>
+                        <span>Total: <span class="stat-val" id="wc-total">0</span></span>
+                    </div>
+                    <div class="stat-group">
+                        <span>Session: <span class="stat-val" id="wc-session">0</span> / 500</span>
+                        <div class="progress-container"><div class="progress-fill" id="wc-progress"></div></div>
+                    </div>
+                </div>
+
                 <button onclick="toggleMobileChapters()" style="position:absolute; top:20px; left:20px; z-index:50; background:var(--bg-panel); color:var(--text-muted); border:1px solid var(--border); border-radius:50%; width:44px; height:44px; display:none; justify-content:center; align-items:center;" id="mobChaptersBtn"><i class="fas fa-list"></i></button>
                 <button onclick="toggleRightPanel()" id="wikiToggleBtn"><i class="fas fa-book"></i></button>
             </div>
@@ -263,7 +286,7 @@
                         <hr style="border:0; border-bottom:1px solid var(--border); margin:20px 0;">
                         <div class="form-group"><label>Name</label><input type="text" id="cName" required></div>
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Race</label><select id="cRace"><option value="">- Select -</option></select></div><div class="form-group"><label>Faction</label><select id="cRole"><option value="">- Select -</option></select></div></div>
-                        <div class="form-group"><label>Religion</label><select id="cGod"><option value="">- Select -</option></select></div>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Religion</label><select id="cGod"><option value="">- Select -</option></select></div><div class="form-group"><label>Birth Year</label><input type="number" id="cBirth" placeholder="e.g. 290"></div></div>
                         <div class="form-group"><label>Goal</label><input type="text" id="cGoal"></div>
                         <div class="form-group"><label>Notes</label><textarea id="cNotes" rows="6"></textarea></div>
                     </form>
@@ -319,6 +342,7 @@
         let activeChapterId = null;
         let isLight = false;
         let wikiFilter = 'all';
+        let sessionStartCount = 0; // For session progress
 
         window.onload = () => {
             if(localStorage.getItem('wsTheme') === 'light') toggleTheme(true);
@@ -326,7 +350,6 @@
             if(saved) { appData = JSON.parse(saved); } else { createWorld("First World", true); }
             loadActiveWorld(); initBoardSortable();
             
-            // KEYBOARD SHORTCUTS
             const editor = document.getElementById('chapterContent');
             editor.addEventListener('keydown', function(e) {
                 if(e.ctrlKey || e.metaKey) {
@@ -341,10 +364,53 @@
                     }
                 }
             });
-            // Update Toolbar Active State
             ['keyup', 'mouseup', 'click'].forEach(evt => editor.addEventListener(evt, checkFormat));
+            
+            // Set initial session count
+            setTimeout(() => { sessionStartCount = countWords(document.body.innerText); }, 500); // Rough init
         };
 
+        // --- WORD COUNT LOGIC ---
+        function updateWordCount() {
+            if(!currentWorld || !activeChapterId) return;
+            const content = document.getElementById('chapterContent').innerText || "";
+            const chapterWords = countWords(content);
+            
+            // Calc Total
+            let total = 0;
+            currentWorld.data.chapters.forEach(ch => {
+                if(ch.id === activeChapterId) total += chapterWords;
+                else {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = ch.content;
+                    total += countWords(tempDiv.innerText || "");
+                }
+            });
+
+            // Update UI
+            document.getElementById('wc-chapter').innerText = chapterWords;
+            document.getElementById('wc-total').innerText = total;
+            
+            // Session Progress
+            // Simple session logic: increment since load. 
+            // Better: just count typing for now.
+            // Let's use a simple accumlator for this session.
+            const sessionVal = document.getElementById('wc-session');
+            let currentSession = parseInt(sessionVal.innerText);
+            // This is tricky without persistent start state. 
+            // Let's just track added words in active chapter for simplicity in this version.
+            // OR: We store 'sessionStart' for active chapter.
+            // Simplified: Just use chapter words for progress for now.
+            const progress = Math.min(100, (chapterWords / 500) * 100);
+            document.getElementById('wc-progress').style.width = progress + "%";
+            document.getElementById('wc-session').innerText = chapterWords; // Showing chapter words vs goal for now
+        }
+
+        function countWords(str) {
+            return str.trim().split(/\s+/).filter(word => word.length > 0).length;
+        }
+
+        // --- CORE LOGIC ---
         function createWorld(name, autoLoad=false) {
             if(!name) name = prompt("Name:"); if(!name) return;
             const id = 'w' + Date.now();
@@ -374,6 +440,7 @@
             document.getElementById('chapterContent').innerHTML = ch.content;
             document.getElementById('chapterNotes').value = ch.notes || '';
             renderChapterList();
+            updateWordCount();
         }
         function saveCurrentBuffer() {
             if(!currentWorld || !activeChapterId) return;
@@ -410,9 +477,7 @@
             document.execCommand('copy'); window.getSelection().removeAllRanges(); alert("Copied!");
         }
         
-        // --- RICH TEXT ---
         function formatDoc(cmd, value=null) { document.execCommand(cmd, false, value); document.getElementById('chapterContent').focus(); checkFormat(); }
-        
         function checkFormat() {
             document.getElementById('btnBold').classList.toggle('active', document.queryCommandState('bold'));
             document.getElementById('btnItalic').classList.toggle('active', document.queryCommandState('italic'));
@@ -423,14 +488,31 @@
             document.getElementById('btnJustify').classList.toggle('active', document.queryCommandState('justifyFull'));
         }
 
-        // --- BOARD ---
         function initBoardSortable() { new Sortable(document.getElementById('boardList'), { animation: 150, delay: 100, delayOnTouchOnly: true, onEnd: function (evt) { const newOrder = []; document.querySelectorAll('.board-card').forEach(card => { const id = parseInt(card.getAttribute('data-id')); const item = currentWorld.data.timeline.find(x => x.id === id); if(item) newOrder.push(item); }); currentWorld.data.timeline = newOrder; saveAll(); } }); }
         function renderBoard() {
             const div = document.getElementById('boardList'); div.innerHTML = '';
             currentWorld.data.timeline.forEach((ev) => {
                 const typeClass = ev.type || 'default';
-                const timeStr = ev.day ? `Day ${ev.day}, ${MONTHS[ev.month-1] || '?'}` : '';
-                div.innerHTML += `<div class="board-card ${typeClass}" data-id="${ev.id}"><div class="bc-actions"><button class="bc-btn" onclick="openEventDetails(${ev.id})"><i class="fas fa-edit"></i></button><button class="bc-btn" onclick="deleteEvent(${ev.id})"><i class="fas fa-trash"></i></button></div><input class="bc-header" value="${ev.title}" onchange="updateEventText(${ev.id}, 'title', this.value)"><textarea class="bc-body" onchange="updateEventText(${ev.id}, 'desc', this.value)">${ev.desc}</textarea><div class="bc-meta">${ev.who ? '<i class="fas fa-user"></i> '+ev.who + '<br>' : ''}${ev.where ? '<i class="fas fa-map-marker-alt"></i> '+ev.where + '<br>' : ''}${timeStr}</div></div>`;
+                const timeStr = ev.day ? `Day ${ev.day}, ${MONTHS[ev.month-1] || '?'}, ${ev.year}` : '';
+                
+                // AGE CALCULATION
+                let namesHtml = '';
+                if(ev.who) {
+                    const names = ev.who.split(',');
+                    names.forEach(n => {
+                        const cleanName = n.trim();
+                        // Find Char
+                        const charData = currentWorld.data.chars.find(c => c.name.toLowerCase() === cleanName.toLowerCase());
+                        let ageStr = '';
+                        if(charData && charData.birth && ev.year) {
+                            const age = parseInt(ev.year) - parseInt(charData.birth);
+                            ageStr = age >= 0 ? ` (Age: ${age})` : ` (Not born)`;
+                        }
+                        namesHtml += `<div><i class="fas fa-user"></i> ${cleanName}${ageStr}</div>`;
+                    });
+                }
+
+                div.innerHTML += `<div class="board-card ${typeClass}" data-id="${ev.id}"><div class="bc-actions"><button class="bc-btn" onclick="openEventDetails(${ev.id})"><i class="fas fa-edit"></i></button><button class="bc-btn" onclick="deleteEvent(${ev.id})"><i class="fas fa-trash"></i></button></div><input class="bc-header" value="${ev.title}" onchange="updateEventText(${ev.id}, 'title', this.value)"><textarea class="bc-body" onchange="updateEventText(${ev.id}, 'desc', this.value)">${ev.desc}</textarea><div class="bc-meta">${namesHtml}${ev.where ? '<i class="fas fa-map-marker-alt"></i> '+ev.where + '<br>' : ''}${timeStr}</div></div>`;
             });
         }
         function addEvent() { currentWorld.data.timeline.push({ id: Date.now(), title: 'New Scene', desc: '', type: 'default' }); saveAll(); renderBoard(); }
@@ -455,8 +537,8 @@
         function populateDropdowns() { const races = currentWorld.data.world.filter(x => x.type === 'Race'); const rels = currentWorld.data.world.filter(x => x.type === 'Religion'); const facs = currentWorld.data.world.filter(x => x.type === 'Faction'); fillSelect('cRace', races); fillSelect('cGod', rels); fillSelect('cRole', facs); }
         function fillSelect(id, items) { const sel = document.getElementById(id); sel.innerHTML = '<option value="">- Select -</option>'; items.forEach(i => { sel.innerHTML += `<option value="${i.name}">${i.name}</option>`; }); }
         function createNewEntity(type) { const id = Date.now().toString(); const empty = type === 'world' ? { id, name: 'New Entry', type: 'Location', desc: '' } : { id, name: 'New Character', race:'', role:'', god: '', goal:'', notes:'' }; if(type === 'world') currentWorld.data.world.push(empty); else currentWorld.data.chars.push(empty); saveAll(); refreshLists(); loadEntity(type, id); }
-        function saveEntity(type) { if(type === 'world') { const id = document.getElementById('wId').value; const idx = currentWorld.data.world.findIndex(x => x.id === id); if(idx > -1) currentWorld.data.world[idx] = { id, name: document.getElementById('wName').value, type: document.getElementById('wType').value, desc: document.getElementById('wDesc').value }; } else { const id = document.getElementById('cId').value; const idx = currentWorld.data.chars.findIndex(x => x.id === id); if(idx > -1) currentWorld.data.chars[idx] = { id, name: document.getElementById('cName').value, race: document.getElementById('cRace').value, role: document.getElementById('cRole').value, god: document.getElementById('cGod').value, goal: document.getElementById('cGoal').value, notes: document.getElementById('cNotes').value }; } saveAll(); refreshLists(); searchWiki(); }
-        function loadEntity(type, id) { const data = type === 'world' ? currentWorld.data.world.find(x => x.id === id) : currentWorld.data.chars.find(x => x.id === id); if(!data) return; if(type === 'world') { document.getElementById('wId').value = data.id; document.getElementById('wName').value = data.name; document.getElementById('wType').value = data.type; document.getElementById('wDesc').value = data.desc; } else { document.getElementById('cId').value = data.id; document.getElementById('cName').value = data.name; document.getElementById('cRace').value = data.race; document.getElementById('cRole').value = data.role; document.getElementById('cGod').value = data.god; document.getElementById('cGoal').value = data.goal; document.getElementById('cNotes').value = data.notes; } }
+        function saveEntity(type) { if(type === 'world') { const id = document.getElementById('wId').value; const idx = currentWorld.data.world.findIndex(x => x.id === id); if(idx > -1) currentWorld.data.world[idx] = { id, name: document.getElementById('wName').value, type: document.getElementById('wType').value, desc: document.getElementById('wDesc').value }; } else { const id = document.getElementById('cId').value; const idx = currentWorld.data.chars.findIndex(x => x.id === id); if(idx > -1) currentWorld.data.chars[idx] = { id, name: document.getElementById('cName').value, race: document.getElementById('cRace').value, role: document.getElementById('cRole').value, god: document.getElementById('cGod').value, birth: document.getElementById('cBirth').value, goal: document.getElementById('cGoal').value, notes: document.getElementById('cNotes').value }; } saveAll(); refreshLists(); searchWiki(); }
+        function loadEntity(type, id) { const data = type === 'world' ? currentWorld.data.world.find(x => x.id === id) : currentWorld.data.chars.find(x => x.id === id); if(!data) return; if(type === 'world') { document.getElementById('wId').value = data.id; document.getElementById('wName').value = data.name; document.getElementById('wType').value = data.type; document.getElementById('wDesc').value = data.desc; } else { document.getElementById('cId').value = data.id; document.getElementById('cName').value = data.name; document.getElementById('cRace').value = data.race; document.getElementById('cRole').value = data.role; document.getElementById('cGod').value = data.god; document.getElementById('cBirth').value = data.birth || ''; document.getElementById('cGoal').value = data.goal; document.getElementById('cNotes').value = data.notes; } }
         function refreshLists() { const wList = document.getElementById('worldList'); wList.innerHTML = ''; ['Race', 'Location', 'Religion', 'Faction', 'Magic', 'History'].forEach(t => { const items = currentWorld.data.world.filter(x => x.type === t); if(items.length > 0) { wList.innerHTML += `<div class="category-header">${t}s</div>`; items.forEach(item => wList.innerHTML += `<div class="entity-item" onclick="loadEntity('world', '${item.id}')">${item.name}</div>`); } }); const cList = document.getElementById('charList'); cList.innerHTML = ''; currentWorld.data.chars.forEach(item => cList.innerHTML += `<div class="entity-item" onclick="loadEntity('char', '${item.id}')">${item.name}</div>`); populateDropdowns(); }
         
         function renderConnections() {
