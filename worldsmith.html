@@ -52,28 +52,20 @@
         .chapter-item.active { background: var(--bg-input); color: var(--accent); border-left: 3px solid var(--accent); font-weight: bold; }
         
         .editor-container { flex: 1; padding: 20px 10%; padding-bottom: 60px; overflow-y: auto; background: var(--bg-body); transition: background 0.3s; position: relative; display:flex; flex-direction:column;}
-        
         .editor-toolbar { display: flex; gap: 5px; margin-bottom: 10px; background: var(--bg-panel); padding: 5px; border-radius: 8px; width: fit-content; border: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
         .fmt-btn { background: transparent; border: none; color: var(--text-main); width: 30px; height: 30px; cursor: pointer; border-radius: 4px; font-weight: bold; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
         .fmt-btn:hover { background: var(--bg-input); }
         .fmt-btn.active { background: var(--accent); color: var(--bg-panel); box-shadow: 0 0 5px var(--accent); }
         .divider { width: 1px; background: var(--border); height: 20px; margin: 5px 2px; }
-
         .editor-title { width: 100%; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--accent); font-size: 1.8rem; padding: 15px; box-sizing: border-box; font-family: 'Georgia', serif; font-weight: bold; margin-bottom: 20px; outline: none; }
         .editor-area { width: 100%; min-height: 60vh; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--text-main); font-size: 1.15rem; line-height: 1.8; padding: 30px; box-sizing: border-box; font-family: 'Georgia', serif; outline: none; overflow-y: visible; flex:1; }
-        .editor-area b { color: inherit; font-weight: bold; } /* Removed purple bold */
+        .editor-area b { color: inherit; font-weight: bold; }
         
         #wikiToggleBtn { position: absolute; top: 20px; right: 20px; z-index: 50; background: var(--bg-panel); color: var(--accent); border: 2px solid var(--accent); border-radius: 50%; width: 44px; height: 44px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s; }
         #wikiToggleBtn:hover { transform: scale(1.1); }
 
-        /* STATS BAR (NEW) */
-        .stats-bar {
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 40px;
-            background: var(--bg-panel); border-top: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 20px; box-sizing: border-box; font-size: 0.8rem; color: var(--text-muted);
-            z-index: 20;
-        }
+        /* STATS BAR */
+        .stats-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 40px; background: var(--bg-panel); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-sizing: border-box; font-size: 0.8rem; color: var(--text-muted); z-index: 20; }
         .stat-group { display: flex; gap: 15px; align-items: center; }
         .stat-val { color: var(--accent); font-weight: bold; }
         .progress-container { width: 150px; height: 6px; background: var(--bg-input); border-radius: 3px; overflow: hidden; display: flex; }
@@ -93,17 +85,22 @@
         .w-tab.active { background: var(--accent); color: var(--bg-panel); border-color: var(--accent); }
         .wiki-search { width: 100%; padding: 12px; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; }
         .wiki-results { flex: 1; overflow-y: auto; padding-right: 5px; }
-        .wiki-card { background: var(--bg-input); padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--accent); cursor: pointer; box-shadow: var(--card-shadow); transition: 0.2s; }
+        
+        .wiki-card { background: var(--bg-input); padding: 0; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--accent); cursor: pointer; box-shadow: var(--card-shadow); transition: 0.2s; overflow: hidden; }
         .wiki-card:hover { background: var(--bg-panel); border-color: var(--accent-sec); }
+        .wiki-card-img { width: 100%; height: 120px; object-fit: cover; background: #000; display: block; }
+        .wiki-card-content { padding: 10px; }
         .wiki-card h4 { margin: 0; color: var(--accent); font-size: 1rem; display: flex; justify-content: space-between; }
         .wiki-card small { color: var(--text-muted); font-size: 0.75rem; font-weight: normal; }
         .wiki-desc { display: none; margin-top: 10px; font-size: 0.85rem; color: var(--text-main); padding-top: 10px; border-top: 1px solid var(--border); white-space: pre-wrap; }
         .wiki-card.expanded .wiki-desc { display: block; }
+        
         .notes-area { flex: 1; width: 100%; height: 100%; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); padding: 15px; box-sizing: border-box; border-radius: 8px; resize: none; font-family: sans-serif; font-size: 1rem; line-height: 1.5; }
 
         /* --- THE BOARD --- */
         .board-container { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; padding-bottom: 100px; }
         .board-card { width: 200px; min-height: 180px; background: var(--note-default); color: #333; border-radius: 4px; padding: 15px; box-shadow: 2px 4px 10px rgba(0,0,0,0.2); position: relative; display: flex; flex-direction: column; cursor: grab; transition: transform 0.2s; }
+        .board-card:hover { transform: scale(1.02); z-index: 10; }
         .board-card.major { background: var(--note-major); } .board-card.sub { background: var(--note-sub); } .board-card.filler { background: var(--note-filler); }
         .bc-header { font-weight: bold; font-family: 'Georgia', serif; font-size: 1.1rem; margin-bottom: 10px; line-height: 1.2; outline: none; border-bottom: 1px dashed rgba(0,0,0,0.2); padding-bottom: 5px; background:transparent; border:none; color:black; width:100%; }
         .bc-body { font-size: 0.85rem; flex: 1; margin-bottom: 10px; overflow: hidden; background:transparent; border:none; resize:none; width:100%; outline:none; font-family:sans-serif; color:black;}
@@ -119,22 +116,6 @@
         .conn-list { display: flex; flex-wrap: wrap; gap: 10px; }
         .conn-tag { background: var(--bg-input); padding: 8px 15px; border-radius: 20px; border: 1px solid var(--border); font-size: 0.9rem; color: var(--text-main); }
         .conn-tag span { color: var(--text-muted); font-size: 0.8rem; margin-left: 5px; }
-
-        /* --- UTILS --- */
-        .wb-grid { display: grid; grid-template-columns: 280px 1fr; gap: 20px; height: 100%; }
-        .wb-list, .wb-detail { background: var(--bg-panel); border-radius: 12px; padding: 15px; overflow-y: auto; border: 1px solid var(--border); }
-        .wb-detail { padding: 30px; }
-        .category-header { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-top: 20px; margin-bottom: 8px; font-weight: 700; }
-        .entity-item { padding: 12px; cursor: pointer; border-radius: 8px; margin-bottom: 5px; transition: 0.2s; }
-        .entity-item:hover { background: var(--bg-input); }
-        .entity-item.active { background: var(--bg-input); color: var(--accent); border-left: 3px solid var(--accent); font-weight: 600; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; color: var(--accent); font-size: 0.85rem; margin-bottom: 8px; font-weight: 700; text-transform: uppercase; }
-        input, select, textarea { width: 100%; padding: 12px; background: var(--bg-input); border: 2px solid var(--border); color: var(--text-main); border-radius: 8px; box-sizing: border-box; font-family: inherit; font-size:16px; transition: border-color 0.2s; }
-        input:focus, select:focus, textarea:focus { border-color: var(--accent); outline: none; }
-        .btn { padding: 10px 20px; background: var(--accent); border: none; color: var(--bg-panel); border-radius: 8px; cursor: pointer; font-weight: 800; }
-        .btn-new { width: 100%; margin-bottom: 15px; background: var(--bg-input); color: var(--text-muted); border: 2px dashed var(--border); }
-        #network-container { width: 100%; height: 85vh; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; }
 
         /* --- BOOK MODE --- */
         .book-container { max-width: 800px; margin: 0 auto; padding: 50px; background: var(--bg-body); min-height: 100%; }
@@ -166,7 +147,7 @@
 
     <div class="sidebar">
         <button class="nav-btn library-btn" onclick="openLibrary()" title="Library"><i class="fas fa-book-journal-whills"></i></button>
-        <hr style="width:50%; border:0; border-bottom:1px solid var(--border); margin:10px 0;">
+        <button class="nav-btn" onclick="openRetcon()" title="Retcon (Find/Replace)"><i class="fas fa-magic"></i></button> <hr style="width:50%; border:0; border-bottom:1px solid var(--border); margin:10px 0;">
         <button class="nav-btn active" onclick="setTab('write')" title="Writer"><i class="fas fa-pen-nib"></i></button>
         <button class="nav-btn" onclick="setTab('read')" title="Read & Export"><i class="fas fa-book-open"></i></button>
         <button class="nav-btn" onclick="setTab('world')"><i class="fas fa-globe-americas"></i></button>
@@ -261,6 +242,7 @@
                         <div style="display:flex; justify-content:space-between; align-items:center;"><h2 style="margin:0; color:var(--accent);">World Entry</h2><button class="btn">Save</button></div>
                         <hr style="border:0; border-bottom:1px solid var(--border); margin:20px 0;">
                         <div class="form-group"><label>Name</label><input type="text" id="wName" required></div>
+                        <div class="form-group"><label>Image URL (Optional)</label><input type="text" id="wImage" placeholder="https://..."></div>
                         <div class="form-group"><label>Type</label>
                             <select id="wType">
                                 <option value="Location">Location / Kingdom</option>
@@ -285,6 +267,7 @@
                         <div style="display:flex; justify-content:space-between; align-items:center;"><h2 style="margin:0; color:var(--accent);">Character</h2><button class="btn">Save</button></div>
                         <hr style="border:0; border-bottom:1px solid var(--border); margin:20px 0;">
                         <div class="form-group"><label>Name</label><input type="text" id="cName" required></div>
+                        <div class="form-group"><label>Image URL (Optional)</label><input type="text" id="cImage" placeholder="https://..."></div>
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Race</label><select id="cRace"><option value="">- Select -</option></select></div><div class="form-group"><label>Faction</label><select id="cRole"><option value="">- Select -</option></select></div></div>
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Religion</label><select id="cGod"><option value="">- Select -</option></select></div><div class="form-group"><label>Birth Year</label><input type="number" id="cBirth" placeholder="e.g. 290"></div></div>
                         <div class="form-group"><label>Goal</label><input type="text" id="cGoal"></div>
@@ -297,7 +280,10 @@
         <div id="view-board" class="view-section">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                 <h2 style="margin:0; color:var(--accent);">Story Board</h2>
-                <button class="btn" onclick="addEvent()">+ Add Card</button>
+                <div style="display:flex; gap:10px;">
+                    <select id="boardFilter" onchange="renderBoard()" style="background:var(--bg-input); color:var(--text-main); border:1px solid var(--border); padding:5px; border-radius:4px;"><option value="all">Show All</option></select>
+                    <button class="btn" onclick="addEvent()">+ Add Card</button>
+                </div>
             </div>
             <div class="board-container" id="boardList"></div>
         </div>
@@ -335,6 +321,17 @@
         </div>
     </div>
 
+    <div id="retconModal" class="overlay">
+        <div class="modal-box">
+            <h3 style="color:var(--accent); margin-top:0;"><i class="fas fa-magic"></i> Retcon Tool</h3>
+            <p style="font-size:0.9rem; color:var(--text-muted);">Find and replace names across your entire world (Chapters, Wiki, Timeline).</p>
+            <div class="form-group"><label>Find</label><input type="text" id="retFind" placeholder="e.g. Oakhaven"></div>
+            <div class="form-group"><label>Replace With</label><input type="text" id="retRepl" placeholder="e.g. Ironhold"></div>
+            <button class="btn" onclick="applyRetcon()">Apply Retcon</button>
+            <button class="btn" style="background:transparent; border:1px solid var(--text-muted); margin-left:10px;" onclick="document.getElementById('retconModal').style.display='none'">Cancel</button>
+        </div>
+    </div>
+
     <script>
         const MONTHS = ["Aether", "Borean", "Cygnus", "Dormus", "Eon", "Fyre", "Glacies", "Harvest", "Ignis", "Juras", "Kryos", "Lux", "Mirus", "Nox", "Omen"];
         let appData = { activeId: null, worlds: [] };
@@ -342,7 +339,7 @@
         let activeChapterId = null;
         let isLight = false;
         let wikiFilter = 'all';
-        let sessionStartCount = 0; // For session progress
+        let sessionStartCount = 0;
 
         window.onload = () => {
             if(localStorage.getItem('wsTheme') === 'light') toggleTheme(true);
@@ -365,52 +362,26 @@
                 }
             });
             ['keyup', 'mouseup', 'click'].forEach(evt => editor.addEventListener(evt, checkFormat));
-            
-            // Set initial session count
-            setTimeout(() => { sessionStartCount = countWords(document.body.innerText); }, 500); // Rough init
+            setTimeout(() => { sessionStartCount = countWords(document.body.innerText); }, 500);
         };
 
-        // --- WORD COUNT LOGIC ---
         function updateWordCount() {
             if(!currentWorld || !activeChapterId) return;
             const content = document.getElementById('chapterContent').innerText || "";
             const chapterWords = countWords(content);
-            
-            // Calc Total
             let total = 0;
             currentWorld.data.chapters.forEach(ch => {
                 if(ch.id === activeChapterId) total += chapterWords;
-                else {
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = ch.content;
-                    total += countWords(tempDiv.innerText || "");
-                }
+                else { const tempDiv = document.createElement('div'); tempDiv.innerHTML = ch.content; total += countWords(tempDiv.innerText || ""); }
             });
-
-            // Update UI
             document.getElementById('wc-chapter').innerText = chapterWords;
             document.getElementById('wc-total').innerText = total;
-            
-            // Session Progress
-            // Simple session logic: increment since load. 
-            // Better: just count typing for now.
-            // Let's use a simple accumlator for this session.
-            const sessionVal = document.getElementById('wc-session');
-            let currentSession = parseInt(sessionVal.innerText);
-            // This is tricky without persistent start state. 
-            // Let's just track added words in active chapter for simplicity in this version.
-            // OR: We store 'sessionStart' for active chapter.
-            // Simplified: Just use chapter words for progress for now.
             const progress = Math.min(100, (chapterWords / 500) * 100);
             document.getElementById('wc-progress').style.width = progress + "%";
-            document.getElementById('wc-session').innerText = chapterWords; // Showing chapter words vs goal for now
+            document.getElementById('wc-session').innerText = chapterWords;
         }
+        function countWords(str) { return str.trim().split(/\s+/).filter(word => word.length > 0).length; }
 
-        function countWords(str) {
-            return str.trim().split(/\s+/).filter(word => word.length > 0).length;
-        }
-
-        // --- CORE LOGIC ---
         function createWorld(name, autoLoad=false) {
             if(!name) name = prompt("Name:"); if(!name) return;
             const id = 'w' + Date.now();
@@ -439,43 +410,21 @@
             document.getElementById('chapterTitle').value = ch.title;
             document.getElementById('chapterContent').innerHTML = ch.content;
             document.getElementById('chapterNotes').value = ch.notes || '';
-            renderChapterList();
-            updateWordCount();
+            renderChapterList(); updateWordCount();
         }
         function saveCurrentBuffer() {
             if(!currentWorld || !activeChapterId) return;
             const ch = currentWorld.data.chapters.find(c => c.id === activeChapterId);
-            if(ch) {
-                ch.title = document.getElementById('chapterTitle').value;
-                ch.content = document.getElementById('chapterContent').innerHTML;
-                ch.notes = document.getElementById('chapterNotes').value;
-            }
+            if(ch) { ch.title = document.getElementById('chapterTitle').value; ch.content = document.getElementById('chapterContent').innerHTML; ch.notes = document.getElementById('chapterNotes').value; }
         }
         function renderChapterList() {
             const list = document.getElementById('chapterList'); list.innerHTML = '';
             currentWorld.data.chapters.forEach(ch => { list.innerHTML += `<div class="chapter-item ${ch.id === activeChapterId ? 'active' : ''}" onclick="loadChapter('${ch.id}')">${ch.title}</div>`; });
         }
 
-        function renderBook() {
-            saveCurrentBuffer();
-            const div = document.getElementById('bookView'); div.innerHTML = '';
-            currentWorld.data.chapters.forEach(ch => {
-                div.innerHTML += `<div class="book-chapter"><div class="book-title">${ch.title}</div><div class="book-body">${ch.content}</div></div>`;
-            });
-        }
-        function exportBook() {
-            renderBook();
-            const content = document.getElementById('bookView').innerHTML;
-            const html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'><head><meta charset='utf-8'><title>${currentWorld.name}</title></head><body>${content}</body></html>`;
-            const blob = new Blob([html], {type: 'application/msword'});
-            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${currentWorld.name}.doc`; a.click();
-        }
-        function copyBook() {
-            renderBook();
-            const range = document.createRange(); range.selectNode(document.getElementById('bookView'));
-            window.getSelection().removeAllRanges(); window.getSelection().addRange(range);
-            document.execCommand('copy'); window.getSelection().removeAllRanges(); alert("Copied!");
-        }
+        function renderBook() { saveCurrentBuffer(); const div = document.getElementById('bookView'); div.innerHTML = ''; currentWorld.data.chapters.forEach(ch => { div.innerHTML += `<div class="book-chapter"><div class="book-title">${ch.title}</div><div class="book-body">${ch.content}</div></div>`; }); }
+        function exportBook() { renderBook(); const content = document.getElementById('bookView').innerHTML; const html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'><head><meta charset='utf-8'><title>${currentWorld.name}</title></head><body>${content}</body></html>`; const blob = new Blob([html], {type: 'application/msword'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${currentWorld.name}.doc`; a.click(); }
+        function copyBook() { renderBook(); const range = document.createRange(); range.selectNode(document.getElementById('bookView')); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); document.execCommand('copy'); window.getSelection().removeAllRanges(); alert("Copied!"); }
         
         function formatDoc(cmd, value=null) { document.execCommand(cmd, false, value); document.getElementById('chapterContent').focus(); checkFormat(); }
         function checkFormat() {
@@ -490,18 +439,17 @@
 
         function initBoardSortable() { new Sortable(document.getElementById('boardList'), { animation: 150, delay: 100, delayOnTouchOnly: true, onEnd: function (evt) { const newOrder = []; document.querySelectorAll('.board-card').forEach(card => { const id = parseInt(card.getAttribute('data-id')); const item = currentWorld.data.timeline.find(x => x.id === id); if(item) newOrder.push(item); }); currentWorld.data.timeline = newOrder; saveAll(); } }); }
         function renderBoard() {
+            const filter = document.getElementById('boardFilter').value;
             const div = document.getElementById('boardList'); div.innerHTML = '';
             currentWorld.data.timeline.forEach((ev) => {
+                if(filter !== 'all' && (!ev.who || !ev.who.includes(filter))) return;
                 const typeClass = ev.type || 'default';
                 const timeStr = ev.day ? `Day ${ev.day}, ${MONTHS[ev.month-1] || '?'}, ${ev.year}` : '';
-                
-                // AGE CALCULATION
                 let namesHtml = '';
                 if(ev.who) {
                     const names = ev.who.split(',');
                     names.forEach(n => {
                         const cleanName = n.trim();
-                        // Find Char
                         const charData = currentWorld.data.chars.find(c => c.name.toLowerCase() === cleanName.toLowerCase());
                         let ageStr = '';
                         if(charData && charData.birth && ev.year) {
@@ -511,15 +459,44 @@
                         namesHtml += `<div><i class="fas fa-user"></i> ${cleanName}${ageStr}</div>`;
                     });
                 }
-
                 div.innerHTML += `<div class="board-card ${typeClass}" data-id="${ev.id}"><div class="bc-actions"><button class="bc-btn" onclick="openEventDetails(${ev.id})"><i class="fas fa-edit"></i></button><button class="bc-btn" onclick="deleteEvent(${ev.id})"><i class="fas fa-trash"></i></button></div><input class="bc-header" value="${ev.title}" onchange="updateEventText(${ev.id}, 'title', this.value)"><textarea class="bc-body" onchange="updateEventText(${ev.id}, 'desc', this.value)">${ev.desc}</textarea><div class="bc-meta">${namesHtml}${ev.where ? '<i class="fas fa-map-marker-alt"></i> '+ev.where + '<br>' : ''}${timeStr}</div></div>`;
             });
+        }
+        function populateBoardFilter() {
+            const sel = document.getElementById('boardFilter');
+            const current = sel.value;
+            sel.innerHTML = '<option value="all">Show All</option>';
+            currentWorld.data.chars.forEach(c => { sel.innerHTML += `<option value="${c.name}">${c.name}</option>`; });
+            sel.value = current;
         }
         function addEvent() { currentWorld.data.timeline.push({ id: Date.now(), title: 'New Scene', desc: '', type: 'default' }); saveAll(); renderBoard(); }
         function deleteEvent(id) { if(confirm("Delete card?")) { currentWorld.data.timeline = currentWorld.data.timeline.filter(x => x.id !== id); saveAll(); renderBoard(); } }
         function updateEventText(id, field, val) { const ev = currentWorld.data.timeline.find(x => x.id === id); if(ev) { ev[field] = val; saveAll(); } }
         function openEventDetails(id) { const ev = currentWorld.data.timeline.find(x => x.id === id); document.getElementById('evId').value = id; document.getElementById('evType').value = ev.type || 'default'; document.getElementById('evWho').value = ev.who || ''; document.getElementById('evWhere').value = ev.where || ''; document.getElementById('evDay').value = ev.day || ''; document.getElementById('evYear').value = ev.year || ''; const mSel = document.getElementById('evMonth'); mSel.innerHTML = '<option value="">Month</option>'; MONTHS.forEach((m, i) => { mSel.innerHTML += `<option value="${i+1}" ${ev.month === (i+1) ? 'selected' : ''}>${m}</option>`; }); document.getElementById('eventModal').style.display = 'flex'; }
         function saveEventDetails() { const id = parseInt(document.getElementById('evId').value); const ev = currentWorld.data.timeline.find(x => x.id === id); if(ev) { ev.type = document.getElementById('evType').value; ev.who = document.getElementById('evWho').value; ev.where = document.getElementById('evWhere').value; ev.day = parseInt(document.getElementById('evDay').value) || ''; ev.month = parseInt(document.getElementById('evMonth').value) || ''; ev.year = parseInt(document.getElementById('evYear').value) || ''; saveAll(); renderBoard(); document.getElementById('eventModal').style.display = 'none'; } }
+
+        // --- RETCON TOOL ---
+        function openRetcon() { document.getElementById('retconModal').style.display = 'flex'; }
+        function applyRetcon() {
+            const find = document.getElementById('retFind').value;
+            const repl = document.getElementById('retRepl').value;
+            if(!find || !repl) return;
+            if(!confirm(`Replace "${find}" with "${repl}" everywhere? This cannot be undone.`)) return;
+            
+            const regex = new RegExp(find, 'gi');
+            const replaceIn = (str) => str ? str.replace(regex, repl) : str;
+
+            // Retcon World
+            currentWorld.data.world.forEach(w => { w.name = replaceIn(w.name); w.desc = replaceIn(w.desc); });
+            // Retcon Chars
+            currentWorld.data.chars.forEach(c => { c.name = replaceIn(c.name); c.race = replaceIn(c.race); c.role = replaceIn(c.role); c.god = replaceIn(c.god); c.goal = replaceIn(c.goal); c.notes = replaceIn(c.notes); });
+            // Retcon Timeline
+            currentWorld.data.timeline.forEach(t => { t.title = replaceIn(t.title); t.desc = replaceIn(t.desc); t.who = replaceIn(t.who); t.where = replaceIn(t.where); });
+            // Retcon Chapters
+            currentWorld.data.chapters.forEach(ch => { ch.title = replaceIn(ch.title); ch.content = replaceIn(ch.content); ch.notes = replaceIn(ch.notes); });
+
+            saveAll(); location.reload();
+        }
 
         function saveAll() { saveCurrentBuffer(); localStorage.setItem('worldSmithMultiverse', JSON.stringify(appData)); }
         function openLibrary() { renderLib(); document.getElementById('libModal').style.display = 'flex'; }
@@ -537,9 +514,14 @@
         function populateDropdowns() { const races = currentWorld.data.world.filter(x => x.type === 'Race'); const rels = currentWorld.data.world.filter(x => x.type === 'Religion'); const facs = currentWorld.data.world.filter(x => x.type === 'Faction'); fillSelect('cRace', races); fillSelect('cGod', rels); fillSelect('cRole', facs); }
         function fillSelect(id, items) { const sel = document.getElementById(id); sel.innerHTML = '<option value="">- Select -</option>'; items.forEach(i => { sel.innerHTML += `<option value="${i.name}">${i.name}</option>`; }); }
         function createNewEntity(type) { const id = Date.now().toString(); const empty = type === 'world' ? { id, name: 'New Entry', type: 'Location', desc: '' } : { id, name: 'New Character', race:'', role:'', god: '', goal:'', notes:'' }; if(type === 'world') currentWorld.data.world.push(empty); else currentWorld.data.chars.push(empty); saveAll(); refreshLists(); loadEntity(type, id); }
-        function saveEntity(type) { if(type === 'world') { const id = document.getElementById('wId').value; const idx = currentWorld.data.world.findIndex(x => x.id === id); if(idx > -1) currentWorld.data.world[idx] = { id, name: document.getElementById('wName').value, type: document.getElementById('wType').value, desc: document.getElementById('wDesc').value }; } else { const id = document.getElementById('cId').value; const idx = currentWorld.data.chars.findIndex(x => x.id === id); if(idx > -1) currentWorld.data.chars[idx] = { id, name: document.getElementById('cName').value, race: document.getElementById('cRace').value, role: document.getElementById('cRole').value, god: document.getElementById('cGod').value, birth: document.getElementById('cBirth').value, goal: document.getElementById('cGoal').value, notes: document.getElementById('cNotes').value }; } saveAll(); refreshLists(); searchWiki(); }
-        function loadEntity(type, id) { const data = type === 'world' ? currentWorld.data.world.find(x => x.id === id) : currentWorld.data.chars.find(x => x.id === id); if(!data) return; if(type === 'world') { document.getElementById('wId').value = data.id; document.getElementById('wName').value = data.name; document.getElementById('wType').value = data.type; document.getElementById('wDesc').value = data.desc; } else { document.getElementById('cId').value = data.id; document.getElementById('cName').value = data.name; document.getElementById('cRace').value = data.race; document.getElementById('cRole').value = data.role; document.getElementById('cGod').value = data.god; document.getElementById('cBirth').value = data.birth || ''; document.getElementById('cGoal').value = data.goal; document.getElementById('cNotes').value = data.notes; } }
-        function refreshLists() { const wList = document.getElementById('worldList'); wList.innerHTML = ''; ['Race', 'Location', 'Religion', 'Faction', 'Magic', 'History'].forEach(t => { const items = currentWorld.data.world.filter(x => x.type === t); if(items.length > 0) { wList.innerHTML += `<div class="category-header">${t}s</div>`; items.forEach(item => wList.innerHTML += `<div class="entity-item" onclick="loadEntity('world', '${item.id}')">${item.name}</div>`); } }); const cList = document.getElementById('charList'); cList.innerHTML = ''; currentWorld.data.chars.forEach(item => cList.innerHTML += `<div class="entity-item" onclick="loadEntity('char', '${item.id}')">${item.name}</div>`); populateDropdowns(); }
+        function saveEntity(type) { if(type === 'world') { const id = document.getElementById('wId').value; const idx = currentWorld.data.world.findIndex(x => x.id === id); if(idx > -1) currentWorld.data.world[idx] = { id, name: document.getElementById('wName').value, image: document.getElementById('wImage').value, type: document.getElementById('wType').value, desc: document.getElementById('wDesc').value }; } else { const id = document.getElementById('cId').value; const idx = currentWorld.data.chars.findIndex(x => x.id === id); if(idx > -1) currentWorld.data.chars[idx] = { id, name: document.getElementById('cName').value, image: document.getElementById('cImage').value, race: document.getElementById('cRace').value, role: document.getElementById('cRole').value, god: document.getElementById('cGod').value, birth: document.getElementById('cBirth').value, goal: document.getElementById('cGoal').value, notes: document.getElementById('cNotes').value }; } saveAll(); refreshLists(); searchWiki(); }
+        function loadEntity(type, id) { const data = type === 'world' ? currentWorld.data.world.find(x => x.id === id) : currentWorld.data.chars.find(x => x.id === id); if(!data) return; if(type === 'world') { document.getElementById('wId').value = data.id; document.getElementById('wName').value = data.name; document.getElementById('wImage').value = data.image || ''; document.getElementById('wType').value = data.type; document.getElementById('wDesc').value = data.desc; } else { document.getElementById('cId').value = data.id; document.getElementById('cName').value = data.name; document.getElementById('cImage').value = data.image || ''; document.getElementById('cRace').value = data.race; document.getElementById('cRole').value = data.role; document.getElementById('cGod').value = data.god; document.getElementById('cBirth').value = data.birth || ''; document.getElementById('cGoal').value = data.goal; document.getElementById('cNotes').value = data.notes; } }
+        function refreshLists() { 
+            const wList = document.getElementById('worldList'); wList.innerHTML = ''; 
+            ['Race', 'Location', 'Religion', 'Faction', 'Magic', 'History'].forEach(t => { const items = currentWorld.data.world.filter(x => x.type === t); if(items.length > 0) { wList.innerHTML += `<div class="category-header">${t}s</div>`; items.forEach(item => wList.innerHTML += `<div class="entity-item" onclick="loadEntity('world', '${item.id}')">${item.name}</div>`); } }); 
+            const cList = document.getElementById('charList'); cList.innerHTML = ''; currentWorld.data.chars.forEach(item => cList.innerHTML += `<div class="entity-item" onclick="loadEntity('char', '${item.id}')">${item.name}</div>`); 
+            populateDropdowns(); populateBoardFilter();
+        }
         
         function renderConnections() {
             const div = document.getElementById('conn-container'); div.innerHTML = '';
@@ -568,14 +550,16 @@
             if(filter === 'all' || filter !== 'char') {
                 currentWorld.data.world.forEach(w => {
                     if((filter === 'all' || filter === 'world' || filter === w.type) && w.name.toLowerCase().includes(term)) {
-                        res.innerHTML += `<div class="wiki-card" onclick="this.classList.toggle('expanded')"><h4>${w.name} <small>${w.type}</small></h4><small>${w.desc.substring(0, 50)}...</small><div class="wiki-desc">${w.desc}</div></div>`;
+                        const img = w.image || 'https://placehold.co/600x300/383942/b59af7?text=Image';
+                        res.innerHTML += `<div class="wiki-card" onclick="this.classList.toggle('expanded')"><img src="${img}" class="wiki-card-img"><div class="wiki-card-content"><h4>${w.name} <small>${w.type}</small></h4><small>${w.desc.substring(0, 50)}...</small><div class="wiki-desc">${w.desc}</div></div></div>`;
                     }
                 });
             }
             if(filter === 'all' || filter === 'char') {
                 currentWorld.data.chars.forEach(c => {
                     if(c.name.toLowerCase().includes(term)) {
-                        res.innerHTML += `<div class="wiki-card" style="border-left-color: var(--accent-sec);" onclick="this.classList.toggle('expanded')"><h4>${c.name}</h4><small>${c.race || ''}</small><div class="wiki-desc">Goal: ${c.goal}<br><br>${c.notes}</div></div>`;
+                        const img = c.image || 'https://placehold.co/600x300/383942/ffb7b2?text=Character';
+                        res.innerHTML += `<div class="wiki-card" style="border-left-color: var(--accent-sec);" onclick="this.classList.toggle('expanded')"><img src="${img}" class="wiki-card-img"><div class="wiki-card-content"><h4>${c.name}</h4><small>${c.race || ''}</small><div class="wiki-desc">Goal: ${c.goal}<br><br>${c.notes}</div></div></div>`;
                     }
                 });
             }
