@@ -54,11 +54,11 @@
         .editor-container { flex: 1; padding: 20px 10%; overflow-y: auto; background: var(--bg-body); transition: background 0.3s; position: relative; }
         
         /* FORMATTING TOOLBAR */
-        .editor-toolbar { display: flex; gap: 5px; margin-bottom: 10px; background: var(--bg-panel); padding: 5px; border-radius: 8px; width: fit-content; border: 1px solid var(--border); }
-        .fmt-btn { background: transparent; border: none; color: var(--text-main); width: 30px; height: 30px; cursor: pointer; border-radius: 4px; font-weight: bold; transition: all 0.2s; }
+        .editor-toolbar { display: flex; gap: 5px; margin-bottom: 10px; background: var(--bg-panel); padding: 5px; border-radius: 8px; width: fit-content; border: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
+        .fmt-btn { background: transparent; border: none; color: var(--text-main); width: 30px; height: 30px; cursor: pointer; border-radius: 4px; font-weight: bold; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
         .fmt-btn:hover { background: var(--bg-input); }
-        /* ACTIVE STATE FOR TOOLBAR BUTTONS */
         .fmt-btn.active { background: var(--accent); color: var(--bg-panel); box-shadow: 0 0 5px var(--accent); }
+        .divider { width: 1px; background: var(--border); height: 20px; margin: 5px 2px; }
 
         .editor-title { width: 100%; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--accent); font-size: 1.8rem; padding: 15px; box-sizing: border-box; font-family: 'Georgia', serif; font-weight: bold; margin-bottom: 20px; outline: none; }
         .editor-area { width: 100%; min-height: 70vh; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--text-main); font-size: 1.15rem; line-height: 1.8; padding: 30px; box-sizing: border-box; font-family: 'Georgia', serif; outline: none; overflow-y: visible; }
@@ -179,12 +179,20 @@
             <div class="editor-container">
                 <div id="storyHeader" style="margin-bottom:10px; color:var(--text-muted); font-size:0.8rem; text-transform:uppercase;"></div>
                 <input type="text" id="chapterTitle" class="editor-title" placeholder="Chapter Title" oninput="autoSave()">
+                
                 <div class="editor-toolbar">
-                    <button class="fmt-btn" id="btnBold" onmousedown="event.preventDefault(); formatDoc('bold')"><i class="fas fa-bold"></i></button>
-                    <button class="fmt-btn" id="btnItalic" onmousedown="event.preventDefault(); formatDoc('italic')"><i class="fas fa-italic"></i></button>
-                    <button class="fmt-btn" id="btnUnderline" onmousedown="event.preventDefault(); formatDoc('underline')"><i class="fas fa-underline"></i></button>
+                    <button class="fmt-btn" id="btnBold" onmousedown="event.preventDefault(); formatDoc('bold')" title="Bold (Ctrl+B)"><i class="fas fa-bold"></i></button>
+                    <button class="fmt-btn" id="btnItalic" onmousedown="event.preventDefault(); formatDoc('italic')" title="Italic (Ctrl+I)"><i class="fas fa-italic"></i></button>
+                    <button class="fmt-btn" id="btnUnderline" onmousedown="event.preventDefault(); formatDoc('underline')" title="Underline (Ctrl+U)"><i class="fas fa-underline"></i></button>
+                    <div class="divider"></div>
+                    <button class="fmt-btn" id="btnLeft" onmousedown="event.preventDefault(); formatDoc('justifyLeft')" title="Left (Ctrl+L)"><i class="fas fa-align-left"></i></button>
+                    <button class="fmt-btn" id="btnCenter" onmousedown="event.preventDefault(); formatDoc('justifyCenter')" title="Center (Ctrl+E)"><i class="fas fa-align-center"></i></button>
+                    <button class="fmt-btn" id="btnRight" onmousedown="event.preventDefault(); formatDoc('justifyRight')" title="Right (Ctrl+R)"><i class="fas fa-align-right"></i></button>
+                    <button class="fmt-btn" id="btnJustify" onmousedown="event.preventDefault(); formatDoc('justifyFull')" title="Justify (Ctrl+J)"><i class="fas fa-align-justify"></i></button>
                 </div>
+
                 <div id="chapterContent" class="editor-area" contenteditable="true" oninput="autoSave()"></div>
+                
                 <button onclick="toggleMobileChapters()" style="position:absolute; top:20px; left:20px; z-index:50; background:var(--bg-panel); color:var(--text-muted); border:1px solid var(--border); border-radius:50%; width:44px; height:44px; display:none; justify-content:center; align-items:center;" id="mobChaptersBtn"><i class="fas fa-list"></i></button>
                 <button onclick="toggleRightPanel()" id="wikiToggleBtn"><i class="fas fa-book"></i></button>
             </div>
@@ -301,7 +309,7 @@
             
             <div style="display:flex; gap:10px;">
                 <button class="btn" onclick="saveEventDetails()" style="flex:2;">Save Details</button>
-                <button class="btn" style="flex:1; background:var(--bg-input); border:1px solid var(--border); color:var(--text-muted);" onclick="document.getElementById('eventModal').style.display='none'">Cancel</button>
+                <button class="btn" style="flex:1; background:var(--bg-input); border:1px solid var(--border); color:var(--text-main);" onclick="document.getElementById('eventModal').style.display='none'">Cancel</button>
             </div>
         </div>
     </div>
@@ -320,8 +328,22 @@
             if(saved) { appData = JSON.parse(saved); } else { createWorld("First World", true); }
             loadActiveWorld(); initBoardSortable();
             
-            // EDITOR LISTENERS FOR TOOLBAR HIGHLIGHT
+            // KEYBOARD SHORTCUTS
             const editor = document.getElementById('chapterContent');
+            editor.addEventListener('keydown', function(e) {
+                if(e.ctrlKey || e.metaKey) {
+                    switch(e.key.toLowerCase()) {
+                        case 'b': e.preventDefault(); formatDoc('bold'); break;
+                        case 'i': e.preventDefault(); formatDoc('italic'); break;
+                        case 'u': e.preventDefault(); formatDoc('underline'); break;
+                        case 'e': e.preventDefault(); formatDoc('justifyCenter'); break;
+                        case 'l': e.preventDefault(); formatDoc('justifyLeft'); break;
+                        case 'r': e.preventDefault(); formatDoc('justifyRight'); break;
+                        case 'j': e.preventDefault(); formatDoc('justifyFull'); break;
+                    }
+                }
+            });
+            // Update Toolbar Active State
             ['keyup', 'mouseup', 'click'].forEach(evt => editor.addEventListener(evt, checkFormat));
         };
 
@@ -392,10 +414,15 @@
         
         // --- RICH TEXT ---
         function formatDoc(cmd, value=null) { document.execCommand(cmd, false, value); document.getElementById('chapterContent').focus(); checkFormat(); }
+        
         function checkFormat() {
             document.getElementById('btnBold').classList.toggle('active', document.queryCommandState('bold'));
             document.getElementById('btnItalic').classList.toggle('active', document.queryCommandState('italic'));
             document.getElementById('btnUnderline').classList.toggle('active', document.queryCommandState('underline'));
+            document.getElementById('btnLeft').classList.toggle('active', document.queryCommandState('justifyLeft'));
+            document.getElementById('btnCenter').classList.toggle('active', document.queryCommandState('justifyCenter'));
+            document.getElementById('btnRight').classList.toggle('active', document.queryCommandState('justifyRight'));
+            document.getElementById('btnJustify').classList.toggle('active', document.queryCommandState('justifyFull'));
         }
 
         // --- BOARD ---
