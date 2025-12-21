@@ -23,6 +23,7 @@
             --card-shadow: 0 4px 6px rgba(0,0,0,0.3);
             --note-major: #ffb7b2; --note-sub: #a0c4ff; --note-filler: #b9fbc0; --note-default: #fdffb6;
             --status-draft: #ff6b6b; --status-edit: #feca57; --status-done: #4caf50;
+            --editor-font-size: 1.15rem; /* Dynamic Font Size Variable */
         }
         body.light-mode {
             --bg-body: #fdf6e3; --bg-panel: #eee8d5; --bg-input: #ffffff;
@@ -33,25 +34,27 @@
         body { margin: 0; background-color: var(--bg-body); color: var(--text-main); font-family: 'Segoe UI', sans-serif; height: 100vh; display: flex; overflow: hidden; transition: background 0.3s ease; }
 
         /* --- SIDEBAR --- */
-        .sidebar { width: 70px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 20px; z-index: 100; box-shadow: 2px 0 10px rgba(0,0,0,0.1); flex-shrink: 0; }
+        .sidebar { width: 70px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 20px; z-index: 100; box-shadow: 2px 0 10px rgba(0,0,0,0.1); flex-shrink: 0; transition: width 0.3s, padding 0.3s; }
         .nav-btn { width: 48px; height: 48px; border-radius: 14px; border: none; background: transparent; color: var(--text-muted); font-size: 1.3rem; margin-bottom: 10px; cursor: pointer; transition: 0.2s; }
         .nav-btn:hover { color: var(--accent); background: var(--bg-input); }
         .nav-btn.active { color: var(--bg-panel); background: var(--accent); box-shadow: 0 4px 12px var(--accent-dim); }
         .library-btn { border: 2px solid var(--accent-sec); color: var(--accent-sec); }
 
         /* --- LAYOUT --- */
-        .main-stage { flex: 1; position: relative; display: flex; overflow: hidden; }
+        .main-stage { flex: 1; position: relative; display: flex; overflow: hidden; transition: all 0.3s; }
         .view-section { display: none; width: 100%; height: 100%; padding: 20px; box-sizing: border-box; overflow-y: auto; }
         .view-section.active { display: block; }
 
         /* --- WRITING DESK --- */
         #view-write { padding: 0; display:none; }
         #view-write.active { display: flex; overflow: hidden; }
-        .chapter-sidebar { width: 220px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 10px; flex-shrink: 0; overflow-y: auto; }
-        .chapter-item { padding: 10px; border-radius: 6px; cursor: grab; margin-bottom: 5px; color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; }
+        .chapter-sidebar { width: 220px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 10px; flex-shrink: 0; overflow-y: auto; transition: width 0.3s, padding 0.3s; }
+        .chapter-item { padding: 10px; border-radius: 6px; cursor: grab; margin-bottom: 5px; color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; group; }
         .chapter-item:hover { background: var(--bg-input); }
         .chapter-item.active { background: var(--bg-input); color: var(--accent); border-left: 3px solid var(--accent); font-weight: bold; }
-        .chapter-drag-area { display: flex; align-items: center; flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .chapter-info { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        .chapter-title-text { white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+        .chapter-wc { font-size: 0.7rem; color: var(--text-muted); opacity: 0.7; }
         .chapter-handle { margin-right: 8px; color: var(--text-muted); opacity: 0.5; cursor: grab; flex-shrink: 0; }
         .chapter-actions { display: flex; align-items: center; gap: 15px; flex-shrink: 0; padding-right:5px; }
         .chapter-status-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--text-muted); cursor: pointer; border: 1px solid var(--bg-panel); transition: transform 0.2s; }
@@ -65,13 +68,26 @@
         .save-indicator { font-size: 0.8rem; color: var(--text-muted); margin-left: auto; display: flex; align-items: center; gap: 5px; }
         .save-indicator.saving { color: #ffd700; } .save-indicator.saved { color: #4caf50; }
 
+        /* UPDATED TOOLBAR */
         .editor-toolbar { display: flex; gap: 5px; margin-bottom: 10px; background: var(--bg-panel); padding: 5px; border-radius: 8px; width: fit-content; border: 1px solid var(--border); position: sticky; top: 0; z-index: 10; align-items: center; flex-wrap: wrap; }
         .fmt-btn { background: transparent; border: none; color: var(--text-main); width: 30px; height: 30px; cursor: pointer; border-radius: 4px; font-weight: bold; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
-        .fmt-btn:hover { background: var(--bg-input); } .fmt-btn.active { background: var(--accent); color: var(--bg-panel); box-shadow: 0 0 5px var(--accent); }
+        .fmt-btn:hover { background: var(--bg-input); }
+        .fmt-btn.active { background: var(--accent); color: var(--bg-panel); box-shadow: 0 0 5px var(--accent); }
         .divider { width: 1px; background: var(--border); height: 20px; margin: 5px 2px; }
+        
+        /* DROPDOWNS */
+        .toolbar-select { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); padding: 4px; border-radius: 4px; font-size: 0.8rem; outline: none; margin: 0 5px; cursor: pointer; }
 
         .editor-title { width: 100%; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--accent); font-size: 1.8rem; padding: 15px; box-sizing: border-box; font-family: 'Georgia', serif; font-weight: bold; margin-bottom: 20px; outline: none; }
-        .editor-area { width: 100%; min-height: 60vh; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--text-main); font-size: 1.15rem; line-height: 1.8; padding: 30px; padding-bottom: 50vh; box-sizing: border-box; font-family: 'Georgia', serif; outline: none; overflow-y: visible; flex:1; }
+        .editor-area { 
+            width: 100%; min-height: 60vh; 
+            background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; 
+            color: var(--text-main); 
+            font-size: var(--editor-font-size); 
+            line-height: 1.8; 
+            padding: 30px; padding-bottom: 50vh; 
+            box-sizing: border-box; font-family: 'Georgia', serif; outline: none; overflow-y: visible; flex:1; 
+        }
         .editor-area b { color: inherit; font-weight: bold; }
         
         #wikiToggleBtn { position: absolute; top: 20px; right: 20px; z-index: 50; background: var(--bg-panel); color: var(--accent); border: 2px solid var(--accent); border-radius: 50%; width: 44px; height: 44px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s; }
@@ -90,7 +106,7 @@
         .progress-fill { height: 100%; background: #4caf50; width: 0%; transition: width 0.3s; }
 
         /* RIGHT PANEL */
-        .right-panel { width: 350px; background: var(--bg-panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; padding: 15px; flex-shrink: 0; transition: margin-right 0.3s ease-in-out; margin-right: 0; }
+        .right-panel { width: 350px; background: var(--bg-panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; padding: 15px; flex-shrink: 0; transition: margin-right 0.3s ease-in-out; margin-right: 0; transition: width 0.3s, padding 0.3s; }
         .right-panel.collapsed { margin-right: -381px; }
         .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .panel-toggle-tabs { width: 100%; display: flex; margin-bottom: 15px; background: var(--bg-input); border-radius: 8px; padding: 4px; box-sizing: border-box; }
@@ -201,6 +217,7 @@
         <button class="nav-btn" onclick="setTab('board')"><i class="fas fa-th-large"></i></button>
         <button class="nav-btn" onclick="setTab('conn')"><i class="fas fa-link"></i></button>
         <div style="margin-top:auto;"></div>
+        
         <button class="nav-btn" onclick="toggleTheme()"><i class="fas fa-adjust"></i></button>
         <button class="nav-btn" onclick="saveToDisk()"><i class="fas fa-save"></i></button>
         <button class="nav-btn" onclick="document.getElementById('loadInput').click()"><i class="fas fa-upload"></i></button>
@@ -227,10 +244,925 @@
                     <button class="fmt-btn" id="btnBold" onmousedown="event.preventDefault(); formatDoc('bold')" title="Bold (Ctrl+B)"><i class="fas fa-bold"></i></button>
                     <button class="fmt-btn" id="btnItalic" onmousedown="event.preventDefault(); formatDoc('italic')" title="Italic (Ctrl+I)"><i class="fas fa-italic"></i></button>
                     <button class="fmt-btn" id="btnUnderline" onmousedown="event.preventDefault(); formatDoc('underline')" title="Underline (Ctrl+U)"><i class="fas fa-underline"></i></button>
-                    <button class="fmt-btn" id="btnSpell" onmousedown="event.preventDefault(); toggleSpellcheck()" title="Toggle Spellcheck"><i class="fas fa-spell-check"></i></button>
+                    
+                    <button class="fmt-btn" id="btnSpell" onmousedown="event.preventDefault(); toggleSpellcheck()" title="Toggle Spellcheck (AB Checkmark)"><i class="fas fa-spell-check"></i></button>
+                    
                     <div class="divider"></div>
-                    <button class="fmt-btn" onmousedown="event.preventDefault(); resizeSel(1)" title="Increase Size (Sel)"><i class="fas fa-plus"></i></button>
-                    <button class="fmt-btn" onmousedown="event.preventDefault(); resizeSel(-1)" title="Decrease Size (Sel)"><i class="fas fa-minus"></i></button>
+                    
+                    <select class="toolbar-select" onchange="formatDoc('formatBlock', this.value); this.value='';">
+                        <option value="">Style...</option>
+                        <option value="p">Normal Text</option>
+                        <option value="h2">Heading 1 (Scene)</option>
+                        <option value="h3">Heading 2 (Sub)</option>
+                        <option value="blockquote">Quote</option>
+                    </select>
+
+                    <select class="toolbar-select" onchange="setEditorSize(this.value)">
+                        <option value="0.9rem">Small</option>
+                        <option value="1.15rem" selected>Normal</option>
+                        <option value="1.4rem">Large</option>
+                        <option value="1.8rem">Huge</option>
+                    </select>
+
+                    <div class="divider"></div>
+                    <button class="fmt-btn" id="btnLeft" onmousedown="event.preventDefault(); formatDoc('justifyLeft')" title="Left"><i class="fas fa-align-left"></i></button>
+                    <button class="fmt-btn" id="btnCenter" onmousedown="event.preventDefault(); formatDoc('justifyCenter')" title="Center"><i class="fas fa-align-center"></i></button>
+                    <button class="fmt-btn" id="btnRight" onmousedown="event.preventDefault(); formatDoc('justifyRight')" title="Right"><i class="fas fa-align-right"></i></button>
+                    <button class="fmt-btn" id="btnJustify" onmousedown="event.preventDefault(); formatDoc('justifyFull')" title="Justify"><i class="fas fa-align-justify"></i></button>
+                    <div class="divider"></div>
+                    <button class="fmt-btn" onmousedown="event.preventDefault(); toggleZenMode()" title="Zen Mode"><i class="fas fa-eye"></i></button>
+                    <button class="fmt-btn" onmousedown="event.preventDefault(); exportSingleChapter()" title="Download Current Chapter" style="color:var(--accent);"><i class="fas fa-download"></i></button>
+                </div>
+
+                <div id="chapterContent" class="editor-area" contenteditable="true" spellcheck="false" oninput="updateWordCount(); showSaving()"></div>
+                
+                <div class="stats-bar" onclick="setSessionGoal()" title="Click to set daily goal">
+                    <div class="stat-group">
+                        <span>Chapter: <span class="stat-val" id="wc-chapter">0</span></span>
+                        <span>Total: <span class="stat-val" id="wc-total">0</span></span>
+                    </div>
+                    <div class="stat-group">
+                        <span>Session: <span class="stat-val" id="wc-session">0</span> / <span id="wc-goal">500</span></span>
+                        <div class="progress-container"><div class="progress-fill" id="wc-progress"></div></div>
+                    </div>
+                </div>
+
+                <button onclick="toggleMobileChapters()" style="position:absolute; top:20px; left:20px; z-index:50; background:var(--bg-panel); color:var(--text-muted); border:1px solid var(--border); border-radius:50%; width:44px; height:44px; display:none; justify-content:center; align-items:center;" id="mobChaptersBtn"><i class="fas fa-list"></i></button>
+                <button onclick="toggleRightPanel()" id="wikiToggleBtn"><i class="fas fa-book"></i></button>
+            </div>
+            <div class="right-panel" id="rightPanel">
+                <div class="panel-header"></div>
+                <div class="panel-toggle-tabs">
+                    <div class="p-tab active" id="tabWikiBtn" onclick="setRightPanel('wiki')">WIKI</div>
+                    <div class="p-tab" id="tabNotesBtn" onclick="setRightPanel('notes')">SCRATCHPAD</div>
+                </div>
+                <div id="panel-wiki" class="active">
+                    <div class="form-group" style="margin-bottom:5px;">
+                        <select id="wikiFilter" onchange="searchWiki()" style="padding:8px; width:100%; border-radius:6px;">
+                            <option value="all">Everything</option>
+                            <option value="char">Characters</option>
+                            <option value="world">World (All)</option>
+                            <option value="History">History / Eras</option>
+                            <option value="Location">Locations</option>
+                            <option value="Religion">Religions</option>
+                            <option value="Faction">Factions</option>
+                            <option value="Magic">Magic Systems</option>
+                        </select>
+                    </div>
+                    <input type="text" class="wiki-search" placeholder="Search..." oninput="searchWiki()">
+                    <div id="wikiResults" class="wiki-results"></div>
+                </div>
+                <div id="panel-notes">
+                    <textarea class="notes-area" id="chapterNotes" placeholder="Type notes for this chapter here..." oninput="autoSave()"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-read" class="view-section">
+            <div class="read-actions">
+                <button class="btn" onclick="exportBook()">Download Full Book (Word)</button>
+                <button class="btn" onclick="copyBook()" style="background:var(--bg-input); color:var(--text-main); border:1px solid var(--border);">Copy Full Book</button>
+            </div>
+            <div class="book-container" id="bookView"></div>
+        </div>
+
+        <div id="view-world" class="view-section">
+            <div class="wb-grid">
+                <div class="wb-list"><button class="btn btn-new" onclick="createNewEntity('world')">+ New Entry</button><div id="worldList"></div></div>
+                <div class="wb-detail">
+                    <form onsubmit="event.preventDefault(); saveEntity('world');"><input type="hidden" id="wId">
+                        
+                        <div id="w-display" style="display:none;">
+                            <div class="disp-h2"><span id="d-wName"></span> <button type="button" class="btn" onclick="toggleEditMode('world', true)">Edit</button></div>
+                            <div class="disp-row"><span class="disp-label">Type:</span> <span class="disp-val" id="d-wType"></span></div>
+                            <div class="disp-row"><span class="disp-label">Timeframe:</span> <span class="disp-val" id="d-wTime"></span></div>
+                            <div class="disp-desc" id="d-wDesc"></div>
+                        </div>
+
+                        <div id="w-edit">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <h2 style="margin:0; color:var(--accent);">World Entry</h2>
+                                <div style="display:flex; gap:10px;">
+                                    <button type="button" class="btn" onclick="deleteEntity('world')" style="background:transparent; color:#ff6b6b; border:1px solid #ff6b6b; padding:5px 10px;"><i class="fas fa-trash"></i></button>
+                                    <button class="btn">Save</button>
+                                </div>
+                            </div>
+                            <hr style="border:0; border-bottom:1px solid var(--border); margin:20px 0;">
+                            <div class="form-group"><label>Name</label><input type="text" id="wName" required placeholder="Enter Name..."></div>
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                                <div class="form-group"><label>Type</label>
+                                    <select id="wType">
+                                        <option value="Location">Location / Kingdom</option>
+                                        <option value="History">History / Era</option>
+                                        <option value="Race">Race / Species</option>
+                                        <option value="Religion">Religion / Deity</option>
+                                        <option value="Faction">Faction / Politics</option>
+                                        <option value="Magic">Magic System</option>
+                                    </select>
+                                </div>
+                                <div class="form-group"><label>Timeframe / Date</label><input type="text" id="wTime" placeholder="e.g. 300-400"></div>
+                            </div>
+                            <div class="form-group"><label>Lore & Desc</label><textarea id="wDesc" rows="10"></textarea></div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-chars" class="view-section">
+            <div class="wb-grid">
+                <div class="wb-list"><button class="btn btn-new" onclick="createNewEntity('char')">+ New Character</button><div id="charList"></div></div>
+                <div class="wb-detail">
+                    <form onsubmit="event.preventDefault(); saveEntity('char');"><input type="hidden" id="cId">
+                        
+                        <div id="c-display" style="display:none;">
+                            <div class="disp-h2"><span id="d-cName"></span> <button type="button" class="btn" onclick="toggleEditMode('char', true)">Edit</button></div>
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                                <div><span class="disp-label">Race:</span> <span class="disp-val" id="d-cRace"></span></div>
+                                <div><span class="disp-label">Faction:</span> <span class="disp-val" id="d-cRole"></span></div>
+                                <div><span class="disp-label">Religion:</span> <span class="disp-val" id="d-cGod"></span></div>
+                                <div><span class="disp-label">Birth Year:</span> <span class="disp-val" id="d-cBirth"></span></div>
+                            </div>
+                            <div class="disp-row" style="margin-top:10px;"><span class="disp-label">Goal:</span> <span class="disp-val" id="d-cGoal"></span></div>
+                            <div class="disp-desc" id="d-cNotes"></div>
+                        </div>
+
+                        <div id="c-edit">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <h2 style="margin:0; color:var(--accent);">Character</h2>
+                                <div style="display:flex; gap:10px;">
+                                    <button type="button" class="btn" onclick="deleteEntity('char')" style="background:transparent; color:#ff6b6b; border:1px solid #ff6b6b; padding:5px 10px;"><i class="fas fa-trash"></i></button>
+                                    <button class="btn">Save</button>
+                                </div>
+                            </div>
+                            <hr style="border:0; border-bottom:1px solid var(--border); margin:20px 0;">
+                            <div class="form-group"><label>Name</label><input type="text" id="cName" required placeholder="Enter Name..."></div>
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Race</label><select id="cRace"><option value="">- Select -</option></select></div><div class="form-group"><label>Faction</label><select id="cRole"><option value="">- Select -</option></select></div></div>
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Religion</label><select id="cGod"><option value="">- Select -</option></select></div><div class="form-group"><label>Birth Year</label><input type="number" id="cBirth" placeholder="e.g. 290"></div></div>
+                            <div class="form-group"><label>Goal</label><input type="text" id="cGoal"></div>
+                            <div class="form-group"><label>Notes</label><textarea id="cNotes" rows="6"></textarea></div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-board" class="view-section">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2 style="margin:0; color:var(--accent);">Story Board</h2>
+                <div style="display:flex; gap:10px;">
+                    <select id="boardFilter" onchange="renderBoard()" style="background:var(--bg-input); color:var(--text-main); border:1px solid var(--border); padding:5px; border-radius:4px;"><option value="all">Show All</option></select>
+                    <button class="btn" onclick="addEvent()">+ Add Card</button>
+                </div>
+            </div>
+            <div class="board-container" id="boardList"></div>
+        </div>
+
+        <div id="view-conn" class="view-section">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;"><h2 style="margin:0; color:var(--accent);">Connections</h2><button class="btn" onclick="renderConnections()">Refresh</button></div>
+            <div id="conn-container" class="conn-container"></div>
+        </div>
+
+    </div>
+
+    <div id="libModal" class="overlay">
+        <div class="modal-box">
+            <h2 style="color:var(--accent);">World Library</h2>
+            <div id="libList" style="margin-bottom:20px; max-height:200px; overflow-y:auto; text-align:left;"></div>
+            <button class="btn btn-new" onclick="createWorld()">+ Create New World</button>
+            <button class="btn" style="background:transparent; border:1px solid var(--text-muted); color:var(--text-main);" onclick="document.getElementById('libModal').style.display='none'">Close</button>
+        </div>
+    </div>
+
+    <div id="eventModal" class="overlay">
+        <div class="modal-box">
+            <h3 style="color:var(--accent); margin-top:0;">Card Details</h3>
+            <input type="hidden" id="evId">
+            <div class="form-group"><label>Plot Type</label><select id="evType"><option value="default">Standard Scene</option><option value="major">Major Plot Point / Climax</option><option value="sub">Subplot / B-Story</option><option value="filler">Filler / Bonding / Travel</option></select></div>
+            <div class="form-group"><label>Who (Characters)</label><input type="text" id="evWho" placeholder="e.g. Aragorn, Gimli"></div>
+            <div class="form-group"><label>Where (Location)</label><input type="text" id="evWhere" placeholder="e.g. Helm's Deep"></div>
+            <label>Time</label>
+            <div style="display:flex; gap:5px; margin-bottom:15px;"><input type="number" id="evDay" placeholder="Day" style="width:60px;"><select id="evMonth" style="flex:1;"><option value="">Month</option></select><input type="number" id="evYear" placeholder="Year" style="width:70px;"></div>
+            
+            <div style="display:flex; gap:10px;">
+                <button class="btn" onclick="saveEventDetails()" style="flex:2;">Save Details</button>
+                <button class="btn" style="flex:1; background:var(--bg-input); border:1px solid var(--border); color:var(--text-main);" onclick="document.getElementById('eventModal').style.display='none'">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="retconModal" class="overlay">
+        <div class="modal-box">
+            <h3 style="color:var(--accent); margin-top:0;"><i class="fas fa-magic"></i> Retcon Tool</h3>
+            <p style="font-size:0.9rem; color:var(--text-muted);">Find and replace names across your entire world (Chapters, Wiki, Timeline).</p>
+            <div class="form-group"><label>Find</label><input type="text" id="retFind" placeholder="e.g. Oakhaven"></div>
+            <div class="form-group"><label>Replace With</label><input type="text" id="retRepl" placeholder="e.g. Ironhold"></div>
+            <button class="btn" onclick="applyRetcon()">Apply Retcon</button>
+            <button class="btn" style="background:transparent; border:1px solid var(--text-muted); color:var(--text-main); margin-left:10px;" onclick="document.getElementById('retconModal').style.display='none'">Cancel</button>
+        </div>
+    </div>
+
+    <div id="searchModal" class="overlay">
+        <div class="modal-box">
+            <h3 style="color:var(--accent); margin-top:0;"><i class="fas fa-search"></i> Global Search</h3>
+            <input type="text" id="globalSearchInput" placeholder="Search entire book..." oninput="runGlobalSearch()" style="margin-bottom:10px;">
+            <div id="globalSearchResults" style="max-height:300px; overflow-y:auto; text-align:left;"></div>
+            <button class="btn" style="background:transparent; border:1px solid var(--text-muted); color:var(--text-main); margin-top:10px;" onclick="document.getElementById('searchModal').style.display='none'">Close</button>
+        </div>
+    </div>
+
+    <div id="sparkModal" class="overlay">
+        <div class="modal-box" style="text-align:center;">
+            <h3 style="color:var(--accent); margin-top:0;"><i class="fas fa-bolt"></i> Inspiration Spark</h3>
+            <p id="sparkOutput" style="font-size:1.2rem; font-style:italic; margin:20px 0; color:var(--text-main);">Thinking...</p>
+            <button class="btn" onclick="generateSpark()">Reroll</button>
+            <button class="btn" style="background:transparent; border:1px solid var(--text-muted); color:var(--text-main); margin-left:10px;" onclick="document.getElementById('sparkModal').style.display='none'">Close</button>
+        </div>
+    </div>
+
+    <script>
+        const MONTHS = ["Aether", "Borean", "Cygnus", "Dormus", "Eon", "Fyre", "Glacies", "Harvest", "Ignis", "Juras", "Kryos", "Lux", "Mirus", "Nox", "Omen"];
+        let appData = { activeId: null, worlds: [] };
+        let currentWorld = null;
+        let activeChapterId = null;
+        let isLight = false;
+        let wikiFilter = 'all';
+        let sessionStartCount = 0;
+        let saveTimer = null;
+        let dailyGoal = 500;
+
+        window.onload = () => {
+            if(localStorage.getItem('wsTheme') === 'light') toggleTheme(true);
+            const saved = localStorage.getItem('worldSmithMultiverse');
+            if(saved) { appData = JSON.parse(saved); } else { createWorld("First World", true); }
+            loadActiveWorld(); initBoardSortable();
+            
+            // CRASH GUARD
+            window.addEventListener('beforeunload', function (e) {
+                e.preventDefault();
+                e.returnValue = '';
+            });
+
+            const editor = document.getElementById('chapterContent');
+            editor.addEventListener('keydown', function(e) {
+                if(e.ctrlKey || e.metaKey) {
+                    switch(e.key.toLowerCase()) {
+                        case 'b': e.preventDefault(); formatDoc('bold'); break;
+                        case 'i': e.preventDefault(); formatDoc('italic'); break;
+                        case 'u': e.preventDefault(); formatDoc('underline'); break;
+                        case 'e': e.preventDefault(); formatDoc('justifyCenter'); break;
+                        case 'l': e.preventDefault(); formatDoc('justifyLeft'); break;
+                        case 'r': e.preventDefault(); formatDoc('justifyRight'); break;
+                        case 'j': e.preventDefault(); formatDoc('justifyFull'); break;
+                    }
+                }
+            });
+            ['keyup', 'mouseup', 'click'].forEach(evt => editor.addEventListener(evt, checkFormat));
+            setTimeout(() => { sessionStartCount = countWords(document.body.innerText); }, 500);
+        };
+
+        // --- SIZE & STYLE PRESETS ---
+        function setEditorSize(val) {
+            document.documentElement.style.setProperty('--editor-font-size', val);
+        }
+
+        function updateWordCount() {
+            if(!currentWorld || !activeChapterId) return;
+            const content = document.getElementById('chapterContent').innerText || "";
+            const chapterWords = countWords(content);
+            let total = 0;
+            currentWorld.data.chapters.forEach(ch => {
+                if(ch.id === activeChapterId) total += chapterWords;
+                else { const tempDiv = document.createElement('div'); tempDiv.innerHTML = ch.content; total += countWords(tempDiv.innerText || ""); }
+            });
+            document.getElementById('wc-chapter').innerText = chapterWords;
+            document.getElementById('wc-total').innerText = total;
+            const progress = Math.min(100, (chapterWords / dailyGoal) * 100);
+            document.getElementById('wc-progress').style.width = progress + "%";
+            document.getElementById('wc-session').innerText = chapterWords;
+        }
+        function setSessionGoal() {
+            const val = prompt("Set Daily Word Goal:", dailyGoal);
+            if(val && !isNaN(val)) { dailyGoal = parseInt(val); document.getElementById('wc-goal').innerText = dailyGoal; updateWordCount(); }
+        }
+        function countWords(str) { return str.trim().split(/\s+/).filter(word => word.length > 0).length; }
+
+        function createWorld(name, autoLoad=false) {
+            if(!name) name = prompt("Name:"); if(!name) return;
+            const id = 'w' + Date.now();
+            appData.worlds.push({ id: id, name: name, data: { chapters: [{id: 'ch1', title: 'Chapter 1', content: '', notes: '', status: 'draft'}], world: [], chars: [], timeline: [] } });
+            saveAll(); if(autoLoad) switchWorld(id); renderLib();
+        }
+        function switchWorld(id) { appData.activeId = id; saveAll(); loadActiveWorld(); document.getElementById('libModal').style.display = 'none'; }
+        
+        function loadActiveWorld() {
+            currentWorld = appData.worlds.find(w => w.id === appData.activeId);
+            if(!currentWorld) return;
+            if(!currentWorld.data.chapters) currentWorld.data.chapters = [{ id: 'legacy', title: 'Chapter 1', content: currentWorld.data.writing?.content || '', notes: '', status: 'draft' }];
+            document.getElementById('storyHeader').innerText = `Current Story: ${currentWorld.name}`;
+            if(!activeChapterId || !currentWorld.data.chapters.find(c => c.id === activeChapterId)) activeChapterId = currentWorld.data.chapters[0].id;
+            loadChapter(activeChapterId);
+            refreshLists(); renderBoard(); searchWiki();
+        }
+
+        function createChapter() {
+            const newCh = { id: 'ch'+Date.now(), title: 'New Chapter', content: '', notes: '', status: 'draft' };
+            currentWorld.data.chapters.push(newCh); saveAll(); renderChapterList(); loadChapter(newCh.id);
+        }
+        function deleteChapter(id, event) {
+            event.stopPropagation();
+            if(confirm("Delete this chapter permanently?")) {
+                const idx = currentWorld.data.chapters.findIndex(c => c.id === id);
+                currentWorld.data.chapters.splice(idx, 1);
+                if (id === activeChapterId) {
+                    if (currentWorld.data.chapters.length > 0) {
+                        activeChapterId = currentWorld.data.chapters[0].id;
+                        loadChapter(activeChapterId);
+                    } else {
+                        createChapter(); return;
+                    }
+                }
+                saveAll(); renderChapterList();
+            }
+        }
+        function toggleChapterStatus(id, event) {
+            event.stopPropagation();
+            const ch = currentWorld.data.chapters.find(c => c.id === id);
+            if(!ch.status || ch.status === 'draft') ch.status = 'edit';
+            else if(ch.status === 'edit') ch.status = 'done';
+            else ch.status = 'draft';
+            saveAll(); renderChapterList();
+        }
+        function loadChapter(id) {
+            saveCurrentBuffer(); activeChapterId = id;
+            const ch = currentWorld.data.chapters.find(c => c.id === id);
+            document.getElementById('chapterTitle').value = ch.title;
+            document.getElementById('chapterContent').innerHTML = ch.content;
+            document.getElementById('chapterNotes').value = ch.notes || '';
+            
+            // Set Spellcheck state if saved, else default to false
+            document.getElementById('chapterContent').spellcheck = false;
+            document.getElementById('btnSpell').classList.remove('active');
+            
+            renderChapterList(); updateWordCount();
+        }
+        function saveCurrentBuffer() {
+            if(!currentWorld || !activeChapterId) return;
+            const ch = currentWorld.data.chapters.find(c => c.id === activeChapterId);
+            if(ch) {
+                ch.title = document.getElementById('chapterTitle').value;
+                ch.content = document.getElementById('chapterContent').innerHTML;
+                ch.notes = document.getElementById('chapterNotes').value;
+            }
+        }
+        function renderChapterList() {
+            const list = document.getElementById('chapterList'); list.innerHTML = '';
+            currentWorld.data.chapters.forEach(ch => { 
+                const statusClass = ch.status || 'draft';
+                // Calc words
+                const div = document.createElement('div'); div.innerHTML = ch.content;
+                const wc = countWords(div.innerText || "");
+                
+                list.innerHTML += `
+                <div class="chapter-item ${ch.id === activeChapterId ? 'active' : ''}" data-id="${ch.id}" onclick="loadChapter('${ch.id}')">
+                    <span class="chapter-handle"><i class="fas fa-grip-vertical"></i></span>
+                    <div class="chapter-info">
+                        <div class="chapter-title-text">${ch.title}</div>
+                        <div class="chapter-wc">${wc} words</div>
+                    </div>
+                    <div class="chapter-actions">
+                        <div class="chapter-status-dot ${statusClass}" onclick="toggleChapterStatus('${ch.id}', event)" title="Status: ${statusClass.toUpperCase()}"></div>
+                        <span class="chapter-delete-btn" onclick="deleteChapter('${ch.id}', event)"><i class="fas fa-trash"></i></span>
+                    </div>
+                </div>`; 
+            });
+            new Sortable(list, {
+                handle: '.chapter-handle', animation: 150,
+                onEnd: function() {
+                    const newOrder = [];
+                    list.querySelectorAll('.chapter-item').forEach(el => {
+                        const id = el.getAttribute('data-id');
+                        newOrder.push(currentWorld.data.chapters.find(c => c.id === id));
+                    });
+                    currentWorld.data.chapters = newOrder;
+                    saveAll();
+                }
+            });
+        }
+
+        function renderBook() { saveCurrentBuffer(); const div = document.getElementById('bookView'); div.innerHTML = ''; currentWorld.data.chapters.forEach(ch => { div.innerHTML += `<div class="book-chapter"><div class="book-title">${ch.title}</div><div class="book-body">${ch.content}</div></div>`; }); }
+        function exportBook() { renderBook(); const content = document.getElementById('bookView').innerHTML; const html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'><head><meta charset='utf-8'><title>${currentWorld.name}</title></head><body>${content}</body></html>`; const blob = new Blob([html], {type: 'application/msword'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${currentWorld.name}.doc`; a.click(); }
+        function copyBook() { renderBook(); const range = document.createRange(); range.selectNode(document.getElementById('bookView')); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); document.execCommand('copy'); window.getSelection().removeAllRanges(); alert("Copied!"); }
+        
+        function exportSingleChapter() {
+            saveCurrentBuffer();
+            const ch = currentWorld.data.chapters.find(c => c.id === activeChapterId);
+            if(!ch) return;
+            const html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'><head><meta charset='utf-8'><title>${ch.title}</title></head><body><h1>${ch.title}</h1>${ch.content}</body></html>`;
+            const blob = new Blob([html], {type: 'application/msword'});
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${ch.title}.doc`; a.click();
+        }
+
+        function formatDoc(cmd, value=null) { document.execCommand(cmd, false, value); document.getElementById('chapterContent').focus(); checkFormat(); }
+        
+        function toggleSpellcheck() {
+            const editor = document.getElementById('chapterContent');
+            const btn = document.getElementById('btnSpell');
+            const current = editor.spellcheck;
+            editor.spellcheck = !current;
+            if(!current) { btn.classList.add('active'); } else { btn.classList.remove('active'); }
+            const text = editor.innerHTML; editor.innerHTML = text; 
+        }
+
+        function checkFormat() {
+            document.getElementById('btnBold').classList.toggle('active', document.queryCommandState('bold'));
+            document.getElementById('btnItalic').classList.toggle('active', document.queryCommandState('italic'));
+            document.getElementById('btnUnderline').classList.toggle('active', document.queryCommandState('underline'));
+            document.getElementById('btnLeft').classList.toggle('active', document.queryCommandState('justifyLeft'));
+            document.getElementById('btnCenter').classList.toggle('active', document.queryCommandState('justifyCenter'));
+            document.getElementById('btnRight').classList.toggle('active', document.queryCommandState('justifyRight'));
+            document.getElementById('btnJustify').classList.toggle('active', document.queryCommandState('justifyFull'));
+        }
+
+        function initBoardSortable() { new Sortable(document.getElementById('boardList'), { animation: 150, delay: 100, delayOnTouchOnly: true, onEnd: function (evt) { const newOrder = []; document.querySelectorAll('.board-card').forEach(card => { const id = parseInt(card.getAttribute('data-id')); const item = currentWorld.data.timeline.find(x => x.id === id); if(item) newOrder.push(item); }); currentWorld.data.timeline = newOrder; saveAll(); } }); }
+        function renderBoard() {
+            const filter = document.getElementById('boardFilter').value;
+            const div = document.getElementById('boardList'); div.innerHTML = '';
+            currentWorld.data.timeline.forEach((ev) => {
+                if(filter !== 'all' && (!ev.who || !ev.who.includes(filter))) return;
+                const typeClass = ev.type || 'default';
+                const timeStr = ev.day ? `Day ${ev.day}, ${MONTHS[ev.month-1] || '?'}, ${ev.year}` : '';
+                let namesHtml = '';
+                if(ev.who) {
+                    const names = ev.who.split(',');
+                    names.forEach(n => {
+                        const cleanName = n.trim();
+                        const charData = currentWorld.data.chars.find(c => c.name.toLowerCase() === cleanName.toLowerCase());
+                        let ageStr = '';
+                        if(charData && charData.birth && ev.year) {
+                            const age = parseInt(ev.year) - parseInt(charData.birth);
+                            ageStr = age >= 0 ? ` (Age: ${age})` : ` (Not born)`;
+                        }
+                        namesHtml += `<div><i class="fas fa-user"></i> ${cleanName}${ageStr}</div>`;
+                    });
+                }
+                div.innerHTML += `<div class="board-card ${typeClass}" data-id="${ev.id}"><div class="bc-actions"><button class="bc-btn" onclick="openEventDetails(${ev.id})"><i class="fas fa-edit"></i></button><button class="bc-btn" onclick="deleteEvent(${ev.id})"><i class="fas fa-trash"></i></button></div><input class="bc-header" value="${ev.title}" onchange="updateEventText(${ev.id}, 'title', this.value)"><textarea class="bc-body" onchange="updateEventText(${ev.id}, 'desc', this.value)">${ev.desc}</textarea><div class="bc-meta">${namesHtml}${ev.where ? '<i class="fas fa-map-marker-alt"></i> '+ev.where + '<br>' : ''}${timeStr}</div></div>`;
+            });
+        }
+        function populateBoardFilter() { const sel = document.getElementById('boardFilter'); const current = sel.value; sel.innerHTML = '<option value="all">Show All</option>'; currentWorld.data.chars.forEach(c => { sel.innerHTML += `<option value="${c.name}">${c.name}</option>`; }); sel.value = current; }
+        function addEvent() { currentWorld.data.timeline.push({ id: Date.now(), title: 'New Scene', desc: '', type: 'default' }); saveAll(); renderBoard(); }
+        function deleteEvent(id) { if(confirm("Delete card?")) { currentWorld.data.timeline = currentWorld.data.timeline.filter(x => x.id !== id); saveAll(); renderBoard(); } }
+        function updateEventText(id, field, val) { const ev = currentWorld.data.timeline.find(x => x.id === id); if(ev) { ev[field] = val; saveAll(); } }
+        function openEventDetails(id) { const ev = currentWorld.data.timeline.find(x => x.id === id); document.getElementById('evId').value = id; document.getElementById('evType').value = ev.type || 'default'; document.getElementById('evWho').value = ev.who || ''; document.getElementById('evWhere').value = ev.where || ''; document.getElementById('evDay').value = ev.day || ''; document.getElementById('evYear').value = ev.year || ''; const mSel = document.getElementById('evMonth'); mSel.innerHTML = '<option value="">Month</option>'; MONTHS.forEach((m, i) => { mSel.innerHTML += `<option value="${i+1}" ${ev.month === (i+1) ? 'selected' : ''}>${m}</option>`; }); document.getElementById('eventModal').style.display = 'flex'; }
+        function saveEventDetails() { const id = parseInt(document.getElementById('evId').value); const ev = currentWorld.data.timeline.find(x => x.id === id); if(ev) { ev.type = document.getElementById('evType').value; ev.who = document.getElementById('evWho').value; ev.where = document.getElementById('evWhere').value; ev.day = parseInt(document.getElementById('evDay').value) || ''; ev.month = parseInt(document.getElementById('evMonth').value) || ''; ev.year = parseInt(document.getElementById('evYear').value) || ''; saveAll(); renderBoard(); document.getElementById('eventModal').style.display = 'none'; } }
+
+        function openRetcon() { document.getElementById('retconModal').style.display = 'flex'; }
+        function applyRetcon() {
+            const find = document.getElementById('retFind').value; const repl = document.getElementById('retRepl').value; if(!find || !repl) return; if(!confirm(`Replace "${find}" with "${repl}" everywhere?`)) return;
+            const regex = new RegExp(find, 'gi'); const replaceIn = (str) => str ? str.replace(regex, repl) : str;
+            currentWorld.data.world.forEach(w => { w.name = replaceIn(w.name); w.desc = replaceIn(w.desc); });
+            currentWorld.data.chars.forEach(c => { c.name = replaceIn(c.name); c.race = replaceIn(c.race); c.role = replaceIn(c.role); c.god = replaceIn(c.god); c.goal = replaceIn(c.goal); c.notes = replaceIn(c.notes); });
+            currentWorld.data.timeline.forEach(t => { t.title = replaceIn(t.title); t.desc = replaceIn(t.desc); t.who = replaceIn(t.who); t.where = replaceIn(t.where); });
+            currentWorld.data.chapters.forEach(ch => { ch.title = replaceIn(ch.title); ch.content = replaceIn(ch.content); ch.notes = replaceIn(ch.notes); });
+            saveAll(); location.reload();
+        }
+
+        function openGlobalSearch() { document.getElementById('searchModal').style.display = 'flex'; document.getElementById('globalSearchInput').focus(); }
+        function runGlobalSearch() {
+            const term = document.getElementById('globalSearchInput').value.toLowerCase();
+            const res = document.getElementById('globalSearchResults'); res.innerHTML = '';
+            if(!term) return;
+            currentWorld.data.chapters.forEach(ch => { if(ch.content.toLowerCase().includes(term) || ch.title.toLowerCase().includes(term)) { res.innerHTML += `<div class="search-res-item" onclick="loadChapter('${ch.id}'); document.getElementById('searchModal').style.display='none'; setTab('write');"><div class="search-highlight">Chapter: ${ch.title}</div><small>Found in text...</small></div>`; } });
+            currentWorld.data.world.forEach(w => { if(w.name.toLowerCase().includes(term) || w.desc.toLowerCase().includes(term)) { res.innerHTML += `<div class="search-res-item" onclick="setTab('world'); document.getElementById('searchModal').style.display='none'; loadEntity('world', '${w.id}')"><div class="search-highlight">World: ${w.name}</div><small>${w.type}</small></div>`; } });
+            currentWorld.data.chars.forEach(c => { if(c.name.toLowerCase().includes(term) || c.notes.toLowerCase().includes(term)) { res.innerHTML += `<div class="search-res-item" onclick="setTab('chars'); document.getElementById('searchModal').style.display='none'; loadEntity('char', '${c.id}')"><div class="search-highlight">Character: ${c.name}</div></div>`; } });
+        }
+
+        function triggerSpark() { document.getElementById('sparkModal').style.display = 'flex'; generateSpark(); }
+        function generateSpark() {
+            const chars = currentWorld.data.chars;
+            const locs = currentWorld.data.world.filter(w => w.type === 'Location');
+            const items = currentWorld.data.world.filter(w => w.type === 'Magic' || w.type === 'Faction');
+            
+            if(chars.length === 0 || locs.length === 0) { document.getElementById('sparkOutput').innerText = "Add more Characters and Locations to generate prompts!"; return; }
+            
+            const c = chars[Math.floor(Math.random() * chars.length)].name;
+            const l = locs[Math.floor(Math.random() * locs.length)].name;
+            const i = items.length > 0 ? items[Math.floor(Math.random() * items.length)].name : "a mysterious object";
+            
+            const prompts = [`Write a scene where ${c} discovers a secret about ${i} in ${l}.`, `${c} is trapped in ${l}. How do they escape using ${i}?`, `A rival faction ambushes ${c} at ${l}.`, `${c} loses something important in ${l}.`];
+            document.getElementById('sparkOutput').innerText = prompts[Math.floor(Math.random() * prompts.length)];
+        }
+
+        function showSaving() { const ind = document.getElementById('saveIndicator'); ind.innerHTML = '<i class="fas fa-pen"></i> Saving...'; ind.className = 'save-indicator saving'; clearTimeout(saveTimer); saveTimer = setTimeout(() => { saveAll(); ind.innerHTML = '<i class="fas fa-check-circle"></i> Saved'; ind.className = 'save-indicator saved'; }, 1000); }
+        function toggleZenMode() { document.body.classList.toggle('zen-mode'); }
+
+        function saveAll() { saveCurrentBuffer(); localStorage.setItem('worldSmithMultiverse', JSON.stringify(appData)); }
+        function openLibrary() { renderLib(); document.getElementById('libModal').style.display = 'flex'; }
+        function renderLib() { const div = document.getElementById('libList'); div.innerHTML = ''; appData.worlds.forEach(w => { div.innerHTML += `<div style="padding:10px; background:var(--bg-input); margin-bottom:5px; cursor:pointer; border-radius:5px; ${w.id===appData.activeId?'border:1px solid var(--accent);':''}" onclick="switchWorld('${w.id}')">${w.name}</div>`; }); }
+        function setTab(tabId) { 
+            // Reset Detail Views
+            if(tabId === 'world' || tabId === 'chars') {
+                createNewEntity(tabId === 'world' ? 'world' : 'char');
+                toggleEditMode(tabId === 'world' ? 'world' : 'char', true);
+            }
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active')); document.getElementById('view-' + tabId).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active')); event.currentTarget.classList.add('active'); if(tabId === 'conn') renderConnections(); if(tabId === 'read') renderBook(); 
+        }
+        function toggleTheme(forceLight) { if(forceLight || !isLight) { document.body.classList.add('light-mode'); isLight = true; } else { document.body.classList.remove('light-mode'); isLight = false; } localStorage.setItem('wsTheme', isLight ? 'light' : 'dark'); }
+        function autoSave() { showSaving(); if(activeChapterId) renderChapterList(); }
+        function populateDropdowns() { const races = currentWorld.data.world.filter(x => x.type === 'Race'); const rels = currentWorld.data.world.filter(x => x.type === 'Religion'); const facs = currentWorld.data.world.filter(x => x.type === 'Faction'); fillSelect('cRace', races); fillSelect('cGod', rels); fillSelect('cRole', facs); }
+        function fillSelect(id, items) { const sel = document.getElementById(id); const current = sel.value; sel.innerHTML = '<option value="">- Select -</option>'; items.forEach(i => { sel.innerHTML += `<option value="${i.name}">${i.name}</option>`; }); if(current) sel.value = current; }
+        
+        function createNewEntity(type) { 
+            document.getElementById(type === 'world' ? 'wId' : 'cId').value = Date.now().toString();
+            if(type === 'world') { document.getElementById('wName').value = ''; document.getElementById('wTime').value = ''; document.getElementById('wDesc').value = ''; }
+            else { document.getElementById('cName').value = ''; document.getElementById('cBirth').value = ''; document.getElementById('cGoal').value = ''; document.getElementById('cNotes').value = ''; }
+            toggleEditMode(type, true);
+        }
+        function deleteEntity(type) {
+            const id = type === 'world' ? document.getElementById('wId').value : document.getElementById('cId').value;
+            if(!id) return;
+            if(confirm("Permanently delete this entry?")) {
+                if(type === 'world') {
+                    const idx = currentWorld.data.world.findIndex(x => x.id === id);
+                    if(idx > -1) currentWorld.data.world.splice(idx, 1);
+                } else {
+                    const idx = currentWorld.data.chars.findIndex(x => x.id === id);
+                    if(idx > -1) currentWorld.data.chars.splice(idx, 1);
+                }
+                saveAll(); refreshLists(); createNewEntity(type);
+            }
+        }
+        function saveEntity(type) { 
+            const id = document.getElementById(type === 'world' ? 'wId' : 'cId').value;
+            if(type === 'world') { 
+                const name = document.getElementById('wName').value || 'Untitled';
+                const idx = currentWorld.data.world.findIndex(x => x.id === id);
+                const data = { id, name, type: document.getElementById('wType').value, time: document.getElementById('wTime').value, desc: document.getElementById('wDesc').value };
+                if(idx > -1) currentWorld.data.world[idx] = data; else currentWorld.data.world.push(data);
+            } else { 
+                const name = document.getElementById('cName').value || 'Untitled';
+                const idx = currentWorld.data.chars.findIndex(x => x.id === id); 
+                const data = { id, name, race: document.getElementById('cRace').value, role: document.getElementById('cRole').value, god: document.getElementById('cGod').value, birth: document.getElementById('cBirth').value, goal: document.getElementById('cGoal').value, notes: document.getElementById('cNotes').value };
+                if(idx > -1) currentWorld.data.chars[idx] = data; else currentWorld.data.chars.push(data);
+            } 
+            saveAll(); refreshLists(); loadEntity(type, id); 
+        }
+        function loadEntity(type, id) { 
+            const data = type === 'world' ? currentWorld.data.world.find(x => x.id === id) : currentWorld.data.chars.find(x => x.id === id); 
+            if(!data) return; 
+            
+            if(type === 'world') {
+                document.getElementById('d-wName').innerText = data.name;
+                document.getElementById('d-wType').innerText = data.type;
+                document.getElementById('d-wTime').innerText = data.time || 'N/A';
+                document.getElementById('d-wDesc').innerText = data.desc;
+                document.getElementById('wId').value = data.id; document.getElementById('wName').value = data.name; document.getElementById('wType').value = data.type; document.getElementById('wTime').value = data.time || ''; document.getElementById('wDesc').value = data.desc;
+            } else {
+                document.getElementById('d-cName').innerText = data.name;
+                document.getElementById('d-cRace').innerText = data.race || '-';
+                document.getElementById('d-cRole').innerText = data.role || '-';
+                document.getElementById('d-cGod').innerText = data.god || '-';
+                document.getElementById('d-cBirth').innerText = data.birth || '-';
+                document.getElementById('d-cGoal').innerText = data.goal || '-';
+                document.getElementById('d-cNotes').innerText = data.notes;
+                document.getElementById('cId').value = data.id; document.getElementById('cName').value = data.name; document.getElementById('cRace').value = data.race; document.getElementById('cRole').value = data.role; document.getElementById('cGod').value = data.god; document.getElementById('cBirth').value = data.birth || ''; document.getElementById('cGoal').value = data.goal; document.getElementById('cNotes').value = data.notes;
+            }
+            toggleEditMode(type, false);
+        }
+        
+        function toggleEditMode(type, edit) {
+            const disp = document.getElementById(type === 'world' ? 'w-display' : 'c-display');
+            const form = document.getElementById(type === 'world' ? 'w-edit' : 'c-edit');
+            if(edit) { disp.style.display = 'none'; form.style.display = 'block'; }
+            else { disp.style.display = 'block'; form.style.display = 'none'; }
+        }
+
+        function refreshLists() { 
+            const wList = document.getElementById('worldList'); wList.innerHTML = ''; 
+            ['Race', 'Location', 'Religion', 'Faction', 'Magic', 'History'].forEach(t => { 
+                const items = currentWorld.data.world.filter(x => x.type === t); 
+                if(items.length > 0) { 
+                    wList.innerHTML += `<div class="category-header">${t}s</div>`; 
+                    items.forEach(item => wList.innerHTML += `<div class="entity-item" onclick="loadEntity('world', '${item.id}')">${item.name || '<span style="opacity:0.5; font-style:italic;">Untitled</span>'}</div>`); 
+                } 
+            }); 
+            const cList = document.getElementById('charList'); cList.innerHTML = ''; 
+            currentWorld.data.chars.forEach(item => cList.innerHTML += `<div class="entity-item" onclick="loadEntity('char', '${item.id}')">${item.name || '<span style="opacity:0.5; font-style:italic;">Untitled</span>'}</div>`); 
+            populateDropdowns(); populateBoardFilter();
+        }
+        
+        function renderConnections() {
+            const div = document.getElementById('conn-container'); div.innerHTML = '';
+            if(!currentWorld) return;
+            const groups = currentWorld.data.world.filter(w => ['Race', 'Religion', 'Faction'].includes(w.type));
+            if(groups.length === 0) div.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-muted);">Create Races, Factions, or Religions in the World tab to see connections here.</div>';
+            
+            groups.forEach(g => {
+                let html = `<div class="conn-group"><div class="conn-title">${g.name || 'Untitled'} <small style="color:var(--text-muted); font-weight:normal;">(${g.type})</small></div><div class="conn-list">`;
+                const members = currentWorld.data.chars.filter(c => c.race === g.name || c.god === g.name || c.role === g.name);
+                if(members.length === 0) html += `<span style="color:var(--text-muted); font-size:0.8rem;">No members found.</span>`;
+                members.forEach(m => { html += `<div class="conn-tag">${m.name || 'Untitled'}</div>`; });
+                html += '</div></div>';
+                div.innerHTML += html;
+            });
+        }
+
+        function setRightPanel(view) { document.getElementById('panel-wiki').className = view === 'wiki' ? 'active' : ''; document.getElementById('panel-notes').className = view === 'notes' ? 'active' : ''; document.getElementById('tabWikiBtn').className = view === 'wiki' ? 'p-tab active' : 'p-tab'; document.getElementById('tabNotesBtn').className = view === 'notes' ? 'p-tab active' : 'p-tab'; }
+        function toggleRightPanel() { const p = document.getElementById('rightPanel'); if(window.innerWidth < 768) { p.classList.toggle('mobile-show'); } else { p.classList.toggle('collapsed'); } }
+        function toggleMobileChapters() { document.getElementById('chapterSidebar').classList.toggle('show'); }
+        function searchWiki() {
+            const filter = document.getElementById('wikiFilter').value;
+            const term = document.querySelector('.wiki-search').value.toLowerCase();
+            const res = document.getElementById('wikiResults'); res.innerHTML = '';
+            
+            if(filter === 'all' || filter !== 'char') {
+                currentWorld.data.world.forEach(w => {
+                    if((filter === 'all' || filter === 'world' || filter === w.type) && (w.name || '').toLowerCase().includes(term)) {
+                        const timeStr = w.time ? `<br><b>${w.time}</b>` : '';
+                        res.innerHTML += `<div class="wiki-card" onclick="this.classList.toggle('expanded')"><div class="wiki-card-content"><h4>${w.name || 'Untitled'} <small>${w.type}</small></h4>${timeStr}<small>${w.desc.substring(0, 50)}...</small><div class="wiki-desc">${w.desc}</div></div></div>`;
+                    }
+                });
+            }
+            if(filter === 'all' || filter === 'char') {
+                currentWorld.data.chars.forEach(c => {
+                    if((c.name || '').toLowerCase().includes(term)) {
+                        res.innerHTML += `<div class="wiki-card" style="border-left-color: var(--accent-sec);" onclick="this.classList.toggle('expanded')"><div class="wiki-card-content"><h4>${c.name || 'Untitled'}</h4><small>${c.race || ''}</small><div class="wiki-desc">Goal: ${c.goal}<br><br>${c.notes}</div></div></div>`;
+                    }
+                });
+            }
+        }
+        function saveToDisk() { const blob = new Blob([JSON.stringify(appData)], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'WorldSmith_Multiverse.json'; a.click(); }
+        function loadFromDisk(input) { const r = new FileReader(); r.onload = (e) => { try { appData = JSON.parse(e.target.result); switchWorld(appData.activeId); location.reload(); } catch(err) { alert("Invalid File"); } }; r.readAsText(input.files[0]); }
+    </script>
+</body>
+</html>
+``````html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="WorldSmith">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <title>The World Smith</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    
+    <style>
+        /* --- THEME --- */
+        :root {
+            --bg-body: #23242a; --bg-panel: #2d2e36; --bg-input: #383942;
+            --text-main: #e0e0e0; --text-muted: #9496a8; --border: #4a4c58;
+            --accent: #b59af7; --accent-dim: #7d6bb0; --accent-sec: #ffb7b2;
+            --card-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            --note-major: #ffb7b2; --note-sub: #a0c4ff; --note-filler: #b9fbc0; --note-default: #fdffb6;
+            --status-draft: #ff6b6b; --status-edit: #feca57; --status-done: #4caf50;
+            --editor-font-size: 1.15rem; /* Dynamic Font Size Variable */
+        }
+        body.light-mode {
+            --bg-body: #fdf6e3; --bg-panel: #eee8d5; --bg-input: #ffffff;
+            --text-main: #586e75; --text-muted: #93a1a1; --border: #d3d0c2;
+            --accent: #2aa198; --accent-dim: #6c71c4; --accent-sec: #cb4b16;
+            --card-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        body { margin: 0; background-color: var(--bg-body); color: var(--text-main); font-family: 'Segoe UI', sans-serif; height: 100vh; display: flex; overflow: hidden; transition: background 0.3s ease; }
+
+        /* --- SIDEBAR --- */
+        .sidebar { width: 70px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 20px; z-index: 100; box-shadow: 2px 0 10px rgba(0,0,0,0.1); flex-shrink: 0; transition: width 0.3s, padding 0.3s; }
+        .nav-btn { width: 48px; height: 48px; border-radius: 14px; border: none; background: transparent; color: var(--text-muted); font-size: 1.3rem; margin-bottom: 10px; cursor: pointer; transition: 0.2s; }
+        .nav-btn:hover { color: var(--accent); background: var(--bg-input); }
+        .nav-btn.active { color: var(--bg-panel); background: var(--accent); box-shadow: 0 4px 12px var(--accent-dim); }
+        .library-btn { border: 2px solid var(--accent-sec); color: var(--accent-sec); }
+
+        /* --- LAYOUT --- */
+        .main-stage { flex: 1; position: relative; display: flex; overflow: hidden; transition: all 0.3s; }
+        .view-section { display: none; width: 100%; height: 100%; padding: 20px; box-sizing: border-box; overflow-y: auto; }
+        .view-section.active { display: block; }
+
+        /* --- WRITING DESK --- */
+        #view-write { padding: 0; display:none; }
+        #view-write.active { display: flex; overflow: hidden; }
+        .chapter-sidebar { width: 220px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 10px; flex-shrink: 0; overflow-y: auto; transition: width 0.3s, padding 0.3s; }
+        .chapter-item { padding: 10px; border-radius: 6px; cursor: grab; margin-bottom: 5px; color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; group; }
+        .chapter-item:hover { background: var(--bg-input); }
+        .chapter-item.active { background: var(--bg-input); color: var(--accent); border-left: 3px solid var(--accent); font-weight: bold; }
+        .chapter-info { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        .chapter-title-text { white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+        .chapter-wc { font-size: 0.7rem; color: var(--text-muted); opacity: 0.7; }
+        .chapter-handle { margin-right: 8px; color: var(--text-muted); opacity: 0.5; cursor: grab; flex-shrink: 0; }
+        .chapter-actions { display: flex; align-items: center; gap: 15px; flex-shrink: 0; padding-right:5px; }
+        .chapter-status-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--text-muted); cursor: pointer; border: 1px solid var(--bg-panel); transition: transform 0.2s; }
+        .chapter-status-dot:hover { transform: scale(1.2); }
+        .chapter-status-dot.draft { background: var(--status-draft); } .chapter-status-dot.edit { background: var(--status-edit); } .chapter-status-dot.done { background: var(--status-done); }
+        .chapter-delete-btn { color: var(--text-muted); cursor: pointer; opacity: 0; transition: 0.2s; padding: 2px; font-size: 0.9rem; }
+        .chapter-item:hover .chapter-delete-btn { opacity: 1; } .chapter-delete-btn:hover { color: #ff6b6b; }
+
+        .editor-container { flex: 1; padding: 20px 10%; padding-bottom: 60px; overflow-y: auto; background: var(--bg-body); transition: all 0.3s; position: relative; display:flex; flex-direction:column;}
+        .editor-header-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .save-indicator { font-size: 0.8rem; color: var(--text-muted); margin-left: auto; display: flex; align-items: center; gap: 5px; }
+        .save-indicator.saving { color: #ffd700; } .save-indicator.saved { color: #4caf50; }
+
+        /* UPDATED TOOLBAR */
+        .editor-toolbar { display: flex; gap: 5px; margin-bottom: 10px; background: var(--bg-panel); padding: 5px; border-radius: 8px; width: fit-content; border: 1px solid var(--border); position: sticky; top: 0; z-index: 10; align-items: center; flex-wrap: wrap; }
+        .fmt-btn { background: transparent; border: none; color: var(--text-main); width: 30px; height: 30px; cursor: pointer; border-radius: 4px; font-weight: bold; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+        .fmt-btn:hover { background: var(--bg-input); }
+        .fmt-btn.active { background: var(--accent); color: var(--bg-panel); box-shadow: 0 0 5px var(--accent); }
+        .divider { width: 1px; background: var(--border); height: 20px; margin: 5px 2px; }
+        
+        /* DROPDOWNS */
+        .toolbar-select { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); padding: 4px; border-radius: 4px; font-size: 0.8rem; outline: none; margin: 0 5px; cursor: pointer; }
+
+        .editor-title { width: 100%; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--accent); font-size: 1.8rem; padding: 15px; box-sizing: border-box; font-family: 'Georgia', serif; font-weight: bold; margin-bottom: 20px; outline: none; }
+        .editor-area { 
+            width: 100%; min-height: 60vh; 
+            background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; 
+            color: var(--text-main); 
+            font-size: var(--editor-font-size); 
+            line-height: 1.8; 
+            padding: 30px; padding-bottom: 50vh; 
+            box-sizing: border-box; font-family: 'Georgia', serif; outline: none; overflow-y: visible; flex:1; 
+        }
+        .editor-area b { color: inherit; font-weight: bold; }
+        
+        #wikiToggleBtn { position: absolute; top: 20px; right: 20px; z-index: 50; background: var(--bg-panel); color: var(--accent); border: 2px solid var(--accent); border-radius: 50%; width: 44px; height: 44px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s; }
+        #wikiToggleBtn:hover { transform: scale(1.1); }
+
+        /* ZEN MODE */
+        body.zen-mode .sidebar, body.zen-mode .chapter-sidebar, body.zen-mode .right-panel, body.zen-mode #wikiToggleBtn, body.zen-mode #mobChaptersBtn { display: none !important; }
+        body.zen-mode .editor-container { padding: 40px 20%; }
+
+        /* STATS BAR */
+        .stats-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 40px; background: var(--bg-panel); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-sizing: border-box; font-size: 0.8rem; color: var(--text-muted); z-index: 20; cursor: pointer; transition: background 0.2s; }
+        .stats-bar:hover { background: var(--bg-input); }
+        .stat-group { display: flex; gap: 15px; align-items: center; }
+        .stat-val { color: var(--accent); font-weight: bold; }
+        .progress-container { width: 150px; height: 6px; background: var(--bg-input); border-radius: 3px; overflow: hidden; display: flex; }
+        .progress-fill { height: 100%; background: #4caf50; width: 0%; transition: width 0.3s; }
+
+        /* RIGHT PANEL */
+        .right-panel { width: 350px; background: var(--bg-panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; padding: 15px; flex-shrink: 0; transition: margin-right 0.3s ease-in-out; margin-right: 0; transition: width 0.3s, padding 0.3s; }
+        .right-panel.collapsed { margin-right: -381px; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .panel-toggle-tabs { width: 100%; display: flex; margin-bottom: 15px; background: var(--bg-input); border-radius: 8px; padding: 4px; box-sizing: border-box; }
+        .p-tab { flex: 1; text-align: center; padding: 8px; border-radius: 6px; cursor: pointer; color: var(--text-muted); font-weight: bold; font-size: 0.8rem; transition: 0.2s; }
+        .p-tab.active { background: var(--bg-panel); color: var(--accent); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        #panel-wiki, #panel-notes { display: none; flex-direction: column; height: 100%; flex: 1; }
+        #panel-wiki.active, #panel-notes.active { display: flex; }
+        .wiki-tabs { display: flex; gap: 5px; margin-bottom: 10px; }
+        .w-tab { flex: 1; padding: 8px; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; border-radius: 6px; font-size: 0.8rem; font-weight: bold; }
+        .w-tab.active { background: var(--accent); color: var(--bg-panel); border-color: var(--accent); }
+        .wiki-search { width: 100%; padding: 12px; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; }
+        .wiki-results { flex: 1; overflow-y: auto; padding-right: 5px; }
+        .wiki-card { background: var(--bg-input); padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--accent); cursor: pointer; box-shadow: var(--card-shadow); transition: 0.2s; }
+        .wiki-card:hover { background: var(--bg-panel); border-color: var(--accent-sec); }
+        .wiki-card h4 { margin: 0; color: var(--accent); font-size: 1rem; display: flex; justify-content: space-between; }
+        .wiki-card small { color: var(--text-muted); font-size: 0.75rem; font-weight: normal; }
+        .wiki-desc { display: none; margin-top: 10px; font-size: 0.85rem; color: var(--text-main); padding-top: 10px; border-top: 1px solid var(--border); white-space: pre-wrap; }
+        .wiki-card.expanded .wiki-desc { display: block; }
+        .notes-area { flex: 1; width: 100%; height: 100%; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); padding: 15px; box-sizing: border-box; border-radius: 8px; resize: none; font-family: sans-serif; font-size: 1rem; line-height: 1.5; }
+
+        /* --- THE BOARD --- */
+        .board-container { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; padding-bottom: 100px; }
+        .board-card { width: 200px; min-height: 180px; background: var(--note-default); color: #333; border-radius: 4px; padding: 15px; box-shadow: 2px 4px 10px rgba(0,0,0,0.2); position: relative; display: flex; flex-direction: column; cursor: grab; transition: transform 0.2s; }
+        .board-card:hover { transform: scale(1.02); z-index: 10; }
+        .board-card.major { background: var(--note-major); } .board-card.sub { background: var(--note-sub); } .board-card.filler { background: var(--note-filler); }
+        .bc-header { font-weight: bold; font-family: 'Georgia', serif; font-size: 1.1rem; margin-bottom: 10px; line-height: 1.2; outline: none; border-bottom: 1px dashed rgba(0,0,0,0.2); padding-bottom: 5px; background:transparent; border:none; color:black; width:100%; }
+        .bc-body { font-size: 0.85rem; flex: 1; margin-bottom: 10px; overflow: hidden; background:transparent; border:none; resize:none; width:100%; outline:none; font-family:sans-serif; color:black;}
+        .bc-meta { font-size: 0.75rem; color: rgba(0,0,0,0.6); margin-top: auto; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 5px; }
+        .bc-actions { position: absolute; top: 5px; right: 5px; opacity: 0; transition: opacity 0.2s; }
+        .board-card:hover .bc-actions { opacity: 1; }
+        .bc-btn { background: rgba(255,255,255,0.5); border: none; border-radius: 4px; padding: 4px 6px; cursor: pointer; font-size: 0.7rem; }
+
+        /* --- CONNECTIONS --- */
+        .conn-container { padding-bottom: 50px; }
+        .conn-group { background: var(--bg-panel); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border); }
+        .conn-title { color: var(--accent); font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+        .conn-list { display: flex; flex-wrap: wrap; gap: 10px; }
+        .conn-tag { background: var(--bg-input); padding: 8px 15px; border-radius: 20px; border: 1px solid var(--border); font-size: 0.9rem; color: var(--text-main); }
+        .conn-tag span { color: var(--text-muted); font-size: 0.8rem; margin-left: 5px; }
+
+        /* --- UTILS --- */
+        .wb-grid { display: grid; grid-template-columns: 280px 1fr; gap: 20px; height: 100%; }
+        .wb-list, .wb-detail { background: var(--bg-panel); border-radius: 12px; padding: 15px; overflow-y: auto; border: 1px solid var(--border); }
+        .wb-detail { padding: 30px; }
+        .category-header { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-top: 20px; margin-bottom: 8px; font-weight: 700; }
+        .entity-item { padding: 12px; cursor: pointer; border-radius: 8px; margin-bottom: 5px; transition: 0.2s; }
+        .entity-item:hover { background: var(--bg-input); }
+        .entity-item.active { background: var(--bg-input); color: var(--accent); border-left: 3px solid var(--accent); font-weight: 600; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; color: var(--accent); font-size: 0.85rem; margin-bottom: 8px; font-weight: 700; text-transform: uppercase; }
+        input, select, textarea { width: 100%; padding: 12px; background: var(--bg-input); border: 2px solid var(--border); color: var(--text-main); border-radius: 8px; box-sizing: border-box; font-family: inherit; font-size:16px; transition: border-color 0.2s; }
+        input:focus, select:focus, textarea:focus { border-color: var(--accent); outline: none; }
+        .btn { padding: 10px 20px; background: var(--accent); border: none; color: var(--bg-panel); border-radius: 8px; cursor: pointer; font-weight: 800; }
+        .btn-new { width: 100%; margin-bottom: 15px; background: var(--bg-input); color: var(--text-muted); border: 2px dashed var(--border); }
+        #network-container { width: 100%; height: 85vh; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; }
+
+        /* --- BOOK MODE --- */
+        .book-container { max-width: 800px; margin: 0 auto; padding: 50px; background: var(--bg-body); min-height: 100%; }
+        .book-chapter { margin-bottom: 60px; border-bottom: 2px dashed var(--border); padding-bottom: 40px; }
+        .book-title { color: var(--accent); font-family: 'Georgia', serif; font-size: 2.5rem; margin-bottom: 20px; text-align: center; }
+        .book-body { font-family: 'Georgia', serif; font-size: 1.2rem; line-height: 1.8; color: var(--text-main); white-space: pre-wrap; }
+        .read-actions { display: flex; justify-content: center; gap: 20px; margin-bottom: 40px; }
+
+        /* --- MODALS --- */
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 500; align-items: center; justify-content: center; }
+        .modal-box { background: var(--bg-panel); padding: 30px; border-radius: 12px; width: 90%; max-width: 500px; text-align: left; border: 1px solid var(--accent); max-height: 90vh; overflow-y: auto; }
+
+        /* --- SEARCH RESULTS --- */
+        .search-res-item { background: var(--bg-input); padding: 10px; margin-bottom: 5px; border-radius: 5px; cursor: pointer; }
+        .search-res-item:hover { border-left: 3px solid var(--accent); }
+        .search-highlight { color: var(--accent); font-weight: bold; }
+
+        /* --- DISPLAY VS EDIT MODE STYLES --- */
+        #ent-display, #char-display { color: var(--text-main); }
+        .disp-h2 { color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 0; display:flex; justify-content:space-between; align-items:center; }
+        .disp-row { margin-bottom: 10px; }
+        .disp-label { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; font-weight: bold; }
+        .disp-val { font-size: 1.1rem; }
+        .disp-desc { white-space: pre-wrap; margin-top: 20px; line-height: 1.6; }
+
+        /* --- MOBILE --- */
+        @media (max-width: 768px) {
+            .chapter-sidebar { display: none; position: absolute; left: 0; top: 0; height: 100%; z-index: 200; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
+            .chapter-sidebar.show { display: flex; }
+            .right-panel { width: 100%; height: 40vh; border-left: none; border-top: 2px solid var(--accent); position: absolute; bottom: 0; left: 0; z-index: 200; display: none; margin-right: 0; }
+            .right-panel.mobile-show { display: flex; }
+            .editor-container { padding: 20px; padding-bottom: 100px; }
+            .sidebar { width: 60px; }
+            .wb-grid { display: flex; flex-direction: column; }
+            .wb-list { height: 200px; }
+            .board-container { justify-content: center; }
+            #mobChaptersBtn { display: flex !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <button class="nav-btn library-btn" onclick="openLibrary()" title="Library"><i class="fas fa-book-journal-whills"></i></button>
+        <button class="nav-btn" onclick="openRetcon()" title="Retcon (Find/Replace)"><i class="fas fa-magic"></i></button>
+        <button class="nav-btn" onclick="openGlobalSearch()" title="Global Search"><i class="fas fa-search"></i></button>
+        <button class="nav-btn" onclick="triggerSpark()" title="Spark Idea Generator"><i class="fas fa-dice"></i></button>
+        <hr style="width:50%; border:0; border-bottom:1px solid var(--border); margin:10px 0;">
+        <button class="nav-btn active" onclick="setTab('write')" title="Writer"><i class="fas fa-pen-nib"></i></button>
+        <button class="nav-btn" onclick="setTab('read')" title="Read & Export"><i class="fas fa-book-open"></i></button>
+        <button class="nav-btn" onclick="setTab('world')"><i class="fas fa-globe-americas"></i></button>
+        <button class="nav-btn" onclick="setTab('chars')"><i class="fas fa-users"></i></button>
+        <button class="nav-btn" onclick="setTab('board')"><i class="fas fa-th-large"></i></button>
+        <button class="nav-btn" onclick="setTab('conn')"><i class="fas fa-link"></i></button>
+        <div style="margin-top:auto;"></div>
+        
+        <button class="nav-btn" onclick="toggleTheme()"><i class="fas fa-adjust"></i></button>
+        <button class="nav-btn" onclick="saveToDisk()"><i class="fas fa-save"></i></button>
+        <button class="nav-btn" onclick="document.getElementById('loadInput').click()"><i class="fas fa-upload"></i></button>
+        <input type="file" id="loadInput" hidden onchange="loadFromDisk(this)">
+    </div>
+
+    <div class="main-stage">
+        
+        <div id="view-write" class="view-section active">
+            <div class="chapter-sidebar" id="chapterSidebar">
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">Chapters (Drag to Reorder)</div>
+                <div id="chapterList"></div>
+                <button class="btn-new" onclick="createChapter()" style="margin-top:10px;">+ New Chapter</button>
+            </div>
+            <div class="editor-container">
+                <div class="editor-header-row">
+                    <div id="storyHeader" style="color:var(--text-muted); font-size:0.8rem; text-transform:uppercase;"></div>
+                    <div class="save-indicator" id="saveIndicator"><i class="fas fa-check-circle"></i> Saved</div>
+                </div>
+                
+                <input type="text" id="chapterTitle" class="editor-title" placeholder="Chapter Title" oninput="showSaving()">
+                
+                <div class="editor-toolbar">
+                    <button class="fmt-btn" id="btnBold" onmousedown="event.preventDefault(); formatDoc('bold')" title="Bold (Ctrl+B)"><i class="fas fa-bold"></i></button>
+                    <button class="fmt-btn" id="btnItalic" onmousedown="event.preventDefault(); formatDoc('italic')" title="Italic (Ctrl+I)"><i class="fas fa-italic"></i></button>
+                    <button class="fmt-btn" id="btnUnderline" onmousedown="event.preventDefault(); formatDoc('underline')" title="Underline (Ctrl+U)"><i class="fas fa-underline"></i></button>
+                    
+                    <button class="fmt-btn" id="btnSpell" onmousedown="event.preventDefault(); toggleSpellcheck()" title="Toggle Spellcheck (AB Checkmark)"><i class="fas fa-spell-check"></i></button>
+                    
+                    <div class="divider"></div>
+                    
+                    <select class="toolbar-select" onchange="formatDoc('formatBlock', this.value); this.value='';">
+                        <option value="">Style...</option>
+                        <option value="p">Normal Text</option>
+                        <option value="h2">Heading 1 (Scene)</option>
+                        <option value="h3">Heading 2 (Sub)</option>
+                        <option value="blockquote">Quote</option>
+                    </select>
+
+                    <select class="toolbar-select" onchange="setEditorSize(this.value)">
+                        <option value="0.9rem">Small</option>
+                        <option value="1.15rem" selected>Normal</option>
+                        <option value="1.4rem">Large</option>
+                        <option value="1.8rem">Huge</option>
+                    </select>
+
                     <div class="divider"></div>
                     <button class="fmt-btn" id="btnLeft" onmousedown="event.preventDefault(); formatDoc('justifyLeft')" title="Left (Ctrl+L)"><i class="fas fa-align-left"></i></button>
                     <button class="fmt-btn" id="btnCenter" onmousedown="event.preventDefault(); formatDoc('justifyCenter')" title="Center (Ctrl+E)"><i class="fas fa-align-center"></i></button>
@@ -465,7 +1397,11 @@
             if(saved) { appData = JSON.parse(saved); } else { createWorld("First World", true); }
             loadActiveWorld(); initBoardSortable();
             
-            window.addEventListener('beforeunload', function (e) { e.preventDefault(); e.returnValue = ''; });
+            // CRASH GUARD
+            window.addEventListener('beforeunload', function (e) {
+                e.preventDefault();
+                e.returnValue = '';
+            });
 
             const editor = document.getElementById('chapterContent');
             editor.addEventListener('keydown', function(e) {
@@ -485,6 +1421,11 @@
             setTimeout(() => { sessionStartCount = countWords(document.body.innerText); }, 500);
         };
 
+        // --- SIZE & STYLE PRESETS ---
+        function setEditorSize(val) {
+            document.documentElement.style.setProperty('--editor-font-size', val);
+        }
+
         function updateWordCount() {
             if(!currentWorld || !activeChapterId) return;
             const content = document.getElementById('chapterContent').innerText || "";
@@ -503,6 +1444,12 @@
         function setSessionGoal() {
             const val = prompt("Set Daily Word Goal:", dailyGoal);
             if(val && !isNaN(val)) { dailyGoal = parseInt(val); document.getElementById('wc-goal').innerText = dailyGoal; updateWordCount(); }
+        }
+        function changeFontSize(dir) {
+            currentFontSize += (dir * 0.1);
+            if(currentFontSize < 0.8) currentFontSize = 0.8;
+            if(currentFontSize > 2.5) currentFontSize = 2.5;
+            document.documentElement.style.setProperty('--editor-font-size', currentFontSize + 'rem');
         }
         function countWords(str) { return str.trim().split(/\s+/).filter(word => word.length > 0).length; }
 
@@ -558,8 +1505,11 @@
             document.getElementById('chapterTitle').value = ch.title;
             document.getElementById('chapterContent').innerHTML = ch.content;
             document.getElementById('chapterNotes').value = ch.notes || '';
+            
+            // Set Spellcheck state if saved, else default to false
             document.getElementById('chapterContent').spellcheck = false;
             document.getElementById('btnSpell').classList.remove('active');
+            
             renderChapterList(); updateWordCount();
         }
         function saveCurrentBuffer() {
@@ -575,8 +1525,10 @@
             const list = document.getElementById('chapterList'); list.innerHTML = '';
             currentWorld.data.chapters.forEach(ch => { 
                 const statusClass = ch.status || 'draft';
+                // Calc words
                 const div = document.createElement('div'); div.innerHTML = ch.content;
                 const wc = countWords(div.innerText || "");
+                
                 list.innerHTML += `
                 <div class="chapter-item ${ch.id === activeChapterId ? 'active' : ''}" data-id="${ch.id}" onclick="loadChapter('${ch.id}')">
                     <span class="chapter-handle"><i class="fas fa-grip-vertical"></i></span>
@@ -619,23 +1571,6 @@
 
         function formatDoc(cmd, value=null) { document.execCommand(cmd, false, value); document.getElementById('chapterContent').focus(); checkFormat(); }
         
-        function resizeSel(dir) {
-            // Apply font size to selection (1-7 scale)
-            // We'll use a trick: get current size (approx) or just toggle Big/Small
-            // Better yet: wrap in span with font-size style
-            const sel = window.getSelection();
-            if(!sel.rangeCount) return;
-            // Native execCommand fontSize is 1-7. Let's map.
-            // A+ = size 5 (Big), A- = size 2 (Small), Normal = 3
-            // This is simple but robust for single file
-            // Let's cycle: 3 (default) -> 5 (Big) -> 7 (Huge)
-            // Or just use 'fontSize' with values
-            // To support specific increment, we'd need complex span parsing.
-            // Let's stick to: A+ makes it Large (h3 like), A- makes it Small.
-            if(dir > 0) document.execCommand('fontSize', false, '5');
-            else document.execCommand('fontSize', false, '2');
-        }
-
         function toggleSpellcheck() {
             const editor = document.getElementById('chapterContent');
             const btn = document.getElementById('btnSpell');
@@ -731,10 +1666,10 @@
         function openLibrary() { renderLib(); document.getElementById('libModal').style.display = 'flex'; }
         function renderLib() { const div = document.getElementById('libList'); div.innerHTML = ''; appData.worlds.forEach(w => { div.innerHTML += `<div style="padding:10px; background:var(--bg-input); margin-bottom:5px; cursor:pointer; border-radius:5px; ${w.id===appData.activeId?'border:1px solid var(--accent);':''}" onclick="switchWorld('${w.id}')">${w.name}</div>`; }); }
         function setTab(tabId) { 
-            // Reset Detail Views if navigating away
+            // Reset Detail Views
             if(tabId === 'world' || tabId === 'chars') {
                 createNewEntity(tabId === 'world' ? 'world' : 'char');
-                toggleEditMode(tabId === 'world' ? 'world' : 'char', true); // Default to edit
+                toggleEditMode(tabId === 'world' ? 'world' : 'char', true);
             }
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active')); document.getElementById('view-' + tabId).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active')); event.currentTarget.classList.add('active'); if(tabId === 'conn') renderConnections(); if(tabId === 'read') renderBook(); 
         }
@@ -745,7 +1680,6 @@
         
         function createNewEntity(type) { 
             document.getElementById(type === 'world' ? 'wId' : 'cId').value = Date.now().toString();
-            // Clear inputs
             if(type === 'world') { document.getElementById('wName').value = ''; document.getElementById('wTime').value = ''; document.getElementById('wDesc').value = ''; }
             else { document.getElementById('cName').value = ''; document.getElementById('cBirth').value = ''; document.getElementById('cGoal').value = ''; document.getElementById('cNotes').value = ''; }
             toggleEditMode(type, true);
@@ -761,7 +1695,8 @@
                     const idx = currentWorld.data.chars.findIndex(x => x.id === id);
                     if(idx > -1) currentWorld.data.chars.splice(idx, 1);
                 }
-                saveAll(); refreshLists(); createNewEntity(type);
+                saveAll(); refreshLists(); searchWiki();
+                createNewEntity(type);
             }
         }
         function saveEntity(type) { 
@@ -783,13 +1718,11 @@
             const data = type === 'world' ? currentWorld.data.world.find(x => x.id === id) : currentWorld.data.chars.find(x => x.id === id); 
             if(!data) return; 
             
-            // Populate Read View
             if(type === 'world') {
                 document.getElementById('d-wName').innerText = data.name;
                 document.getElementById('d-wType').innerText = data.type;
                 document.getElementById('d-wTime').innerText = data.time || 'N/A';
                 document.getElementById('d-wDesc').innerText = data.desc;
-                // Populate Inputs
                 document.getElementById('wId').value = data.id; document.getElementById('wName').value = data.name; document.getElementById('wType').value = data.type; document.getElementById('wTime').value = data.time || ''; document.getElementById('wDesc').value = data.desc;
             } else {
                 document.getElementById('d-cName').innerText = data.name;
@@ -799,7 +1732,6 @@
                 document.getElementById('d-cBirth').innerText = data.birth || '-';
                 document.getElementById('d-cGoal').innerText = data.goal || '-';
                 document.getElementById('d-cNotes').innerText = data.notes;
-                // Populate Inputs
                 document.getElementById('cId').value = data.id; document.getElementById('cName').value = data.name; document.getElementById('cRace').value = data.race; document.getElementById('cRole').value = data.role; document.getElementById('cGod').value = data.god; document.getElementById('cBirth').value = data.birth || ''; document.getElementById('cGoal').value = data.goal; document.getElementById('cNotes').value = data.notes;
             }
             toggleEditMode(type, false);
