@@ -23,6 +23,7 @@
             --card-shadow: 0 4px 6px rgba(0,0,0,0.3);
             --note-major: #ffb7b2; --note-sub: #a0c4ff; --note-filler: #b9fbc0; --note-default: #fdffb6;
             --status-draft: #ff6b6b; --status-edit: #feca57; --status-done: #4caf50;
+            --editor-font-size: 1.15rem; /* Dynamic Font Size */
         }
         body.light-mode {
             --bg-body: #fdf6e3; --bg-panel: #eee8d5; --bg-input: #ffffff;
@@ -34,10 +35,13 @@
 
         /* --- SIDEBAR --- */
         .sidebar { width: 70px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 20px; z-index: 100; box-shadow: 2px 0 10px rgba(0,0,0,0.1); flex-shrink: 0; transition: width 0.3s, padding 0.3s; }
-        .nav-btn { width: 48px; height: 48px; border-radius: 14px; border: none; background: transparent; color: var(--text-muted); font-size: 1.3rem; margin-bottom: 15px; cursor: pointer; transition: 0.2s; }
+        .nav-btn { width: 48px; height: 48px; border-radius: 14px; border: none; background: transparent; color: var(--text-muted); font-size: 1.3rem; margin-bottom: 10px; cursor: pointer; transition: 0.2s; }
         .nav-btn:hover { color: var(--accent); background: var(--bg-input); }
         .nav-btn.active { color: var(--bg-panel); background: var(--accent); box-shadow: 0 4px 12px var(--accent-dim); }
         .library-btn { border: 2px solid var(--accent-sec); color: var(--accent-sec); }
+        /* Font Controls */
+        .font-ctrl-group { display:flex; flex-direction:column; gap:5px; margin-bottom:15px; border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:10px 0; width:100%; align-items:center; }
+        .font-btn { font-size:0.8rem; height:30px; width:48px; }
 
         /* --- LAYOUT --- */
         .main-stage { flex: 1; position: relative; display: flex; overflow: hidden; transition: all 0.3s; }
@@ -79,7 +83,17 @@
         .divider { width: 1px; background: var(--border); height: 20px; margin: 5px 2px; }
 
         .editor-title { width: 100%; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--accent); font-size: 1.8rem; padding: 15px; box-sizing: border-box; font-family: 'Georgia', serif; font-weight: bold; margin-bottom: 20px; outline: none; }
-        .editor-area { width: 100%; min-height: 60vh; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--text-main); font-size: 1.15rem; line-height: 1.8; padding: 30px; box-sizing: border-box; font-family: 'Georgia', serif; outline: none; overflow-y: visible; flex:1; }
+        
+        /* EDITOR AREA WITH TYPEWRITER PADDING & DYNAMIC FONT */
+        .editor-area { 
+            width: 100%; min-height: 60vh; 
+            background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; 
+            color: var(--text-main); 
+            font-size: var(--editor-font-size); /* DYNAMIC SIZE */
+            line-height: 1.8; 
+            padding: 30px; padding-bottom: 50vh; /* TYPEWRITER PADDING */
+            box-sizing: border-box; font-family: 'Georgia', serif; outline: none; overflow-y: visible; flex:1; 
+        }
         .editor-area b { color: inherit; font-weight: bold; }
         
         #wikiToggleBtn { position: absolute; top: 20px; right: 20px; z-index: 50; background: var(--bg-panel); color: var(--accent); border: 2px solid var(--accent); border-radius: 50%; width: 44px; height: 44px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s; }
@@ -200,6 +214,12 @@
         <button class="nav-btn" onclick="setTab('board')"><i class="fas fa-th-large"></i></button>
         <button class="nav-btn" onclick="setTab('conn')"><i class="fas fa-link"></i></button>
         <div style="margin-top:auto;"></div>
+        
+        <div class="font-ctrl-group">
+            <button class="nav-btn font-btn" onclick="changeFontSize(1)" title="Increase Font">A+</button>
+            <button class="nav-btn font-btn" onclick="changeFontSize(-1)" title="Decrease Font">A-</button>
+        </div>
+
         <button class="nav-btn" onclick="toggleTheme()"><i class="fas fa-adjust"></i></button>
         <button class="nav-btn" onclick="saveToDisk()"><i class="fas fa-save"></i></button>
         <button class="nav-btn" onclick="document.getElementById('loadInput').click()"><i class="fas fa-upload"></i></button>
@@ -396,6 +416,7 @@
         let sessionStartCount = 0;
         let saveTimer = null;
         let dailyGoal = 500;
+        let currentFontSize = 1.15; // rem
 
         window.onload = () => {
             if(localStorage.getItem('wsTheme') === 'light') toggleTheme(true);
@@ -403,6 +424,12 @@
             if(saved) { appData = JSON.parse(saved); } else { createWorld("First World", true); }
             loadActiveWorld(); initBoardSortable();
             
+            // CRASH GUARD
+            window.addEventListener('beforeunload', function (e) {
+                e.preventDefault();
+                e.returnValue = '';
+            });
+
             const editor = document.getElementById('chapterContent');
             editor.addEventListener('keydown', function(e) {
                 if(e.ctrlKey || e.metaKey) {
@@ -439,6 +466,12 @@
         function setSessionGoal() {
             const val = prompt("Set Daily Word Goal:", dailyGoal);
             if(val && !isNaN(val)) { dailyGoal = parseInt(val); document.getElementById('wc-goal').innerText = dailyGoal; updateWordCount(); }
+        }
+        function changeFontSize(dir) {
+            currentFontSize += (dir * 0.1);
+            if(currentFontSize < 0.8) currentFontSize = 0.8;
+            if(currentFontSize > 2.5) currentFontSize = 2.5;
+            document.documentElement.style.setProperty('--editor-font-size', currentFontSize + 'rem');
         }
         function countWords(str) { return str.trim().split(/\s+/).filter(word => word.length > 0).length; }
 
