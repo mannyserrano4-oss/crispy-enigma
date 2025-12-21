@@ -3,12 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="WorldSmith">
-    <link rel="apple-touch-icon" href="icon.png">
-
-    <title>The World Smith</title>
+    <title>The World Smith (Offline)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
@@ -32,7 +27,7 @@
         body { margin: 0; background-color: var(--bg-body); color: var(--text-main); font-family: 'Segoe UI', sans-serif; height: 100vh; display: flex; overflow: hidden; transition: background 0.3s ease; }
 
         /* --- SIDEBAR --- */
-        .sidebar { width: 70px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 20px; z-index: 100; box-shadow: 2px 0 10px rgba(0,0,0,0.1); flex-shrink: 0; transition: width 0.3s, padding 0.3s; }
+        .sidebar { width: 70px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 20px; z-index: 100; box-shadow: 2px 0 10px rgba(0,0,0,0.1); flex-shrink: 0; }
         .nav-btn { width: 48px; height: 48px; border-radius: 14px; border: none; background: transparent; color: var(--text-muted); font-size: 1.3rem; margin-bottom: 10px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
         .nav-btn:hover { color: var(--accent); background: var(--bg-input); }
         .nav-btn.active { color: var(--bg-panel); background: var(--accent); box-shadow: 0 4px 12px var(--accent-dim); }
@@ -43,14 +38,14 @@
         .backup-needed { color: #ff6b6b !important; animation: pulse-red 2s infinite; border: 1px solid #ff6b6b; }
 
         /* --- LAYOUT --- */
-        .main-stage { flex: 1; position: relative; display: flex; overflow: hidden; transition: all 0.3s; }
+        .main-stage { flex: 1; position: relative; display: flex; overflow: hidden; }
         .view-section { display: none; width: 100%; height: 100%; padding: 20px; box-sizing: border-box; overflow-y: auto; }
         .view-section.active { display: block; }
 
         /* --- WRITING DESK --- */
         #view-write { padding: 0; display:none; }
         #view-write.active { display: flex; overflow: hidden; }
-        .chapter-sidebar { width: 220px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 10px; flex-shrink: 0; overflow-y: auto; transition: width 0.3s, padding 0.3s; }
+        .chapter-sidebar { width: 220px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 10px; flex-shrink: 0; overflow-y: auto; }
         
         /* DRAG AND DROP STYLES */
         .draggable-item { cursor: grab; user-select: none; }
@@ -108,28 +103,29 @@
         .progress-container { width: 150px; height: 6px; background: var(--bg-input); border-radius: 3px; overflow: hidden; display: flex; }
         .progress-fill { height: 100%; background: #4caf50; width: 0%; transition: width 0.3s; }
 
-        /* RIGHT PANEL */
-        .right-panel { width: 350px; background: var(--bg-panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; padding: 15px; flex-shrink: 0; transition: margin-right 0.3s ease-in-out; margin-right: 0; }
-        .right-panel.collapsed { margin-right: -381px; }
+        /* RIGHT PANEL (WIKI) - Now collapses properly */
+        .right-panel { width: 0; overflow: hidden; background: var(--bg-panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; padding: 0; flex-shrink: 0; transition: width 0.3s, padding 0.3s; }
+        .right-panel.open { width: 350px; padding: 15px; }
+
         .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .panel-toggle-tabs { width: 100%; display: flex; margin-bottom: 15px; background: var(--bg-input); border-radius: 8px; padding: 4px; box-sizing: border-box; }
         .p-tab { flex: 1; text-align: center; padding: 8px; border-radius: 6px; cursor: pointer; color: var(--text-muted); font-weight: bold; font-size: 0.8rem; transition: 0.2s; }
         .p-tab.active { background: var(--bg-panel); color: var(--accent); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        
         #panel-wiki, #panel-notes { display: none; flex-direction: column; height: 100%; flex: 1; }
         #panel-wiki.active, #panel-notes.active { display: flex; }
+        
         .wiki-tabs { display: flex; gap: 5px; margin-bottom: 10px; }
         .w-tab { flex: 1; padding: 8px; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; border-radius: 6px; font-size: 0.8rem; font-weight: bold; }
         .w-tab.active { background: var(--accent); color: var(--bg-panel); border-color: var(--accent); }
         .wiki-search { width: 100%; padding: 12px; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; }
         .wiki-results { flex: 1; overflow-y: auto; padding-right: 5px; }
-        
         .wiki-card { background: var(--bg-input); padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--accent); cursor: pointer; box-shadow: var(--card-shadow); transition: 0.2s; }
         .wiki-card:hover { background: var(--bg-panel); border-color: var(--accent-sec); }
         .wiki-card h4 { margin: 0; color: var(--accent); font-size: 1rem; display: flex; justify-content: space-between; }
         .wiki-card small { color: var(--text-muted); font-size: 0.75rem; font-weight: normal; }
         .wiki-desc { display: none; margin-top: 10px; font-size: 0.85rem; color: var(--text-main); padding-top: 10px; border-top: 1px solid var(--border); white-space: pre-wrap; }
         .wiki-card.expanded .wiki-desc { display: block; }
-        
         .notes-area { flex: 1; width: 100%; height: 100%; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); padding: 15px; box-sizing: border-box; border-radius: 8px; resize: none; font-family: sans-serif; font-size: 1rem; line-height: 1.5; }
 
         /* --- THE BOARD --- */
@@ -204,6 +200,7 @@
             .chapter-sidebar.show { display: flex; }
             .right-panel { width: 100%; height: 40vh; border-left: none; border-top: 2px solid var(--accent); position: absolute; bottom: 0; left: 0; z-index: 200; display: none; margin-right: 0; }
             .right-panel.mobile-show { display: flex; }
+            .right-panel.open { width: 100%; } /* Mobile full width */
             .editor-container { padding: 20px; padding-bottom: 100px; }
             .sidebar { width: 60px; }
             .wb-grid { display: flex; flex-direction: column; }
@@ -260,19 +257,15 @@
                     
                     <div class="divider"></div>
                     
-                    <select class="toolbar-select" onchange="formatDoc('formatBlock', this.value); this.value='';">
-                        <option value="">Style...</option>
-                        <option value="p">Normal Text</option>
-                        <option value="h2">Heading 1 (Scene)</option>
-                        <option value="h3">Heading 2 (Sub)</option>
-                        <option value="blockquote">Quote</option>
-                    </select>
-
-                    <select class="toolbar-select" onchange="formatDoc('fontSize', this.value); this.value='3';">
-                        <option value="1">Small</option>
-                        <option value="3" selected>Normal</option>
-                        <option value="5">Large</option>
-                        <option value="7">Huge</option>
+                    <select class="toolbar-select" onchange="formatDoc('fontSize', this.value); this.value='';">
+                        <option value="">Text Size...</option>
+                        <option value="1">1 (Tiny)</option>
+                        <option value="2">2 (Small)</option>
+                        <option value="3">3 (Normal)</option>
+                        <option value="4">4 (Medium)</option>
+                        <option value="5">5 (Large)</option>
+                        <option value="6">6 (Huge)</option>
+                        <option value="7">7 (Massive)</option>
                     </select>
 
                     <div class="divider"></div>
@@ -301,6 +294,7 @@
                 <button onclick="toggleMobileChapters()" style="position:absolute; top:20px; left:20px; z-index:50; background:var(--bg-panel); color:var(--text-muted); border:1px solid var(--border); border-radius:50%; width:44px; height:44px; display:none; justify-content:center; align-items:center;" id="mobChaptersBtn"><i class="fas fa-list"></i></button>
                 <button onclick="toggleRightPanel()" id="wikiToggleBtn"><i class="fas fa-book"></i></button>
             </div>
+            
             <div class="right-panel" id="rightPanel">
                 <div class="panel-header"></div>
                 <div class="panel-toggle-tabs">
@@ -767,7 +761,7 @@
                         namesHtml += `<div><i class="fas fa-user"></i> ${cleanName}${ageStr}</div>`;
                     });
                 }
-                div.innerHTML += `<div class="board-card draggable-item ${typeClass}" draggable="true"><div class="bc-actions"><button class="bc-btn" onclick="openEventDetails(${ev.id})"><i class="fas fa-edit"></i></button><button class="bc-btn" onclick="deleteEvent(${ev.id})"><i class="fas fa-trash"></i></button></div><input class="bc-header" value="${ev.title}" onchange="updateEventText(${ev.id}, 'title', this.value)"><textarea class="bc-body" onchange="updateEventText(${ev.id}, 'desc', this.value)">${ev.desc}</textarea><div class="bc-meta">${namesHtml}${ev.where ? '<i class="fas fa-map-marker-alt"></i> '+ev.where + '<br>' : ''}${timeStr}</div></div>`;
+                div.innerHTML += `<div class="board-card draggable-item ${typeClass}" draggable="true"><div class="bc-actions"><button class="bc-btn" onclick="openEventDetails(${ev.id})"><i class="fas fa-edit"></i></button><button class="bc-btn" onclick="deleteEvent(${ev.id})"><i class="fas fa-trash"></i></button></div><input class="bc-header" value="${ev.title}" onchange="updateEventText(${ev.id}, 'title', this.value)"><textarea class="bc-body" onchange="updateEventText(${ev.id}, 'desc', this.value)">${ev.desc}</textarea><div class="bc-meta">${namesHtml}${ev.where ? '📍 '+ev.where + '<br>' : ''}${timeStr}</div></div>`;
             });
             document.querySelectorAll('#boardList .draggable-item').forEach(addDnDHandlers);
         }
@@ -908,6 +902,14 @@
         
         function saveToDisk() { const blob = new Blob([JSON.stringify(appData)], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'WorldSmith_Multiverse.json'; a.click(); lastBackupTime = Date.now(); document.getElementById('saveBtn').classList.remove('backup-needed'); }
         function loadFromDisk(input) { const r = new FileReader(); r.onload = (e) => { try { appData = JSON.parse(e.target.result); switchWorld(appData.activeId); location.reload(); } catch(err) { alert("Invalid File"); } }; r.readAsText(input.files[0]); }
+        function toggleRightPanel() { const p = document.getElementById('rightPanel'); p.classList.toggle('open'); }
+        function toggleMobileChapters() { document.getElementById('chapterSidebar').classList.toggle('show'); }
+        function setRightPanel(view) {
+            document.getElementById('panel-wiki').className = view === 'wiki' ? 'active' : '';
+            document.getElementById('panel-notes').className = view === 'notes' ? 'active' : '';
+            document.getElementById('tabWikiBtn').className = view === 'wiki' ? 'p-tab active' : 'p-tab';
+            document.getElementById('tabNotesBtn').className = view === 'notes' ? 'p-tab active' : 'p-tab';
+        }
         function searchWiki() {
             const typeColors = { "Character": "var(--accent-sec)", "Location": "#66bb6a", "History": "#ef5350", "Race": "#26c6da", "Religion": "#ab47bc", "Faction": "#ffa726", "Magic": "#42a5f5" };
             const filter = document.getElementById('wikiFilter').value;
