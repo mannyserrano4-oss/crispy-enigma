@@ -62,7 +62,8 @@
 
         .editor-title { width: 100%; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--accent); font-size: 1.8rem; padding: 15px; box-sizing: border-box; font-family: 'Georgia', serif; font-weight: bold; margin-bottom: 20px; outline: none; }
         .editor-area { width: 100%; min-height: 70vh; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--text-main); font-size: 1.15rem; line-height: 1.8; padding: 30px; box-sizing: border-box; font-family: 'Georgia', serif; outline: none; overflow-y: visible; }
-        .editor-area b { color: var(--accent); }
+        
+        /* REMOVED: .editor-area b { color: var(--accent); } to stop purple text */
         
         #wikiToggleBtn { position: absolute; top: 20px; right: 20px; z-index: 50; background: var(--bg-panel); color: var(--accent); border: 2px solid var(--accent); border-radius: 50%; width: 44px; height: 44px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s; }
         #wikiToggleBtn:hover { transform: scale(1.1); }
@@ -179,7 +180,6 @@
             <div class="editor-container">
                 <div id="storyHeader" style="margin-bottom:10px; color:var(--text-muted); font-size:0.8rem; text-transform:uppercase;"></div>
                 <input type="text" id="chapterTitle" class="editor-title" placeholder="Chapter Title" oninput="autoSave()">
-                
                 <div class="editor-toolbar">
                     <button class="fmt-btn" id="btnBold" onmousedown="event.preventDefault(); formatDoc('bold')" title="Bold (Ctrl+B)"><i class="fas fa-bold"></i></button>
                     <button class="fmt-btn" id="btnItalic" onmousedown="event.preventDefault(); formatDoc('italic')" title="Italic (Ctrl+I)"><i class="fas fa-italic"></i></button>
@@ -190,9 +190,7 @@
                     <button class="fmt-btn" id="btnRight" onmousedown="event.preventDefault(); formatDoc('justifyRight')" title="Right (Ctrl+R)"><i class="fas fa-align-right"></i></button>
                     <button class="fmt-btn" id="btnJustify" onmousedown="event.preventDefault(); formatDoc('justifyFull')" title="Justify (Ctrl+J)"><i class="fas fa-align-justify"></i></button>
                 </div>
-
                 <div id="chapterContent" class="editor-area" contenteditable="true" oninput="autoSave()"></div>
-                
                 <button onclick="toggleMobileChapters()" style="position:absolute; top:20px; left:20px; z-index:50; background:var(--bg-panel); color:var(--text-muted); border:1px solid var(--border); border-radius:50%; width:44px; height:44px; display:none; justify-content:center; align-items:center;" id="mobChaptersBtn"><i class="fas fa-list"></i></button>
                 <button onclick="toggleRightPanel()" id="wikiToggleBtn"><i class="fas fa-book"></i></button>
             </div>
