@@ -23,7 +23,6 @@
             --card-shadow: 0 4px 6px rgba(0,0,0,0.3);
             --note-major: #ffb7b2; --note-sub: #a0c4ff; --note-filler: #b9fbc0; --note-default: #fdffb6;
             --status-draft: #ff6b6b; --status-edit: #feca57; --status-done: #4caf50;
-            --editor-font-size: 1.15rem;
         }
         body.light-mode {
             --bg-body: #fdf6e3; --bg-panel: #eee8d5; --bg-input: #ffffff;
@@ -34,75 +33,53 @@
         body { margin: 0; background-color: var(--bg-body); color: var(--text-main); font-family: 'Segoe UI', sans-serif; height: 100vh; display: flex; overflow: hidden; transition: background 0.3s ease; }
 
         /* --- SIDEBAR --- */
-        .sidebar { width: 70px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 20px; z-index: 100; box-shadow: 2px 0 10px rgba(0,0,0,0.1); flex-shrink: 0; transition: width 0.3s, padding 0.3s; }
+        .sidebar { width: 70px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 20px; z-index: 100; box-shadow: 2px 0 10px rgba(0,0,0,0.1); flex-shrink: 0; }
         .nav-btn { width: 48px; height: 48px; border-radius: 14px; border: none; background: transparent; color: var(--text-muted); font-size: 1.3rem; margin-bottom: 10px; cursor: pointer; transition: 0.2s; }
         .nav-btn:hover { color: var(--accent); background: var(--bg-input); }
         .nav-btn.active { color: var(--bg-panel); background: var(--accent); box-shadow: 0 4px 12px var(--accent-dim); }
         .library-btn { border: 2px solid var(--accent-sec); color: var(--accent-sec); }
-        .font-ctrl-group { display:flex; flex-direction:column; gap:5px; margin-bottom:15px; border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:10px 0; width:100%; align-items:center; }
-        .font-btn { font-size:0.8rem; height:30px; width:48px; }
 
         /* --- LAYOUT --- */
-        .main-stage { flex: 1; position: relative; display: flex; overflow: hidden; transition: all 0.3s; }
+        .main-stage { flex: 1; position: relative; display: flex; overflow: hidden; }
         .view-section { display: none; width: 100%; height: 100%; padding: 20px; box-sizing: border-box; overflow-y: auto; }
         .view-section.active { display: block; }
 
         /* --- WRITING DESK --- */
         #view-write { padding: 0; display:none; }
         #view-write.active { display: flex; overflow: hidden; }
-        .chapter-sidebar { width: 220px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 10px; flex-shrink: 0; overflow-y: auto; transition: width 0.3s, padding 0.3s; }
-        
-        .chapter-item { padding: 10px; border-radius: 6px; cursor: grab; margin-bottom: 5px; color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; group; }
+        .chapter-sidebar { width: 220px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 10px; flex-shrink: 0; overflow-y: auto; }
+        .chapter-item { padding: 10px; border-radius: 6px; cursor: grab; margin-bottom: 5px; color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; }
         .chapter-item:hover { background: var(--bg-input); }
         .chapter-item.active { background: var(--bg-input); color: var(--accent); border-left: 3px solid var(--accent); font-weight: bold; }
-        
-        .chapter-info { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
-        .chapter-title-text { white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
-        .chapter-wc { font-size: 0.7rem; color: var(--text-muted); opacity: 0.7; }
-        
+        .chapter-drag-area { display: flex; align-items: center; flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
         .chapter-handle { margin-right: 8px; color: var(--text-muted); opacity: 0.5; cursor: grab; flex-shrink: 0; }
-        
-        /* UPDATED ACTIONS SPACING */
         .chapter-actions { display: flex; align-items: center; gap: 15px; flex-shrink: 0; padding-right:5px; }
-        
-        /* BIGGER TRAFFIC LIGHT DOT */
         .chapter-status-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--text-muted); cursor: pointer; border: 1px solid var(--bg-panel); transition: transform 0.2s; }
         .chapter-status-dot:hover { transform: scale(1.2); }
-        .chapter-status-dot.draft { background: var(--status-draft); }
-        .chapter-status-dot.edit { background: var(--status-edit); }
-        .chapter-status-dot.done { background: var(--status-done); }
-        
+        .chapter-status-dot.draft { background: var(--status-draft); } .chapter-status-dot.edit { background: var(--status-edit); } .chapter-status-dot.done { background: var(--status-done); }
         .chapter-delete-btn { color: var(--text-muted); cursor: pointer; opacity: 0; transition: 0.2s; padding: 2px; font-size: 0.9rem; }
-        .chapter-item:hover .chapter-delete-btn { opacity: 1; }
-        .chapter-delete-btn:hover { color: #ff6b6b; }
+        .chapter-item:hover .chapter-delete-btn { opacity: 1; } .chapter-delete-btn:hover { color: #ff6b6b; }
 
         .editor-container { flex: 1; padding: 20px 10%; padding-bottom: 60px; overflow-y: auto; background: var(--bg-body); transition: all 0.3s; position: relative; display:flex; flex-direction:column;}
-        
         .editor-header-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
         .save-indicator { font-size: 0.8rem; color: var(--text-muted); margin-left: auto; display: flex; align-items: center; gap: 5px; }
-        .save-indicator.saving { color: #ffd700; }
-        .save-indicator.saved { color: #4caf50; }
+        .save-indicator.saving { color: #ffd700; } .save-indicator.saved { color: #4caf50; }
 
         .editor-toolbar { display: flex; gap: 5px; margin-bottom: 10px; background: var(--bg-panel); padding: 5px; border-radius: 8px; width: fit-content; border: 1px solid var(--border); position: sticky; top: 0; z-index: 10; align-items: center; flex-wrap: wrap; }
         .fmt-btn { background: transparent; border: none; color: var(--text-main); width: 30px; height: 30px; cursor: pointer; border-radius: 4px; font-weight: bold; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
-        .fmt-btn:hover { background: var(--bg-input); }
-        .fmt-btn.active { background: var(--accent); color: var(--bg-panel); box-shadow: 0 0 5px var(--accent); }
+        .fmt-btn:hover { background: var(--bg-input); } .fmt-btn.active { background: var(--accent); color: var(--bg-panel); box-shadow: 0 0 5px var(--accent); }
         .divider { width: 1px; background: var(--border); height: 20px; margin: 5px 2px; }
 
         .editor-title { width: 100%; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--accent); font-size: 1.8rem; padding: 15px; box-sizing: border-box; font-family: 'Georgia', serif; font-weight: bold; margin-bottom: 20px; outline: none; }
-        .editor-area { width: 100%; min-height: 60vh; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--text-main); font-size: var(--editor-font-size); line-height: 1.8; padding: 30px; padding-bottom: 50vh; box-sizing: border-box; font-family: 'Georgia', serif; outline: none; overflow-y: visible; flex:1; }
+        .editor-area { width: 100%; min-height: 60vh; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--text-main); font-size: 1.15rem; line-height: 1.8; padding: 30px; padding-bottom: 50vh; box-sizing: border-box; font-family: 'Georgia', serif; outline: none; overflow-y: visible; flex:1; }
         .editor-area b { color: inherit; font-weight: bold; }
         
         #wikiToggleBtn { position: absolute; top: 20px; right: 20px; z-index: 50; background: var(--bg-panel); color: var(--accent); border: 2px solid var(--accent); border-radius: 50%; width: 44px; height: 44px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s; }
         #wikiToggleBtn:hover { transform: scale(1.1); }
 
         /* ZEN MODE */
-        body.zen-mode .sidebar { width: 0; padding: 0; overflow: hidden; border: none; }
-        body.zen-mode .chapter-sidebar { width: 0; padding: 0; overflow: hidden; border: none; }
-        body.zen-mode .right-panel { width: 0; padding: 0; overflow: hidden; border: none; }
+        body.zen-mode .sidebar, body.zen-mode .chapter-sidebar, body.zen-mode .right-panel, body.zen-mode #wikiToggleBtn, body.zen-mode #mobChaptersBtn { display: none !important; }
         body.zen-mode .editor-container { padding: 40px 20%; }
-        body.zen-mode #wikiToggleBtn { display: none; }
-        body.zen-mode #mobChaptersBtn { display: none; }
 
         /* STATS BAR */
         .stats-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 40px; background: var(--bg-panel); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-sizing: border-box; font-size: 0.8rem; color: var(--text-muted); z-index: 20; cursor: pointer; transition: background 0.2s; }
@@ -113,7 +90,7 @@
         .progress-fill { height: 100%; background: #4caf50; width: 0%; transition: width 0.3s; }
 
         /* RIGHT PANEL */
-        .right-panel { width: 350px; background: var(--bg-panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; padding: 15px; flex-shrink: 0; transition: margin-right 0.3s ease-in-out; margin-right: 0; transition: width 0.3s, padding 0.3s; }
+        .right-panel { width: 350px; background: var(--bg-panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; padding: 15px; flex-shrink: 0; transition: margin-right 0.3s ease-in-out; margin-right: 0; }
         .right-panel.collapsed { margin-right: -381px; }
         .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .panel-toggle-tabs { width: 100%; display: flex; margin-bottom: 15px; background: var(--bg-input); border-radius: 8px; padding: 4px; box-sizing: border-box; }
@@ -126,7 +103,7 @@
         .w-tab.active { background: var(--accent); color: var(--bg-panel); border-color: var(--accent); }
         .wiki-search { width: 100%; padding: 12px; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; }
         .wiki-results { flex: 1; overflow-y: auto; padding-right: 5px; }
-        .wiki-card { background: var(--bg-input); padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--accent); cursor: pointer; box-shadow: var(--card-shadow); transition: 0.2s; overflow: hidden; }
+        .wiki-card { background: var(--bg-input); padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--accent); cursor: pointer; box-shadow: var(--card-shadow); transition: 0.2s; }
         .wiki-card:hover { background: var(--bg-panel); border-color: var(--accent-sec); }
         .wiki-card h4 { margin: 0; color: var(--accent); font-size: 1rem; display: flex; justify-content: space-between; }
         .wiki-card small { color: var(--text-muted); font-size: 0.75rem; font-weight: normal; }
@@ -186,6 +163,14 @@
         .search-res-item:hover { border-left: 3px solid var(--accent); }
         .search-highlight { color: var(--accent); font-weight: bold; }
 
+        /* --- DISPLAY VS EDIT MODE STYLES --- */
+        #ent-display, #char-display { color: var(--text-main); }
+        .disp-h2 { color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 0; display:flex; justify-content:space-between; align-items:center; }
+        .disp-row { margin-bottom: 10px; }
+        .disp-label { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; font-weight: bold; }
+        .disp-val { font-size: 1.1rem; }
+        .disp-desc { white-space: pre-wrap; margin-top: 20px; line-height: 1.6; }
+
         /* --- MOBILE --- */
         @media (max-width: 768px) {
             .chapter-sidebar { display: none; position: absolute; left: 0; top: 0; height: 100%; z-index: 200; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
@@ -216,7 +201,6 @@
         <button class="nav-btn" onclick="setTab('board')"><i class="fas fa-th-large"></i></button>
         <button class="nav-btn" onclick="setTab('conn')"><i class="fas fa-link"></i></button>
         <div style="margin-top:auto;"></div>
-        
         <button class="nav-btn" onclick="toggleTheme()"><i class="fas fa-adjust"></i></button>
         <button class="nav-btn" onclick="saveToDisk()"><i class="fas fa-save"></i></button>
         <button class="nav-btn" onclick="document.getElementById('loadInput').click()"><i class="fas fa-upload"></i></button>
@@ -245,8 +229,8 @@
                     <button class="fmt-btn" id="btnUnderline" onmousedown="event.preventDefault(); formatDoc('underline')" title="Underline (Ctrl+U)"><i class="fas fa-underline"></i></button>
                     <button class="fmt-btn" id="btnSpell" onmousedown="event.preventDefault(); toggleSpellcheck()" title="Toggle Spellcheck"><i class="fas fa-spell-check"></i></button>
                     <div class="divider"></div>
-                    <button class="fmt-btn" onmousedown="event.preventDefault(); changeFontSize(-1)" title="Decrease Font"><i class="fas fa-minus"></i></button>
-                    <button class="fmt-btn" onmousedown="event.preventDefault(); changeFontSize(1)" title="Increase Font"><i class="fas fa-plus"></i></button>
+                    <button class="fmt-btn" onmousedown="event.preventDefault(); resizeSel(1)" title="Increase Size (Sel)"><i class="fas fa-plus"></i></button>
+                    <button class="fmt-btn" onmousedown="event.preventDefault(); resizeSel(-1)" title="Decrease Size (Sel)"><i class="fas fa-minus"></i></button>
                     <div class="divider"></div>
                     <button class="fmt-btn" id="btnLeft" onmousedown="event.preventDefault(); formatDoc('justifyLeft')" title="Left (Ctrl+L)"><i class="fas fa-align-left"></i></button>
                     <button class="fmt-btn" id="btnCenter" onmousedown="event.preventDefault(); formatDoc('justifyCenter')" title="Center (Ctrl+E)"><i class="fas fa-align-center"></i></button>
@@ -314,27 +298,39 @@
                 <div class="wb-list"><button class="btn btn-new" onclick="createNewEntity('world')">+ New Entry</button><div id="worldList"></div></div>
                 <div class="wb-detail">
                     <form onsubmit="event.preventDefault(); saveEntity('world');"><input type="hidden" id="wId">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <h2 style="margin:0; color:var(--accent);">World Entry</h2>
-                            <button class="btn" onclick="deleteEntity('world')" style="background:transparent; color:#ff6b6b; border:1px solid #ff6b6b; padding:5px 10px;"><i class="fas fa-trash"></i> Delete</button>
-                            <button class="btn">Save</button>
+                        
+                        <div id="w-display" style="display:none;">
+                            <div class="disp-h2"><span id="d-wName"></span> <button type="button" class="btn" onclick="toggleEditMode('world', true)">Edit</button></div>
+                            <div class="disp-row"><span class="disp-label">Type:</span> <span class="disp-val" id="d-wType"></span></div>
+                            <div class="disp-row"><span class="disp-label">Timeframe:</span> <span class="disp-val" id="d-wTime"></span></div>
+                            <div class="disp-desc" id="d-wDesc"></div>
                         </div>
-                        <hr style="border:0; border-bottom:1px solid var(--border); margin:20px 0;">
-                        <div class="form-group"><label>Name</label><input type="text" id="wName" required placeholder="Enter Name..."></div>
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                            <div class="form-group"><label>Type</label>
-                                <select id="wType">
-                                    <option value="Location">Location / Kingdom</option>
-                                    <option value="History">History / Era</option>
-                                    <option value="Race">Race / Species</option>
-                                    <option value="Religion">Religion / Deity</option>
-                                    <option value="Faction">Faction / Politics</option>
-                                    <option value="Magic">Magic System</option>
-                                </select>
+
+                        <div id="w-edit">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <h2 style="margin:0; color:var(--accent);">World Entry</h2>
+                                <div style="display:flex; gap:10px;">
+                                    <button type="button" class="btn" onclick="deleteEntity('world')" style="background:transparent; color:#ff6b6b; border:1px solid #ff6b6b; padding:5px 10px;"><i class="fas fa-trash"></i></button>
+                                    <button class="btn">Save</button>
+                                </div>
                             </div>
-                            <div class="form-group"><label>Timeframe / Date</label><input type="text" id="wTime" placeholder="e.g. 300-400"></div>
+                            <hr style="border:0; border-bottom:1px solid var(--border); margin:20px 0;">
+                            <div class="form-group"><label>Name</label><input type="text" id="wName" required placeholder="Enter Name..."></div>
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                                <div class="form-group"><label>Type</label>
+                                    <select id="wType">
+                                        <option value="Location">Location / Kingdom</option>
+                                        <option value="History">History / Era</option>
+                                        <option value="Race">Race / Species</option>
+                                        <option value="Religion">Religion / Deity</option>
+                                        <option value="Faction">Faction / Politics</option>
+                                        <option value="Magic">Magic System</option>
+                                    </select>
+                                </div>
+                                <div class="form-group"><label>Timeframe / Date</label><input type="text" id="wTime" placeholder="e.g. 300-400"></div>
+                            </div>
+                            <div class="form-group"><label>Lore & Desc</label><textarea id="wDesc" rows="10"></textarea></div>
                         </div>
-                        <div class="form-group"><label>Lore & Desc</label><textarea id="wDesc" rows="10"></textarea></div>
                     </form>
                 </div>
             </div>
@@ -345,17 +341,34 @@
                 <div class="wb-list"><button class="btn btn-new" onclick="createNewEntity('char')">+ New Character</button><div id="charList"></div></div>
                 <div class="wb-detail">
                     <form onsubmit="event.preventDefault(); saveEntity('char');"><input type="hidden" id="cId">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <h2 style="margin:0; color:var(--accent);">Character</h2>
-                            <button class="btn" onclick="deleteEntity('char')" style="background:transparent; color:#ff6b6b; border:1px solid #ff6b6b; padding:5px 10px;"><i class="fas fa-trash"></i> Delete</button>
-                            <button class="btn">Save</button>
+                        
+                        <div id="c-display" style="display:none;">
+                            <div class="disp-h2"><span id="d-cName"></span> <button type="button" class="btn" onclick="toggleEditMode('char', true)">Edit</button></div>
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                                <div><span class="disp-label">Race:</span> <span class="disp-val" id="d-cRace"></span></div>
+                                <div><span class="disp-label">Faction:</span> <span class="disp-val" id="d-cRole"></span></div>
+                                <div><span class="disp-label">Religion:</span> <span class="disp-val" id="d-cGod"></span></div>
+                                <div><span class="disp-label">Birth Year:</span> <span class="disp-val" id="d-cBirth"></span></div>
+                            </div>
+                            <div class="disp-row" style="margin-top:10px;"><span class="disp-label">Goal:</span> <span class="disp-val" id="d-cGoal"></span></div>
+                            <div class="disp-desc" id="d-cNotes"></div>
                         </div>
-                        <hr style="border:0; border-bottom:1px solid var(--border); margin:20px 0;">
-                        <div class="form-group"><label>Name</label><input type="text" id="cName" required placeholder="Enter Name..."></div>
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Race</label><select id="cRace"><option value="">- Select -</option></select></div><div class="form-group"><label>Faction</label><select id="cRole"><option value="">- Select -</option></select></div></div>
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Religion</label><select id="cGod"><option value="">- Select -</option></select></div><div class="form-group"><label>Birth Year</label><input type="number" id="cBirth" placeholder="e.g. 290"></div></div>
-                        <div class="form-group"><label>Goal</label><input type="text" id="cGoal"></div>
-                        <div class="form-group"><label>Notes</label><textarea id="cNotes" rows="6"></textarea></div>
+
+                        <div id="c-edit">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <h2 style="margin:0; color:var(--accent);">Character</h2>
+                                <div style="display:flex; gap:10px;">
+                                    <button type="button" class="btn" onclick="deleteEntity('char')" style="background:transparent; color:#ff6b6b; border:1px solid #ff6b6b; padding:5px 10px;"><i class="fas fa-trash"></i></button>
+                                    <button class="btn">Save</button>
+                                </div>
+                            </div>
+                            <hr style="border:0; border-bottom:1px solid var(--border); margin:20px 0;">
+                            <div class="form-group"><label>Name</label><input type="text" id="cName" required placeholder="Enter Name..."></div>
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Race</label><select id="cRace"><option value="">- Select -</option></select></div><div class="form-group"><label>Faction</label><select id="cRole"><option value="">- Select -</option></select></div></div>
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Religion</label><select id="cGod"><option value="">- Select -</option></select></div><div class="form-group"><label>Birth Year</label><input type="number" id="cBirth" placeholder="e.g. 290"></div></div>
+                            <div class="form-group"><label>Goal</label><input type="text" id="cGoal"></div>
+                            <div class="form-group"><label>Notes</label><textarea id="cNotes" rows="6"></textarea></div>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -452,11 +465,7 @@
             if(saved) { appData = JSON.parse(saved); } else { createWorld("First World", true); }
             loadActiveWorld(); initBoardSortable();
             
-            // CRASH GUARD
-            window.addEventListener('beforeunload', function (e) {
-                e.preventDefault();
-                e.returnValue = '';
-            });
+            window.addEventListener('beforeunload', function (e) { e.preventDefault(); e.returnValue = ''; });
 
             const editor = document.getElementById('chapterContent');
             editor.addEventListener('keydown', function(e) {
@@ -494,12 +503,6 @@
         function setSessionGoal() {
             const val = prompt("Set Daily Word Goal:", dailyGoal);
             if(val && !isNaN(val)) { dailyGoal = parseInt(val); document.getElementById('wc-goal').innerText = dailyGoal; updateWordCount(); }
-        }
-        function changeFontSize(dir) {
-            currentFontSize += (dir * 0.1);
-            if(currentFontSize < 0.8) currentFontSize = 0.8;
-            if(currentFontSize > 2.5) currentFontSize = 2.5;
-            document.documentElement.style.setProperty('--editor-font-size', currentFontSize + 'rem');
         }
         function countWords(str) { return str.trim().split(/\s+/).filter(word => word.length > 0).length; }
 
@@ -555,11 +558,8 @@
             document.getElementById('chapterTitle').value = ch.title;
             document.getElementById('chapterContent').innerHTML = ch.content;
             document.getElementById('chapterNotes').value = ch.notes || '';
-            
-            // Set Spellcheck state if saved, else default to false
             document.getElementById('chapterContent').spellcheck = false;
             document.getElementById('btnSpell').classList.remove('active');
-            
             renderChapterList(); updateWordCount();
         }
         function saveCurrentBuffer() {
@@ -575,10 +575,8 @@
             const list = document.getElementById('chapterList'); list.innerHTML = '';
             currentWorld.data.chapters.forEach(ch => { 
                 const statusClass = ch.status || 'draft';
-                // Calc words
                 const div = document.createElement('div'); div.innerHTML = ch.content;
                 const wc = countWords(div.innerText || "");
-                
                 list.innerHTML += `
                 <div class="chapter-item ${ch.id === activeChapterId ? 'active' : ''}" data-id="${ch.id}" onclick="loadChapter('${ch.id}')">
                     <span class="chapter-handle"><i class="fas fa-grip-vertical"></i></span>
@@ -621,16 +619,29 @@
 
         function formatDoc(cmd, value=null) { document.execCommand(cmd, false, value); document.getElementById('chapterContent').focus(); checkFormat(); }
         
+        function resizeSel(dir) {
+            // Apply font size to selection (1-7 scale)
+            // We'll use a trick: get current size (approx) or just toggle Big/Small
+            // Better yet: wrap in span with font-size style
+            const sel = window.getSelection();
+            if(!sel.rangeCount) return;
+            // Native execCommand fontSize is 1-7. Let's map.
+            // A+ = size 5 (Big), A- = size 2 (Small), Normal = 3
+            // This is simple but robust for single file
+            // Let's cycle: 3 (default) -> 5 (Big) -> 7 (Huge)
+            // Or just use 'fontSize' with values
+            // To support specific increment, we'd need complex span parsing.
+            // Let's stick to: A+ makes it Large (h3 like), A- makes it Small.
+            if(dir > 0) document.execCommand('fontSize', false, '5');
+            else document.execCommand('fontSize', false, '2');
+        }
+
         function toggleSpellcheck() {
             const editor = document.getElementById('chapterContent');
             const btn = document.getElementById('btnSpell');
             const current = editor.spellcheck;
             editor.spellcheck = !current;
-            if(!current) {
-                btn.classList.add('active'); // On
-            } else {
-                btn.classList.remove('active'); // Off
-            }
+            if(!current) { btn.classList.add('active'); } else { btn.classList.remove('active'); }
             const text = editor.innerHTML; editor.innerHTML = text; 
         }
 
@@ -687,7 +698,6 @@
             saveAll(); location.reload();
         }
 
-        // --- SEARCH & SPARK ---
         function openGlobalSearch() { document.getElementById('searchModal').style.display = 'flex'; document.getElementById('globalSearchInput').focus(); }
         function runGlobalSearch() {
             const term = document.getElementById('globalSearchInput').value.toLowerCase();
@@ -720,12 +730,26 @@
         function saveAll() { saveCurrentBuffer(); localStorage.setItem('worldSmithMultiverse', JSON.stringify(appData)); }
         function openLibrary() { renderLib(); document.getElementById('libModal').style.display = 'flex'; }
         function renderLib() { const div = document.getElementById('libList'); div.innerHTML = ''; appData.worlds.forEach(w => { div.innerHTML += `<div style="padding:10px; background:var(--bg-input); margin-bottom:5px; cursor:pointer; border-radius:5px; ${w.id===appData.activeId?'border:1px solid var(--accent);':''}" onclick="switchWorld('${w.id}')">${w.name}</div>`; }); }
-        function setTab(tabId) { document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active')); document.getElementById('view-' + tabId).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active')); event.currentTarget.classList.add('active'); if(tabId === 'conn') renderConnections(); if(tabId === 'read') renderBook(); }
+        function setTab(tabId) { 
+            // Reset Detail Views if navigating away
+            if(tabId === 'world' || tabId === 'chars') {
+                createNewEntity(tabId === 'world' ? 'world' : 'char');
+                toggleEditMode(tabId === 'world' ? 'world' : 'char', true); // Default to edit
+            }
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active')); document.getElementById('view-' + tabId).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active')); event.currentTarget.classList.add('active'); if(tabId === 'conn') renderConnections(); if(tabId === 'read') renderBook(); 
+        }
         function toggleTheme(forceLight) { if(forceLight || !isLight) { document.body.classList.add('light-mode'); isLight = true; } else { document.body.classList.remove('light-mode'); isLight = false; } localStorage.setItem('wsTheme', isLight ? 'light' : 'dark'); }
         function autoSave() { showSaving(); if(activeChapterId) renderChapterList(); }
         function populateDropdowns() { const races = currentWorld.data.world.filter(x => x.type === 'Race'); const rels = currentWorld.data.world.filter(x => x.type === 'Religion'); const facs = currentWorld.data.world.filter(x => x.type === 'Faction'); fillSelect('cRace', races); fillSelect('cGod', rels); fillSelect('cRole', facs); }
-        function fillSelect(id, items) { const sel = document.getElementById(id); sel.innerHTML = '<option value="">- Select -</option>'; items.forEach(i => { sel.innerHTML += `<option value="${i.name}">${i.name}</option>`; }); }
-        function createNewEntity(type) { const id = Date.now().toString(); const empty = type === 'world' ? { id, name: '', type: 'Location', desc: '' } : { id, name: '', race:'', role:'', god: '', goal:'', notes:'' }; if(type === 'world') currentWorld.data.world.push(empty); else currentWorld.data.chars.push(empty); saveAll(); refreshLists(); loadEntity(type, id); }
+        function fillSelect(id, items) { const sel = document.getElementById(id); const current = sel.value; sel.innerHTML = '<option value="">- Select -</option>'; items.forEach(i => { sel.innerHTML += `<option value="${i.name}">${i.name}</option>`; }); if(current) sel.value = current; }
+        
+        function createNewEntity(type) { 
+            document.getElementById(type === 'world' ? 'wId' : 'cId').value = Date.now().toString();
+            // Clear inputs
+            if(type === 'world') { document.getElementById('wName').value = ''; document.getElementById('wTime').value = ''; document.getElementById('wDesc').value = ''; }
+            else { document.getElementById('cName').value = ''; document.getElementById('cBirth').value = ''; document.getElementById('cGoal').value = ''; document.getElementById('cNotes').value = ''; }
+            toggleEditMode(type, true);
+        }
         function deleteEntity(type) {
             const id = type === 'world' ? document.getElementById('wId').value : document.getElementById('cId').value;
             if(!id) return;
@@ -737,11 +761,57 @@
                     const idx = currentWorld.data.chars.findIndex(x => x.id === id);
                     if(idx > -1) currentWorld.data.chars.splice(idx, 1);
                 }
-                saveAll(); refreshLists(); searchWiki();
+                saveAll(); refreshLists(); createNewEntity(type);
             }
         }
-        function saveEntity(type) { if(type === 'world') { const id = document.getElementById('wId').value; const idx = currentWorld.data.world.findIndex(x => x.id === id); if(idx > -1) currentWorld.data.world[idx] = { id, name: document.getElementById('wName').value, type: document.getElementById('wType').value, time: document.getElementById('wTime').value, desc: document.getElementById('wDesc').value }; } else { const id = document.getElementById('cId').value; const idx = currentWorld.data.chars.findIndex(x => x.id === id); if(idx > -1) currentWorld.data.chars[idx] = { id, name: document.getElementById('cName').value, race: document.getElementById('cRace').value, role: document.getElementById('cRole').value, god: document.getElementById('cGod').value, birth: document.getElementById('cBirth').value, goal: document.getElementById('cGoal').value, notes: document.getElementById('cNotes').value }; } saveAll(); refreshLists(); searchWiki(); }
-        function loadEntity(type, id) { const data = type === 'world' ? currentWorld.data.world.find(x => x.id === id) : currentWorld.data.chars.find(x => x.id === id); if(!data) return; if(type === 'world') { document.getElementById('wId').value = data.id; document.getElementById('wName').value = data.name; document.getElementById('wType').value = data.type; document.getElementById('wTime').value = data.time || ''; document.getElementById('wDesc').value = data.desc; } else { document.getElementById('cId').value = data.id; document.getElementById('cName').value = data.name; document.getElementById('cRace').value = data.race; document.getElementById('cRole').value = data.role; document.getElementById('cGod').value = data.god; document.getElementById('cBirth').value = data.birth || ''; document.getElementById('cGoal').value = data.goal; document.getElementById('cNotes').value = data.notes; } }
+        function saveEntity(type) { 
+            const id = document.getElementById(type === 'world' ? 'wId' : 'cId').value;
+            if(type === 'world') { 
+                const name = document.getElementById('wName').value || 'Untitled';
+                const idx = currentWorld.data.world.findIndex(x => x.id === id);
+                const data = { id, name, type: document.getElementById('wType').value, time: document.getElementById('wTime').value, desc: document.getElementById('wDesc').value };
+                if(idx > -1) currentWorld.data.world[idx] = data; else currentWorld.data.world.push(data);
+            } else { 
+                const name = document.getElementById('cName').value || 'Untitled';
+                const idx = currentWorld.data.chars.findIndex(x => x.id === id); 
+                const data = { id, name, race: document.getElementById('cRace').value, role: document.getElementById('cRole').value, god: document.getElementById('cGod').value, birth: document.getElementById('cBirth').value, goal: document.getElementById('cGoal').value, notes: document.getElementById('cNotes').value };
+                if(idx > -1) currentWorld.data.chars[idx] = data; else currentWorld.data.chars.push(data);
+            } 
+            saveAll(); refreshLists(); loadEntity(type, id); 
+        }
+        function loadEntity(type, id) { 
+            const data = type === 'world' ? currentWorld.data.world.find(x => x.id === id) : currentWorld.data.chars.find(x => x.id === id); 
+            if(!data) return; 
+            
+            // Populate Read View
+            if(type === 'world') {
+                document.getElementById('d-wName').innerText = data.name;
+                document.getElementById('d-wType').innerText = data.type;
+                document.getElementById('d-wTime').innerText = data.time || 'N/A';
+                document.getElementById('d-wDesc').innerText = data.desc;
+                // Populate Inputs
+                document.getElementById('wId').value = data.id; document.getElementById('wName').value = data.name; document.getElementById('wType').value = data.type; document.getElementById('wTime').value = data.time || ''; document.getElementById('wDesc').value = data.desc;
+            } else {
+                document.getElementById('d-cName').innerText = data.name;
+                document.getElementById('d-cRace').innerText = data.race || '-';
+                document.getElementById('d-cRole').innerText = data.role || '-';
+                document.getElementById('d-cGod').innerText = data.god || '-';
+                document.getElementById('d-cBirth').innerText = data.birth || '-';
+                document.getElementById('d-cGoal').innerText = data.goal || '-';
+                document.getElementById('d-cNotes').innerText = data.notes;
+                // Populate Inputs
+                document.getElementById('cId').value = data.id; document.getElementById('cName').value = data.name; document.getElementById('cRace').value = data.race; document.getElementById('cRole').value = data.role; document.getElementById('cGod').value = data.god; document.getElementById('cBirth').value = data.birth || ''; document.getElementById('cGoal').value = data.goal; document.getElementById('cNotes').value = data.notes;
+            }
+            toggleEditMode(type, false);
+        }
+        
+        function toggleEditMode(type, edit) {
+            const disp = document.getElementById(type === 'world' ? 'w-display' : 'c-display');
+            const form = document.getElementById(type === 'world' ? 'w-edit' : 'c-edit');
+            if(edit) { disp.style.display = 'none'; form.style.display = 'block'; }
+            else { disp.style.display = 'block'; form.style.display = 'none'; }
+        }
+
         function refreshLists() { 
             const wList = document.getElementById('worldList'); wList.innerHTML = ''; 
             ['Race', 'Location', 'Religion', 'Faction', 'Magic', 'History'].forEach(t => { 
