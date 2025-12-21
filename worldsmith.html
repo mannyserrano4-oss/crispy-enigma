@@ -12,6 +12,7 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     
     <style>
         /* --- THEME --- */
@@ -53,11 +54,7 @@
         #view-write.active { display: flex; overflow: hidden; }
         .chapter-sidebar { width: 220px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 10px; flex-shrink: 0; overflow-y: auto; transition: width 0.3s, padding 0.3s; }
         
-        /* DRAG AND DROP STYLES */
-        .draggable-item { cursor: grab; user-select: none; }
-        .draggable-item.dragging { opacity: 0.5; background: var(--bg-input); }
-        
-        .chapter-item { padding: 10px; border-radius: 6px; margin-bottom: 5px; color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; border: 1px solid transparent; }
+        .chapter-item { padding: 10px; border-radius: 6px; cursor: grab; margin-bottom: 5px; color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; group; }
         .chapter-item:hover { background: var(--bg-input); }
         .chapter-item.active { background: var(--bg-input); color: var(--accent); border-left: 3px solid var(--accent); font-weight: bold; }
         
@@ -78,17 +75,25 @@
         .save-indicator.saving { color: #ffd700; } .save-indicator.saved { color: #4caf50; }
 
         .editor-toolbar { display: flex; gap: 5px; margin-bottom: 10px; background: var(--bg-panel); padding: 5px; border-radius: 8px; width: fit-content; border: 1px solid var(--border); position: sticky; top: 0; z-index: 10; align-items: center; flex-wrap: wrap; }
-        .fmt-btn { background: transparent; border: none; color: var(--text-main); width: 30px; height: 30px; cursor: pointer; border-radius: 4px; font-weight: bold; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+        .fmt-btn { background: transparent; border: none; color: var(--text-main); width: 30px; height: 30px; cursor: pointer; border-radius: 4px; font-weight: bold; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
         .fmt-btn:hover { background: var(--bg-input); }
         .fmt-btn.active { background: var(--accent); color: var(--bg-panel); box-shadow: 0 0 5px var(--accent); }
         .divider { width: 1px; background: var(--border); height: 20px; margin: 5px 2px; }
         .toolbar-select { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); padding: 4px; border-radius: 4px; font-size: 0.8rem; outline: none; margin: 0 5px; cursor: pointer; }
 
         .editor-title { width: 100%; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--accent); font-size: 1.8rem; padding: 15px; box-sizing: border-box; font-family: 'Georgia', serif; font-weight: bold; margin-bottom: 20px; outline: none; }
-        .editor-area { width: 100%; min-height: 60vh; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; color: var(--text-main); font-size: var(--editor-font-size); line-height: 1.8; padding: 30px; padding-bottom: 50vh; box-sizing: border-box; font-family: 'Georgia', serif; outline: none; overflow-y: visible; flex:1; }
+        .editor-area { 
+            width: 100%; min-height: 60vh; 
+            background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; 
+            color: var(--text-main); 
+            font-size: var(--editor-font-size); 
+            line-height: 1.8; 
+            padding: 30px; padding-bottom: 50vh; 
+            box-sizing: border-box; font-family: 'Georgia', serif; outline: none; overflow-y: visible; flex:1; 
+        }
         .editor-area b { color: inherit; font-weight: bold; }
         
-        #wikiToggleBtn { position: absolute; top: 20px; right: 20px; z-index: 50; background: var(--bg-panel); color: var(--accent); border: 2px solid var(--accent); border-radius: 50%; width: 44px; height: 44px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s; font-size: 1.2rem;}
+        #wikiToggleBtn { position: absolute; top: 20px; right: 20px; z-index: 50; background: var(--bg-panel); color: var(--accent); border: 2px solid var(--accent); border-radius: 50%; width: 44px; height: 44px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s; }
         #wikiToggleBtn:hover { transform: scale(1.1); }
 
         body.zen-mode .sidebar, body.zen-mode .chapter-sidebar, body.zen-mode .right-panel, body.zen-mode #wikiToggleBtn, body.zen-mode #mobChaptersBtn { display: none !important; }
@@ -116,14 +121,12 @@
         .w-tab.active { background: var(--accent); color: var(--bg-panel); border-color: var(--accent); }
         .wiki-search { width: 100%; padding: 12px; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; }
         .wiki-results { flex: 1; overflow-y: auto; padding-right: 5px; }
-        
         .wiki-card { background: var(--bg-input); padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--accent); cursor: pointer; box-shadow: var(--card-shadow); transition: 0.2s; }
         .wiki-card:hover { background: var(--bg-panel); border-color: var(--accent-sec); }
         .wiki-card h4 { margin: 0; color: var(--accent); font-size: 1rem; display: flex; justify-content: space-between; }
         .wiki-card small { color: var(--text-muted); font-size: 0.75rem; font-weight: normal; }
         .wiki-desc { display: none; margin-top: 10px; font-size: 0.85rem; color: var(--text-main); padding-top: 10px; border-top: 1px solid var(--border); white-space: pre-wrap; }
         .wiki-card.expanded .wiki-desc { display: block; }
-        
         .notes-area { flex: 1; width: 100%; height: 100%; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); padding: 15px; box-sizing: border-box; border-radius: 8px; resize: none; font-family: sans-serif; font-size: 1rem; line-height: 1.5; }
 
         /* --- THE BOARD --- */
@@ -214,14 +217,14 @@
         <button class="nav-btn" onclick="openRetcon()" title="Retcon (Find/Replace)"><i class="fas fa-magic"></i></button>
         <button class="nav-btn" onclick="openGlobalSearch()" title="Global Search"><i class="fas fa-search"></i></button>
         <button class="nav-btn" onclick="triggerSpark()" title="Spark Idea Generator"><i class="fas fa-dice"></i></button>
-        <button class="nav-btn" onclick="setTab('tips')" title="Guide & Tips"><i class="fas fa-question-circle"></i></button>
+        <button class="nav-btn" onclick="setTab('tips', this)" title="Guide & Tips"><i class="fas fa-question-circle"></i></button>
         <hr style="width:50%; border:0; border-bottom:1px solid var(--border); margin:10px 0;">
-        <button class="nav-btn active" onclick="setTab('write')" title="Writer"><i class="fas fa-pen-nib"></i></button>
-        <button class="nav-btn" onclick="setTab('read')" title="Read & Export"><i class="fas fa-book-open"></i></button>
-        <button class="nav-btn" onclick="setTab('world')" title="World"><i class="fas fa-globe-americas"></i></button>
-        <button class="nav-btn" onclick="setTab('chars')" title="Characters"><i class="fas fa-users"></i></button>
-        <button class="nav-btn" onclick="setTab('board')" title="Board"><i class="fas fa-th-large"></i></button>
-        <button class="nav-btn" onclick="setTab('conn')" title="Connections"><i class="fas fa-link"></i></button>
+        <button class="nav-btn active" onclick="setTab('write', this)" title="Writer"><i class="fas fa-pen-nib"></i></button>
+        <button class="nav-btn" onclick="setTab('read', this)" title="Read & Export"><i class="fas fa-book-open"></i></button>
+        <button class="nav-btn" onclick="setTab('world', this)" title="World"><i class="fas fa-globe-americas"></i></button>
+        <button class="nav-btn" onclick="setTab('chars', this)" title="Characters"><i class="fas fa-users"></i></button>
+        <button class="nav-btn" onclick="setTab('board', this)" title="Board"><i class="fas fa-th-large"></i></button>
+        <button class="nav-btn" onclick="setTab('conn', this)" title="Connections"><i class="fas fa-link"></i></button>
         <div style="margin-top:auto;"></div>
         
         <button class="nav-btn" onclick="toggleTheme()"><i class="fas fa-adjust"></i></button>
@@ -534,48 +537,9 @@
         let wikiFilter = 'all';
         let sessionStartCount = 0;
         let saveTimer = null;
-        let backupTimer = null;
         let lastBackupTime = Date.now();
         let dailyGoal = 500;
         let currentFontSize = 1.15; // rem
-
-        // --- NATIVE DRAG AND DROP ---
-        let dragSrcEl = null;
-        function handleDragStart(e) { dragSrcEl = this; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/html', this.innerHTML); this.classList.add('dragging'); }
-        function handleDragOver(e) { if (e.preventDefault) e.preventDefault(); e.dataTransfer.dropEffect = 'move'; return false; }
-        function handleDragEnter(e) { this.classList.add('over'); }
-        function handleDragLeave(e) { this.classList.remove('over'); }
-        function handleDrop(e) {
-            if (e.stopPropagation) e.stopPropagation();
-            if (dragSrcEl !== this) {
-                const container = this.parentNode;
-                const items = Array.from(container.children);
-                const srcIdx = items.indexOf(dragSrcEl);
-                const destIdx = items.indexOf(this);
-                
-                if(container.id === 'chapterList') {
-                    const temp = currentWorld.data.chapters[srcIdx];
-                    currentWorld.data.chapters[srcIdx] = currentWorld.data.chapters[destIdx];
-                    currentWorld.data.chapters[destIdx] = temp;
-                    saveAll(); renderChapterList();
-                } else if(container.id === 'boardList') {
-                    const temp = currentWorld.data.timeline[srcIdx];
-                    currentWorld.data.timeline[srcIdx] = currentWorld.data.timeline[destIdx];
-                    currentWorld.data.timeline[destIdx] = temp;
-                    saveAll(); renderBoard();
-                }
-            }
-            return false;
-        }
-        function handleDragEnd(e) { this.classList.remove('dragging'); this.parentNode.querySelectorAll('.draggable-item').forEach(item => item.classList.remove('over')); }
-        function addDnDHandlers(elem) {
-            elem.addEventListener('dragstart', handleDragStart, false);
-            elem.addEventListener('dragenter', handleDragEnter, false);
-            elem.addEventListener('dragover', handleDragOver, false);
-            elem.addEventListener('dragleave', handleDragLeave, false);
-            elem.addEventListener('drop', handleDrop, false);
-            elem.addEventListener('dragend', handleDragEnd, false);
-        }
 
         window.onload = () => {
             if(localStorage.getItem('wsTheme') === 'light') toggleTheme(true);
@@ -588,7 +552,7 @@
                 createWorld("Recovered World", true);
             }
 
-            loadActiveWorld(); 
+            loadActiveWorld(); initBoardSortable();
             
             // CRASH GUARD
             window.addEventListener('beforeunload', function (e) {
@@ -596,7 +560,7 @@
                 e.returnValue = '';
             });
 
-            // BACKUP REMINDER
+            // BACKUP REMINDER LOOP
             setInterval(checkBackupStatus, 60000); 
 
             // SHORTCUTS
@@ -614,11 +578,17 @@
             setTimeout(() => { sessionStartCount = countWords(document.body.innerText); }, 500);
         };
 
+        // --- BACKUP LOGIC ---
         function checkBackupStatus() {
-            if(Date.now() - lastBackupTime > 30 * 60 * 1000) { document.getElementById('saveBtn').classList.add('backup-needed'); }
+            if(Date.now() - lastBackupTime > 30 * 60 * 1000) {
+                document.getElementById('saveBtn').classList.add('backup-needed');
+            }
         }
 
-        function setEditorSize(val) { document.documentElement.style.setProperty('--editor-font-size', val); }
+        // --- SIZE & STYLE PRESETS ---
+        function setEditorSize(val) {
+            document.documentElement.style.setProperty('--editor-font-size', val);
+        }
 
         function updateWordCount() {
             if(!currentWorld || !activeChapterId) return;
@@ -669,7 +639,12 @@
                 const idx = currentWorld.data.chapters.findIndex(c => c.id === id);
                 currentWorld.data.chapters.splice(idx, 1);
                 if (id === activeChapterId) {
-                    if (currentWorld.data.chapters.length > 0) { activeChapterId = currentWorld.data.chapters[0].id; loadChapter(activeChapterId); } else { createChapter(); return; }
+                    if (currentWorld.data.chapters.length > 0) {
+                        activeChapterId = currentWorld.data.chapters[0].id;
+                        loadChapter(activeChapterId);
+                    } else {
+                        createChapter(); return;
+                    }
                 }
                 saveAll(); renderChapterList();
             }
@@ -688,8 +663,11 @@
             document.getElementById('chapterTitle').value = ch.title;
             document.getElementById('chapterContent').innerHTML = ch.content;
             document.getElementById('chapterNotes').value = ch.notes || '';
+            
+            // Set Spellcheck state if saved, else default to false
             document.getElementById('chapterContent').spellcheck = false;
             document.getElementById('btnSpell').classList.remove('active');
+            
             renderChapterList(); updateWordCount();
         }
         function saveCurrentBuffer() {
@@ -705,10 +683,12 @@
             const list = document.getElementById('chapterList'); list.innerHTML = '';
             currentWorld.data.chapters.forEach(ch => { 
                 const statusClass = ch.status || 'draft';
+                // Calc words
                 const div = document.createElement('div'); div.innerHTML = ch.content;
                 const wc = countWords(div.innerText || "");
+                
                 list.innerHTML += `
-                <div class="chapter-item draggable-item ${ch.id === activeChapterId ? 'active' : ''}" draggable="true" onclick="loadChapter('${ch.id}')">
+                <div class="chapter-item ${ch.id === activeChapterId ? 'active' : ''}" data-id="${ch.id}" onclick="loadChapter('${ch.id}')">
                     <span class="chapter-handle"><i class="fas fa-grip-vertical"></i></span>
                     <div class="chapter-info">
                         <div class="chapter-title-text">${ch.title}</div>
@@ -720,7 +700,19 @@
                     </div>
                 </div>`; 
             });
-            document.querySelectorAll('#chapterList .draggable-item').forEach(addDnDHandlers);
+            // Init Sortable on Chapters
+            new Sortable(list, {
+                handle: '.chapter-handle', animation: 150,
+                onEnd: function() {
+                    const newOrder = [];
+                    list.querySelectorAll('.chapter-item').forEach(el => {
+                        const id = el.getAttribute('data-id');
+                        newOrder.push(currentWorld.data.chapters.find(c => c.id === id));
+                    });
+                    currentWorld.data.chapters = newOrder;
+                    saveAll();
+                }
+            });
         }
 
         function renderBook() { saveCurrentBuffer(); const div = document.getElementById('bookView'); div.innerHTML = ''; currentWorld.data.chapters.forEach(ch => { div.innerHTML += `<div class="book-chapter"><div class="book-title">${ch.title}</div><div class="book-body">${ch.content}</div></div>`; }); }
@@ -757,7 +749,7 @@
             document.getElementById('btnJustify').classList.toggle('active', document.queryCommandState('justifyFull'));
         }
 
-        function initBoardSortable() { renderBoard(); }
+        function initBoardSortable() { new Sortable(document.getElementById('boardList'), { animation: 150, delay: 100, delayOnTouchOnly: true, onEnd: function (evt) { const newOrder = []; document.querySelectorAll('.board-card').forEach(card => { const id = parseInt(card.getAttribute('data-id')); const item = currentWorld.data.timeline.find(x => x.id === id); if(item) newOrder.push(item); }); currentWorld.data.timeline = newOrder; saveAll(); } }); }
         function renderBoard() {
             const typeColors = { "Character": "var(--accent-sec)", "Location": "#66bb6a", "History": "#ef5350", "Race": "#26c6da", "Religion": "#ab47bc", "Faction": "#ffa726", "Magic": "#42a5f5" };
             const filter = document.getElementById('boardFilter').value;
@@ -780,9 +772,8 @@
                         namesHtml += `<div><i class="fas fa-user"></i> ${cleanName}${ageStr}</div>`;
                     });
                 }
-                div.innerHTML += `<div class="board-card draggable-item ${typeClass}" draggable="true"><div class="bc-actions"><button class="bc-btn" onclick="openEventDetails(${ev.id})"><i class="fas fa-edit"></i></button><button class="bc-btn" onclick="deleteEvent(${ev.id})"><i class="fas fa-trash"></i></button></div><input class="bc-header" value="${ev.title}" onchange="updateEventText(${ev.id}, 'title', this.value)"><textarea class="bc-body" onchange="updateEventText(${ev.id}, 'desc', this.value)">${ev.desc}</textarea><div class="bc-meta">${namesHtml}${ev.where ? '<i class="fas fa-map-marker-alt"></i> '+ev.where + '<br>' : ''}${timeStr}</div></div>`;
+                div.innerHTML += `<div class="board-card ${typeClass}" data-id="${ev.id}"><div class="bc-actions"><button class="bc-btn" onclick="openEventDetails(${ev.id})"><i class="fas fa-edit"></i></button><button class="bc-btn" onclick="deleteEvent(${ev.id})"><i class="fas fa-trash"></i></button></div><input class="bc-header" value="${ev.title}" onchange="updateEventText(${ev.id}, 'title', this.value)"><textarea class="bc-body" onchange="updateEventText(${ev.id}, 'desc', this.value)">${ev.desc}</textarea><div class="bc-meta">${namesHtml}${ev.where ? '<i class="fas fa-map-marker-alt"></i> '+ev.where + '<br>' : ''}${timeStr}</div></div>`;
             });
-            document.querySelectorAll('#boardList .draggable-item').forEach(addDnDHandlers);
         }
         function populateBoardFilter() { const sel = document.getElementById('boardFilter'); const current = sel.value; sel.innerHTML = '<option value="all">Show All</option>'; currentWorld.data.chars.forEach(c => { sel.innerHTML += `<option value="${c.name}">${c.name}</option>`; }); sel.value = current; }
         function addEvent() { currentWorld.data.timeline.push({ id: Date.now(), title: 'New Scene', desc: '', type: 'default' }); saveAll(); renderBoard(); }
@@ -807,9 +798,9 @@
             const term = document.getElementById('globalSearchInput').value.toLowerCase();
             const res = document.getElementById('globalSearchResults'); res.innerHTML = '';
             if(!term) return;
-            currentWorld.data.chapters.forEach(ch => { if(ch.content.toLowerCase().includes(term) || ch.title.toLowerCase().includes(term)) { res.innerHTML += `<div class="search-res-item" onclick="loadChapter('${ch.id}'); document.getElementById('searchModal').style.display='none'; setTab('write');"><div class="search-highlight">Chapter: ${ch.title}</div><small>Found in text...</small></div>`; } });
-            currentWorld.data.world.forEach(w => { if(w.name.toLowerCase().includes(term) || w.desc.toLowerCase().includes(term)) { res.innerHTML += `<div class="search-res-item" onclick="setTab('world'); document.getElementById('searchModal').style.display='none'; loadEntity('world', '${w.id}')"><div class="search-highlight">World: ${w.name}</div><small>${w.type}</small></div>`; } });
-            currentWorld.data.chars.forEach(c => { if(c.name.toLowerCase().includes(term) || c.notes.toLowerCase().includes(term)) { res.innerHTML += `<div class="search-res-item" onclick="setTab('chars'); document.getElementById('searchModal').style.display='none'; loadEntity('char', '${c.id}')"><div class="search-highlight">Character: ${c.name}</div></div>`; } });
+            currentWorld.data.chapters.forEach(ch => { if(ch.content.toLowerCase().includes(term) || ch.title.toLowerCase().includes(term)) { res.innerHTML += `<div class="search-res-item" onclick="loadChapter('${ch.id}'); document.getElementById('searchModal').style.display='none'; setTab('write', document.querySelector('.sidebar .nav-btn.active'));"><div class="search-highlight">Chapter: ${ch.title}</div><small>Found in text...</small></div>`; } });
+            currentWorld.data.world.forEach(w => { if(w.name.toLowerCase().includes(term) || w.desc.toLowerCase().includes(term)) { res.innerHTML += `<div class="search-res-item" onclick="setTab('world', document.querySelector('.sidebar .nav-btn:nth-child(8)')); document.getElementById('searchModal').style.display='none'; loadEntity('world', '${w.id}')"><div class="search-highlight">World: ${w.name}</div><small>${w.type}</small></div>`; } });
+            currentWorld.data.chars.forEach(c => { if(c.name.toLowerCase().includes(term) || c.notes.toLowerCase().includes(term)) { res.innerHTML += `<div class="search-res-item" onclick="setTab('chars', document.querySelector('.sidebar .nav-btn:nth-child(9)')); document.getElementById('searchModal').style.display='none'; loadEntity('char', '${c.id}')"><div class="search-highlight">Character: ${c.name}</div></div>`; } });
         }
 
         function triggerSpark() { document.getElementById('sparkModal').style.display = 'flex'; generateSpark(); }
@@ -935,12 +926,27 @@
             });
         }
 
-        function setTab(tabId) { 
+        function setTab(tabId, btn) { 
+            // Reset Detail Views
             if(tabId === 'world' || tabId === 'chars') {
                 createNewEntity(tabId === 'world' ? 'world' : 'char');
                 toggleEditMode(tabId === 'world' ? 'world' : 'char', true);
             }
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active')); document.getElementById('view-' + tabId).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active')); event.currentTarget.classList.add('active'); if(tabId === 'conn') renderConnections(); if(tabId === 'read') renderBook(); 
+            
+            // Hide all views
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active')); 
+            // Show target view
+            document.getElementById('view-' + tabId).classList.add('active'); 
+            
+            // Reset Sidebar Buttons
+            document.querySelectorAll('.sidebar .nav-btn').forEach(b => b.classList.remove('active')); 
+            
+            // Set Active Button (if passed)
+            if(btn) btn.classList.add('active'); 
+            
+            // Specific initializers
+            if(tabId === 'conn') renderConnections(); 
+            if(tabId === 'read') renderBook(); 
         }
         function toggleTheme(forceLight) { if(forceLight || !isLight) { document.body.classList.add('light-mode'); isLight = true; } else { document.body.classList.remove('light-mode'); isLight = false; } localStorage.setItem('wsTheme', isLight ? 'light' : 'dark'); }
         function autoSave() { showSaving(); if(activeChapterId) renderChapterList(); }
@@ -949,6 +955,32 @@
         
         function saveToDisk() { const blob = new Blob([JSON.stringify(appData)], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'WorldSmith_Multiverse.json'; a.click(); lastBackupTime = Date.now(); document.getElementById('saveBtn').classList.remove('backup-needed'); }
         function loadFromDisk(input) { const r = new FileReader(); r.onload = (e) => { try { appData = JSON.parse(e.target.result); switchWorld(appData.activeId); location.reload(); } catch(err) { alert("Invalid File"); } }; r.readAsText(input.files[0]); }
+        function toggleRightPanel() { const p = document.getElementById('rightPanel'); if(window.innerWidth < 768) { p.classList.toggle('mobile-show'); } else { p.classList.toggle('collapsed'); } }
+        function toggleMobileChapters() { document.getElementById('chapterSidebar').classList.toggle('show'); }
+        function searchWiki() {
+            const typeColors = { "Character": "var(--accent-sec)", "Location": "#66bb6a", "History": "#ef5350", "Race": "#26c6da", "Religion": "#ab47bc", "Faction": "#ffa726", "Magic": "#42a5f5" };
+            const filter = document.getElementById('wikiFilter').value;
+            const term = document.querySelector('.wiki-search').value.toLowerCase();
+            const res = document.getElementById('wikiResults'); res.innerHTML = '';
+            
+            if(filter === 'all' || filter !== 'char') {
+                currentWorld.data.world.forEach(w => {
+                    if((filter === 'all' || filter === 'world' || filter === w.type) && (w.name || '').toLowerCase().includes(term)) {
+                        const timeStr = w.time ? `<br><b>${w.time}</b>` : '';
+                        const color = typeColors[w.type] || 'var(--accent)';
+                        res.innerHTML += `<div class="wiki-card" style="border-left-color: ${color};" onclick="this.classList.toggle('expanded')"><h4>${w.name || 'Untitled'} <small>${w.type}</small></h4>${timeStr}<small>${w.desc.substring(0, 50)}...</small><div class="wiki-desc">${w.desc}</div></div>`;
+                    }
+                });
+            }
+            if(filter === 'all' || filter === 'char') {
+                currentWorld.data.chars.forEach(c => {
+                    if((c.name || '').toLowerCase().includes(term)) {
+                        const color = typeColors["Character"];
+                        res.innerHTML += `<div class="wiki-card" style="border-left-color: ${color};" onclick="this.classList.toggle('expanded')"><h4>${c.name || 'Untitled'}</h4><small>${c.race || ''}</small><div class="wiki-desc">Goal: ${c.goal}<br><br>${c.notes}</div></div>`;
+                    }
+                });
+            }
+        }
     </script>
 </body>
-</html>v
+</html>
