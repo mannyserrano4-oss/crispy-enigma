@@ -705,10 +705,23 @@
         function toggleSpellcheck() {
             const editor = document.getElementById('chapterContent');
             const btn = document.getElementById('btnSpell');
-            const current = editor.spellcheck;
-            editor.spellcheck = !current;
-            if(!current) { btn.classList.add('active'); } else { btn.classList.remove('active'); }
-            const text = editor.innerHTML; editor.innerHTML = text; 
+            
+            // Check current state based on the button class, not the editor property
+            const isCurrentlyOn = btn.classList.contains('active');
+            
+            if (isCurrentlyOn) {
+                // Turn OFF
+                editor.setAttribute('spellcheck', 'false');
+                btn.classList.remove('active');
+            } else {
+                // Turn ON
+                editor.setAttribute('spellcheck', 'true');
+                btn.classList.add('active');
+            }
+            
+            // Force a "blur" and "focus" to make the browser re-scan for errors
+            editor.blur();
+            editor.focus();
         }
 
         function checkFormat() {
