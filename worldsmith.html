@@ -83,7 +83,7 @@
             width: 100%; min-height: 60vh; 
             background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; 
             color: var(--text-main); 
-            font-size: 18px; /* Base size */
+            font-size: 18px; /* Standard Size */
             line-height: 1.8; 
             padding: 30px; padding-bottom: 50vh; 
             box-sizing: border-box; font-family: 'Georgia', serif; outline: none; overflow-y: visible; flex:1; 
@@ -104,7 +104,7 @@
         .progress-container { width: 150px; height: 6px; background: var(--bg-input); border-radius: 3px; overflow: hidden; display: flex; }
         .progress-fill { height: 100%; background: #4caf50; width: 0%; transition: width 0.3s; }
 
-        /* RIGHT PANEL */
+        /* RIGHT PANEL (WIKI) - Sliding Logic */
         .right-panel { width: 0; overflow: hidden; background: var(--bg-panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; padding: 0; flex-shrink: 0; transition: width 0.3s, padding 0.3s; }
         .right-panel.open { width: 350px; padding: 15px; }
 
@@ -256,17 +256,6 @@
                     
                     <div class="divider"></div>
                     
-                    <select class="toolbar-select" onchange="setFontSize(this.value); this.value='';" title="Text Size">
-                        <option value="">Size...</option>
-                        <option value="12">Tiny (12px)</option>
-                        <option value="14">Small (14px)</option>
-                        <option value="18">Normal (18px)</option>
-                        <option value="24">Medium (24px)</option>
-                        <option value="30">Large (30px)</option>
-                        <option value="36">Title (36px)</option>
-                        <option value="48">Huge (48px)</option>
-                    </select>
-
                     <div class="divider"></div>
                     <button class="fmt-btn" id="btnLeft" onmousedown="event.preventDefault(); formatDoc('justifyLeft')" title="Left (Ctrl+L)"><i class="fas fa-align-left"></i></button>
                     <button class="fmt-btn" id="btnCenter" onmousedown="event.preventDefault(); formatDoc('justifyCenter')" title="Center (Ctrl+E)"><i class="fas fa-align-center"></i></button>
@@ -357,7 +346,6 @@
                     <li><b>Spellcheck (ABC Icon):</b> Toggles red squiggles on/off.</li>
                     <li><b>Status Dots:</b> Click the colored dot next to a chapter to cycle status (Red=Draft, Yellow=Edit, Green=Done).</li>
                     <li><b>Drag & Drop:</b> Drag chapters in the list to reorder them for the final book.</li>
-                    <li><b>Highlighting:</b> Use the dropdown to format specific words (bold, large text) without changing the whole page.</li>
                 </ul>
             </div>
 
@@ -568,6 +556,10 @@
                         case 'b': e.preventDefault(); formatDoc('bold'); break;
                         case 'i': e.preventDefault(); formatDoc('italic'); break;
                         case 'u': e.preventDefault(); formatDoc('underline'); break;
+                        case 'e': e.preventDefault(); formatDoc('justifyCenter'); break;
+                        case 'l': e.preventDefault(); formatDoc('justifyLeft'); break;
+                        case 'r': e.preventDefault(); formatDoc('justifyRight'); break;
+                        case 'j': e.preventDefault(); formatDoc('justifyFull'); break;
                     }
                 }
             });
@@ -579,20 +571,6 @@
         function checkBackupStatus() {
             if(Date.now() - lastBackupTime > 30 * 60 * 1000) {
                 document.getElementById('saveBtn').classList.add('backup-needed');
-            }
-        }
-
-        // --- CUSTOM FONT SIZE LOGIC ---
-        function setFontSize(val) {
-            // Use CSS injection for precise sizing
-            const sel = window.getSelection();
-            if (sel.rangeCount) {
-                const span = document.createElement("span");
-                span.style.fontSize = val + "px";
-                const range = sel.getRangeAt(0).cloneRange();
-                range.surroundContents(span);
-                sel.removeAllRanges();
-                sel.addRange(range);
             }
         }
 
@@ -694,7 +672,7 @@
                 const wc = countWords(div.innerText || "");
                 
                 list.innerHTML += `
-                <div class="chapter-item ${ch.id === activeChapterId ? 'active' : ''}" data-id="${ch.id}" onclick="loadChapter('${ch.id}')">
+                <div class="chapter-item draggable-item ${ch.id === activeChapterId ? 'active' : ''}" draggable="true" onclick="loadChapter('${ch.id}')">
                     <span class="chapter-handle"><i class="fas fa-grip-vertical"></i></span>
                     <div class="chapter-info">
                         <div class="chapter-title-text">${ch.title}</div>
@@ -706,18 +684,7 @@
                     </div>
                 </div>`; 
             });
-            new Sortable(list, {
-                handle: '.chapter-handle', animation: 150,
-                onEnd: function() {
-                    const newOrder = [];
-                    list.querySelectorAll('.chapter-item').forEach(el => {
-                        const id = el.getAttribute('data-id');
-                        newOrder.push(currentWorld.data.chapters.find(c => c.id === id));
-                    });
-                    currentWorld.data.chapters = newOrder;
-                    saveAll();
-                }
-            });
+            document.querySelectorAll('#chapterList .draggable-item').forEach(addDnDHandlers);
         }
 
         function renderBook() { saveCurrentBuffer(); const div = document.getElementById('bookView'); div.innerHTML = ''; currentWorld.data.chapters.forEach(ch => { div.innerHTML += `<div class="book-chapter"><div class="book-title">${ch.title}</div><div class="book-body">${ch.content}</div></div>`; }); }
@@ -774,8 +741,9 @@
                         namesHtml += `<div><i class="fas fa-user"></i> ${cleanName}${ageStr}</div>`;
                     });
                 }
-                div.innerHTML += `<div class="board-card ${typeClass}" data-id="${ev.id}"><div class="bc-actions"><button class="bc-btn" onclick="openEventDetails(${ev.id})"><i class="fas fa-edit"></i></button><button class="bc-btn" onclick="deleteEvent(${ev.id})"><i class="fas fa-trash"></i></button></div><input class="bc-header" value="${ev.title}" onchange="updateEventText(${ev.id}, 'title', this.value)"><textarea class="bc-body" onchange="updateEventText(${ev.id}, 'desc', this.value)">${ev.desc}</textarea><div class="bc-meta">${namesHtml}${ev.where ? '<i class="fas fa-map-marker-alt"></i> '+ev.where + '<br>' : ''}${timeStr}</div></div>`;
+                div.innerHTML += `<div class="board-card draggable-item ${typeClass}" draggable="true"><div class="bc-actions"><button class="bc-btn" onclick="openEventDetails(${ev.id})"><i class="fas fa-edit"></i></button><button class="bc-btn" onclick="deleteEvent(${ev.id})"><i class="fas fa-trash"></i></button></div><input class="bc-header" value="${ev.title}" onchange="updateEventText(${ev.id}, 'title', this.value)"><textarea class="bc-body" onchange="updateEventText(${ev.id}, 'desc', this.value)">${ev.desc}</textarea><div class="bc-meta">${namesHtml}${ev.where ? '<i class="fas fa-map-marker-alt"></i> '+ev.where + '<br>' : ''}${timeStr}</div></div>`;
             });
+            document.querySelectorAll('#boardList .draggable-item').forEach(addDnDHandlers);
         }
         function populateBoardFilter() { const sel = document.getElementById('boardFilter'); const current = sel.value; sel.innerHTML = '<option value="all">Show All</option>'; currentWorld.data.chars.forEach(c => { sel.innerHTML += `<option value="${c.name}">${c.name}</option>`; }); sel.value = current; }
         function addEvent() { currentWorld.data.timeline.push({ id: Date.now(), title: 'New Scene', desc: '', type: 'default' }); saveAll(); renderBoard(); }
@@ -821,7 +789,7 @@
             document.getElementById('sparkOutput').innerText = prompts[Math.floor(Math.random() * prompts.length)];
         }
 
-        function showSaving() { const ind = document.getElementById('saveIndicator'); ind.innerHTML = '<i class="fas fa-pen"></i> Saving...'; ind.className = 'save-indicator saving'; clearTimeout(saveTimer); saveTimer = setTimeout(() => { saveAll(); ind.innerHTML = '<i class="fas fa-check-circle"></i> Saved'; ind.className = 'save-indicator saved'; }, 1000); }
+        function showSaving() { const ind = document.getElementById('saveIndicator'); ind.innerHTML = '✔ Saving...'; ind.className = 'save-indicator saving'; clearTimeout(saveTimer); saveTimer = setTimeout(() => { saveAll(); ind.innerHTML = '✔ Saved'; ind.className = 'save-indicator saved'; }, 1000); }
         function toggleZenMode() { document.body.classList.toggle('zen-mode'); }
 
         function saveToDisk() { const blob = new Blob([JSON.stringify(appData)], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'WorldSmith_Multiverse.json'; a.click(); lastBackupTime = Date.now(); document.getElementById('saveBtn').classList.remove('backup-needed'); }
@@ -950,6 +918,43 @@
                     }
                 });
             }
+        }
+
+        // --- NATIVE DRAG AND DROP ---
+        let dragSrcEl = null;
+        function handleDragStart(e) { dragSrcEl = this; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/html', this.innerHTML); this.classList.add('dragging'); }
+        function handleDragOver(e) { if (e.preventDefault) e.preventDefault(); e.dataTransfer.dropEffect = 'move'; return false; }
+        function handleDragEnter(e) { this.classList.add('over'); }
+        function handleDragLeave(e) { this.classList.remove('over'); }
+        function handleDrop(e) {
+            if (e.stopPropagation) e.stopPropagation();
+            if (dragSrcEl !== this) {
+                const container = this.parentNode;
+                const items = Array.from(container.children);
+                const srcIdx = items.indexOf(dragSrcEl);
+                const destIdx = items.indexOf(this);
+                if(container.id === 'chapterList') {
+                    const temp = currentWorld.data.chapters[srcIdx];
+                    currentWorld.data.chapters[srcIdx] = currentWorld.data.chapters[destIdx];
+                    currentWorld.data.chapters[destIdx] = temp;
+                    saveAll(); renderChapterList();
+                } else if(container.id === 'boardList') {
+                    const temp = currentWorld.data.timeline[srcIdx];
+                    currentWorld.data.timeline[srcIdx] = currentWorld.data.timeline[destIdx];
+                    currentWorld.data.timeline[destIdx] = temp;
+                    saveAll(); renderBoard();
+                }
+            }
+            return false;
+        }
+        function handleDragEnd(e) { this.classList.remove('dragging'); this.parentNode.querySelectorAll('.draggable-item').forEach(item => item.classList.remove('over')); }
+        function addDnDHandlers(elem) {
+            elem.addEventListener('dragstart', handleDragStart, false);
+            elem.addEventListener('dragenter', handleDragEnter, false);
+            elem.addEventListener('dragover', handleDragOver, false);
+            elem.addEventListener('dragleave', handleDragLeave, false);
+            elem.addEventListener('drop', handleDrop, false);
+            elem.addEventListener('dragend', handleDragEnd, false);
         }
     </script>
 </body>
