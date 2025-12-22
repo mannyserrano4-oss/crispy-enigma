@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Book a Cut</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg: #1a1b21;
+            --card: #25262e;
+            --text: #e0e0e0;
+            --accent: #d4af37; /* Gold for Barber vibe */
+            --input-bg: #2f303a;
+        }
+        body { margin: 0; background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; box-sizing: border-box; }
+        
+        .booking-card {
+            background: var(--card);
+            width: 100%;
+            max-width: 400px;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            text-align: center;
+            border-top: 5px solid var(--accent);
+        }
+
+        h1 { margin: 0 0 10px 0; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; }
+        p { color: #888; font-size: 0.9rem; margin-bottom: 30px; }
+
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; color: #888; }
+        
+        select, input {
+            width: 100%;
+            padding: 15px;
+            background: var(--input-bg);
+            border: 1px solid #444;
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: 0.2s;
+        }
+        select:focus, input:focus { border-color: var(--accent); }
+
+        .btn-group { display: flex; gap: 10px; margin-top: 30px; }
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-sms { background: #4caf50; color: white; }
+        .btn-wa { background: #25D366; color: white; }
+
+        .disclaimer { font-size: 0.7rem; color: #555; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="booking-card">
+        <h1><i class="fas fa-cut"></i> The Shop</h1>
+        <p>Select a time and send request.</p>
+
+        <div class="form-group">
+            <label>Your Name</label>
+            <input type="text" id="cName" placeholder="John Doe">
+        </div>
+
+        <div class="form-group">
+            <label>Service</label>
+            <select id="cService">
+                <option value="Haircut">Haircut ($30)</option>
+                <option value="Shave">Hot Towel Shave ($20)</option>
+                <option value="Full Service">Cut & Shave ($45)</option>
+                <option value="Shape Up">Line Up / Shape Up ($15)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Date & Time Preference</label>
+            <input type="datetime-local" id="cDate">
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-sms" onclick="sendRequest('sms')">
+                <i class="fas fa-comment-dots"></i> Text
+            </button>
+            <button class="btn btn-wa" onclick="sendRequest('wa')">
+                <i class="fab fa-whatsapp"></i> WhatsApp
+            </button>
+        </div>
+
+        <div class="disclaimer">
+            *This will open your messaging app to send the request. Appointment is not confirmed until reply.
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIGURATION: CHANGE THIS TO YOUR NUMBER ---
+        const BARBER_PHONE = "15550000000"; // Format: 1 + Area Code + Number (No spaces/dashes)
+        
+        function sendRequest(type) {
+            const name = document.getElementById('cName').value;
+            const service = document.getElementById('cService').value;
+            const dateVal = document.getElementById('cDate').value;
+
+            if(!name || !dateVal) {
+                alert("Please fill in your Name and a Date.");
+                return;
+            }
+
+            // Format the date to look nice
+            const dateObj = new Date(dateVal);
+            const dateStr = dateObj.toLocaleDateString();
+            const timeStr = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+            // Create the message
+            const message = `Yo! It's ${name}. I'd like to request a ${service} on ${dateStr} at ${timeStr}. Is that slot open?`;
+
+            // Open the link
+            if(type === 'sms') {
+                // SMS Link uses a slightly different format for iPhone vs Android, but 'sms:' usually works universally now
+                // For universality we use the body separator
+                const sep = navigator.userAgent.match(/iPhone|iPad|iPod/i) ? '&' : '?';
+                window.location.href = `sms:${BARBER_PHONE}${sep}body=${encodeURIComponent(message)}`;
+            } else if (type === 'wa') {
+                window.open(`https://wa.me/${BARBER_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
+            }
+        }
+    </script>
+
+</body>
+</html>
