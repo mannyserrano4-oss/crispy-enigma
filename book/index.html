@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Manny Serrano</title>
-    <link rel="icon" type="image/png" href="icon.png?v=2">
+    <link rel="icon" type="image/png" href="icon.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -43,7 +43,7 @@
         <div class="bg-violet-600 p-6 text-center relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
             
-            <img src="icon.png" alt="Manny" class="w-24 h-24 rounded-full mx-auto mb-3 border-4 border-white shadow-lg relative z-10 object-cover">
+            <img src="gitpp.png" alt="Manny" class="w-24 h-24 rounded-full mx-auto mb-3 border-4 border-white shadow-lg relative z-10 object-cover">
             
             <h1 class="text-2xl font-bold text-white relative z-10">Book an Appointment</h1>
             <p class="text-violet-200 text-sm mt-1 relative z-10">Secure your spot with Manny.</p>
@@ -61,18 +61,17 @@
                     <label class="block text-xs font-bold text-violet-700 uppercase tracking-wider mb-1">Service</label>
                     <div class="relative">
                         <select id="cService" class="form-input appearance-none cursor-pointer" onchange="updatePrice()">
-                            <option value="Haircut" data-price="30">Haircut ($30)</option>
-                            <option value="Skin Fade" data-price="35">Skin Fade ($35)</option>
-                            <option value="Beard Trim" data-price="20">Beard Trim ($20)</option>
-                            <option value="Full Service" data-price="45">Full Service ($45)</option>
+                            <option value="Haircut" data-price="30">Haircut ($25)</option>
+                            <option value="Skin Fade" data-price="35">Skin Fade ($30)</option>
+                            <option value="Beard Trim" data-price="20">Beard Trim ($15)</option>
+                            <option value="Full Service" data-price="45">Full Service ($35)</option>
                             <option value="Line Up" data-price="15">Line Up Only ($15)</option>
-                            <option value="House Call" data-price="100+">House Call (Starts at $100)</option>
+                            <option value="House Call" data-price="100+">House Call (Starts at $50)</option>
                             <option value="General Inquiry" data-price="0">General Inquiry</option>
                         </select>
                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-violet-600"><i class="fa-solid fa-chevron-down text-xs"></i></div>
                     </div>
                 </div>
-                
                 <div class="w-24">
                     <label class="block text-xs font-bold text-violet-700 uppercase tracking-wider mb-1 text-center">Est. Cost</label>
                     <div id="priceDisplay" class="h-[50px] flex items-center justify-center bg-violet-100 rounded-lg text-violet-800 font-bold text-lg border border-violet-200">
@@ -91,9 +90,33 @@
                 <textarea id="cNotes" rows="2" placeholder="e.g. Leave the top long..." class="form-input resize-none"></textarea>
             </div>
 
-            <div class="bg-violet-50 border border-violet-200 rounded-lg p-3 flex items-start gap-3">
-                <i class="fa-solid fa-image text-violet-500 mt-1"></i>
-                <div class="text-xs text-violet-800">
+            <div class="bg-violet-50 border border-violet-200 rounded-lg p-4">
+                <h3 class="text-center text-xs font-bold text-violet-900 uppercase tracking-wide mb-3">
+                    <i class="fa-solid fa-gift mr-1"></i> Deals & Loyalty
+                </h3>
+                <ul class="space-y-3">
+                    <li class="flex items-start gap-3 text-xs text-gray-700">
+                        <i class="fa-solid fa-user-plus text-violet-500 mt-0.5"></i>
+                        <div><span class="font-bold text-violet-800">Refer a Friend:</span> You both get $5 off your next cut.</div>
+                    </li>
+                    <li class="flex items-start gap-3 text-xs text-gray-700">
+                        <i class="fa-solid fa-scissors text-violet-500 mt-0.5"></i>
+                        <div><span class="font-bold text-violet-800">Loyalty:</span> Every 6th cut is FREE* <span class="italic text-gray-500">(Subject to change)</span>.</div>
+                    </li>
+                    <li class="flex items-start gap-3 text-xs text-gray-700">
+                        <i class="fa-solid fa-cake-candles text-violet-500 mt-0.5"></i>
+                        <div><span class="font-bold text-violet-800">Birthday:</span> 50% off (Must have 1 previous full-price visit).</div>
+                    </li>
+                    <li class="flex items-start gap-3 text-xs text-gray-700">
+                        <i class="fa-solid fa-calendar-check text-violet-500 mt-0.5"></i>
+                        <div><span class="font-bold text-violet-800">Cuttiversary:</span> 50% off on your yearly "anniversary."</div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-start gap-3">
+                <i class="fa-solid fa-image text-blue-500 mt-1"></i>
+                <div class="text-xs text-blue-800">
                     <span class="font-bold">Have a reference photo?</span><br>
                     Please attach it to the text message after you click "Send".
                 </div>
@@ -102,7 +125,7 @@
             <div class="flex items-start gap-3 px-1">
                 <input type="checkbox" id="cPolicy" class="mt-1 w-4 h-4 text-violet-600 rounded border-gray-300 focus:ring-violet-500 cursor-pointer">
                 <label for="cPolicy" class="text-xs text-gray-600 cursor-pointer">
-                    I agree to the <span class="font-bold text-violet-700">Cancellation Policy</span>. (No-shows or late cancellations may require a deposit for future booking).
+                    I agree to the <span class="font-bold text-violet-700">Cancellation Policy</span>.
                 </label>
             </div>
 
@@ -120,19 +143,30 @@
                 <div class="space-y-2">
                     <details class="group bg-white border border-violet-100 rounded-lg open:shadow-md transition-all">
                         <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-3 text-sm text-violet-800 bg-violet-50/50 hover:bg-violet-100 rounded-lg">
-                            <span>🕒 Operating Hours</span>
+                            <span>📅 Do you accept walk-ins?</span>
                             <span class="transition group-open:rotate-180"><i class="fa-solid fa-chevron-down text-xs"></i></span>
                         </summary>
                         <div class="text-gray-600 text-xs p-3 pt-0 leading-relaxed">
-                            Mon-Fri: 9am - 6pm<br>Sat: 10am - 4pm<br>Sun: Closed
+                            I am primarily appointment-only to ensure quality. However, text me to check for last-minute gaps!
                         </div>
                     </details>
+                    
+                    <details class="group bg-white border border-violet-100 rounded-lg open:shadow-md transition-all">
+                        <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-3 text-sm text-violet-800 bg-violet-50/50 hover:bg-violet-100 rounded-lg">
+                            <span>⏱️ Running Late?</span>
+                            <span class="transition group-open:rotate-180"><i class="fa-solid fa-chevron-down text-xs"></i></span>
+                        </summary>
+                        <div class="text-gray-600 text-xs p-3 pt-0 leading-relaxed">
+                            There is a 15-minute grace period. After that, we may need to reschedule to respect the next client's time.
+                        </div>
+                    </details>
+
                     <details class="group bg-white border border-violet-100 rounded-lg open:shadow-md transition-all">
                         <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-3 text-sm text-violet-800 bg-violet-50/50 hover:bg-violet-100 rounded-lg">
                             <span>💵 Payment Methods</span>
                             <span class="transition group-open:rotate-180"><i class="fa-solid fa-chevron-down text-xs"></i></span>
                         </summary>
-                        <div class="text-gray-600 text-xs p-3 pt-0 leading-relaxed">Cash, CashApp, Zelle, Apple Pay.</div>
+                        <div class="text-gray-600 text-xs p-3 pt-0 leading-relaxed">Cash, CashApp, Venmo, Apple Pay. <strong>Cash</strong> is always king!</div>
                     </details>
                 </div>
             </div>
@@ -145,21 +179,16 @@
 
     <script>
         // === CONFIGURATION ===
-        const BARBER_PHONE = "15550000000"; // REPLACE WITH YOUR NUMBER
+        const BARBER_PHONE = "9014437338"; // REPLACE WITH YOUR NUMBER
         // =====================
 
         function updatePrice() {
             const select = document.getElementById('cService');
             const price = select.options[select.selectedIndex].getAttribute('data-price');
             const display = document.getElementById('priceDisplay');
-            
-            if (price === '0') {
-                display.innerText = "-";
-            } else if (price.includes('+')) {
-                display.innerText = "$" + price;
-            } else {
-                display.innerText = "$" + price;
-            }
+            if (price === '0') { display.innerText = "-"; } 
+            else if (price.includes('+')) { display.innerText = "$" + price; } 
+            else { display.innerText = "$" + price; }
         }
 
         function sendRequest(type) {
@@ -169,12 +198,10 @@
             const notes = document.getElementById('cNotes').value.trim();
             const policy = document.getElementById('cPolicy').checked;
 
-            // Validation
             if(!name) { alert("Please enter your name."); return; }
             if(!dateVal && service !== 'General Inquiry') { alert("Please select a date and time."); return; }
-            if(!policy) { alert("Please accept the cancellation policy to continue."); return; }
+            if(!policy) { alert("Please accept the cancellation policy."); return; }
 
-            // Format Date
             let timeStr = "Anytime";
             if (dateVal) {
                 const dateObj = new Date(dateVal);
@@ -183,14 +210,12 @@
                 timeStr = `${d} at ${t}`;
             }
 
-            // Construct Message
             let message = `Yo Manny! It's ${name}.`;
             if (service === 'General Inquiry') { message += ` I have a question about booking/services.`; }
             else { message += ` I'd like to request a ${service} on ${timeStr}.`; }
             if (notes) { message += `\n\nNotes: ${notes}`; }
             message += `\n\n(I've read the policy & am waiting for confirmation)`;
 
-            // Open App
             if(type === 'sms') {
                 const sep = navigator.userAgent.match(/iPhone|iPad|iPod/i) ? '&' : '?';
                 window.location.href = `sms:${BARBER_PHONE}${sep}body=${encodeURIComponent(message)}`;
