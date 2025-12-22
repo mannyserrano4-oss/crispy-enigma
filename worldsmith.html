@@ -612,6 +612,27 @@
             refreshLists(); renderBoard(); searchWiki();
         }
 
+        function openLibrary() { 
+            // 1. Show the popup
+            document.getElementById('libModal').style.display = 'flex'; 
+            // 2. Load the list of worlds
+            renderLib(); 
+        }
+        
+        function renderLib() { 
+            const list = document.getElementById('libList'); 
+            list.innerHTML = ''; 
+            
+            // Safety check: ensure worlds exist
+            if (!appData.worlds) appData.worlds = [];
+        
+            // Loop through saved worlds and create buttons
+            appData.worlds.forEach(w => {
+                const isActive = (w.id === appData.activeId) ? 'border:1px solid var(--accent);' : '';
+                list.innerHTML += `<div style="padding:10px; background:var(--bg-input); margin-bottom:5px; cursor:pointer; border-radius:5px; ${isActive}" onclick="switchWorld('${w.id}')">${w.name}</div>`; 
+            }); 
+        }
+
         function createChapter() {
             const newCh = { id: 'ch'+Date.now(), title: 'New Chapter', content: '', notes: '', status: 'draft' };
             currentWorld.data.chapters.push(newCh); saveAll(); renderChapterList(); loadChapter(newCh.id);
