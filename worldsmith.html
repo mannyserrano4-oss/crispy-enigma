@@ -702,27 +702,32 @@
 
         function formatDoc(cmd, value=null) { document.execCommand(cmd, false, value); document.getElementById('chapterContent').focus(); checkFormat(); }
         
-        function toggleSpellcheck() {
+       function toggleSpellcheck() {
             const editor = document.getElementById('chapterContent');
             const btn = document.getElementById('btnSpell');
             
-            // Check current state based on the button class, not the editor property
-            const isCurrentlyOn = btn.classList.contains('active');
+            // 1. Toggle the button look
+            // If it is currently active, we are turning it OFF.
+            const isTurningOn = !btn.classList.contains('active');
             
-            if (isCurrentlyOn) {
-                // Turn OFF
-                editor.setAttribute('spellcheck', 'false');
-                btn.classList.remove('active');
+            if (isTurningOn) {
+                btn.classList.add('active'); // Make button look pressed
+                editor.setAttribute('spellcheck', 'true'); // Tell browser to check
             } else {
-                // Turn ON
-                editor.setAttribute('spellcheck', 'true');
-                btn.classList.add('active');
+                btn.classList.remove('active'); // Make button look normal
+                editor.setAttribute('spellcheck', 'false'); // Tell browser to stop
             }
+        
+            // 2. THE "HARD REBOOT"
+            // We briefly disable editing. This forces the browser to dump its cache
+            // of the text. When we re-enable it a millisecond later, the browser
+            // has to re-scan the whole thing, applying the new spellcheck setting.
+            editor.contentEditable = "false";
+            editor.contentEditable = "true";
             
-            // Force a "blur" and "focus" to make the browser re-scan for errors
-            editor.blur();
+            // 3. Put cursor back in the box
             editor.focus();
-        }
+    }
 
         function checkFormat() {
             document.getElementById('btnBold').classList.toggle('active', document.queryCommandState('bold'));
