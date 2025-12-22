@@ -252,7 +252,6 @@
                     <button class="fmt-btn" id="btnBold" onmousedown="event.preventDefault(); formatDoc('bold')" title="Bold (Ctrl+B)"><i class="fas fa-bold"></i></button>
                     <button class="fmt-btn" id="btnItalic" onmousedown="event.preventDefault(); formatDoc('italic')" title="Italic (Ctrl+I)"><i class="fas fa-italic"></i></button>
                     <button class="fmt-btn" id="btnUnderline" onmousedown="event.preventDefault(); formatDoc('underline')" title="Underline (Ctrl+U)"><i class="fas fa-underline"></i></button>
-                    <button class="fmt-btn" id="btnSpell" onmousedown="event.preventDefault(); toggleSpellcheck()" title="Toggle Spellcheck (AB Checkmark)"><i class="fas fa-spell-check"></i></button>
                     
                     <div class="divider"></div>
                     
@@ -650,7 +649,7 @@
             
             // Set Spellcheck state if saved, else default to false
             document.getElementById('chapterContent').spellcheck = false;
-            document.getElementById('btnSpell').classList.remove('active');
+            
             
             renderChapterList(); updateWordCount();
         }
@@ -701,33 +700,6 @@
         }
 
         function formatDoc(cmd, value=null) { document.execCommand(cmd, false, value); document.getElementById('chapterContent').focus(); checkFormat(); }
-        
-       function toggleSpellcheck() {
-            const editor = document.getElementById('chapterContent');
-            const btn = document.getElementById('btnSpell');
-            
-            // 1. Toggle the button look
-            // If it is currently active, we are turning it OFF.
-            const isTurningOn = !btn.classList.contains('active');
-            
-            if (isTurningOn) {
-                btn.classList.add('active'); // Make button look pressed
-                editor.setAttribute('spellcheck', 'true'); // Tell browser to check
-            } else {
-                btn.classList.remove('active'); // Make button look normal
-                editor.setAttribute('spellcheck', 'false'); // Tell browser to stop
-            }
-        
-            // 2. THE "HARD REBOOT"
-            // We briefly disable editing. This forces the browser to dump its cache
-            // of the text. When we re-enable it a millisecond later, the browser
-            // has to re-scan the whole thing, applying the new spellcheck setting.
-            editor.contentEditable = "false";
-            editor.contentEditable = "true";
-            
-            // 3. Put cursor back in the box
-            editor.focus();
-    }
 
         function checkFormat() {
             document.getElementById('btnBold').classList.toggle('active', document.queryCommandState('bold'));
