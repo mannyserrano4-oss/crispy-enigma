@@ -68,13 +68,13 @@
             
             <img src="gitpp.png" alt="Manny" class="w-24 h-24 rounded-full mx-auto mb-2 border-4 border-white shadow-lg relative z-10 object-cover">
             
-            <h1 class="text-2xl font-bold text-white relative z-10">Book Manny Serrano</h1>
+            <h1 class="text-2xl font-bold text-white relative z-10">Book your cut with Manny</h1>
             
             <div class="flex justify-center gap-1 text-yellow-300 text-xs mb-1 relative z-10">
                 <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
             </div>
             
-            <p class="text-violet-200 text-sm relative z-10">Professional Barber & Comedian</p>
+            <p class="text-violet-200 text-sm relative z-10">Professional Barber & Unpaid Comedian</p>
         </div>
 
         <div class="p-6 space-y-5">
@@ -89,12 +89,12 @@
                     <label class="block text-xs font-bold text-violet-700 uppercase tracking-wider mb-1">Service</label>
                     <div class="relative">
                         <select id="cService" class="form-input appearance-none cursor-pointer" onchange="updatePrice()">
-                            <option value="Haircut" data-price="30">Haircut ($30)</option>
-                            <option value="Skin Fade" data-price="35">Skin Fade ($35)</option>
-                            <option value="Beard Trim" data-price="20">Beard Trim ($20)</option>
-                            <option value="Full Service" data-price="45">Full Service ($45)</option>
+                            <option value="Haircut" data-price="25">Haircut ($25)</option>
+                            <option value="Skin Fade" data-price="30">Skin Fade ($30)</option>
+                            <option value="Beard Trim" data-price="15">Beard Trim ($15)</option>
+                            <option value="Full Service" data-price="35">Full Service ($35)</option>
                             <option value="Line Up" data-price="15">Line Up Only ($15)</option>
-                            <option value="House Call" data-price="100+">House Call (Starts at $100)</option>
+                            <option value="House Call" data-price="50+">House Call (Starts at $50)</option>
                             <option value="General Inquiry" data-price="0">General Inquiry</option>
                         </select>
                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-violet-600"><i class="fa-solid fa-chevron-down text-xs"></i></div>
@@ -103,7 +103,7 @@
                 <div class="w-24">
                     <label class="block text-xs font-bold text-violet-700 uppercase tracking-wider mb-1 text-center">Est. Cost</label>
                     <div id="priceDisplay" class="h-[50px] flex items-center justify-center bg-violet-100 rounded-lg text-violet-800 font-bold text-lg border border-violet-200 shadow-inner">
-                        $30
+                        $25
                     </div>
                 </div>
             </div>
@@ -120,12 +120,12 @@
 
             <div class="bg-gradient-to-br from-violet-50 to-white border border-violet-200 rounded-lg p-4 shadow-sm">
                 <h3 class="text-center text-xs font-bold text-violet-900 uppercase tracking-wide mb-3 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-crown text-yellow-500"></i> Deals & Rewards
+                    <i class="fa-solid fa-crown text-yellow-500"></i> Deals & Loyalty
                 </h3>
                 <ul class="space-y-3">
                     <li class="flex items-start gap-3 text-xs text-gray-700">
                         <div class="min-w-[20px] text-center"><i class="fa-solid fa-user-group text-violet-500"></i></div>
-                        <div><span class="font-bold text-violet-800">Refer a Friend:</span> You both get $5 off.</div>
+                        <div><span class="font-bold text-violet-800">Refer a Friend:</span> You both get $5 off your next cut.</div>
                     </li>
                     <li class="flex items-start gap-3 text-xs text-gray-700">
                         <div class="min-w-[20px] text-center"><i class="fa-solid fa-scissors text-violet-500"></i></div>
@@ -137,7 +137,7 @@
                     </li>
                     <li class="flex items-start gap-3 text-xs text-gray-700">
                         <div class="min-w-[20px] text-center"><i class="fa-solid fa-calendar-check text-violet-500"></i></div>
-                        <div><span class="font-bold text-violet-800">Cuttiversary:</span> 50% off your 1-year anniversary.</div>
+                        <div><span class="font-bold text-violet-800">Cuttiversary:</span> 50% off your yearly anniversary.</div>
                     </li>
                 </ul>
                 <p class="text-[10px] text-center text-gray-400 mt-2 italic">*Loyalty terms subject to change.</p>
@@ -153,8 +153,11 @@
 
             <div class="flex items-start gap-3 px-1">
                 <input type="checkbox" id="cPolicy" class="mt-1 w-4 h-4 text-violet-600 rounded border-gray-300 focus:ring-violet-500 cursor-pointer">
-                <label for="cPolicy" class="text-xs text-gray-600 cursor-pointer">
-                    I agree to the <span class="font-bold text-violet-700">Cancellation Policy</span>.
+                <label for="cPolicy" class="text-xs text-gray-600 cursor-pointer leading-relaxed">
+                    I agree to the <span class="font-bold text-violet-700">Cancellation Policy</span>: 
+                    <span class="block mt-1 text-[10px] text-gray-500">
+                        24 hours in advance is preferred. No-shows or late cancellations may require a deposit for future bookings.
+                    </span>
                 </label>
             </div>
 
@@ -168,7 +171,7 @@
             </div>
 
             <div class="mt-8 pt-6 border-t border-gray-200">
-                <h3 class="text-center text-sm font-bold text-violet-900 uppercase tracking-wide mb-4">FAQ</h3>
+                <h3 class="text-center text-sm font-bold text-violet-900 uppercase tracking-wide mb-4">FAQ & INFO</h3>
                 <div class="space-y-2">
                     <details class="group bg-white border border-violet-100 rounded-lg open:shadow-md transition-all">
                         <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-3 text-sm text-violet-800 bg-violet-50/50 hover:bg-violet-100 rounded-lg">
@@ -186,7 +189,7 @@
                             <span class="transition group-open:rotate-180"><i class="fa-solid fa-chevron-down text-xs"></i></span>
                         </summary>
                         <div class="text-gray-600 text-xs p-3 pt-0 leading-relaxed">
-                            Yes! Select "House Call" in the service menu to inquire. Pricing starts at $100 depending on location.
+                            Yes! Select "House Call" in the service menu to inquire. Pricing starts at $50 depending on location.
                         </div>
                     </details>
 
@@ -205,7 +208,7 @@
                             <span>💵 Payment Methods</span>
                             <span class="transition group-open:rotate-180"><i class="fa-solid fa-chevron-down text-xs"></i></span>
                         </summary>
-                        <div class="text-gray-600 text-xs p-3 pt-0 leading-relaxed">Cash, CashApp, Venmo, Apple Pay.</div>
+                        <div class="text-gray-600 text-xs p-3 pt-0 leading-relaxed">Cash, CashApp, Venmo, Apple Pay. <strong>Cash</strong> is always king!</div>
                     </details>
                 </div>
             </div>
