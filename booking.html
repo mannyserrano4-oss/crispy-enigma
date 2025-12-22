@@ -26,7 +26,7 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Custom Input Styling to match the violet theme */
+        /* Custom Input Styling */
         .form-input {
             width: 100%;
             padding: 12px;
@@ -42,18 +42,35 @@
             box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
             background-color: #ffffff;
         }
+
+        /* FAQ Animation */
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        details[open] summary ~ * {
+            animation: sweep .3s ease-in-out;
+        }
+        @keyframes sweep {
+            0%    {opacity: 0; transform: translateY(-10px)}
+            100%  {opacity: 1; transform: translateY(0)}
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 text-gray-800">
 
-    <div class="w-full max-w-md bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden border border-white/50">
+    <div class="w-full max-w-md bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden border border-white/50 mb-10">
         
-        <div class="bg-violet-600 p-6 text-center">
-            <div class="w-20 h-20 bg-white rounded-full mx-auto mb-3 flex items-center justify-center shadow-lg text-violet-600 text-3xl">
+        <div class="bg-violet-600 p-6 text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+            
+            <div class="w-20 h-20 bg-white rounded-full mx-auto mb-3 flex items-center justify-center shadow-lg text-violet-600 text-3xl relative z-10">
                 <i class="fa-solid fa-scissors"></i>
             </div>
-            <h1 class="text-2xl font-bold text-white">Book an Appointment</h1>
-            <p class="text-violet-200 text-sm mt-1">Select your service & time.</p>
+            <h1 class="text-2xl font-bold text-white relative z-10">Book an Appointment</h1>
+            <p class="text-violet-200 text-sm mt-1 relative z-10">Select your service & time.</p>
         </div>
 
         <div class="p-6 space-y-4">
@@ -67,11 +84,13 @@
                 <label class="block text-xs font-bold text-violet-700 uppercase tracking-wider mb-1">Service</label>
                 <div class="relative">
                     <select id="cService" class="form-input appearance-none cursor-pointer">
-                        <option value="Haircut">Standard Haircut ($25)</option>
-                        <option value="Skin Fade">Skin Fade ($30)</option>
-                        <option value="Beard Trim">Beard Trim ($15)</option>
-                        <option value="Full Service">Full Service (Cut & Beard) ($35)</option>
+                        <option value="Haircut">Standard Haircut ($30)</option>
+                        <option value="Skin Fade">Skin Fade ($35)</option>
+                        <option value="Beard Trim">Beard Trim ($20)</option>
+                        <option value="Full Service">Full Service (Cut & Beard) ($45)</option>
                         <option value="Line Up">Line Up Only ($15)</option>
+                        <option value="House Call">House Call (Contact for pricing)</option>
+                        <option value="General Question">General Question / Inquiry</option>
                     </select>
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-violet-600">
                         <i class="fa-solid fa-chevron-down text-xs"></i>
@@ -84,9 +103,20 @@
                 <input type="datetime-local" id="cDate" class="form-input cursor-pointer">
             </div>
 
-            <div class="pt-4 space-y-3">
-                <p class="text-center text-xs text-gray-500 mb-2">This will open your messaging app with the details pre-filled.</p>
-                
+            <div>
+                <label class="block text-xs font-bold text-violet-700 uppercase tracking-wider mb-1">Details / Specifics</label>
+                <textarea id="cNotes" rows="2" placeholder="e.g. Leave the top long, hard part on left, etc..." class="form-input resize-none"></textarea>
+            </div>
+
+            <div class="bg-violet-50 border border-violet-200 rounded-lg p-3 flex items-start gap-3">
+                <i class="fa-solid fa-image text-violet-500 mt-1"></i>
+                <div class="text-xs text-violet-800">
+                    <span class="font-bold">Have a reference photo?</span><br>
+                    Please attach it to the text message after you click "Send".
+                </div>
+            </div>
+
+            <div class="pt-2 space-y-3">
                 <button onclick="sendRequest('sms')" class="w-full bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:-translate-y-1 flex items-center justify-center gap-2">
                     <i class="fa-solid fa-comment-sms"></i>
                     Send via Text
@@ -96,6 +126,48 @@
                     <i class="fa-brands fa-whatsapp text-xl"></i>
                     Send via WhatsApp
                 </button>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-gray-200">
+                <h3 class="text-center text-sm font-bold text-violet-900 uppercase tracking-wide mb-4">Frequently Asked Questions</h3>
+                
+                <div class="space-y-2">
+                    <details class="group bg-white border border-violet-100 rounded-lg open:shadow-md transition-all">
+                        <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-3 text-sm text-violet-800 bg-violet-50/50 hover:bg-violet-100 rounded-lg">
+                            <span>💵 What forms of payment do you take?</span>
+                            <span class="transition group-open:rotate-180">
+                                <i class="fa-solid fa-chevron-down text-xs"></i>
+                            </span>
+                        </summary>
+                        <div class="text-gray-600 text-xs mt-0 p-3 pt-0 leading-relaxed">
+                            I accept Cash, CashApp, Venmo, and Apple Pay. Cash is always king!
+                        </div>
+                    </details>
+
+                    <details class="group bg-white border border-violet-100 rounded-lg open:shadow-md transition-all">
+                        <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-3 text-sm text-violet-800 bg-violet-50/50 hover:bg-violet-100 rounded-lg">
+                            <span>📍 Where are you located?</span>
+                            <span class="transition group-open:rotate-180">
+                                <i class="fa-solid fa-chevron-down text-xs"></i>
+                            </span>
+                        </summary>
+                        <div class="text-gray-600 text-xs mt-0 p-3 pt-0 leading-relaxed">
+                            I am mobile in the Tampa area or working out of [Shop Name if applicable]. I will confirm the address in the text reply.
+                        </div>
+                    </details>
+
+                    <details class="group bg-white border border-violet-100 rounded-lg open:shadow-md transition-all">
+                        <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-3 text-sm text-violet-800 bg-violet-50/50 hover:bg-violet-100 rounded-lg">
+                            <span>⏱️ Late Policy?</span>
+                            <span class="transition group-open:rotate-180">
+                                <i class="fa-solid fa-chevron-down text-xs"></i>
+                            </span>
+                        </summary>
+                        <div class="text-gray-600 text-xs mt-0 p-3 pt-0 leading-relaxed">
+                            Please be on time. If you are more than 15 minutes late, we may need to reschedule to keep the schedule flowing.
+                        </div>
+                    </details>
+                </div>
             </div>
 
             <div class="text-center mt-6">
@@ -111,41 +183,51 @@
         // ==========================================
         // CONFIGURATION: UPDATE YOUR NUMBER HERE
         // ==========================================
-        const BARBER_PHONE = "19014437338"; 
+        const BARBER_PHONE = "15550000000"; // REPLACE WITH YOUR NUMBER
         // ==========================================
 
         function sendRequest(type) {
             const name = document.getElementById('cName').value.trim();
             const service = document.getElementById('cService').value;
             const dateVal = document.getElementById('cDate').value;
+            const notes = document.getElementById('cNotes').value.trim();
 
-            // Simple validation styling
+            // Validation
             if(!name) {
                 document.getElementById('cName').classList.add('border-red-500', 'ring-1', 'ring-red-500');
                 return;
-            } else {
-                document.getElementById('cName').classList.remove('border-red-500', 'ring-1', 'ring-red-500');
             }
-
-            if(!dateVal) {
+            if(!dateVal && service !== 'General Question') {
                 document.getElementById('cDate').classList.add('border-red-500', 'ring-1', 'ring-red-500');
                 return;
-            } else {
-                document.getElementById('cDate').classList.remove('border-red-500', 'ring-1', 'ring-red-500');
             }
 
-            // Format Date for humans
-            const dateObj = new Date(dateVal);
-            const dateStr = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-            const timeStr = dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+            // Format Date
+            let timeStr = "Anytime";
+            if (dateVal) {
+                const dateObj = new Date(dateVal);
+                const d = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                const t = dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+                timeStr = `${d} at ${t}`;
+            }
 
             // Construct Message
-            // Example: "Yo Manny! It's Kai. I need a Skin Fade on Fri, Oct 25 at 4:30 PM. You free?"
-            const message = `Yo Manny! It's ${name}. I need a ${service} on ${dateStr} at ${timeStr}. You free?`;
+            let message = `Yo! It's ${name}.`;
+            
+            if (service === 'General Question') {
+                message += ` I have a question about booking/services.`;
+            } else {
+                message += ` I'd like to request a ${service} on ${timeStr}.`;
+            }
 
-            // Logic to open apps
+            if (notes) {
+                message += `\n\nNotes: ${notes}`;
+            }
+
+            message += `\n\n(Waiting for confirmation)`;
+
+            // Open App
             if(type === 'sms') {
-                // Detect iPhone vs Android for body separator
                 const sep = navigator.userAgent.match(/iPhone|iPad|iPod/i) ? '&' : '?';
                 window.location.href = `sms:${BARBER_PHONE}${sep}body=${encodeURIComponent(message)}`;
             } else if (type === 'wa') {
