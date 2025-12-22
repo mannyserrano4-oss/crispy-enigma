@@ -4,60 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Manny Serrano</title>
-    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="icon" type="image/png" href="gitpp.png?v=2">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            /* Matches your Digital ID Background */
             background: linear-gradient(-45deg, #e9d5ff, #f5d0fe, #c4b5fd, #a78bfa);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
         }
-
         @keyframes gradientBG {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-
-        /* Custom Input Styling */
         .form-input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 0.5rem;
-            border: 1px solid #ddd6fe; /* violet-200 */
-            background-color: rgba(255, 255, 255, 0.8);
-            color: #4c1d95; /* violet-900 */
-            outline: none;
-            transition: all 0.2s;
+            width: 100%; padding: 12px; border-radius: 0.5rem;
+            border: 1px solid #ddd6fe; background-color: rgba(255, 255, 255, 0.9);
+            color: #4c1d95; outline: none; transition: all 0.2s;
         }
-        .form-input:focus {
-            border-color: #7c3aed; /* violet-600 */
-            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
-            background-color: #ffffff;
-        }
-
+        .form-input:focus { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2); background-color: #ffffff; }
+        
         /* FAQ Animation */
-        details > summary {
-            list-style: none;
-        }
-        details > summary::-webkit-details-marker {
-            display: none;
-        }
-        details[open] summary ~ * {
-            animation: sweep .3s ease-in-out;
-        }
-        @keyframes sweep {
-            0%    {opacity: 0; transform: translateY(-10px)}
-            100%  {opacity: 1; transform: translateY(0)}
-        }
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        details[open] summary ~ * { animation: sweep .3s ease-in-out; }
+        @keyframes sweep { 0% {opacity: 0; transform: translateY(-10px)} 100% {opacity: 1; transform: translateY(0)} }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 text-gray-800">
@@ -67,34 +43,40 @@
         <div class="bg-violet-600 p-6 text-center relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
             
-            <div class="w-20 h-20 bg-white rounded-full mx-auto mb-3 flex items-center justify-center shadow-lg text-violet-600 text-3xl relative z-10">
-                <i class="fa-solid fa-scissors"></i>
-            </div>
+            <img src="gitpp.png" alt="Manny" class="w-24 h-24 rounded-full mx-auto mb-3 border-4 border-white shadow-lg relative z-10 object-cover">
+            
             <h1 class="text-2xl font-bold text-white relative z-10">Book an Appointment</h1>
-            <p class="text-violet-200 text-sm mt-1 relative z-10">Select your service & time.</p>
+            <p class="text-violet-200 text-sm mt-1 relative z-10">Secure your spot with Manny.</p>
         </div>
 
-        <div class="p-6 space-y-4">
+        <div class="p-6 space-y-5">
             
             <div>
                 <label class="block text-xs font-bold text-violet-700 uppercase tracking-wider mb-1">Your Name</label>
-                <input type="text" id="cName" placeholder="e.g. Manny" class="form-input">
+                <input type="text" id="cName" placeholder="e.g. John Doe" class="form-input">
             </div>
 
-            <div>
-                <label class="block text-xs font-bold text-violet-700 uppercase tracking-wider mb-1">Service</label>
-                <div class="relative">
-                    <select id="cService" class="form-input appearance-none cursor-pointer">
-                        <option value="Haircut">Standard Haircut ($30)</option>
-                        <option value="Skin Fade">Skin Fade ($35)</option>
-                        <option value="Beard Trim">Beard Trim ($20)</option>
-                        <option value="Full Service">Full Service (Cut & Beard) ($45)</option>
-                        <option value="Line Up">Line Up Only ($15)</option>
-                        <option value="House Call">House Call (Contact for pricing)</option>
-                        <option value="General Question">General Question / Inquiry</option>
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-violet-600">
-                        <i class="fa-solid fa-chevron-down text-xs"></i>
+            <div class="flex gap-4">
+                <div class="flex-grow">
+                    <label class="block text-xs font-bold text-violet-700 uppercase tracking-wider mb-1">Service</label>
+                    <div class="relative">
+                        <select id="cService" class="form-input appearance-none cursor-pointer" onchange="updatePrice()">
+                            <option value="Haircut" data-price="30">Haircut ($30)</option>
+                            <option value="Skin Fade" data-price="35">Skin Fade ($35)</option>
+                            <option value="Beard Trim" data-price="20">Beard Trim ($20)</option>
+                            <option value="Full Service" data-price="45">Full Service ($45)</option>
+                            <option value="Line Up" data-price="15">Line Up Only ($15)</option>
+                            <option value="House Call" data-price="100+">House Call (Starts at $100)</option>
+                            <option value="General Inquiry" data-price="0">General Inquiry</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-violet-600"><i class="fa-solid fa-chevron-down text-xs"></i></div>
+                    </div>
+                </div>
+                
+                <div class="w-24">
+                    <label class="block text-xs font-bold text-violet-700 uppercase tracking-wider mb-1 text-center">Est. Cost</label>
+                    <div id="priceDisplay" class="h-[50px] flex items-center justify-center bg-violet-100 rounded-lg text-violet-800 font-bold text-lg border border-violet-200">
+                        $30
                     </div>
                 </div>
             </div>
@@ -106,7 +88,7 @@
 
             <div>
                 <label class="block text-xs font-bold text-violet-700 uppercase tracking-wider mb-1">Details / Specifics</label>
-                <textarea id="cNotes" rows="2" placeholder="e.g. Leave the top long, hard part on left, etc..." class="form-input resize-none"></textarea>
+                <textarea id="cNotes" rows="2" placeholder="e.g. Leave the top long..." class="form-input resize-none"></textarea>
             </div>
 
             <div class="bg-violet-50 border border-violet-200 rounded-lg p-3 flex items-start gap-3">
@@ -117,91 +99,80 @@
                 </div>
             </div>
 
+            <div class="flex items-start gap-3 px-1">
+                <input type="checkbox" id="cPolicy" class="mt-1 w-4 h-4 text-violet-600 rounded border-gray-300 focus:ring-violet-500 cursor-pointer">
+                <label for="cPolicy" class="text-xs text-gray-600 cursor-pointer">
+                    I agree to the <span class="font-bold text-violet-700">Cancellation Policy</span>. (No-shows or late cancellations may require a deposit for future booking).
+                </label>
+            </div>
+
             <div class="pt-2 space-y-3">
                 <button onclick="sendRequest('sms')" class="w-full bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:-translate-y-1 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-comment-sms"></i>
-                    Send via Text
+                    <i class="fa-solid fa-comment-sms"></i> Send via Text
                 </button>
-
                 <button onclick="sendRequest('wa')" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:-translate-y-1 flex items-center justify-center gap-2">
-                    <i class="fa-brands fa-whatsapp text-xl"></i>
-                    Send via WhatsApp
+                    <i class="fa-brands fa-whatsapp text-xl"></i> Send via WhatsApp
                 </button>
             </div>
 
             <div class="mt-8 pt-6 border-t border-gray-200">
-                <h3 class="text-center text-sm font-bold text-violet-900 uppercase tracking-wide mb-4">Frequently Asked Questions</h3>
-                
+                <h3 class="text-center text-sm font-bold text-violet-900 uppercase tracking-wide mb-4">FAQ & Info</h3>
                 <div class="space-y-2">
                     <details class="group bg-white border border-violet-100 rounded-lg open:shadow-md transition-all">
                         <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-3 text-sm text-violet-800 bg-violet-50/50 hover:bg-violet-100 rounded-lg">
-                            <span>💵 What forms of payment do you take?</span>
-                            <span class="transition group-open:rotate-180">
-                                <i class="fa-solid fa-chevron-down text-xs"></i>
-                            </span>
+                            <span>🕒 Operating Hours</span>
+                            <span class="transition group-open:rotate-180"><i class="fa-solid fa-chevron-down text-xs"></i></span>
                         </summary>
-                        <div class="text-gray-600 text-xs mt-0 p-3 pt-0 leading-relaxed">
-                            I accept Cash, CashApp, Venmo, and Apple Pay. Cash is always king!
+                        <div class="text-gray-600 text-xs p-3 pt-0 leading-relaxed">
+                            Mon-Fri: 9am - 6pm<br>Sat: 10am - 4pm<br>Sun: Closed
                         </div>
                     </details>
-
                     <details class="group bg-white border border-violet-100 rounded-lg open:shadow-md transition-all">
                         <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-3 text-sm text-violet-800 bg-violet-50/50 hover:bg-violet-100 rounded-lg">
-                            <span>📍 Where are you located?</span>
-                            <span class="transition group-open:rotate-180">
-                                <i class="fa-solid fa-chevron-down text-xs"></i>
-                            </span>
+                            <span>💵 Payment Methods</span>
+                            <span class="transition group-open:rotate-180"><i class="fa-solid fa-chevron-down text-xs"></i></span>
                         </summary>
-                        <div class="text-gray-600 text-xs mt-0 p-3 pt-0 leading-relaxed">
-                            I am mobile in the Tampa area or working out of [Shop Name if applicable]. I will confirm the address in the text reply.
-                        </div>
-                    </details>
-
-                    <details class="group bg-white border border-violet-100 rounded-lg open:shadow-md transition-all">
-                        <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-3 text-sm text-violet-800 bg-violet-50/50 hover:bg-violet-100 rounded-lg">
-                            <span>⏱️ Late Policy?</span>
-                            <span class="transition group-open:rotate-180">
-                                <i class="fa-solid fa-chevron-down text-xs"></i>
-                            </span>
-                        </summary>
-                        <div class="text-gray-600 text-xs mt-0 p-3 pt-0 leading-relaxed">
-                            Please be on time. If you are more than 15 minutes late, we may need to reschedule to keep the schedule flowing.
-                        </div>
+                        <div class="text-gray-600 text-xs p-3 pt-0 leading-relaxed">Cash, CashApp, Zelle, Apple Pay.</div>
                     </details>
                 </div>
             </div>
 
             <div class="text-center mt-6">
-                <a href="index.html" class="text-sm text-violet-500 hover:text-violet-700 font-semibold transition-colors">
-                    &larr; Back to Profile
-                </a>
+                <a href="index.html" class="text-sm text-violet-500 hover:text-violet-700 font-semibold transition-colors">&larr; Back to Profile</a>
             </div>
-
         </div>
     </div>
 
     <script>
-        // ==========================================
-        // CONFIGURATION: UPDATE YOUR NUMBER HERE
-        // ==========================================
+        // === CONFIGURATION ===
         const BARBER_PHONE = "15550000000"; // REPLACE WITH YOUR NUMBER
-        // ==========================================
+        // =====================
+
+        function updatePrice() {
+            const select = document.getElementById('cService');
+            const price = select.options[select.selectedIndex].getAttribute('data-price');
+            const display = document.getElementById('priceDisplay');
+            
+            if (price === '0') {
+                display.innerText = "-";
+            } else if (price.includes('+')) {
+                display.innerText = "$" + price;
+            } else {
+                display.innerText = "$" + price;
+            }
+        }
 
         function sendRequest(type) {
             const name = document.getElementById('cName').value.trim();
             const service = document.getElementById('cService').value;
             const dateVal = document.getElementById('cDate').value;
             const notes = document.getElementById('cNotes').value.trim();
+            const policy = document.getElementById('cPolicy').checked;
 
             // Validation
-            if(!name) {
-                document.getElementById('cName').classList.add('border-red-500', 'ring-1', 'ring-red-500');
-                return;
-            }
-            if(!dateVal && service !== 'General Question') {
-                document.getElementById('cDate').classList.add('border-red-500', 'ring-1', 'ring-red-500');
-                return;
-            }
+            if(!name) { alert("Please enter your name."); return; }
+            if(!dateVal && service !== 'General Inquiry') { alert("Please select a date and time."); return; }
+            if(!policy) { alert("Please accept the cancellation policy to continue."); return; }
 
             // Format Date
             let timeStr = "Anytime";
@@ -213,19 +184,11 @@
             }
 
             // Construct Message
-            let message = `Yo! It's ${name}.`;
-            
-            if (service === 'General Question') {
-                message += ` I have a question about booking/services.`;
-            } else {
-                message += ` I'd like to request a ${service} on ${timeStr}.`;
-            }
-
-            if (notes) {
-                message += `\n\nNotes: ${notes}`;
-            }
-
-            message += `\n\n(Waiting for confirmation)`;
+            let message = `Yo Manny! It's ${name}.`;
+            if (service === 'General Inquiry') { message += ` I have a question about booking/services.`; }
+            else { message += ` I'd like to request a ${service} on ${timeStr}.`; }
+            if (notes) { message += `\n\nNotes: ${notes}`; }
+            message += `\n\n(I've read the policy & am waiting for confirmation)`;
 
             // Open App
             if(type === 'sms') {
@@ -236,6 +199,5 @@
             }
         }
     </script>
-
 </body>
 </html>
