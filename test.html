@@ -108,6 +108,82 @@
                 </div>
             </div>
 
+            <div class="mt-4 mb-4 bg-violet-50 p-4 rounded-xl border border-violet-100 space-y-4">
+                
+                <label class="block text-xs font-bold text-violet-700 uppercase tracking-wider mb-1">
+                    <i class="fa-solid fa-sparkles mr-1"></i> Enhancements
+                </label>
+
+                <div class="space-y-2">
+                    
+                    <label class="flex items-center justify-between cursor-pointer bg-white p-2 rounded-lg border border-violet-100 shadow-sm hover:border-violet-300 transition-all">
+                        <span class="text-sm font-medium text-gray-700 flex items-center">
+                            <input type="checkbox" class="addon-checkbox form-checkbox h-4 w-4 text-violet-600 rounded mr-3" data-name="Eyebrows" data-price="5" onchange="updatePrice()">
+                            Eyebrows / Cleanup
+                        </span>
+                        <span class="text-xs font-bold text-violet-600">+$5</span>
+                    </label>
+                    
+                    <label class="flex items-center justify-between cursor-pointer bg-white p-2 rounded-lg border border-violet-100 shadow-sm hover:border-violet-300 transition-all">
+                        <span class="text-sm font-medium text-gray-700 flex items-center">
+                            <input type="checkbox" class="addon-checkbox form-checkbox h-4 w-4 text-violet-600 rounded mr-3" data-name="Beard Lineup" data-price="10" onchange="updatePrice()">
+                            Beard Line-up
+                        </span>
+                        <span class="text-xs font-bold text-violet-600">+$10</span>
+                    </label>
+                </div>
+
+                <div class="pt-2 border-t border-violet-200/50">
+                    <p class="text-[10px] font-bold text-violet-400 uppercase tracking-wider mb-2">Skin Treatments</p>
+                    
+                    <div class="mb-2">
+                        <label class="flex items-center justify-between cursor-pointer bg-white p-3 rounded-lg border border-violet-100 shadow-sm hover:border-violet-300 transition-all relative z-10">
+                            <div class="flex items-center">
+                                <input type="radio" name="facialType" class="facial-radio form-radio h-4 w-4 text-violet-600 mr-3" data-name="Express Facial" data-price="15" onchange="updatePrice()">
+                                <div>
+                                    <div class="text-sm font-bold text-gray-800">The Express</div>
+                                    <div class="text-[10px] text-gray-500">Cleanse, Towel, Mask, Moisturize</div>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold text-violet-600">+$15</span>
+                        </label>
+                        
+                        <details class="text-[10px] text-gray-500 px-3 pt-2 pb-1">
+                            <summary class="cursor-pointer text-violet-400 hover:text-violet-600 list-none text-right">See full steps <i class="fa-solid fa-chevron-down ml-1"></i></summary>
+                            <div class="mt-1 pl-2 border-l-2 border-violet-200">
+                                Includes: Hot Towel, Pore Opening Wash, Choice of Mask (Clay/Sheet), and Hydrating Moisturizer.
+                            </div>
+                        </details>
+                    </div>
+
+                    <div>
+                        <label class="flex items-center justify-between cursor-pointer bg-white p-3 rounded-lg border border-violet-100 shadow-sm hover:border-violet-300 transition-all relative z-10">
+                            <div class="flex items-center">
+                                <input type="radio" name="facialType" class="facial-radio form-radio h-4 w-4 text-violet-600 mr-3" data-name="Deluxe Spa Facial" data-price="30" onchange="updatePrice()">
+                                <div>
+                                    <div class="text-sm font-bold text-gray-800">The Deluxe</div>
+                                    <div class="text-[10px] text-gray-500">Steamer, Extraction, Serums + More</div>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold text-violet-600">+$30</span>
+                        </label>
+                        
+                        <details class="text-[10px] text-gray-500 px-3 pt-2 pb-1">
+                            <summary class="cursor-pointer text-violet-400 hover:text-violet-600 list-none text-right">See full steps <i class="fa-solid fa-chevron-down ml-1"></i></summary>
+                            <div class="mt-1 pl-2 border-l-2 border-violet-200">
+                                The Full Experience: Professional Steamer, Deep Extractions, Under-Eye Treatment, Custom Clay or Sheet Mask, Vitamin Serum, and Hot Towel Finish.
+                            </div>
+                        </details>
+                    </div>
+                    
+                    <label class="flex items-center gap-2 mt-2 cursor-pointer opacity-50 hover:opacity-100">
+                        <input type="radio" name="facialType" class="facial-radio h-3 w-3" data-name="No Facial" data-price="0" onchange="updatePrice()" checked>
+                        <span class="text-[10px] font-bold text-gray-400">No Facial</span>
+                    </label>
+
+                </div>
+            </div>
+
             <div>
                 <label class="block text-xs font-bold text-violet-700 uppercase tracking-wider mb-1">Requested Time</label>
                 <input type="datetime-local" id="cDate" class="form-input cursor-pointer">
@@ -225,21 +301,46 @@
     
     <div id="toast"><i class="fa-solid fa-circle-exclamation mr-2"></i> <span id="toastMsg">Error</span></div>
 
-    <script>
-        // === CONFIGURATION ===
-        const BARBER_PHONE = "9014437338"; // REPLACE WITH YOUR NUMBER
-        // =====================
+   <script>
+        // ==============================================================
+        // CONFIGURATION
+        // ==============================================================
+        const BARBER_PHONE = "9014437338"; // Your phone number
+        // ==============================================================
 
+        // 1. PRICE CALCULATOR
+        // This function runs every time you click a checkbox or change service
         function updatePrice() {
+            // A. Get Base Service Price
             const select = document.getElementById('cService');
-            const price = select.options[select.selectedIndex].getAttribute('data-price');
+            // We grab the price from the data-price attribute in the dropdown
+            let total = parseFloat(select.options[select.selectedIndex].getAttribute('data-price')) || 0;
+            const isHouseCall = select.value === "House Call";
+
+            // B. Add Checkboxes (Eyebrows, etc)
+            // We look for any checkbox with class 'addon-checkbox' that is checked
+            document.querySelectorAll('.addon-checkbox:checked').forEach(box => {
+                total += parseFloat(box.getAttribute('data-price')) || 0;
+            });
+
+            // C. Add Facial (Radio Button)
+            // We look for the selected facial radio button
+            const facial = document.querySelector('input[name="facialType"]:checked');
+            if(facial) {
+                total += parseFloat(facial.getAttribute('data-price')) || 0;
+            }
+
+            // D. Update the Blue Box on screen
             const display = document.getElementById('priceDisplay');
-            if (price === '0') { display.innerText = "-"; } 
-            else if (price.includes('+')) { display.innerText = "$" + price; } 
-            else { display.innerText = "$" + price; }
+            if (total === 0) { 
+                display.innerText = "-"; 
+            } else { 
+                // If it's a House Call, we add a "+" sign because price varies
+                display.innerText = "$" + total + (isHouseCall ? "+" : ""); 
+            }
         }
 
-        // Custom Toast Function
+        // Helper: Shows the red error popup
         function showToast(message) {
             const toast = document.getElementById("toast");
             document.getElementById("toastMsg").innerText = message;
@@ -247,17 +348,22 @@
             setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
         }
 
+        // 2. SEND MESSAGE FUNCTION
+        // This runs when they click "Send via Text"
         function sendRequest(type) {
+            // Gather all the inputs
             const name = document.getElementById('cName').value.trim();
             const service = document.getElementById('cService').value;
             const dateVal = document.getElementById('cDate').value;
             const notes = document.getElementById('cNotes').value.trim();
             const policy = document.getElementById('cPolicy').checked;
 
+            // Safety Checks (Validation)
             if(!name) { showToast("Please enter your name."); return; }
             if(!dateVal && service !== 'General Inquiry') { showToast("Please select a date and time."); return; }
             if(!policy) { showToast("Please accept the cancellation policy."); return; }
 
+            // Format the Date nicely (e.g., "Mon, Jan 12 at 4:00 PM")
             let timeStr = "Anytime";
             if (dateVal) {
                 const dateObj = new Date(dateVal);
@@ -266,12 +372,39 @@
                 timeStr = `${d} at ${t}`;
             }
 
+            // --- COLLECT ADD-ONS TO WRITE IN TEXT ---
+            let addons = [];
+            
+            // 1. Get Checked Boxes names
+            document.querySelectorAll('.addon-checkbox:checked').forEach(box => {
+                addons.push(box.getAttribute('data-name'));
+            });
+            
+            // 2. Get Selected Facial name
+            const facial = document.querySelector('input[name="facialType"]:checked');
+            // We only add it if price is not 0 (skips "No Facial")
+            if(facial && facial.getAttribute('data-price') != "0") {
+                addons.push(facial.getAttribute('data-name'));
+            }
+
+            // --- BUILD THE TEXT MESSAGE ---
             let message = `Yo Manny! It's ${name}.`;
-            if (service === 'General Inquiry') { message += ` I have a question about booking/services.`; }
-            else { message += ` I'd like to request a ${service} on ${timeStr}.`; }
+            
+            if (service === 'General Inquiry') { 
+                message += ` I have a question about booking/services.`; 
+            } else { 
+                message += ` I'd like to request a ${service} on ${timeStr}.`; 
+            }
+
+            // If they picked add-ons, add them to the text
+            if(addons.length > 0) {
+                message += `\n\n+ Add-ons: ${addons.join(", ")}`;
+            }
+
             if (notes) { message += `\n\nNotes: ${notes}`; }
             message += `\n\n(I've read the policy & am waiting for confirmation)`;
 
+            // --- SEND IT ---
             if(type === 'sms') {
                 const sep = navigator.userAgent.match(/iPhone|iPad|iPod/i) ? '&' : '?';
                 window.location.href = `sms:${BARBER_PHONE}${sep}body=${encodeURIComponent(message)}`;
