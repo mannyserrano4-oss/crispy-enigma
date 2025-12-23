@@ -834,7 +834,7 @@
             if(type === 'followup') msg = `Appreciate you coming through ${first}! How's the cut treating you?`; 
             
             // NEW REVIEW LOGIC
-            if(type === 'review') msg = `Yo ${first}, appreciate the cut! If you have a sec, rate it here:\n\nhttps://mannyserrano4-oss.github.io/crispy-enigma/review.html`; 
+            if(type === 'review') msg = `Yo ${first}, appreciate the cut! If you have a sec, rate it here:\n\nhttps://mannyserrano4-oss.github.io/crispy-enigma/reviews.html`; 
         
             window.location.href = `sms:${c.phone}&body=${encodeURIComponent(msg)}`; 
             closeModal('smsModal'); 
