@@ -424,6 +424,7 @@
             <div class="sms-opt" onclick="sendSms('confirm')">📅 Confirm Appointment <i class="fas fa-chevron-right"></i></div>
             <div class="sms-opt" onclick="sendSms('longtime')">👋 Long Time No See <i class="fas fa-chevron-right"></i></div>
             <div class="sms-opt" onclick="sendSms('followup')">✂️ Follow Up <i class="fas fa-chevron-right"></i></div>
+            <div class="sms-opt" onclick="sendSms('review')">⭐ Request Review <i class="fas fa-chevron-right"></i></div>
             <div class="sms-opt" onclick="sendSms('custom')">💬 Custom Message <i class="fas fa-chevron-right"></i></div>
             <button class="btn btn-red" onclick="closeModal('smsModal')">Cancel</button>
         </div>
@@ -821,7 +822,24 @@
         async function addStrike() { const c = getClient(activeId); if(await customConfirm(`Mark ${c.name} as a No-Show? \n\nAdds a Strike 🚩.`)) { c.strikes = (c.strikes || 0) + 1; saveData(); closeModal('viewModal'); render(); } }
         async function removeStrike() { const c = getClient(activeId); if(await customConfirm("Remove one Strike 🚩?")) { c.strikes = Math.max(0, (c.strikes || 0) - 1); saveData(); closeModal('viewModal'); render(); } }
         function openSmsMenu() { openModal('smsModal'); }
-        function sendSms(type) { const c = getClient(activeId); if(!c || !c.phone) return alert('No phone saved.'); const first = c.name.split(' ')[0]; let msg = ''; if(type === 'late') msg = `Hey ${first}, running about 15 mins late. So sorry!`; if(type === 'confirm') msg = `Yo ${first}, just confirming our cut. You still good?`; if(type === 'longtime') msg = `Hey ${first}, been a while! Time to clean up that cut?`; if(type === 'followup') msg = `Appreciate you coming through ${first}! How's the cut treating you?`; window.location.href = `sms:${c.phone}&body=${encodeURIComponent(msg)}`; closeModal('smsModal'); }
+        function sendSms(type) { 
+            const c = getClient(activeId); 
+            if(!c || !c.phone) return alert('No phone saved.'); 
+            const first = c.name.split(' ')[0]; 
+            let msg = ''; 
+        
+            if(type === 'late') msg = `Hey ${first}, running about 15 mins late. So sorry!`; 
+            if(type === 'confirm') msg = `Yo ${first}, just confirming our cut. You still good?`; 
+            if(type === 'longtime') msg = `Hey ${first}, been a while! Time to clean up that cut?`; 
+            if(type === 'followup') msg = `Appreciate you coming through ${first}! How's the cut treating you?`; 
+            
+            // NEW REVIEW LOGIC
+            if(type === 'review') msg = `Yo ${first}, appreciate the cut! If you have a sec, rate it here: https://mannyserrano4-oss.github.io/crispy-enigma/review.html`; 
+        
+            window.location.href = `sms:${c.phone}&body=${encodeURIComponent(msg)}`; 
+            closeModal('smsModal'); 
+        }
+        /* function sendSms(type) { const c = getClient(activeId); if(!c || !c.phone) return alert('No phone saved.'); const first = c.name.split(' ')[0]; let msg = ''; if(type === 'late') msg = `Hey ${first}, running about 15 mins late. So sorry!`; if(type === 'confirm') msg = `Yo ${first}, just confirming our cut. You still good?`; if(type === 'longtime') msg = `Hey ${first}, been a while! Time to clean up that cut?`; if(type === 'followup') msg = `Appreciate you coming through ${first}! How's the cut treating you?`; window.location.href = `sms:${c.phone}&body=${encodeURIComponent(msg)}`; closeModal('smsModal'); } */
 
         // --- RESTORE FUNCTION (Missing Fix) ---
         function restoreData(input) {
