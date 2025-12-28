@@ -204,16 +204,7 @@ body {
 </div>
 -->
                 
-<!-- MINI-GALLERY: This code now forces square, uniform images -->
-<div class="w-full text-left mb-4">
-    <h3 class="text-lg font-semibold text-violet-800 mb-3 text-center">My Work</h3>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-        <img src="BP1.jpeg" alt="Barbering example 1" class="gallery-img rounded-lg shadow-md cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 w-full aspect-square object-cover">
-        <img src="BP2.jpeg" alt="Barbering example 2" class="gallery-img rounded-lg shadow-md cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 w-full aspect-square object-cover">
-        <img src="BP3.jpeg" alt="Barbering example 3" class="gallery-img rounded-lg shadow-md cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 w-full aspect-square object-cover">
-        <img src="BP4.jpeg" alt="Barbering example 4" class="gallery-img rounded-lg shadow-md cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 w-full aspect-square object-cover">
-    </div>
-</div>
+
                 
                 <!-- Subheading -->
                 <p class="text-sm font-semibold text-violet-700 uppercase tracking-wider mb-2 mt-4">Follow Me</p>
@@ -365,38 +356,8 @@ body {
             }, 2000);
                     });
             
-                    // JavaScript for the Image Lightbox Gallery
-            const galleryImages = document.querySelectorAll('.gallery-img');
-            const lightboxModal = document.getElementById('lightbox-modal');
-            const lightboxImg = document.getElementById('lightbox-img');
-            const lightboxClose = document.getElementById('lightbox-close');
-            
-            galleryImages.forEach(img => {
-                img.addEventListener('click', () => {
-                    lightboxImg.src = img.src;
-                    lightboxModal.classList.remove('hidden');
-                });
-            });
-            
-            const closeModal = () => {
-                lightboxModal.classList.add('hidden');
-            };
-            
-            lightboxClose.addEventListener('click', closeModal);
-            lightboxModal.addEventListener('click', (e) => {
-                // Close modal only if clicking on the dark background, not the image itself
-                if (e.target !== lightboxImg) {
-                    closeModal();
-                }
-            });
         
     </script>
-
-    <!-- Image Lightbox Modal (hidden by default) -->
-<div id="lightbox-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50 cursor-pointer">
-    <img id="lightbox-img" src="" alt="Full size gallery image" class="max-w-full max-h-full rounded-lg">
-    <span id="lightbox-close" class="absolute top-4 right-6 text-white text-4xl font-bold cursor-pointer">&times;</span>
-</div>
     
 </body>
 </html>
