@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
     <style>
-        /* === UNIFORM BACKGROUND ANIMATION === */
+        /* === UNIFORM BACKGROUND ANIMATION (Matches Booking Page) === */
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(-45deg, #e9d5ff, #f5d0fe, #c4b5fd, #a78bfa);
@@ -28,22 +28,24 @@
 
     <div class="w-full max-w-md bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden border border-white/50 mb-6">
 
-        <div class="relative bg-violet-900 text-white p-8 text-center overflow-hidden">
-            <div class="relative z-10">
-                <h1 class="text-3xl font-extrabold tracking-tight mb-2">Skin & Science</h1>
-                <p class="text-violet-200 text-sm font-medium">Why your face needs more than just soap.</p>
-            </div>
-            <i class="fa-solid fa-droplet absolute -bottom-4 -right-4 text-9xl text-violet-800 opacity-20 rotate-12"></i>
+        <div class="bg-violet-600 p-6 text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+            
+            <img src="icon.png" alt="Manny" class="w-24 h-24 rounded-full mx-auto mb-2 border-4 border-white shadow-lg relative z-10 object-cover">
+            
+            <h1 class="text-2xl font-bold text-white relative z-10">Skin & Science</h1>
+            
+            <p class="text-violet-200 text-sm relative z-10 font-medium">Why your face needs more than just soap.</p>
         </div>
 
         <div class="p-6">
-            <h2 class="text-xs font-bold text-violet-600 uppercase tracking-widest mb-4 text-center">Compare Treatments</h2>
+            <h2 class="block text-xs font-bold text-violet-700 uppercase tracking-wider mb-4 text-center">Compare Treatments</h2>
             
             <div class="border border-violet-100 rounded-xl overflow-hidden shadow-sm bg-white">
                 <div class="grid grid-cols-3 bg-violet-50 p-3 text-center border-b border-violet-100">
                     <div class="text-[10px] font-bold text-gray-400 self-end text-left pl-2">FEATURE</div>
                     <div class="text-xs font-bold text-violet-700">EXPRESS<br><span class="text-[10px] text-gray-500 font-normal">$15</span></div>
-                    <div class="text-xs font-bold text-violet-900">DELUXE<br><span class="text-[10px] text-gray-500 font-normal">$30</span></div>
+                    <div class="text-xs font-bold text-violet-800">DELUXE<br><span class="text-[10px] text-gray-500 font-normal">$30</span></div>
                 </div>
 
                 <div class="grid grid-cols-3 p-3 border-b border-gray-50 items-center">
@@ -85,18 +87,18 @@
             
             <div class="mt-4 text-center">
                 <p class="text-xs text-gray-500 italic">
-                    <span class="font-bold text-violet-600">Pro Tip:</span> Choose <strong>Deluxe</strong> for deep pore cleaning and extra relaxation.
+                    <span class="font-bold text-violet-700">Pro Tip:</span> Choose <strong>Deluxe</strong> for deep pore cleaning and extra relaxation.
                 </p>
             </div>
         </div>
 
         <div class="p-6 pt-0">
-            <h2 class="text-xs font-bold text-violet-600 uppercase tracking-widest mb-4 text-center">The Step-by-Step Process</h2>
+            <h2 class="block text-xs font-bold text-violet-700 uppercase tracking-wider mb-4 text-center">The Step-by-Step Process</h2>
 
             <div class="space-y-4">
                 
                 <div class="flex gap-4 items-start">
-                    <div class="w-12 h-12 rounded-full bg-violet-100 flex items-center justify-center text-violet-500 flex-shrink-0">
+                    <div class="w-12 h-12 rounded-full bg-violet-100 flex items-center justify-center text-violet-600 flex-shrink-0">
                         <i class="fa-solid fa-soap text-xl"></i>
                     </div>
                     <div>
@@ -163,20 +165,20 @@
         </div>
 
         <div class="bg-gray-50 border-t border-gray-100 p-4 text-center">
-            <a href="book.html" class="block w-full bg-violet-900 text-white font-bold py-3 rounded-xl hover:bg-violet-800 transition-colors shadow-lg transform active:scale-95 transition-transform">
-                Book Your Treatment
+            <a href="book.html" class="block w-full bg-violet-600 text-white font-bold py-3 rounded-xl hover:bg-violet-700 transition-colors shadow-md flex items-center justify-center gap-2">
+                <i class="fa-solid fa-calendar-check"></i> Book Your Treatment
             </a>
             <div class="mt-4">
-                <a href="index.html" class="text-xs text-violet-400 hover:text-violet-600 font-semibold">
-                    &larr; Back to Profile
+                <a href="book.html" class="text-xs text-violet-500 hover:text-violet-700 font-semibold">
+                    &larr; Back to Booking
                 </a>
             </div>
         </div>
 
     </div>
 
-    <p class="text-xs text-violet-900 opacity-60 text-center font-medium drop-shadow-sm pb-6">
-        Made by me at work, because I have too much downtime.
+    <p class="text-xs text-violet-800 opacity-75 mt-2 text-center pb-6">
+        Made by me at work, because I have SO much downtime.
     </p>
 
 </body>
