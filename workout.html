@@ -2,13 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FitLogic 6.0 | Active Plans</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FitLogic">
+    
+    <title>FitLogic 7.0 | Ultimate</title>
     
     <link rel="icon" type="image/png" href="icon.png">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="apple-touch-icon" href="icon.png"> <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #F2F2F7; color: #1C1C1E; -webkit-tap-highlight-color: transparent; }
@@ -25,13 +32,16 @@
         
         .toggle-checkbox:checked { right: 0; border-color: #34C759; }
         .toggle-checkbox:checked + .toggle-label { background-color: #34C759; }
+
+        /* iOS Safe Area Padding */
+        .safe-pb { padding-bottom: env(safe-area-inset-bottom); }
     </style>
 </head>
-<body class="min-h-screen pb-24">
+<body class="min-h-screen pb-32">
 
-    <div id="app-header" class="bg-white sticky top-0 z-30 px-6 py-4 shadow-sm flex justify-between items-center">
+    <div id="app-header" class="bg-white/90 backdrop-blur sticky top-0 z-30 px-6 py-4 pt-12 shadow-sm flex justify-between items-center">
         <div>
-            <h1 class="text-xl font-extrabold tracking-tight text-gray-900">FitLogic <span class="text-blue-600">6.0</span></h1>
+            <h1 class="text-xl font-extrabold tracking-tight text-gray-900">FitLogic <span class="text-blue-600">7.0</span></h1>
             <p class="text-xs text-gray-500 font-medium" id="currentDate">Today</p>
         </div>
         <div class="flex items-center gap-3">
@@ -39,7 +49,7 @@
                 <i class="fa-solid fa-fire text-orange-500 text-sm"></i>
                 <span id="streakDisplay" class="text-xs font-bold text-orange-700">0</span>
             </div>
-            <div class="relative w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center border-2 border-white shadow-sm" onclick="toggleSettings()">
+            <div class="relative w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center border-2 border-white shadow-sm cursor-pointer hover:scale-105 transition-transform" onclick="toggleSettings()">
                 <span id="userLevel" class="text-xs font-bold text-blue-600">Lvl 1</span>
             </div>
         </div>
@@ -73,37 +83,21 @@
         <div id="plan-library" class="hidden">
             <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wide mb-2">Available Plans (4 Weeks)</h3>
             <div class="space-y-3">
-                
                 <div class="card p-4 flex justify-between items-center">
-                    <div>
-                        <h4 class="font-bold text-gray-900">Full Body Alpha</h4>
-                        <p class="text-xs text-gray-500">3x/Week • Strength & Size</p>
-                    </div>
-                    <button onclick="startPlan('plan_full_body', 'Full Body Alpha')" class="bg-black text-white px-4 py-2 rounded-lg text-xs font-bold active:scale-95">Start Plan</button>
+                    <div><h4 class="font-bold text-gray-900">Full Body Alpha</h4><p class="text-xs text-gray-500">3x/Week • Strength & Size</p></div>
+                    <button onclick="startPlan('plan_full_body', 'Full Body Alpha')" class="bg-black text-white px-4 py-2 rounded-lg text-xs font-bold active:scale-95">Start</button>
                 </div>
-
                 <div class="card p-4 flex justify-between items-center">
-                    <div>
-                        <h4 class="font-bold text-gray-900">Chest & Tri Builder</h4>
-                        <p class="text-xs text-gray-500">3x/Week • Upper Body Focus</p>
-                    </div>
-                    <button onclick="startPlan('plan_chest', 'Chest & Tri Builder')" class="bg-black text-white px-4 py-2 rounded-lg text-xs font-bold active:scale-95">Start Plan</button>
+                    <div><h4 class="font-bold text-gray-900">Chest & Tri Builder</h4><p class="text-xs text-gray-500">3x/Week • Upper Body Focus</p></div>
+                    <button onclick="startPlan('plan_chest', 'Chest & Tri Builder')" class="bg-black text-white px-4 py-2 rounded-lg text-xs font-bold active:scale-95">Start</button>
                 </div>
-
                 <div class="card p-4 flex justify-between items-center">
-                    <div>
-                        <h4 class="font-bold text-gray-900">Thick Thighs</h4>
-                        <p class="text-xs text-gray-500">3x/Week • Glutes & Quads</p>
-                    </div>
-                    <button onclick="startPlan('plan_lower_mass', 'Thick Thighs')" class="bg-black text-white px-4 py-2 rounded-lg text-xs font-bold active:scale-95">Start Plan</button>
+                    <div><h4 class="font-bold text-gray-900">Thick Thighs</h4><p class="text-xs text-gray-500">3x/Week • Glutes & Quads</p></div>
+                    <button onclick="startPlan('plan_lower_mass', 'Thick Thighs')" class="bg-black text-white px-4 py-2 rounded-lg text-xs font-bold active:scale-95">Start</button>
                 </div>
-                
                 <div class="card p-4 flex justify-between items-center">
-                    <div>
-                        <h4 class="font-bold text-gray-900">Abs & Core</h4>
-                        <p class="text-xs text-gray-500">3x/Week • Definition</p>
-                    </div>
-                    <button onclick="startPlan('plan_abs', 'Abs & Core')" class="bg-black text-white px-4 py-2 rounded-lg text-xs font-bold active:scale-95">Start Plan</button>
+                    <div><h4 class="font-bold text-gray-900">Abs & Core</h4><p class="text-xs text-gray-500">3x/Week • Definition</p></div>
+                    <button onclick="startPlan('plan_abs', 'Abs & Core')" class="bg-black text-white px-4 py-2 rounded-lg text-xs font-bold active:scale-95">Start</button>
                 </div>
             </div>
         </div>
@@ -116,7 +110,7 @@
                 <button onclick="document.getElementById('freestyle-opts').classList.toggle('hidden')" class="text-xs text-blue-500 font-bold">Show Options</button>
             </div>
             
-            <div id="freestyle-opts" class="card p-5 mb-4 space-y-4">
+            <div id="freestyle-opts" class="card p-5 mb-4 space-y-4 hidden">
                 <div class="flex justify-between items-center cursor-pointer" onclick="document.getElementById('equip-options').classList.toggle('hidden')">
                     <h3 class="font-bold text-gray-800 text-sm"><i class="fa-solid fa-toolbox text-gray-500 mr-2"></i>My Gear</h3>
                     <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
@@ -153,7 +147,7 @@
         <div id="historyLog" class="space-y-2 pb-10"></div>
     </div>
 
-    <div id="workout-modal" class="fixed inset-0 bg-white z-50 hidden flex flex-col">
+    <div id="workout-modal" class="fixed inset-0 bg-white z-50 hidden flex flex-col pt-12">
         <div class="bg-white border-b border-gray-100 p-4 flex justify-between items-center shadow-sm z-10">
             <button onclick="closeWorkout()" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
             <div class="text-center">
@@ -163,9 +157,19 @@
             <div class="text-xs font-mono bg-gray-100 px-2 py-1 rounded text-gray-600" id="sessionTimer">00:00</div>
         </div>
 
-        <div id="workout-content" class="flex-1 overflow-y-auto p-6 space-y-6 pb-32 bg-gray-50"></div>
+        <div id="workout-content" class="flex-1 overflow-y-auto p-6 space-y-6 pb-40 bg-gray-50"></div>
 
-        <div class="absolute bottom-0 w-full bg-white border-t border-gray-200 p-4">
+        <div id="circuit-controls" class="hidden absolute bottom-0 w-full bg-white border-t border-gray-200 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] safe-pb">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-xs font-bold text-gray-500" id="round-tracker">Round 1/3</span>
+                <span class="text-xs font-bold text-blue-500">Next: Rest</span>
+            </div>
+            <button onclick="completeRound()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-md active:scale-95 transition-transform">
+                Finish Round & Rest <i class="fa-solid fa-stopwatch ml-2"></i>
+            </button>
+        </div>
+        
+        <div id="standard-controls" class="absolute bottom-0 w-full bg-white border-t border-gray-200 p-4 hidden safe-pb">
              <button onclick="finishWorkout()" class="w-full bg-green-500 text-white font-bold py-4 rounded-xl shadow-md active:scale-95 transition-transform">
                 Finish Workout <i class="fa-solid fa-check ml-2"></i>
             </button>
@@ -174,7 +178,7 @@
 
     <div id="rest-overlay" class="fixed inset-0 bg-black/95 z-[60] hidden flex flex-col items-center justify-center text-white">
         <div class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Recover</div>
-        <div class="text-7xl font-mono font-bold mb-8" id="rest-countdown">00:45</div>
+        <div class="text-7xl font-mono font-bold mb-8 transition-all" id="rest-countdown">00:45</div>
         <div class="flex gap-4">
             <button onclick="addRest(15)" class="px-6 py-2 rounded-full border border-white/30 text-sm hover:bg-white/10">+15s</button>
             <button onclick="skipRest()" class="px-6 py-2 rounded-full bg-white text-black font-bold text-sm">Resume</button>
@@ -182,6 +186,9 @@
         <div class="mt-8 text-center px-6">
             <p class="text-xs text-gray-500 uppercase mb-2">Up Next:</p>
             <p class="text-lg font-bold text-blue-400" id="up-next-text">Next Exercise</p>
+        </div>
+        <div class="mt-8">
+            <button onclick="toggleAudio()" id="audioBtn" class="text-gray-500 text-sm"><i class="fa-solid fa-volume-high"></i> Sound On</button>
         </div>
     </div>
 
@@ -201,42 +208,31 @@
     </div>
 
     <script>
-        // --- DATA LIBRARIES ---
+        // --- DATA ---
         const exerciseLibrary = [
-            // CHEST
             { id: 'pushup_std', name: 'Standard Pushups', muscle: 'Chest', equipment: 'None', howTo: 'Plank position. Hands shoulder width. Lower chest to floor.', benefit: 'Builds mass and core stability.', videoUrl: "" },
             { id: 'db_press', name: 'Dumbbell Floor Press', muscle: 'Chest', equipment: 'Dumbbells', howTo: 'Lie on back. Press weights up over chest. Tap elbows to floor.', benefit: 'Heavy loading without shoulder strain.', videoUrl: "" },
             { id: 'band_fly', name: 'Band Flys', muscle: 'Chest', equipment: 'Bands', howTo: 'Anchor band behind you. Hug a tree motion.', benefit: 'Isolates chest squeeze.', videoUrl: "" },
             { id: 'db_fly', name: 'Dumbbell Flys', muscle: 'Chest', equipment: 'Dumbbells', howTo: 'Lie on floor/bench. Open arms wide, squeeze back together.', benefit: 'Targets outer pec fibers.', videoUrl: "" },
             { id: 'pushup_wide', name: 'Wide Pushups', muscle: 'Chest', equipment: 'None', howTo: 'Hands wider than shoulders. Lower chest to floor.', benefit: 'Shifts focus to outer chest.', videoUrl: "" },
-
-            // BACK
             { id: 'pullup', name: 'Pull-ups', muscle: 'Back', equipment: 'Pullup Bar', howTo: 'Hang from bar. Pull chin over bar. Lower fully.', benefit: 'King of back exercises (V-taper).', videoUrl: "" },
             { id: 'db_row', name: 'One-Arm DB Row', muscle: 'Back', equipment: 'Dumbbells', howTo: 'Hand on chair. Pull weight to hip, keeping back flat.', benefit: 'Thickens mid-back.', videoUrl: "" },
             { id: 'band_row', name: 'Seated Band Row', muscle: 'Back', equipment: 'Bands', howTo: 'Sit legs straight. Loop band around feet. Pull to waist.', benefit: 'Improves posture/rhomboids.', videoUrl: "" },
             { id: 'superman', name: 'Supermans', muscle: 'Back', equipment: 'None', howTo: 'Lie on stomach. Lift arms/legs. Squeeze glutes/back.', benefit: 'Lower back health.', videoUrl: "" },
-
-            // LEGS
             { id: 'goblet_squat', name: 'Goblet Squats', muscle: 'Legs', equipment: 'Dumbbells', howTo: 'Hold weight at chest. Squat deep.', benefit: 'Adds load + core stability.', videoUrl: "" },
             { id: 'rdl_db', name: 'Dumbbell RDL', muscle: 'Legs', equipment: 'Dumbbells', howTo: 'Hold weights. Hinge hips back. Slight knee bend.', benefit: 'Hamstring & Glute builder.', videoUrl: "" },
             { id: 'bulgarian', name: 'Bulgarian Split Squat', muscle: 'Legs', equipment: 'Dumbbells', howTo: 'One foot on chair behind you. Squat with front leg.', benefit: 'Massive quad/glute growth.', videoUrl: "" },
             { id: 'squat_jump', name: 'Jump Squats', muscle: 'Legs', equipment: 'None', howTo: 'Squat down, explode up into a jump.', benefit: 'Explosive power and high calorie burn.', videoUrl: "" },
             { id: 'lunge_walk', name: 'Walking Lunges', muscle: 'Legs', equipment: 'None', howTo: 'Step forward, drop back knee. Alternate legs.', benefit: 'Dynamic balance and glutes.', videoUrl: "" },
             { id: 'glute_bridge', name: 'Glute Bridges', muscle: 'Legs', equipment: 'None', howTo: 'Lie on back, knees up. Drive hips to ceiling.', benefit: 'Isolates glutes.', videoUrl: "" },
-
-            // SHOULDERS
             { id: 'pike_pushup', name: 'Pike Pushups', muscle: 'Shoulders', equipment: 'None', howTo: 'Downward dog position. Lower head to floor. Press up.', benefit: 'Overhead press with bodyweight.', videoUrl: "" },
             { id: 'lat_raise', name: 'DB Lateral Raise', muscle: 'Shoulders', equipment: 'Dumbbells', howTo: 'Stand. Lift weights to side until shoulder height.', benefit: 'Side delts for width.', videoUrl: "" },
             { id: 'ohp_db', name: 'Seated DB Press', muscle: 'Shoulders', equipment: 'Dumbbells', howTo: 'Sit down. Press weights from shoulder to overhead.', benefit: 'Overall shoulder mass.', videoUrl: "" },
-
-            // ARMS
             { id: 'dip_chair', name: 'Chair Dips', muscle: 'Arms', equipment: 'None', howTo: 'Hands on chair behind you. Lower hips. Press up.', benefit: 'Tricep mass.', videoUrl: "" },
             { id: 'tri_kickback', name: 'Tricep Kickbacks', muscle: 'Arms', equipment: 'Dumbbells', howTo: 'Lean forward. Extend arm back. Squeeze tricep.', benefit: 'Tones back of arm.', videoUrl: "" },
             { id: 'pushup_diamond', name: 'Diamond Pushups', muscle: 'Arms', equipment: 'None', howTo: 'Hands form diamond shape. Lower chest.', benefit: 'Heavy tricep load.', videoUrl: "" },
             { id: 'curl_db', name: 'Dumbbell Curls', muscle: 'Arms', equipment: 'Dumbbells', howTo: 'Stand. Curl weight to shoulder. Squeeze.', benefit: 'Bicep peak.', videoUrl: "" },
             { id: 'curl_hammer', name: 'Hammer Curls', muscle: 'Arms', equipment: 'Dumbbells', howTo: 'Curl with palms facing each other.', benefit: 'Forearms and biceps width.', videoUrl: "" },
-
-            // CORE
             { id: 'plank', name: 'Plank', muscle: 'Core', equipment: 'None', howTo: 'Elbows under shoulders. Body straight. Hold.', benefit: 'Total core stability.', videoUrl: "" },
             { id: 'leg_raise', name: 'Leg Raises', muscle: 'Core', equipment: 'None', howTo: 'Lie flat. Lift legs to 90 degrees. Lower slowly.', benefit: 'Lower abs.', videoUrl: "" },
             { id: 'mountain_climber', name: 'Mountain Climbers', muscle: 'Core', equipment: 'None', howTo: 'Plank position. Run knees to chest fast.', benefit: 'Core cardio burn.', videoUrl: "" },
@@ -263,7 +259,7 @@
 
         // --- STATE ---
         let state = {
-            user: { level: 1, xp: 0, streak: 0 },
+            user: { level: 1, xp: 0, streak: 0, audioOn: true },
             activePlan: { id: null, name: null, progress: 0, total: 12 },
             equipment: { 'Dumbbells': true, 'Bands': true, 'Pullup Bar': true, 'Barbell': false },
             exerciseData: {},
@@ -271,13 +267,39 @@
         };
         let session = { exercises: [], isPlan: false, startTime: 0, timerInt: null };
         let selectedMuscles = [];
+        let audioCtx = null;
 
         // --- INIT ---
         function init() {
-            const saved = localStorage.getItem('fitLogicData_v6');
+            const saved = localStorage.getItem('fitLogicData_v7');
             if (saved) state = JSON.parse(saved);
             updateDashboard();
             renderEquipmentToggles();
+            updateAudioBtn();
+        }
+
+        // --- AUDIO ENGINE ---
+        function playBeep(freq, type) {
+            if (!state.user.audioOn) return;
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type || 'sine';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+        function toggleAudio() {
+            state.user.audioOn = !state.user.audioOn;
+            updateAudioBtn();
+            saveData();
+        }
+        function updateAudioBtn() {
+            const btn = document.getElementById('audioBtn');
+            btn.innerHTML = state.user.audioOn ? '<i class="fa-solid fa-volume-high"></i> Sound On' : '<i class="fa-solid fa-volume-xmark"></i> Sound Off';
         }
 
         function updateDashboard() {
@@ -355,9 +377,7 @@
             session.isPlan = (mode === 'plan');
             
             if (session.isPlan) {
-                // LOAD PLAN EXERCISES
                 const planIds = staticPlans[state.activePlan.id];
-                // Substitution logic
                 planIds.forEach(id => {
                     const ex = exerciseLibrary.find(e => e.id === id);
                     if (ex) {
@@ -370,7 +390,6 @@
                     }
                 });
             } else {
-                // FREESTYLE
                 const duration = parseInt(document.getElementById('durationSelector').value);
                 const targets = selectedMuscles.length > 0 ? selectedMuscles : ['Chest', 'Back', 'Legs', 'Shoulders', 'Core', 'Arms'];
                 let pool = exerciseLibrary.filter(ex => targets.includes(ex.muscle) && (ex.equipment === 'None' || state.equipment[ex.equipment]));
@@ -385,7 +404,6 @@
 
             if (selectedList.length === 0) { alert("No exercises found!"); return; }
 
-            // SETUP SESSION
             session.exercises = selectedList.map(ex => {
                 const hist = state.exerciseData[ex.id] || { reps: 10 };
                 return { ...ex, targetReps: hist.reps, sets: 3, completedSets: 0 };
@@ -414,7 +432,6 @@
             const container = document.getElementById('workout-content');
             container.innerHTML = '';
 
-            // STRETCHES
             const uniqueMuscles = [...new Set(session.exercises.map(ex => ex.muscle))];
             let wHTML = `<details class="bg-orange-50 p-3 rounded-xl border border-orange-100 mb-4 cursor-pointer">
                 <summary class="font-bold text-orange-800 text-sm flex justify-between">Warmup Stretches <i class="fa-solid fa-chevron-down"></i></summary>
@@ -429,7 +446,6 @@
             wHTML += `</div></details>`;
             container.innerHTML += wHTML;
 
-            // CARDS
             session.exercises.forEach((ex, idx) => {
                 const videoBlock = ex.videoUrl ? 
                     `<iframe class="w-full h-40 rounded-lg mt-2" src="${ex.videoUrl}" frameborder="0" allowfullscreen></iframe>` : 
@@ -447,7 +463,6 @@
                         <h4 class="font-bold text-lg">${ex.name}</h4>
                         <span class="text-xs font-mono bg-gray-100 px-2 py-1 rounded text-gray-700">${ex.muscle}</span>
                     </div>
-                    
                     <details class="mt-2 text-xs text-gray-600 cursor-pointer">
                         <summary class="font-bold text-blue-500">How & Why <i class="fa-solid fa-chevron-down ml-1"></i></summary>
                         <div class="mt-2 p-2 bg-gray-50 rounded border border-gray-100">
@@ -456,12 +471,10 @@
                             ${videoBlock}
                         </div>
                     </details>
-                    
                     <div class="mt-3 flex gap-2 justify-center">${checks}</div>
                     <div class="text-center text-xs text-gray-400 mt-1">Target: <span id="target-${idx}">${ex.targetReps}</span> Reps</div>
-                    
                     <div class="mt-3 pt-3 border-t border-gray-100 flex justify-between items-center">
-                        <span class="text-[10px] text-gray-400">Rate for Next Time:</span>
+                        <span class="text-[10px] text-gray-400">Rate:</span>
                         <div class="flex gap-1">
                             <button onclick="rate(${idx}, 'easy')" class="px-3 py-1 bg-gray-100 text-[10px] rounded hover:bg-blue-100 font-bold">Too Easy</button>
                             <button onclick="rate(${idx}, 'hard')" class="px-3 py-1 bg-gray-100 text-[10px] rounded hover:bg-red-100 font-bold">Too Hard</button>
@@ -470,7 +483,6 @@
                 </div>`;
             });
             
-            // COOLDOWN
             let cHTML = `<details class="bg-blue-50 p-3 rounded-xl border border-blue-100 mt-4 cursor-pointer">
                 <summary class="font-bold text-blue-800 text-sm flex justify-between">Cooldown Stretches <i class="fa-solid fa-chevron-down"></i></summary>
                 <div class="mt-2 space-y-2">`;
@@ -492,7 +504,15 @@
                 triggerRest(60, "Next Set");
             }
         }
-
+        function completeRound() {
+            if (session.currentRound < session.totalRounds) {
+                triggerRest(90, `Round ${session.currentRound + 1}`);
+                session.currentRound++;
+                document.getElementById('round-tracker').innerText = `Round ${session.currentRound}/${session.totalRounds}`;
+            } else {
+                finishWorkout();
+            }
+        }
         function rate(idx, rating) {
             const exId = session.exercises[idx].id;
             if (!state.exerciseData[exId]) state.exerciseData[exId] = { reps: 10 };
@@ -516,7 +536,8 @@
             restInt = setInterval(() => {
                 timeLeft--;
                 display.innerText = formatTime(timeLeft);
-                if (timeLeft <= 0) skipRest();
+                if (timeLeft <= 3 && timeLeft > 0) playBeep(440, 'sine'); // BEEP
+                if (timeLeft === 0) { playBeep(880, 'square'); skipRest(); }
             }, 1000);
         }
         function formatTime(s) { return `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`; }
@@ -525,14 +546,11 @@
 
         function finishWorkout() {
             if(!confirm("Finish & Save?")) return;
-            
-            // Stats
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); // CONFETTI
             const xp = 100 + (session.exercises.length * 10);
             state.user.xp += xp;
             state.user.streak++;
             state.user.level = Math.floor(state.user.xp / 500) + 1;
-            
-            // Plan Progress
             if (session.isPlan) {
                 state.activePlan.progress++;
                 if(state.activePlan.progress >= state.activePlan.total) {
@@ -540,21 +558,20 @@
                     state.activePlan = { id: null, name: null, progress: 0, total: 0 };
                 }
             }
-            
             state.history.unshift({ date: Date.now(), title: document.getElementById('workoutTitle').innerText, xp: xp });
             saveData();
-            location.reload();
+            setTimeout(() => location.reload(), 2000);
         }
 
         function closeWorkout() { if(confirm("Exit?")) { document.getElementById('workout-modal').classList.add('hidden'); clearInterval(session.timerInt); }}
-        function saveData() { localStorage.setItem('fitLogicData_v6', JSON.stringify(state)); }
+        function saveData() { localStorage.setItem('fitLogicData_v7', JSON.stringify(state)); }
         function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
         function exportData() {
             const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
             a.download = "fitlogic_backup.json"; document.body.appendChild(a); a.click(); a.remove();
         }
         function importData(input) { const r = new FileReader(); r.onload = (e) => { state = JSON.parse(e.target.result); saveData(); location.reload(); }; r.readAsText(input.files[0]); }
-        function resetApp() { if(confirm("Reset data?")) { localStorage.removeItem('fitLogicData_v6'); location.reload(); }}
+        function resetApp() { if(confirm("Reset data?")) { localStorage.removeItem('fitLogicData_v7'); location.reload(); }}
 
         init();
     </script>
