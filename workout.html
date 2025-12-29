@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="FitLogic">
     
-    <title>FitLogic 13.0 | Gear Update</title>
+    <title>FitLogic 14.0</title>
     
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
@@ -47,7 +47,7 @@
 
     <div id="app-header" class="bg-white/90 dark:bg-darkcard/90 backdrop-blur sticky top-0 z-30 px-6 py-4 pt-14 shadow-sm flex justify-between items-center transition-colors duration-300 border-b dark:border-gray-800">
         <div>
-            <h1 class="text-xl font-extrabold tracking-tight">FitLogic <span class="text-blue-600 dark:text-blue-400">13.0</span></h1>
+            <h1 class="text-xl font-extrabold tracking-tight">FitLogic <span class="text-blue-600 dark:text-blue-400">14.0</span></h1>
             <p class="text-xs text-gray-500 dark:text-gray-400 font-medium" id="currentDate">Today</p>
         </div>
         <div class="flex items-center gap-4">
@@ -106,17 +106,25 @@
                 <h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">My Routines</h3>
                 <button onclick="openBuilder()" class="text-xs bg-black dark:bg-white dark:text-black text-white px-3 py-1 rounded-full font-bold shadow-lg hover:scale-105 transition-transform">Create New +</button>
             </div>
-            
             <div id="custom-routines-list" class="space-y-3"></div>
             <div id="no-custom-msg" class="text-center text-xs text-gray-400 py-4 italic">No saved routines yet. Build one!</div>
         </div>
 
         <div id="plan-library" class="hidden">
             <h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2 mt-4">4-Week Plans</h3>
-            <div class="space-y-3">
-                <div class="bg-white dark:bg-darkcard p-4 rounded-xl shadow-sm flex justify-between items-center border border-gray-100 dark:border-gray-800"><div><h4 class="font-bold">Full Body Alpha</h4><p class="text-xs text-gray-500">3x/Week • Strength</p></div><button onclick="promptStartPlan('plan_full_body', 'Full Body Alpha')" class="bg-gray-200 dark:bg-gray-700 px-4 py-2 rounded-lg text-xs font-bold">Start</button></div>
-                <div class="bg-white dark:bg-darkcard p-4 rounded-xl shadow-sm flex justify-between items-center border border-gray-100 dark:border-gray-800"><div><h4 class="font-bold">Thick Thighs</h4><p class="text-xs text-gray-500">3x/Week • Legs</p></div><button onclick="promptStartPlan('plan_lower_mass', 'Thick Thighs')" class="bg-gray-200 dark:bg-gray-700 px-4 py-2 rounded-lg text-xs font-bold">Start</button></div>
+            
+            <div id="plans-container" class="space-y-3 overflow-hidden transition-all duration-500" style="max-height: 180px;">
+                <div class="bg-white dark:bg-darkcard p-4 rounded-xl shadow-sm flex justify-between items-center border border-gray-100 dark:border-gray-800"><div><h4 class="font-bold">Full Body Alpha</h4><p class="text-xs text-gray-500">3x/Week • Balanced</p></div><button onclick="promptStartPlan('plan_full_body', 'Full Body Alpha')" class="bg-gray-200 dark:bg-gray-700 px-4 py-2 rounded-lg text-xs font-bold">Start</button></div>
+                <div class="bg-white dark:bg-darkcard p-4 rounded-xl shadow-sm flex justify-between items-center border border-gray-100 dark:border-gray-800"><div><h4 class="font-bold">Home Hero (DB)</h4><p class="text-xs text-gray-500">3x/Week • Dumbbells Only</p></div><button onclick="promptStartPlan('plan_home_hero', 'Home Hero (DB)')" class="bg-gray-200 dark:bg-gray-700 px-4 py-2 rounded-lg text-xs font-bold">Start</button></div>
+                <div class="bg-white dark:bg-darkcard p-4 rounded-xl shadow-sm flex justify-between items-center border border-gray-100 dark:border-gray-800"><div><h4 class="font-bold">Full Body Bravo (Intense)</h4><p class="text-xs text-gray-500">4x/Week • High Volume</p></div><button onclick="promptStartPlan('plan_full_body_intense', 'Full Body Bravo')" class="bg-gray-200 dark:bg-gray-700 px-4 py-2 rounded-lg text-xs font-bold">Start</button></div>
+                <div class="bg-white dark:bg-darkcard p-4 rounded-xl shadow-sm flex justify-between items-center border border-gray-100 dark:border-gray-800"><div><h4 class="font-bold">Power Builder (Barbell)</h4><p class="text-xs text-gray-500">3x/Week • Heavy Lifts</p></div><button onclick="promptStartPlan('plan_strength', 'Power Builder')" class="bg-gray-200 dark:bg-gray-700 px-4 py-2 rounded-lg text-xs font-bold">Start</button></div>
+                <div class="bg-white dark:bg-darkcard p-4 rounded-xl shadow-sm flex justify-between items-center border border-gray-100 dark:border-gray-800"><div><h4 class="font-bold">Upper Body Sculpt</h4><p class="text-xs text-gray-500">2x/Week • Chest/Back/Arms</p></div><button onclick="promptStartPlan('plan_upper', 'Upper Sculpt')" class="bg-gray-200 dark:bg-gray-700 px-4 py-2 rounded-lg text-xs font-bold">Start</button></div>
+                <div class="bg-white dark:bg-darkcard p-4 rounded-xl shadow-sm flex justify-between items-center border border-gray-100 dark:border-gray-800"><div><h4 class="font-bold">Thick Thighs</h4><p class="text-xs text-gray-500">2x/Week • Glutes/Quads</p></div><button onclick="promptStartPlan('plan_lower_mass', 'Thick Thighs')" class="bg-gray-200 dark:bg-gray-700 px-4 py-2 rounded-lg text-xs font-bold">Start</button></div>
+                <div class="bg-white dark:bg-darkcard p-4 rounded-xl shadow-sm flex justify-between items-center border border-gray-100 dark:border-gray-800"><div><h4 class="font-bold">Lean Legs (Cardio)</h4><p class="text-xs text-gray-500">3x/Week • High Reps</p></div><button onclick="promptStartPlan('plan_lower_cut', 'Lean Legs')" class="bg-gray-200 dark:bg-gray-700 px-4 py-2 rounded-lg text-xs font-bold">Start</button></div>
+                <div class="bg-white dark:bg-darkcard p-4 rounded-xl shadow-sm flex justify-between items-center border border-gray-100 dark:border-gray-800"><div><h4 class="font-bold">Core Blaster</h4><p class="text-xs text-gray-500">Add-on • Abs Focus</p></div><button onclick="promptStartPlan('plan_core', 'Core Blaster')" class="bg-gray-200 dark:bg-gray-700 px-4 py-2 rounded-lg text-xs font-bold">Start</button></div>
             </div>
+            
+            <button id="toggle-plans-btn" onclick="togglePlanView()" class="w-full text-center text-xs font-bold text-blue-500 py-3 mt-1 hover:text-blue-600">View All 8 Plans <i class="fa-solid fa-chevron-down ml-1"></i></button>
         </div>
 
         <hr class="border-gray-200 dark:border-gray-800">
@@ -136,13 +144,7 @@
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Targets</label>
                     <div class="grid grid-cols-3 gap-2" id="muscle-selector">
-                        <button onclick="toggleMuscle(this, 'Chest')" class="muscle-btn bg-gray-50 dark:bg-gray-800 dark:text-gray-300 rounded-xl py-2 text-xs font-bold">Chest</button>
-                        <button onclick="toggleMuscle(this, 'Back')" class="muscle-btn bg-gray-50 dark:bg-gray-800 dark:text-gray-300 rounded-xl py-2 text-xs font-bold">Back</button>
-                        <button onclick="toggleMuscle(this, 'Legs')" class="muscle-btn bg-gray-50 dark:bg-gray-800 dark:text-gray-300 rounded-xl py-2 text-xs font-bold">Legs</button>
-                        <button onclick="toggleMuscle(this, 'Arms')" class="muscle-btn bg-gray-50 dark:bg-gray-800 dark:text-gray-300 rounded-xl py-2 text-xs font-bold">Arms</button>
-                        <button onclick="toggleMuscle(this, 'Core')" class="muscle-btn bg-gray-50 dark:bg-gray-800 dark:text-gray-300 rounded-xl py-2 text-xs font-bold">Core</button>
-                        <button onclick="toggleMuscle(this, 'Shoulders')" class="muscle-btn bg-gray-50 dark:bg-gray-800 dark:text-gray-300 rounded-xl py-2 text-xs font-bold">Shoulders</button>
-                    </div>
+                        </div>
                 </div>
             </div>
             <button onclick="generateWorkout('freestyle')" class="w-full bg-white dark:bg-darkcard border-2 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-2xl py-4 font-bold shadow-sm active:scale-95 transition-transform hover:bg-gray-50 dark:hover:bg-gray-800"><i class="fa-solid fa-shuffle mr-2"></i> Random Workout</button>
@@ -160,10 +162,8 @@
         <div class="p-4 bg-gray-50 dark:bg-darkbg flex-1 overflow-y-auto pb-40">
             <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Routine Name</label>
             <input type="text" id="builder-name" placeholder="e.g. Friday Pump" class="w-full p-3 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-darkcard dark:text-white mb-6 focus:ring-2 focus:ring-blue-500 outline-none">
-            
             <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Select Exercises</label>
-            <div id="builder-list" class="space-y-4">
-                </div>
+            <div id="builder-list" class="space-y-4"></div>
         </div>
     </div>
 
@@ -201,10 +201,7 @@
     <div id="settings-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-darkcard w-full max-w-sm rounded-2xl p-6 shadow-2xl">
             <h2 class="font-bold text-xl mb-4">Settings & Gear</h2>
-            
-            <div id="equip-settings-list" class="space-y-2 mb-6">
-                </div>
-
+            <div id="equip-settings-list" class="space-y-2 mb-6"></div>
             <div class="space-y-3 pt-4 border-t border-gray-100 dark:border-gray-800">
                 <button onclick="exportData()" class="w-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-bold py-3 rounded-lg border border-blue-100 dark:border-blue-900 text-sm">Backup Data</button>
                 <label class="block w-full cursor-pointer">
@@ -218,59 +215,52 @@
     </div>
 
     <script>
-        const muscleThemes = {
-            'Chest': 'bg-blue-50 dark:bg-blue-900/10 border-blue-500 text-blue-900 dark:text-blue-100',
-            'Back': 'bg-purple-50 dark:bg-purple-900/10 border-purple-500 text-purple-900 dark:text-purple-100',
-            'Legs': 'bg-red-50 dark:bg-red-900/10 border-red-500 text-red-900 dark:text-red-100',
-            'Arms': 'bg-pink-50 dark:bg-pink-900/10 border-pink-500 text-pink-900 dark:text-pink-100',
-            'Shoulders': 'bg-indigo-50 dark:bg-indigo-900/10 border-indigo-500 text-indigo-900 dark:text-indigo-100',
-            'Core': 'bg-emerald-50 dark:bg-emerald-900/10 border-emerald-500 text-emerald-900 dark:text-emerald-100',
-            'Neck': 'bg-gray-50 dark:bg-gray-800 border-gray-400 text-gray-900 dark:text-gray-100'
-        };
-        
-        // Gear Icons Map
-        const gearIcons = {
-            'None': '<i class="fa-solid fa-person text-gray-400"></i>',
-            'Dumbbells': '<i class="fa-solid fa-dumbbell text-blue-500"></i>',
-            'Bands': '<i class="fa-solid fa-infinity text-purple-500"></i>',
-            'Barbell': '<i class="fa-solid fa-weight-hanging text-red-500"></i>',
-            'Pullup Bar': '<i class="fa-solid fa-up-long text-green-500"></i>'
-        };
-
+        const muscleThemes = { 'Chest':'bg-blue-50 dark:bg-blue-900/10 border-blue-500 text-blue-900 dark:text-blue-100', 'Back':'bg-purple-50 dark:bg-purple-900/10 border-purple-500 text-purple-900 dark:text-purple-100', 'Legs':'bg-red-50 dark:bg-red-900/10 border-red-500 text-red-900 dark:text-red-100', 'Arms':'bg-pink-50 dark:bg-pink-900/10 border-pink-500 text-pink-900 dark:text-pink-100', 'Shoulders':'bg-indigo-50 dark:bg-indigo-900/10 border-indigo-500 text-indigo-900 dark:text-indigo-100', 'Core':'bg-emerald-50 dark:bg-emerald-900/10 border-emerald-500 text-emerald-900 dark:text-emerald-100', 'Neck':'bg-gray-50 dark:bg-gray-800 border-gray-400 text-gray-900 dark:text-gray-100' };
+        const gearIcons = { 'None':'<i class="fa-solid fa-person text-gray-400"></i>', 'Dumbbells':'<i class="fa-solid fa-dumbbell text-blue-500"></i>', 'Bands':'<i class="fa-solid fa-infinity text-purple-500"></i>', 'Barbell':'<i class="fa-solid fa-weight-hanging text-red-500"></i>', 'Pullup Bar':'<i class="fa-solid fa-up-long text-green-500"></i>' };
         const dailyTips = ["Drink 16oz water immediately.", "20-30g protein after training.", "Aim for 7-8h sleep.", "Creatine helps brain & muscle.", "Cut liquid sugar.", "Dynamic warmups, Static cooldowns.", "Consistency > Intensity.", "Magnesium for sleep.", "Pinch of salt for hydration.", "Track your lifts."];
         
         const exerciseLibrary = [
-            // CHEST
             { id: 'pushup_std', name: 'Standard Pushups', muscle: 'Chest', equipment: 'None', howTo: 'Plank position. Lower chest.', benefit: 'Mass & Core.', videoUrl: "" },
             { id: 'db_press', name: 'DB Floor Press', muscle: 'Chest', equipment: 'Dumbbells', howTo: 'Lie back. Press up.', benefit: 'Heavy loading.', videoUrl: "" },
-            { id: 'barbell_bench', name: 'Barbell Bench Press', muscle: 'Chest', equipment: 'Barbell', howTo: 'Lie on bench. Lower bar to chest. Press.', benefit: 'King of chest moves.', videoUrl: "" },
+            { id: 'barbell_bench', name: 'Barbell Bench Press', muscle: 'Chest', equipment: 'Barbell', howTo: 'Lie on bench. Lower bar. Press.', benefit: 'King of chest moves.', videoUrl: "" },
             { id: 'band_fly', name: 'Band Flys', muscle: 'Chest', equipment: 'Bands', howTo: 'Hug a tree motion.', benefit: 'Isolation.', videoUrl: "" },
-            // BACK
+            { id: 'db_fly', name: 'DB Flys', muscle: 'Chest', equipment: 'Dumbbells', howTo: 'Open arms wide.', benefit: 'Stretch pec fibers.', videoUrl: "" },
             { id: 'pullup', name: 'Pull-ups', muscle: 'Back', equipment: 'Pullup Bar', howTo: 'Chin over bar.', benefit: 'V-Taper.', videoUrl: "" },
             { id: 'db_row', name: 'DB Row', muscle: 'Back', equipment: 'Dumbbells', howTo: 'Pull weight to hip.', benefit: 'Thick Back.', videoUrl: "" },
             { id: 'barbell_row', name: 'Barbell Row', muscle: 'Back', equipment: 'Barbell', howTo: 'Bent over. Pull bar to waist.', benefit: 'Back density.', videoUrl: "" },
             { id: 'band_row', name: 'Seated Band Row', muscle: 'Back', equipment: 'Bands', howTo: 'Legs straight. Pull band.', benefit: 'Posture.', videoUrl: "" },
-            // LEGS
             { id: 'goblet_squat', name: 'Goblet Squat', muscle: 'Legs', equipment: 'Dumbbells', howTo: 'Hold weight at chest. Squat.', benefit: 'Legs & Core.', videoUrl: "" },
             { id: 'barbell_squat', name: 'Barbell Back Squat', muscle: 'Legs', equipment: 'Barbell', howTo: 'Bar on traps. Squat deep.', benefit: 'Overall mass.', videoUrl: "" },
             { id: 'barbell_dl', name: 'Deadlift', muscle: 'Legs', equipment: 'Barbell', howTo: 'Lift bar from floor to hip.', benefit: 'Posterior chain.', videoUrl: "" },
             { id: 'squat_jump', name: 'Jump Squats', muscle: 'Legs', equipment: 'None', howTo: 'Explode up.', benefit: 'Power.', videoUrl: "" },
-            // SHOULDERS
+            { id: 'lunge_walk', name: 'Walking Lunges', muscle: 'Legs', equipment: 'None', howTo: 'Step forward.', benefit: 'Balance.', videoUrl: "" },
             { id: 'barbell_ohp', name: 'Overhead Press', muscle: 'Shoulders', equipment: 'Barbell', howTo: 'Press bar overhead.', benefit: 'Shoulder strength.', videoUrl: "" },
+            { id: 'db_ohp', name: 'DB Shoulder Press', muscle: 'Shoulders', equipment: 'Dumbbells', howTo: 'Press DBs overhead.', benefit: 'Delt mass.', videoUrl: "" },
             { id: 'lat_raise', name: 'Lateral Raise', muscle: 'Shoulders', equipment: 'Dumbbells', howTo: 'Raise arms to side.', benefit: 'Width.', videoUrl: "" },
-            // ARMS & CORE
             { id: 'curl_bar', name: 'Barbell Curl', muscle: 'Arms', equipment: 'Barbell', howTo: 'Curl bar up.', benefit: 'Bicep Mass.', videoUrl: "" },
+            { id: 'db_curl', name: 'DB Curl', muscle: 'Arms', equipment: 'Dumbbells', howTo: 'Curl weight.', benefit: 'Isolation.', videoUrl: "" },
+            { id: 'dip_chair', name: 'Chair Dips', muscle: 'Arms', equipment: 'None', howTo: 'Lower hips.', benefit: 'Triceps.', videoUrl: "" },
             { id: 'plank', name: 'Plank', muscle: 'Core', equipment: 'None', howTo: 'Hold straight line.', benefit: 'Stability.', videoUrl: "" },
             { id: 'leg_raise', name: 'Leg Raises', muscle: 'Core', equipment: 'None', howTo: 'Lift legs.', benefit: 'Lower Abs.', videoUrl: "" },
-            // MOBILITY
-            { id: 'neck_roll', name: 'Neck Rolls', muscle: 'Neck', equipment: 'None', howTo: 'Roll head.', benefit: 'Tension relief.', videoUrl: "" },
-            { id: 'cat_cow', name: 'Cat-Cow', muscle: 'Back', equipment: 'None', howTo: 'Arch/Sink spine.', benefit: 'Mobility.', videoUrl: "" },
+            { id: 'neck_roll', name: 'Neck Rolls', muscle: 'Neck', equipment: 'None', howTo: 'Roll head.', benefit: 'Relief.', videoUrl: "" },
+            { id: 'cat_cow', name: 'Cat-Cow', muscle: 'Back', equipment: 'None', howTo: 'Arch/Sink.', benefit: 'Mobility.', videoUrl: "" },
             { id: 'child_pose', name: 'Childs Pose', muscle: 'Back', equipment: 'None', howTo: 'Sit on heels.', benefit: 'Decompress.', videoUrl: "" },
             { id: 'butterfly', name: 'Butterfly', muscle: 'Legs', equipment: 'None', howTo: 'Feet together.', benefit: 'Hips.', videoUrl: "" },
             { id: 'thoracic_twist', name: 'T-Spine Twist', muscle: 'Back', equipment: 'None', howTo: 'Reach sky.', benefit: 'Mobility.', videoUrl: "" },
             { id: 'forward_fold', name: 'Forward Fold', muscle: 'Legs', equipment: 'None', howTo: 'Touch toes.', benefit: 'Hamstrings.', videoUrl: "" }
         ];
-        const staticPlans = { 'plan_full_body': ['squat_jump', 'pushup_std', 'pullup', 'plank'], 'plan_lower_mass': ['goblet_squat', 'squat_jump', 'plank'] };
+
+        // 8 PLANS
+        const staticPlans = { 
+            'plan_full_body': ['squat_jump', 'pushup_std', 'pullup', 'plank', 'lunge_walk'], 
+            'plan_home_hero': ['goblet_squat', 'db_press', 'db_row', 'db_ohp', 'plank'],
+            'plan_full_body_intense': ['barbell_squat', 'barbell_bench', 'barbell_row', 'barbell_ohp', 'leg_raise'],
+            'plan_strength': ['barbell_dl', 'barbell_bench', 'barbell_squat', 'curl_bar'],
+            'plan_upper': ['barbell_bench', 'pullup', 'db_ohp', 'dip_chair', 'db_curl'],
+            'plan_lower_mass': ['barbell_squat', 'barbell_dl', 'lunge_walk', 'plank'],
+            'plan_lower_cut': ['squat_jump', 'goblet_squat', 'lunge_walk', 'mountain_climber'],
+            'plan_core': ['plank', 'leg_raise', 'mountain_climber', 'superman']
+        };
         const routineFlows = { 'morning': ['neck_roll', 'cat_cow', 'thoracic_twist', 'squat_jump'], 'night': ['child_pose', 'butterfly', 'forward_fold', 'neck_roll'] };
 
         let state = { user: { level: 1, xp: 0, streak: 0, audioOn: true, darkMode: false }, activePlan: { id: null, name: null, progress: 0, total: 12 }, equipment: { 'Dumbbells': true, 'Bands': true, 'Pullup Bar': true, 'Barbell': true }, exerciseData: {}, history: [], customRoutines: [] };
@@ -279,44 +269,66 @@
         let audioCtx = null; let wakeLock = null;
 
         function init() {
-            const saved = localStorage.getItem('fitLogicData_v13');
+            const saved = localStorage.getItem('fitLogicData_v14');
             if (saved) state = JSON.parse(saved);
-            // Ensure new gear keys exist if loading old data
-            if(state.equipment.Bands === undefined) state.equipment.Bands = true;
-            if(state.equipment.Barbell === undefined) state.equipment.Barbell = true;
             if(!state.customRoutines) state.customRoutines = [];
-            
             if(state.user.darkMode) document.documentElement.classList.add('dark');
-            updateThemeIcon(); updateDashboard(); renderEquipmentToggles(); renderTip(); renderWeekVisualizer(); updateAudioBtn(); renderCustomRoutines();
+            updateThemeIcon(); updateDashboard(); renderEquipmentToggles(); renderTip(); renderWeekVisualizer(); updateAudioBtn(); renderCustomRoutines(); renderMuscleButtons();
         }
 
-        // --- CUSTOM ROUTINES ---
+        // --- NEW BUTTON LOGIC ---
+        function renderMuscleButtons() {
+            const container = document.getElementById('muscle-selector');
+            const muscles = ['Chest', 'Back', 'Legs', 'Arms', 'Core', 'Shoulders'];
+            container.innerHTML = '';
+            muscles.forEach(m => {
+                const isActive = selectedMuscles.includes(m);
+                const baseClass = "muscle-btn rounded-xl py-2 text-xs font-bold transition-all border";
+                const activeClass = "bg-blue-600 text-white border-blue-600 shadow-md transform scale-105";
+                const inactiveClass = "bg-gray-50 dark:bg-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700";
+                
+                container.innerHTML += `<button onclick="toggleMuscle(this, '${m}')" class="${baseClass} ${isActive ? activeClass : inactiveClass}">${m}</button>`;
+            });
+        }
+
+        function toggleMuscle(btn, muscle) {
+            const isSelected = selectedMuscles.includes(muscle);
+            if(isSelected) {
+                selectedMuscles = selectedMuscles.filter(m => m !== muscle);
+            } else {
+                selectedMuscles.push(muscle);
+            }
+            renderMuscleButtons(); // Re-render to update UI state cleanly
+        }
+
+        function togglePlanView() {
+            const c = document.getElementById('plans-container');
+            const b = document.getElementById('toggle-plans-btn');
+            if(c.style.maxHeight === '180px') {
+                c.style.maxHeight = '1000px';
+                b.innerHTML = 'Show Less <i class="fa-solid fa-chevron-up ml-1"></i>';
+            } else {
+                c.style.maxHeight = '180px';
+                b.innerHTML = 'View All 8 Plans <i class="fa-solid fa-chevron-down ml-1"></i>';
+            }
+        }
+
+        // --- BUILDER ---
         function openBuilder() {
-            const list = document.getElementById('builder-list');
-            list.innerHTML = '';
-            const groups = {};
-            exerciseLibrary.forEach(ex => { if(!groups[ex.muscle]) groups[ex.muscle] = []; groups[ex.muscle].push(ex); });
-            
+            const list = document.getElementById('builder-list'); list.innerHTML = '';
+            const groups = {}; exerciseLibrary.forEach(ex => { if(!groups[ex.muscle]) groups[ex.muscle] = []; groups[ex.muscle].push(ex); });
             Object.keys(groups).forEach(muscle => {
                 const grp = document.createElement('div');
                 grp.innerHTML = `<h4 class="font-bold text-sm text-gray-800 dark:text-gray-200 mb-2 mt-4 uppercase tracking-wider">${muscle}</h4>`;
                 groups[muscle].forEach(ex => {
                     const pr = state.exerciseData[ex.id] ? state.exerciseData[ex.id].reps : 0;
                     const icon = gearIcons[ex.equipment] || '';
-                    grp.innerHTML += `
-                    <label class="flex items-center gap-3 p-3 bg-white dark:bg-darkcard rounded-xl border border-gray-100 dark:border-gray-800 mb-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                        <input type="checkbox" value="${ex.id}" class="builder-check w-5 h-5 accent-blue-500 rounded">
-                        <div class="flex-1">
-                            <div class="font-bold text-sm flex items-center gap-2">${ex.name} <span class="text-xs">${icon}</span></div>
-                            <div class="text-[10px] text-gray-400">PR: ${pr > 0 ? pr + ' Reps' : '-'}</div>
-                        </div>
-                    </label>`;
+                    grp.innerHTML += `<label class="flex items-center gap-3 p-3 bg-white dark:bg-darkcard rounded-xl border border-gray-100 dark:border-gray-800 mb-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"><input type="checkbox" value="${ex.id}" class="builder-check w-5 h-5 accent-blue-500 rounded"><div class="flex-1"><div class="font-bold text-sm flex items-center gap-2">${ex.name} <span class="text-xs">${icon}</span></div><div class="text-[10px] text-gray-400">PR: ${pr > 0 ? pr + ' Reps' : '-'}</div></div></label>`;
                 });
                 list.appendChild(grp);
             });
             document.getElementById('builder-modal').classList.remove('hidden');
         }
-
         function saveCustomRoutine() {
             const name = document.getElementById('builder-name').value;
             if(!name) return alert("Please name your routine");
@@ -328,8 +340,7 @@
         }
         function closeBuilder() { document.getElementById('builder-modal').classList.add('hidden'); document.getElementById('builder-name').value = ''; }
         function renderCustomRoutines() {
-            const list = document.getElementById('custom-routines-list'); const msg = document.getElementById('no-custom-msg');
-            list.innerHTML = '';
+            const list = document.getElementById('custom-routines-list'); const msg = document.getElementById('no-custom-msg'); list.innerHTML = '';
             if(!state.customRoutines || state.customRoutines.length === 0) { msg.classList.remove('hidden'); return; }
             msg.classList.add('hidden');
             state.customRoutines.forEach(r => {
@@ -342,15 +353,11 @@
         function deleteCustomRoutine(id) { if(confirm("Delete?")) { state.customRoutines = state.customRoutines.filter(r => r.id !== id); saveData(); renderCustomRoutines(); } }
         function startCustomRoutine(id) {
             const routine = state.customRoutines.find(r => r.id === id);
-            session.exercises = routine.exercises.map(exId => {
-                const ex = exerciseLibrary.find(e => e.id === exId);
-                const hist = state.exerciseData[ex.id] || { reps: 10, rest: 45 };
-                return { ...ex, targetReps: hist.reps, targetRest: hist.rest, sets: 3, completedSets: 0 };
-            });
+            session.exercises = routine.exercises.map(exId => { const ex = exerciseLibrary.find(e => e.id === exId); const hist = state.exerciseData[ex.id] || { reps: 10, rest: 45 }; return { ...ex, targetReps: hist.reps, targetRest: hist.rest, sets: 3, completedSets: 0 }; });
             session.isPlan = false; startWorkoutUI(routine.name);
         }
 
-        // --- DASHBOARD & GEAR ---
+        // --- DASHBOARD ---
         function updateDashboard() {
             document.getElementById('streakDisplay').innerText = state.user.streak; document.getElementById('userLevel').innerText = "Lvl " + state.user.level;
             const planCard = document.getElementById('active-plan-card'); const planLib = document.getElementById('plan-library');
@@ -361,31 +368,25 @@
             renderWeekVisualizer();
         }
         function deleteHistoryItem(index) { showModal("Delete?", "Remove entry?", [{ text: "Cancel", class: "bg-gray-100 dark:bg-gray-800" }, { text: "Delete", class: "bg-red-500 text-white", action: () => { state.history.splice(index, 1); saveData(); updateDashboard(); }}]); }
-
+        
         function renderEquipmentToggles() {
-            // Render in Settings Modal
-            const sList = document.getElementById('equip-settings-list');
-            sList.innerHTML = '';
+            const sList = document.getElementById('equip-settings-list'); sList.innerHTML = '';
+            const fList = document.getElementById('equip-options'); fList.innerHTML = '';
             Object.keys(state.equipment).forEach(i => {
-                sList.innerHTML += `<label class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-xl cursor-pointer"><span class="text-sm font-bold text-gray-700 dark:text-gray-300">${i}</span><div class="relative inline-block w-10 align-middle select-none"><input type="checkbox" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer" ${state.equipment[i]?'checked':''} onchange="toggleEquipment('${i}')"/><label class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label></div></label>`;
-            });
-            // Render in Freestyle Options (Short list)
-            const fList = document.getElementById('equip-options');
-            fList.innerHTML = '';
-            Object.keys(state.equipment).forEach(i => {
-                fList.innerHTML += `<label class="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg cursor-pointer"><span class="text-xs font-bold text-gray-700 dark:text-gray-300">${i}</span><input type="checkbox" class="accent-blue-500 w-4 h-4" ${state.equipment[i]?'checked':''} onchange="toggleEquipment('${i}')"></label>`;
+                const html = `<label class="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg cursor-pointer"><span class="text-xs font-bold text-gray-700 dark:text-gray-300">${i}</span><input type="checkbox" class="accent-blue-500 w-4 h-4" ${state.equipment[i]?'checked':''} onchange="toggleEquipment('${i}')"></label>`;
+                sList.innerHTML += html; fList.innerHTML += html;
             });
         }
         function toggleEquipment(i) { state.equipment[i] = !state.equipment[i]; saveData(); renderEquipmentToggles(); }
-        
-        // --- CORE FUNCTIONS ---
+
+        // --- CORE ---
         function showModal(title, message, buttons) { const m = document.getElementById('custom-modal'); document.getElementById('modal-title').innerText = title; document.getElementById('modal-message').innerText = message; const c = document.getElementById('modal-buttons'); c.innerHTML = ''; buttons.forEach(b => { const btn = document.createElement('button'); btn.innerText = b.text; btn.className = `w-full py-3 rounded-xl font-bold text-sm ${b.class}`; btn.onclick = () => { m.classList.add('hidden'); if (b.action) b.action(); }; c.appendChild(btn); }); m.classList.remove('hidden'); }
-        function promptFinishWorkout() { showModal("Finish Workout?", "Ready to save?", [{ text: "No", class: "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300" }, { text: "Yes", class: "bg-green-500 text-white", action: executeFinish }]); }
-        function promptCloseWorkout() { showModal("Exit Session?", "Unsaved progress.", [{ text: "Resume", class: "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300" }, { text: "Exit", class: "bg-red-500 text-white", action: executeClose }]); }
-        function promptStartPlan(id, name) { showModal("Start Plan?", name, [{ text: "Cancel", class: "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300" }, { text: "Start", class: "bg-blue-600 text-white", action: () => { state.activePlan = { id: id, name: name, progress: 0, total: 12 }; saveData(); updateDashboard(); } }]); }
-        function promptQuitPlan() { showModal("Quit Plan?", "Lose progress?", [{ text: "Keep", class: "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300" }, { text: "Quit", class: "bg-red-500 text-white", action: () => { state.activePlan = { id: null, name: null, progress: 0, total: 0 }; saveData(); updateDashboard(); } }]); }
-        function promptResetApp() { showModal("Factory Reset?", "Delete ALL data?", [{ text: "Cancel", class: "bg-gray-100 dark:bg-gray-800" }, { text: "Delete", class: "bg-red-600 text-white", action: () => { localStorage.removeItem('fitLogicData_v13'); location.reload(); } }]); }
-        function promptRate(idx, rating) { const t = rating === 'easy' ? 'Too Easy?' : 'Too Hard?'; const c = rating === 'easy' ? 'Reps +2, Rest -5s' : 'Reps -2, Rest +10s'; showModal(t, `Next: ${c}`, [{ text: "Cancel", class: "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300" }, { text: "Confirm", class: "bg-blue-600 text-white", action: () => executeRate(idx, rating) }]); }
+        function promptFinishWorkout() { showModal("Finish Workout?", "Great job! Ready to save?", [{ text: "No", class: "bg-gray-100 dark:bg-gray-800" }, { text: "Yes", class: "bg-green-500 text-white", action: executeFinish }]); }
+        function promptCloseWorkout() { showModal("Exit Session?", "Progress not saved.", [{ text: "Resume", class: "bg-gray-100 dark:bg-gray-800" }, { text: "Exit", class: "bg-red-500 text-white", action: executeClose }]); }
+        function promptStartPlan(id, name) { showModal("Start Plan?", name, [{ text: "Cancel", class: "bg-gray-100 dark:bg-gray-800" }, { text: "Start", class: "bg-blue-600 text-white", action: () => { state.activePlan = { id: id, name: name, progress: 0, total: 12 }; saveData(); updateDashboard(); } }]); }
+        function promptQuitPlan() { showModal("Quit Plan?", "Lose progress?", [{ text: "Keep", class: "bg-gray-100 dark:bg-gray-800" }, { text: "Quit", class: "bg-red-500 text-white", action: () => { state.activePlan = { id: null, name: null, progress: 0, total: 0 }; saveData(); updateDashboard(); } }]); }
+        function promptResetApp() { showModal("Factory Reset?", "Delete ALL data?", [{ text: "Cancel", class: "bg-gray-100 dark:bg-gray-800" }, { text: "Delete", class: "bg-red-600 text-white", action: () => { localStorage.removeItem('fitLogicData_v14'); location.reload(); } }]); }
+        function promptRate(idx, rating) { const t = rating === 'easy' ? 'Too Easy?' : 'Too Hard?'; const c = rating === 'easy' ? 'Reps +2, Rest -5s' : 'Reps -2, Rest +10s'; showModal(t, `Next: ${c}`, [{ text: "Cancel", class: "bg-gray-100 dark:bg-gray-800" }, { text: "Confirm", class: "bg-blue-600 text-white", action: () => executeRate(idx, rating) }]); }
 
         function executeFinish() { confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } }); const xp = 100 + (session.exercises.length * 10); state.user.xp += xp; state.user.streak++; state.user.level = Math.floor(state.user.xp / 500) + 1; if (session.isPlan) { state.activePlan.progress++; if(state.activePlan.progress >= state.activePlan.total) { state.activePlan = { id: null, name: null, progress: 0, total: 0 }; showModal("Plan Complete!", "Dedication pays off.", [{text:"Awesome", class:"bg-blue-600 text-white", action:()=>location.reload()}]); return; } } state.history.unshift({ date: Date.now(), title: document.getElementById('workoutTitle').innerText, xp: xp }); saveData(); releaseWakeLock(); setTimeout(() => location.reload(), 1500); }
         function executeClose() { document.getElementById('workout-modal').classList.add('hidden'); clearInterval(session.timerInt); releaseWakeLock(); }
@@ -414,7 +415,6 @@
         function updateThemeIcon() { document.getElementById('themeIcon').className = state.user.darkMode ? 'fa-solid fa-sun text-xl' : 'fa-solid fa-moon text-xl'; }
         function renderWeekVisualizer() { const c = document.getElementById('week-visualizer'); const d = ['S','M','T','W','T','F','S']; const today = new Date(); let h = ''; for(let i=0; i<7; i++) { const isT = (i === today.getDay()); let cls = "bg-gray-100 dark:bg-gray-800 text-gray-300 dark:text-gray-600"; if(isT) { const w = state.history.some(l => new Date(l.date).toDateString() === today.toDateString()); cls = w ? "bg-green-500 text-white" : "bg-blue-100 dark:bg-blue-900 text-blue-500 border-2 border-blue-500"; } h += `<div class="flex flex-col items-center gap-1"><div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${cls}">${d[i]}</div></div>`; } c.innerHTML = h; }
         function renderTip() { document.getElementById('dailyTipText').innerText = dailyTips[Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000) % dailyTips.length]; }
-        function toggleMuscle(b, m) { b.classList.toggle('selected'); if(selectedMuscles.includes(m)) selectedMuscles = selectedMuscles.filter(x=>x!==m); else selectedMuscles.push(m); }
         function requestWakeLock() { if ('wakeLock' in navigator) navigator.wakeLock.request('screen').then(w => wakeLock = w).catch(() => {}); }
         function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
         function playBeep(f) { if(!state.user.audioOn)return; if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.type='sine';o.frequency.setValueAtTime(f,audioCtx.currentTime);g.gain.setValueAtTime(0.1,audioCtx.currentTime);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+0.1); }
@@ -423,7 +423,7 @@
         function startRoutine(type) { const flow = routineFlows[type]; session.exercises = flow.map(id => { const ex = exerciseLibrary.find(e => e.id === id); return { ...ex, targetReps: "1 Set", targetRest: 10, sets: 1, completedSets: 0 }; }); session.isPlan = false; startWorkoutUI(`${type === 'morning' ? 'Morning' : 'Night'} Flow`); }
         function generateWorkout(mode) {
             let list = []; session.isPlan = (mode === 'plan');
-            if (session.isPlan) { staticPlans[state.activePlan.id].forEach(id => { const ex = exerciseLibrary.find(e => e.id === id); if(ex) { if(ex.equipment !== 'None' && !state.equipment[ex.equipment]) { const sub = exerciseLibrary.find(s => s.muscle === ex.muscle && (s.equipment === 'None' || state.equipment[s.equipment])); list.push(sub ? sub : ex); } else { list.push(ex); } } }); }
+            if (session.isPlan) { staticPlans[state.activePlan.id].forEach(id => { const ex = exerciseLibrary.find(e => e.id === id); if(ex) { if(ex.equipment !== 'None' && !state.equipment[ex.equipment]) { /* skip if gear missing */ } else { list.push(ex); } } }); }
             else { const t = selectedMuscles.length > 0 ? selectedMuscles : ['Chest','Back','Legs','Core']; let p = exerciseLibrary.filter(ex => t.includes(ex.muscle) && (ex.equipment === 'None' || state.equipment[ex.equipment])); for(let i=0; i<4; i++) { if(p.length===0)break; const idx = Math.floor(Math.random()*p.length); list.push(p[idx]); p.splice(idx,1); } }
             if (list.length === 0) { alert("No exercises found!"); return; }
             session.exercises = list.map(ex => { const h = state.exerciseData[ex.id] || { reps: 10, rest: 45 }; return { ...ex, targetReps: h.reps, targetRest: h.rest, sets: 3, completedSets: 0 }; });
@@ -436,7 +436,7 @@
         function fmt(s) { return `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`; }
         function addRest(s) { triggerRest(parseInt(document.getElementById('rest-countdown').innerText.split(':')[1]) + s, document.getElementById('up-next-text').innerText); }
         function skipRest() { document.getElementById('rest-overlay').classList.add('hidden'); if(restInt) clearInterval(restInt); }
-        function saveData() { localStorage.setItem('fitLogicData_v13', JSON.stringify(state)); }
+        function saveData() { localStorage.setItem('fitLogicData_v14', JSON.stringify(state)); }
         function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
         function exportData() { const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state)); a.download = "fitlogic_backup.json"; document.body.appendChild(a); a.click(); a.remove(); }
         function importData(input) { const r = new FileReader(); r.onload = (e) => { state = JSON.parse(e.target.result); saveData(); location.reload(); }; r.readAsText(input.files[0]); }
