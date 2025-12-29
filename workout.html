@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FitLogic 5.0 | Training Plans</title>
+    <title>FitLogic 6.0 | Active Plans</title>
     
     <link rel="icon" type="image/png" href="icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -16,8 +16,8 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .card { background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
         .muscle-btn.selected { background-color: #007AFF; color: white; border-color: #007AFF; }
+        .progress-bar { transition: width 0.5s ease-in-out; }
         
-        /* Dropdown Animation */
         details > summary { list-style: none; }
         details > summary::-webkit-details-marker { display: none; }
         details[open] summary ~ * { animation: sweep .3s ease-in-out; }
@@ -31,7 +31,7 @@
 
     <div id="app-header" class="bg-white sticky top-0 z-30 px-6 py-4 shadow-sm flex justify-between items-center">
         <div>
-            <h1 class="text-xl font-extrabold tracking-tight text-gray-900">FitLogic <span class="text-blue-600">5.0</span></h1>
+            <h1 class="text-xl font-extrabold tracking-tight text-gray-900">FitLogic <span class="text-blue-600">6.0</span></h1>
             <p class="text-xs text-gray-500 font-medium" id="currentDate">Today</p>
         </div>
         <div class="flex items-center gap-3">
@@ -45,71 +45,110 @@
         </div>
     </div>
 
-    <div id="main-container" class="p-6 space-y-6 max-w-lg mx-auto page-transition">
+    <div id="main-container" class="p-6 space-y-8 max-w-lg mx-auto page-transition">
 
-        <div class="card p-5 space-y-4">
-            <div class="flex justify-between items-center cursor-pointer" onclick="document.getElementById('equip-options').classList.toggle('hidden')">
-                <h3 class="font-bold text-gray-800 text-sm"><i class="fa-solid fa-toolbox text-gray-500 mr-2"></i>My Gear</h3>
-                <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
+        <div id="active-plan-card" class="hidden">
+            <div class="flex justify-between items-center mb-2">
+                <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wide">My Active Plan</h3>
+                <button onclick="quitPlan()" class="text-[10px] text-red-400 font-bold hover:text-red-600">Quit Plan</button>
             </div>
-            <div id="equip-options" class="hidden grid grid-cols-2 gap-2 pt-2 border-t border-gray-100"></div>
+            
+            <div class="card p-5 border-2 border-blue-500/20 bg-blue-50/50 relative overflow-hidden">
+                <div class="relative z-10">
+                    <h2 class="text-xl font-extrabold text-gray-900" id="planNameDisplay">Chest Builder</h2>
+                    <p class="text-xs text-blue-600 font-bold mt-1 mb-4" id="planProgressText">Workout 3 of 12 (Week 1)</p>
+                    
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+                        <div id="planProgressBar" class="bg-blue-600 h-2.5 rounded-full progress-bar" style="width: 0%"></div>
+                    </div>
 
-            <div>
-                <label class="block text-xs font-bold text-blue-600 uppercase mb-1">Select Training Mode</label>
-                <select id="planSelector" class="w-full bg-blue-50 border border-blue-200 text-blue-900 text-sm font-bold rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" onchange="toggleUIModes()">
-                    <optgroup label="⚡ Quick Generators">
-                        <option value="custom_random">Randomized Custom Workout</option>
-                    </optgroup>
-                    <optgroup label="📅 Structured Plans (Progressive)">
-                        <option value="plan_full_body">Full Body Strength (A)</option>
-                        <option value="plan_upper">Upper Body Sculpt</option>
-                        <option value="plan_lower_mass">Lower Body Mass (Thick Thighs)</option>
-                        <option value="plan_lower_cut">Lower Body Toning (Lean)</option>
-                        <option value="plan_chest">Chest & Tricep Builder</option>
-                        <option value="plan_abs">Core & Abs Blaster</option>
-                    </optgroup>
-                </select>
+                    <button onclick="generateWorkout('plan')" class="w-full bg-blue-600 text-white rounded-xl py-3 shadow-md active:scale-95 transition-transform font-bold flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play"></i> Start Next Workout
+                    </button>
+                </div>
+                <i class="fa-solid fa-trophy absolute -bottom-4 -right-4 text-8xl text-blue-100 z-0 opacity-50"></i>
             </div>
+        </div>
 
-            <div class="grid grid-cols-2 gap-4">
+        <div id="plan-library" class="hidden">
+            <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wide mb-2">Available Plans (4 Weeks)</h3>
+            <div class="space-y-3">
+                
+                <div class="card p-4 flex justify-between items-center">
+                    <div>
+                        <h4 class="font-bold text-gray-900">Full Body Alpha</h4>
+                        <p class="text-xs text-gray-500">3x/Week • Strength & Size</p>
+                    </div>
+                    <button onclick="startPlan('plan_full_body', 'Full Body Alpha')" class="bg-black text-white px-4 py-2 rounded-lg text-xs font-bold active:scale-95">Start Plan</button>
+                </div>
+
+                <div class="card p-4 flex justify-between items-center">
+                    <div>
+                        <h4 class="font-bold text-gray-900">Chest & Tri Builder</h4>
+                        <p class="text-xs text-gray-500">3x/Week • Upper Body Focus</p>
+                    </div>
+                    <button onclick="startPlan('plan_chest', 'Chest & Tri Builder')" class="bg-black text-white px-4 py-2 rounded-lg text-xs font-bold active:scale-95">Start Plan</button>
+                </div>
+
+                <div class="card p-4 flex justify-between items-center">
+                    <div>
+                        <h4 class="font-bold text-gray-900">Thick Thighs</h4>
+                        <p class="text-xs text-gray-500">3x/Week • Glutes & Quads</p>
+                    </div>
+                    <button onclick="startPlan('plan_lower_mass', 'Thick Thighs')" class="bg-black text-white px-4 py-2 rounded-lg text-xs font-bold active:scale-95">Start Plan</button>
+                </div>
+                
+                <div class="card p-4 flex justify-between items-center">
+                    <div>
+                        <h4 class="font-bold text-gray-900">Abs & Core</h4>
+                        <p class="text-xs text-gray-500">3x/Week • Definition</p>
+                    </div>
+                    <button onclick="startPlan('plan_abs', 'Abs & Core')" class="bg-black text-white px-4 py-2 rounded-lg text-xs font-bold active:scale-95">Start Plan</button>
+                </div>
+            </div>
+        </div>
+
+        <hr class="border-gray-200">
+
+        <div>
+            <div class="flex justify-between items-center mb-2">
+                <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wide">Freestyle / Quick Workout</h3>
+                <button onclick="document.getElementById('freestyle-opts').classList.toggle('hidden')" class="text-xs text-blue-500 font-bold">Show Options</button>
+            </div>
+            
+            <div id="freestyle-opts" class="card p-5 mb-4 space-y-4">
+                <div class="flex justify-between items-center cursor-pointer" onclick="document.getElementById('equip-options').classList.toggle('hidden')">
+                    <h3 class="font-bold text-gray-800 text-sm"><i class="fa-solid fa-toolbox text-gray-500 mr-2"></i>My Gear</h3>
+                    <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
+                </div>
+                <div id="equip-options" class="hidden grid grid-cols-2 gap-2 pt-2 border-t border-gray-100"></div>
+
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Duration</label>
                     <select id="durationSelector" class="w-full bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg p-2.5">
                         <option value="10">10 Mins</option>
                         <option value="20" selected>20 Mins</option>
                         <option value="30">30 Mins</option>
-                        <option value="45">45 Mins</option>
                     </select>
                 </div>
+
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Circuit Mode</label>
-                    <div class="flex items-center bg-gray-50 p-2.5 rounded-lg border border-gray-200 h-[42px]">
-                        <span class="text-[10px] text-gray-500 flex-grow">Rounds</span>
-                        <div class="relative inline-block w-8 align-middle select-none">
-                            <input type="checkbox" id="circuitToggle" class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300 transition-all duration-300"/>
-                            <label for="circuitToggle" class="toggle-label block overflow-hidden h-4 rounded-full bg-gray-300 cursor-pointer"></label>
-                        </div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Targets</label>
+                    <div class="grid grid-cols-3 gap-2" id="muscle-selector">
+                        <button onclick="toggleMuscle(this, 'Chest')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-2 text-xs font-bold text-gray-600 shadow-sm">Chest</button>
+                        <button onclick="toggleMuscle(this, 'Back')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-2 text-xs font-bold text-gray-600 shadow-sm">Back</button>
+                        <button onclick="toggleMuscle(this, 'Legs')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-2 text-xs font-bold text-gray-600 shadow-sm">Legs</button>
+                        <button onclick="toggleMuscle(this, 'Arms')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-2 text-xs font-bold text-gray-600 shadow-sm">Arms</button>
+                        <button onclick="toggleMuscle(this, 'Core')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-2 text-xs font-bold text-gray-600 shadow-sm">Core</button>
+                        <button onclick="toggleMuscle(this, 'Shoulders')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-2 text-xs font-bold text-gray-600 shadow-sm">Shoulders</button>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div id="muscle-selector-container">
-            <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wide mb-2 ml-1">Focus Area</h3>
-            <div class="grid grid-cols-3 gap-2" id="muscle-selector">
-                <button onclick="toggleMuscle(this, 'Chest')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-3 text-xs font-bold text-gray-600 shadow-sm active:scale-95">Chest</button>
-                <button onclick="toggleMuscle(this, 'Back')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-3 text-xs font-bold text-gray-600 shadow-sm active:scale-95">Back</button>
-                <button onclick="toggleMuscle(this, 'Legs')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-3 text-xs font-bold text-gray-600 shadow-sm active:scale-95">Legs</button>
-                <button onclick="toggleMuscle(this, 'Shoulders')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-3 text-xs font-bold text-gray-600 shadow-sm active:scale-95">Shoulders</button>
-                <button onclick="toggleMuscle(this, 'Arms')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-3 text-xs font-bold text-gray-600 shadow-sm active:scale-95">Arms</button>
-                <button onclick="toggleMuscle(this, 'Core')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-3 text-xs font-bold text-gray-600 shadow-sm active:scale-95">Core</button>
-            </div>
+            <button onclick="generateWorkout('freestyle')" class="w-full bg-white border-2 border-gray-200 text-gray-700 rounded-2xl py-4 font-bold shadow-sm active:scale-95 transition-transform">
+                <i class="fa-solid fa-shuffle mr-2"></i> Generate Random Workout
+            </button>
         </div>
-
-        <button onclick="generateWorkout()" class="w-full bg-black text-white rounded-2xl py-5 shadow-lg active:scale-95 transition-transform flex flex-col items-center justify-center gap-1 group">
-            <span class="text-lg font-bold group-hover:text-blue-400 transition-colors"><i class="fa-solid fa-bolt mr-2 text-yellow-400"></i> Start Workout</span>
-            <span class="text-xs text-gray-400 font-medium">Auto-scaling Reps & Sets</span>
-        </button>
         
         <div id="historyLog" class="space-y-2 pb-10"></div>
     </div>
@@ -126,17 +165,7 @@
 
         <div id="workout-content" class="flex-1 overflow-y-auto p-6 space-y-6 pb-32 bg-gray-50"></div>
 
-        <div id="circuit-controls" class="hidden absolute bottom-0 w-full bg-white border-t border-gray-200 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
-            <div class="flex justify-between items-center mb-2">
-                <span class="text-xs font-bold text-gray-500" id="round-tracker">Round 1/3</span>
-                <span class="text-xs font-bold text-blue-500">Next: Rest</span>
-            </div>
-            <button onclick="completeRound()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-md active:scale-95 transition-transform">
-                Finish Round & Rest <i class="fa-solid fa-stopwatch ml-2"></i>
-            </button>
-        </div>
-        
-        <div id="standard-controls" class="absolute bottom-0 w-full bg-white border-t border-gray-200 p-4 hidden">
+        <div class="absolute bottom-0 w-full bg-white border-t border-gray-200 p-4">
              <button onclick="finishWorkout()" class="w-full bg-green-500 text-white font-bold py-4 rounded-xl shadow-md active:scale-95 transition-transform">
                 Finish Workout <i class="fa-solid fa-check ml-2"></i>
             </button>
@@ -172,7 +201,7 @@
     </div>
 
     <script>
-        // --- DATA: EXERCISES ---
+        // --- DATA LIBRARIES ---
         const exerciseLibrary = [
             // CHEST
             { id: 'pushup_std', name: 'Standard Pushups', muscle: 'Chest', equipment: 'None', howTo: 'Plank position. Hands shoulder width. Lower chest to floor.', benefit: 'Builds mass and core stability.', videoUrl: "" },
@@ -214,7 +243,6 @@
             { id: 'r_twist', name: 'Russian Twists', muscle: 'Core', equipment: 'None', howTo: 'Sit. Lean back slightly. Twist torso left to right.', benefit: 'Obliques (side abs).', videoUrl: "" }
         ];
 
-        // --- DATA: STATIC PLANS ---
         const staticPlans = {
             'plan_full_body': ['squat_jump', 'pushup_std', 'pullup', 'rdl_db', 'plank'],
             'plan_upper': ['pushup_wide', 'db_row', 'ohp_db', 'curl_db', 'dip_chair'],
@@ -224,7 +252,6 @@
             'plan_abs': ['leg_raise', 'plank', 'r_twist', 'mountain_climber', 'superman']
         };
 
-        // --- DATA: STRETCHES ---
         const stretches = {
             'Chest': { name: 'Doorway Stretch', how: 'Place forearm on doorframe. Lean forward.', why: 'Prevents rounded shoulders/slouching.' },
             'Back': { name: 'Childs Pose', how: 'Kneel, sit on heels, reach arms forward on floor.', why: 'Decompresses the spine.' },
@@ -234,28 +261,47 @@
             'Core': { name: 'Cobra Stretch', how: 'Lie on stomach, press chest up with hands.', why: 'Stretches abdominal wall.' }
         };
 
-        // --- STATE & SESSION ---
+        // --- STATE ---
         let state = {
             user: { level: 1, xp: 0, streak: 0 },
+            activePlan: { id: null, name: null, progress: 0, total: 12 },
             equipment: { 'Dumbbells': true, 'Bands': true, 'Pullup Bar': true, 'Barbell': false },
             exerciseData: {},
             history: []
         };
-        let session = { exercises: [], isCircuit: false, currentRound: 1, totalRounds: 3, timerInt: null };
+        let session = { exercises: [], isPlan: false, startTime: 0, timerInt: null };
         let selectedMuscles = [];
 
         // --- INIT ---
         function init() {
-            const saved = localStorage.getItem('fitLogicData_v5');
+            const saved = localStorage.getItem('fitLogicData_v6');
             if (saved) state = JSON.parse(saved);
             updateDashboard();
             renderEquipmentToggles();
-            toggleUIModes();
         }
 
         function updateDashboard() {
             document.getElementById('streakDisplay').innerText = state.user.streak;
             document.getElementById('userLevel').innerText = "Lvl " + state.user.level;
+
+            // Update Plan Card
+            const planCard = document.getElementById('active-plan-card');
+            const planLib = document.getElementById('plan-library');
+            
+            if (state.activePlan && state.activePlan.id) {
+                planCard.classList.remove('hidden');
+                planLib.classList.add('hidden');
+                document.getElementById('planNameDisplay').innerText = state.activePlan.name;
+                const week = Math.floor(state.activePlan.progress / 3) + 1;
+                document.getElementById('planProgressText').innerText = `Workout ${state.activePlan.progress + 1} of ${state.activePlan.total} (Week ${week})`;
+                const pct = (state.activePlan.progress / state.activePlan.total) * 100;
+                document.getElementById('planProgressBar').style.width = `${pct}%`;
+            } else {
+                planCard.classList.add('hidden');
+                planLib.classList.remove('hidden');
+            }
+
+            // History
             const histEl = document.getElementById('historyLog');
             histEl.innerHTML = state.history.length ? '' : '<p class="text-center text-gray-400 text-xs py-4">No workouts yet.</p>';
             state.history.slice(0, 3).forEach(log => {
@@ -278,90 +324,79 @@
                     </label>`;
             });
         }
-
         function toggleEquipment(item) { state.equipment[item] = !state.equipment[item]; saveData(); }
         
-        function toggleUIModes() {
-            const plan = document.getElementById('planSelector').value;
-            const muscleDiv = document.getElementById('muscle-selector-container');
-            if (plan === 'custom_random') muscleDiv.classList.remove('hidden');
-            else muscleDiv.classList.add('hidden');
-        }
-
         function toggleMuscle(btn, muscle) {
             btn.classList.toggle('selected');
             if (selectedMuscles.includes(muscle)) selectedMuscles = selectedMuscles.filter(m => m !== muscle);
             else selectedMuscles.push(muscle);
         }
 
-        // --- GENERATOR LOGIC ---
-        function generateWorkout() {
-            const duration = parseInt(document.getElementById('durationSelector').value);
-            const isCircuit = document.getElementById('circuitToggle').checked;
-            const planKey = document.getElementById('planSelector').value;
-            
+        // --- PLAN LOGIC ---
+        function startPlan(id, name) {
+            if(confirm(`Start "${name}" plan? This will run for 4 weeks (12 workouts).`)) {
+                state.activePlan = { id: id, name: name, progress: 0, total: 12 };
+                saveData();
+                updateDashboard();
+            }
+        }
+        
+        function quitPlan() {
+            if(confirm("Quit current plan? Progress will be lost.")) {
+                state.activePlan = { id: null, name: null, progress: 0, total: 0 };
+                saveData();
+                updateDashboard();
+            }
+        }
+
+        // --- GENERATOR ---
+        function generateWorkout(mode) {
             let selectedList = [];
+            session.isPlan = (mode === 'plan');
             
-            if (planKey === 'custom_random') {
-                // RANDOM GENERATOR
+            if (session.isPlan) {
+                // LOAD PLAN EXERCISES
+                const planIds = staticPlans[state.activePlan.id];
+                // Substitution logic
+                planIds.forEach(id => {
+                    const ex = exerciseLibrary.find(e => e.id === id);
+                    if (ex) {
+                        if (ex.equipment !== 'None' && !state.equipment[ex.equipment]) {
+                            const sub = exerciseLibrary.find(s => s.muscle === ex.muscle && (s.equipment === 'None' || state.equipment[s.equipment]));
+                            selectedList.push(sub ? sub : ex);
+                        } else {
+                            selectedList.push(ex);
+                        }
+                    }
+                });
+            } else {
+                // FREESTYLE
+                const duration = parseInt(document.getElementById('durationSelector').value);
                 const targets = selectedMuscles.length > 0 ? selectedMuscles : ['Chest', 'Back', 'Legs', 'Shoulders', 'Core', 'Arms'];
                 let pool = exerciseLibrary.filter(ex => targets.includes(ex.muscle) && (ex.equipment === 'None' || state.equipment[ex.equipment]));
                 const numExercises = Math.max(2, Math.floor(duration / 5));
-                
                 for (let i = 0; i < numExercises; i++) {
                     if (pool.length === 0) break;
                     const idx = Math.floor(Math.random() * pool.length);
                     selectedList.push(pool[idx]);
                     pool.splice(idx, 1); 
                 }
-            } else {
-                // STATIC PLANS
-                const planIds = staticPlans[planKey];
-                // Map IDs to Objects + Substitution Logic
-                planIds.forEach(id => {
-                    const ex = exerciseLibrary.find(e => e.id === id);
-                    if (ex) {
-                        // Check Equipment. If not available, try to substitute? 
-                        // For this version, we include it but mark it, or substitute if possible.
-                        // Simple logic: If equipment missing, try to find same muscle group & available equip
-                        if (ex.equipment !== 'None' && !state.equipment[ex.equipment]) {
-                            const sub = exerciseLibrary.find(s => s.muscle === ex.muscle && (s.equipment === 'None' || state.equipment[s.equipment]));
-                            if (sub) selectedList.push(sub); // Swap
-                            else selectedList.push(ex); // Keep original if no swap found
-                        } else {
-                            selectedList.push(ex);
-                        }
-                    }
-                });
             }
 
-            if (selectedList.length === 0) { alert("No exercises found! Check settings."); return; }
+            if (selectedList.length === 0) { alert("No exercises found!"); return; }
 
             // SETUP SESSION
             session.exercises = selectedList.map(ex => {
                 const hist = state.exerciseData[ex.id] || { reps: 10 };
                 return { ...ex, targetReps: hist.reps, sets: 3, completedSets: 0 };
             });
-            session.isCircuit = isCircuit;
-            session.currentRound = 1;
-            session.totalRounds = 3;
             session.startTime = Date.now();
-
             startWorkoutUI();
         }
 
         function startWorkoutUI() {
             document.getElementById('workout-modal').classList.remove('hidden');
-            const planName = document.getElementById('planSelector').options[document.getElementById('planSelector').selectedIndex].text;
-            document.getElementById('workoutTitle').innerText = planName;
-            
-            if (session.isCircuit) {
-                document.getElementById('circuit-controls').classList.remove('hidden');
-                document.getElementById('standard-controls').classList.add('hidden');
-            } else {
-                document.getElementById('circuit-controls').classList.add('hidden');
-                document.getElementById('standard-controls').classList.remove('hidden');
-            }
+            document.getElementById('workoutTitle').innerText = session.isPlan ? state.activePlan.name : "Freestyle Session";
             
             if (session.timerInt) clearInterval(session.timerInt);
             let sec = 0;
@@ -400,15 +435,10 @@
                     `<iframe class="w-full h-40 rounded-lg mt-2" src="${ex.videoUrl}" frameborder="0" allowfullscreen></iframe>` : 
                     `<div class="w-full h-24 bg-gray-100 rounded-lg mt-2 flex items-center justify-center text-xs text-gray-400 italic">Video Placeholder</div>`;
 
-                let status = '';
-                if(session.isCircuit) status = `<div class="mt-2 text-sm font-bold text-blue-600">Target: <span id="target-${idx}">${ex.targetReps}</span> Reps</div>`;
-                else {
-                    let checks = '';
-                    for(let i=0; i<ex.sets; i++) {
-                        const isDone = i < ex.completedSets;
-                        checks += `<div onclick="completeSet(${idx}, ${i})" class="h-8 w-8 rounded-full border-2 flex items-center justify-center cursor-pointer ${isDone ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300 text-gray-300'}">${i+1}</div>`;
-                    }
-                    status = `<div class="mt-3 flex gap-2 justify-center">${checks}</div><div class="text-center text-xs text-gray-400 mt-1">Target: <span id="target-${idx}">${ex.targetReps}</span></div>`;
+                let checks = '';
+                for(let i=0; i<ex.sets; i++) {
+                    const isDone = i < ex.completedSets;
+                    checks += `<div onclick="completeSet(${idx}, ${i})" class="h-8 w-8 rounded-full border-2 flex items-center justify-center cursor-pointer ${isDone ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300 text-gray-300'}">${i+1}</div>`;
                 }
 
                 container.innerHTML += `
@@ -427,10 +457,11 @@
                         </div>
                     </details>
                     
-                    ${status}
+                    <div class="mt-3 flex gap-2 justify-center">${checks}</div>
+                    <div class="text-center text-xs text-gray-400 mt-1">Target: <span id="target-${idx}">${ex.targetReps}</span> Reps</div>
                     
                     <div class="mt-3 pt-3 border-t border-gray-100 flex justify-between items-center">
-                        <span class="text-[10px] text-gray-400">Rate for Next Round/Session:</span>
+                        <span class="text-[10px] text-gray-400">Rate for Next Time:</span>
                         <div class="flex gap-1">
                             <button onclick="rate(${idx}, 'easy')" class="px-3 py-1 bg-gray-100 text-[10px] rounded hover:bg-blue-100 font-bold">Too Easy</button>
                             <button onclick="rate(${idx}, 'hard')" class="px-3 py-1 bg-gray-100 text-[10px] rounded hover:bg-red-100 font-bold">Too Hard</button>
@@ -454,7 +485,6 @@
             container.innerHTML += cHTML;
         }
 
-        // --- ACTIONS ---
         function completeSet(exIdx, setIdx) {
             if (setIdx === session.exercises[exIdx].completedSets) {
                 session.exercises[exIdx].completedSets++;
@@ -462,15 +492,7 @@
                 triggerRest(60, "Next Set");
             }
         }
-        function completeRound() {
-            if (session.currentRound < session.totalRounds) {
-                triggerRest(90, `Round ${session.currentRound + 1}`);
-                session.currentRound++;
-                document.getElementById('round-tracker').innerText = `Round ${session.currentRound}/${session.totalRounds}`;
-            } else {
-                finishWorkout();
-            }
-        }
+
         function rate(idx, rating) {
             const exId = session.exercises[idx].id;
             if (!state.exerciseData[exId]) state.exerciseData[exId] = { reps: 10 };
@@ -478,11 +500,7 @@
             state.exerciseData[exId].reps = Math.max(5, state.exerciseData[exId].reps + change);
             saveData();
             session.exercises[idx].targetReps = state.exerciseData[exId].reps;
-            const targetEl = document.getElementById(`target-${idx}`);
-            if(targetEl) {
-                targetEl.innerText = session.exercises[idx].targetReps;
-                targetEl.parentElement.innerHTML += ` <span class="text-[10px] ${rating==='easy'?'text-green-500':'text-red-500'} font-bold">(${change>0?'+':''}${change})</span>`;
-            }
+            document.getElementById(`target-${idx}`).innerText = session.exercises[idx].targetReps;
         }
 
         // --- REST ---
@@ -507,23 +525,36 @@
 
         function finishWorkout() {
             if(!confirm("Finish & Save?")) return;
+            
+            // Stats
             const xp = 100 + (session.exercises.length * 10);
             state.user.xp += xp;
             state.user.streak++;
             state.user.level = Math.floor(state.user.xp / 500) + 1;
+            
+            // Plan Progress
+            if (session.isPlan) {
+                state.activePlan.progress++;
+                if(state.activePlan.progress >= state.activePlan.total) {
+                    alert("CONGRATULATIONS! You finished the plan!");
+                    state.activePlan = { id: null, name: null, progress: 0, total: 0 };
+                }
+            }
+            
             state.history.unshift({ date: Date.now(), title: document.getElementById('workoutTitle').innerText, xp: xp });
             saveData();
             location.reload();
         }
+
         function closeWorkout() { if(confirm("Exit?")) { document.getElementById('workout-modal').classList.add('hidden'); clearInterval(session.timerInt); }}
-        function saveData() { localStorage.setItem('fitLogicData_v5', JSON.stringify(state)); }
+        function saveData() { localStorage.setItem('fitLogicData_v6', JSON.stringify(state)); }
         function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
         function exportData() {
             const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
             a.download = "fitlogic_backup.json"; document.body.appendChild(a); a.click(); a.remove();
         }
         function importData(input) { const r = new FileReader(); r.onload = (e) => { state = JSON.parse(e.target.result); saveData(); location.reload(); }; r.readAsText(input.files[0]); }
-        function resetApp() { if(confirm("Reset data?")) { localStorage.removeItem('fitLogicData_v5'); location.reload(); }}
+        function resetApp() { if(confirm("Reset data?")) { localStorage.removeItem('fitLogicData_v6'); location.reload(); }}
 
         init();
     </script>
