@@ -8,10 +8,12 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="FitLogic">
     
-    <title>FitLogic 7.0 | Ultimate</title>
+    <title>FitLogic 8.0 | Adaptive</title>
     
     <link rel="icon" type="image/png" href="icon.png">
-    <link rel="apple-touch-icon" href="icon.png"> <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="apple-touch-icon" href="icon.png">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     
@@ -41,7 +43,7 @@
 
     <div id="app-header" class="bg-white/90 backdrop-blur sticky top-0 z-30 px-6 py-4 pt-12 shadow-sm flex justify-between items-center">
         <div>
-            <h1 class="text-xl font-extrabold tracking-tight text-gray-900">FitLogic <span class="text-blue-600">7.0</span></h1>
+            <h1 class="text-xl font-extrabold tracking-tight text-gray-900">FitLogic <span class="text-blue-600">8.0</span></h1>
             <p class="text-xs text-gray-500 font-medium" id="currentDate">Today</p>
         </div>
         <div class="flex items-center gap-3">
@@ -67,11 +69,9 @@
                 <div class="relative z-10">
                     <h2 class="text-xl font-extrabold text-gray-900" id="planNameDisplay">Chest Builder</h2>
                     <p class="text-xs text-blue-600 font-bold mt-1 mb-4" id="planProgressText">Workout 3 of 12 (Week 1)</p>
-                    
                     <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4">
                         <div id="planProgressBar" class="bg-blue-600 h-2.5 rounded-full progress-bar" style="width: 0%"></div>
                     </div>
-
                     <button onclick="generateWorkout('plan')" class="w-full bg-blue-600 text-white rounded-xl py-3 shadow-md active:scale-95 transition-transform font-bold flex items-center justify-center gap-2">
                         <i class="fa-solid fa-play"></i> Start Next Workout
                     </button>
@@ -208,7 +208,7 @@
     </div>
 
     <script>
-        // --- DATA ---
+        // --- DATA & EXERCISES ---
         const exerciseLibrary = [
             { id: 'pushup_std', name: 'Standard Pushups', muscle: 'Chest', equipment: 'None', howTo: 'Plank position. Hands shoulder width. Lower chest to floor.', benefit: 'Builds mass and core stability.', videoUrl: "" },
             { id: 'db_press', name: 'Dumbbell Floor Press', muscle: 'Chest', equipment: 'Dumbbells', howTo: 'Lie on back. Press weights up over chest. Tap elbows to floor.', benefit: 'Heavy loading without shoulder strain.', videoUrl: "" },
@@ -257,7 +257,7 @@
             'Core': { name: 'Cobra Stretch', how: 'Lie on stomach, press chest up with hands.', why: 'Stretches abdominal wall.' }
         };
 
-        // --- STATE ---
+        // --- STATE & AUDIO ---
         let state = {
             user: { level: 1, xp: 0, streak: 0, audioOn: true },
             activePlan: { id: null, name: null, progress: 0, total: 12 },
@@ -268,14 +268,26 @@
         let session = { exercises: [], isPlan: false, startTime: 0, timerInt: null };
         let selectedMuscles = [];
         let audioCtx = null;
+        let wakeLock = null;
 
-        // --- INIT ---
         function init() {
-            const saved = localStorage.getItem('fitLogicData_v7');
+            const saved = localStorage.getItem('fitLogicData_v8');
             if (saved) state = JSON.parse(saved);
             updateDashboard();
             renderEquipmentToggles();
             updateAudioBtn();
+        }
+
+        // --- WAKE LOCK (Keep screen on) ---
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                }
+            } catch (err) { console.log(err); }
+        }
+        async function releaseWakeLock() {
+            if (wakeLock !== null) { await wakeLock.release(); wakeLock = null; }
         }
 
         // --- AUDIO ENGINE ---
@@ -296,6 +308,8 @@
             state.user.audioOn = !state.user.audioOn;
             updateAudioBtn();
             saveData();
+            // Init audio context on user click to unlock browser policy
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         }
         function updateAudioBtn() {
             const btn = document.getElementById('audioBtn');
@@ -306,7 +320,6 @@
             document.getElementById('streakDisplay').innerText = state.user.streak;
             document.getElementById('userLevel').innerText = "Lvl " + state.user.level;
 
-            // Update Plan Card
             const planCard = document.getElementById('active-plan-card');
             const planLib = document.getElementById('plan-library');
             
@@ -323,7 +336,6 @@
                 planLib.classList.remove('hidden');
             }
 
-            // History
             const histEl = document.getElementById('historyLog');
             histEl.innerHTML = state.history.length ? '' : '<p class="text-center text-gray-400 text-xs py-4">No workouts yet.</p>';
             state.history.slice(0, 3).forEach(log => {
@@ -347,14 +359,12 @@
             });
         }
         function toggleEquipment(item) { state.equipment[item] = !state.equipment[item]; saveData(); }
-        
         function toggleMuscle(btn, muscle) {
             btn.classList.toggle('selected');
             if (selectedMuscles.includes(muscle)) selectedMuscles = selectedMuscles.filter(m => m !== muscle);
             else selectedMuscles.push(muscle);
         }
 
-        // --- PLAN LOGIC ---
         function startPlan(id, name) {
             if(confirm(`Start "${name}" plan? This will run for 4 weeks (12 workouts).`)) {
                 state.activePlan = { id: id, name: name, progress: 0, total: 12 };
@@ -362,7 +372,6 @@
                 updateDashboard();
             }
         }
-        
         function quitPlan() {
             if(confirm("Quit current plan? Progress will be lost.")) {
                 state.activePlan = { id: null, name: null, progress: 0, total: 0 };
@@ -371,7 +380,6 @@
             }
         }
 
-        // --- GENERATOR ---
         function generateWorkout(mode) {
             let selectedList = [];
             session.isPlan = (mode === 'plan');
@@ -384,9 +392,7 @@
                         if (ex.equipment !== 'None' && !state.equipment[ex.equipment]) {
                             const sub = exerciseLibrary.find(s => s.muscle === ex.muscle && (s.equipment === 'None' || state.equipment[s.equipment]));
                             selectedList.push(sub ? sub : ex);
-                        } else {
-                            selectedList.push(ex);
-                        }
+                        } else { selectedList.push(ex); }
                     }
                 });
             } else {
@@ -405,17 +411,19 @@
             if (selectedList.length === 0) { alert("No exercises found!"); return; }
 
             session.exercises = selectedList.map(ex => {
-                const hist = state.exerciseData[ex.id] || { reps: 10 };
-                return { ...ex, targetReps: hist.reps, sets: 3, completedSets: 0 };
+                const hist = state.exerciseData[ex.id] || { reps: 10, rest: 45 };
+                // Ensure legacy data gets updated
+                if (hist.rest === undefined) hist.rest = 45;
+                return { ...ex, targetReps: hist.reps, targetRest: hist.rest, sets: 3, completedSets: 0 };
             });
             session.startTime = Date.now();
             startWorkoutUI();
         }
 
         function startWorkoutUI() {
+            requestWakeLock();
             document.getElementById('workout-modal').classList.remove('hidden');
             document.getElementById('workoutTitle').innerText = session.isPlan ? state.activePlan.name : "Freestyle Session";
-            
             if (session.timerInt) clearInterval(session.timerInt);
             let sec = 0;
             session.timerInt = setInterval(() => {
@@ -424,14 +432,14 @@
                 const s = (sec % 60).toString().padStart(2, '0');
                 document.getElementById('sessionTimer').innerText = `${m}:${s}`;
             }, 1000);
-
             renderExercises();
         }
 
         function renderExercises() {
             const container = document.getElementById('workout-content');
             container.innerHTML = '';
-
+            
+            // WARMUP
             const uniqueMuscles = [...new Set(session.exercises.map(ex => ex.muscle))];
             let wHTML = `<details class="bg-orange-50 p-3 rounded-xl border border-orange-100 mb-4 cursor-pointer">
                 <summary class="font-bold text-orange-800 text-sm flex justify-between">Warmup Stretches <i class="fa-solid fa-chevron-down"></i></summary>
@@ -472,9 +480,12 @@
                         </div>
                     </details>
                     <div class="mt-3 flex gap-2 justify-center">${checks}</div>
-                    <div class="text-center text-xs text-gray-400 mt-1">Target: <span id="target-${idx}">${ex.targetReps}</span> Reps</div>
+                    <div class="flex justify-between mt-1 px-4 text-xs text-gray-400">
+                        <span>Reps: <span id="target-${idx}" class="font-bold text-black">${ex.targetReps}</span></span>
+                        <span>Rest: <span class="font-bold text-black">${ex.targetRest}s</span></span>
+                    </div>
                     <div class="mt-3 pt-3 border-t border-gray-100 flex justify-between items-center">
-                        <span class="text-[10px] text-gray-400">Rate:</span>
+                        <span class="text-[10px] text-gray-400">Rate for Next Time:</span>
                         <div class="flex gap-1">
                             <button onclick="rate(${idx}, 'easy')" class="px-3 py-1 bg-gray-100 text-[10px] rounded hover:bg-blue-100 font-bold">Too Easy</button>
                             <button onclick="rate(${idx}, 'hard')" class="px-3 py-1 bg-gray-100 text-[10px] rounded hover:bg-red-100 font-bold">Too Hard</button>
@@ -501,7 +512,9 @@
             if (setIdx === session.exercises[exIdx].completedSets) {
                 session.exercises[exIdx].completedSets++;
                 renderExercises();
-                triggerRest(60, "Next Set");
+                // Use adaptive rest
+                const restTime = session.exercises[exIdx].targetRest || 45;
+                triggerRest(restTime, "Next Set");
             }
         }
         function completeRound() {
@@ -513,17 +526,44 @@
                 finishWorkout();
             }
         }
+
+        // --- ADAPTIVE RATING ---
         function rate(idx, rating) {
             const exId = session.exercises[idx].id;
-            if (!state.exerciseData[exId]) state.exerciseData[exId] = { reps: 10 };
-            let change = (rating === 'easy') ? 2 : -2;
-            state.exerciseData[exId].reps = Math.max(5, state.exerciseData[exId].reps + change);
+            
+            // Initial data
+            if (!state.exerciseData[exId]) state.exerciseData[exId] = { reps: 10, rest: 45 };
+            // Legacy data fix
+            if (state.exerciseData[exId].rest === undefined) state.exerciseData[exId].rest = 45;
+
+            let repChange = 0;
+            let restChange = 0;
+
+            if (rating === 'easy') {
+                repChange = 2; // Increase reps
+                // Decrease Rest (Intensity UP) - Min 15s
+                state.exerciseData[exId].rest = Math.max(15, state.exerciseData[exId].rest - 5);
+                restChange = -5;
+            } else {
+                repChange = -2; // Decrease reps
+                // Increase Rest (Recovery UP) - Max 120s
+                state.exerciseData[exId].rest = Math.min(120, state.exerciseData[exId].rest + 10);
+                restChange = 10;
+            }
+
+            state.exerciseData[exId].reps = Math.max(5, state.exerciseData[exId].reps + repChange);
             saveData();
+            
+            // Live Update UI
             session.exercises[idx].targetReps = state.exerciseData[exId].reps;
+            session.exercises[idx].targetRest = state.exerciseData[exId].rest;
+            
             document.getElementById(`target-${idx}`).innerText = session.exercises[idx].targetReps;
+            alert(`${rating === 'easy' ? 'Too Easy?' : 'Too Hard?'} Adjusting next round:\nReps: ${repChange > 0 ? '+' : ''}${repChange}\nRest: ${restChange > 0 ? '+' : ''}${restChange}s`);
+            renderExercises();
         }
 
-        // --- REST ---
+        // --- REST TIMER ---
         let restInt = null;
         function triggerRest(seconds, nextText) {
             const overlay = document.getElementById('rest-overlay');
@@ -536,7 +576,7 @@
             restInt = setInterval(() => {
                 timeLeft--;
                 display.innerText = formatTime(timeLeft);
-                if (timeLeft <= 3 && timeLeft > 0) playBeep(440, 'sine'); // BEEP
+                if (timeLeft <= 3 && timeLeft > 0) playBeep(440, 'sine'); // 3-2-1 BEEP
                 if (timeLeft === 0) { playBeep(880, 'square'); skipRest(); }
             }, 1000);
         }
@@ -546,7 +586,7 @@
 
         function finishWorkout() {
             if(!confirm("Finish & Save?")) return;
-            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); // CONFETTI
+            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
             const xp = 100 + (session.exercises.length * 10);
             state.user.xp += xp;
             state.user.streak++;
@@ -560,18 +600,19 @@
             }
             state.history.unshift({ date: Date.now(), title: document.getElementById('workoutTitle').innerText, xp: xp });
             saveData();
+            releaseWakeLock();
             setTimeout(() => location.reload(), 2000);
         }
 
-        function closeWorkout() { if(confirm("Exit?")) { document.getElementById('workout-modal').classList.add('hidden'); clearInterval(session.timerInt); }}
-        function saveData() { localStorage.setItem('fitLogicData_v7', JSON.stringify(state)); }
+        function closeWorkout() { if(confirm("Exit?")) { document.getElementById('workout-modal').classList.add('hidden'); clearInterval(session.timerInt); releaseWakeLock(); }}
+        function saveData() { localStorage.setItem('fitLogicData_v8', JSON.stringify(state)); }
         function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
         function exportData() {
             const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
             a.download = "fitlogic_backup.json"; document.body.appendChild(a); a.click(); a.remove();
         }
         function importData(input) { const r = new FileReader(); r.onload = (e) => { state = JSON.parse(e.target.result); saveData(); location.reload(); }; r.readAsText(input.files[0]); }
-        function resetApp() { if(confirm("Reset data?")) { localStorage.removeItem('fitLogicData_v7'); location.reload(); }}
+        function resetApp() { if(confirm("Reset data?")) { localStorage.removeItem('fitLogicData_v8'); location.reload(); }}
 
         init();
     </script>
