@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FitLogic Pro | Smart Trainer</title>
+    <title>FitLogic 3.0 | Circuit Trainer</title>
     
     <link rel="icon" type="image/png" href="icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -15,18 +15,24 @@
         .page-transition { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .card { background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .muscle-btn.selected { background-color: #007AFF; color: white; border-color: #007AFF; }
+        
+        /* Dropdown Animation */
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        details[open] summary ~ * { animation: sweep .3s ease-in-out; }
+        @keyframes sweep { 0% {opacity: 0; transform: translateY(-10px)} 100% {opacity: 1; transform: translateY(0)} }
+
+        /* Custom Checkbox */
         .toggle-checkbox:checked { right: 0; border-color: #34C759; }
         .toggle-checkbox:checked + .toggle-label { background-color: #34C759; }
-        
-        /* Muscle Selector Buttons */
-        .muscle-btn.selected { background-color: #007AFF; color: white; border-color: #007AFF; }
     </style>
 </head>
 <body class="min-h-screen pb-24">
 
     <div id="app-header" class="bg-white sticky top-0 z-30 px-6 py-4 shadow-sm flex justify-between items-center">
         <div>
-            <h1 class="text-xl font-extrabold tracking-tight text-gray-900">FitLogic <span class="text-blue-500">Pro</span></h1>
+            <h1 class="text-xl font-extrabold tracking-tight text-gray-900">FitLogic <span class="text-blue-500">3.0</span></h1>
             <p class="text-xs text-gray-500 font-medium" id="currentDate">Today</p>
         </div>
         <div class="flex items-center gap-3">
@@ -42,56 +48,97 @@
 
     <div id="main-container" class="p-6 space-y-6 max-w-lg mx-auto page-transition">
 
-        <div class="card p-5">
+        <div class="card p-5 space-y-4">
             <div class="flex justify-between items-center cursor-pointer" onclick="document.getElementById('equip-options').classList.toggle('hidden')">
-                <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-toolbox text-gray-500"></i> My Gear</h3>
-                <span class="text-xs text-blue-500 font-bold">Edit <i class="fa-solid fa-chevron-down ml-1"></i></span>
+                <h3 class="font-bold text-gray-800 text-sm"><i class="fa-solid fa-toolbox text-gray-500 mr-2"></i>My Gear</h3>
+                <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
             </div>
-            <div id="equip-options" class="hidden mt-4 grid grid-cols-2 gap-2 pt-3 border-t border-gray-100">
+            <div id="equip-options" class="hidden grid grid-cols-2 gap-2 pt-2 border-t border-gray-100">
                 </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Duration</label>
+                <select id="durationSelector" class="w-full bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                    <option value="10">10 Mins (Express)</option>
+                    <option value="20">20 Mins (Standard)</option>
+                    <option value="30" selected>30 Mins (Recommended)</option>
+                    <option value="45">45 Mins (Intense)</option>
+                    <option value="60">60 Mins (Pro)</option>
+                </select>
+            </div>
+
+            <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg border border-gray-200">
+                <div>
+                    <div class="text-sm font-bold text-gray-800">Circuit Mode</div>
+                    <div class="text-[10px] text-gray-500">Do all exercises in a row, then rest.</div>
+                </div>
+                <div class="relative inline-block w-10 align-middle select-none">
+                    <input type="checkbox" id="circuitToggle" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300 transition-all duration-300"/>
+                    <label for="circuitToggle" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
+                </div>
+            </div>
         </div>
 
         <div>
-            <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wide mb-2 ml-1">Focus Area (Select Multiple)</h3>
+            <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wide mb-2 ml-1">Focus Area</h3>
             <div class="grid grid-cols-3 gap-2" id="muscle-selector">
-                <button onclick="toggleMuscle(this, 'Chest')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-3 text-sm font-bold text-gray-600 shadow-sm transition-all active:scale-95">Chest</button>
-                <button onclick="toggleMuscle(this, 'Back')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-3 text-sm font-bold text-gray-600 shadow-sm transition-all active:scale-95">Back</button>
-                <button onclick="toggleMuscle(this, 'Legs')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-3 text-sm font-bold text-gray-600 shadow-sm transition-all active:scale-95">Legs</button>
-                <button onclick="toggleMuscle(this, 'Shoulders')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-3 text-sm font-bold text-gray-600 shadow-sm transition-all active:scale-95">Shoulders</button>
-                <button onclick="toggleMuscle(this, 'Arms')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-3 text-sm font-bold text-gray-600 shadow-sm transition-all active:scale-95">Arms</button>
-                <button onclick="toggleMuscle(this, 'Core')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-3 text-sm font-bold text-gray-600 shadow-sm transition-all active:scale-95">Core</button>
+                <button onclick="toggleMuscle(this, 'Chest')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-3 text-xs font-bold text-gray-600 shadow-sm active:scale-95">Chest</button>
+                <button onclick="toggleMuscle(this, 'Back')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-3 text-xs font-bold text-gray-600 shadow-sm active:scale-95">Back</button>
+                <button onclick="toggleMuscle(this, 'Legs')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-3 text-xs font-bold text-gray-600 shadow-sm active:scale-95">Legs</button>
+                <button onclick="toggleMuscle(this, 'Shoulders')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-3 text-xs font-bold text-gray-600 shadow-sm active:scale-95">Shoulders</button>
+                <button onclick="toggleMuscle(this, 'Arms')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-3 text-xs font-bold text-gray-600 shadow-sm active:scale-95">Arms</button>
+                <button onclick="toggleMuscle(this, 'Core')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-3 text-xs font-bold text-gray-600 shadow-sm active:scale-95">Core</button>
             </div>
-            <p class="text-[10px] text-gray-400 mt-2 ml-1 italic">*Leave all unselected for a Full Body workout.</p>
         </div>
 
         <button onclick="generateWorkout()" class="w-full bg-black text-white rounded-2xl py-5 shadow-lg active:scale-95 transition-transform flex flex-col items-center justify-center gap-1 group">
-            <span class="text-lg font-bold group-hover:text-blue-400 transition-colors"><i class="fa-solid fa-bolt mr-2 text-yellow-400"></i> Generate Custom Workout</span>
-            <span class="text-xs text-gray-400 font-medium">Science-Based • Auto-Scaling Difficulty</span>
+            <span class="text-lg font-bold group-hover:text-blue-400 transition-colors"><i class="fa-solid fa-bolt mr-2 text-yellow-400"></i> Generate Workout</span>
+            <span class="text-xs text-gray-400 font-medium">Auto-calculated Rests & Sets</span>
         </button>
-
-        <div>
-            <h3 class="text-sm font-bold text-gray-900 mb-3 ml-1">Recent History</h3>
-            <div id="historyLog" class="space-y-3"></div>
-        </div>
+        
+        <div id="historyLog" class="space-y-2 pb-10"></div>
     </div>
 
     <div id="workout-modal" class="fixed inset-0 bg-white z-50 hidden flex flex-col">
         <div class="bg-white border-b border-gray-100 p-4 flex justify-between items-center shadow-sm z-10">
             <button onclick="closeWorkout()" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <div>
-                <h2 class="font-bold text-lg text-center" id="workoutTitle">Custom Session</h2>
-                <div class="text-[10px] text-center text-gray-400" id="workoutSubtitle">Focus: Full Body</div>
+            <div class="text-center">
+                <h2 class="font-bold text-lg" id="workoutTitle">Session</h2>
+                <div class="text-[10px] text-gray-400" id="workoutSubtitle"></div>
             </div>
             <div class="text-xs font-mono bg-gray-100 px-2 py-1 rounded text-gray-600" id="sessionTimer">00:00</div>
         </div>
 
-        <div id="workout-content" class="flex-1 overflow-y-auto p-6 space-y-6 pb-20 bg-gray-50">
+        <div id="workout-content" class="flex-1 overflow-y-auto p-6 space-y-6 pb-32 bg-gray-50">
             </div>
 
-        <div class="p-4 border-t border-gray-100 bg-white/95 backdrop-blur">
-            <button onclick="finishWorkout()" class="w-full bg-green-500 text-white font-bold py-4 rounded-xl shadow-md active:scale-95 transition-transform">
-                Complete Workout <i class="fa-solid fa-check ml-2"></i>
+        <div id="circuit-controls" class="hidden absolute bottom-0 w-full bg-white border-t border-gray-200 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-xs font-bold text-gray-500" id="round-tracker">Round 1/3</span>
+                <span class="text-xs font-bold text-blue-500">Next: Rest</span>
+            </div>
+            <button onclick="completeRound()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-md active:scale-95 transition-transform">
+                Finish Round & Rest <i class="fa-solid fa-stopwatch ml-2"></i>
             </button>
+        </div>
+        
+        <div id="standard-controls" class="absolute bottom-0 w-full bg-white border-t border-gray-200 p-4 hidden">
+             <button onclick="finishWorkout()" class="w-full bg-green-500 text-white font-bold py-4 rounded-xl shadow-md active:scale-95 transition-transform">
+                Finish Workout <i class="fa-solid fa-check ml-2"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="rest-overlay" class="fixed inset-0 bg-black/90 z-[60] hidden flex flex-col items-center justify-center text-white">
+        <div class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Rest Time</div>
+        <div class="text-7xl font-mono font-bold mb-8" id="rest-countdown">00:45</div>
+        <div class="flex gap-4">
+            <button onclick="addRest(15)" class="px-6 py-2 rounded-full border border-white/30 text-sm hover:bg-white/10">+15s</button>
+            <button onclick="skipRest()" class="px-6 py-2 rounded-full bg-white text-black font-bold text-sm">Skip</button>
+        </div>
+        <div class="mt-8 text-center px-6">
+            <p class="text-xs text-gray-500 uppercase mb-2">Up Next:</p>
+            <p class="text-lg font-bold text-blue-400" id="up-next-text">Next Exercise</p>
         </div>
     </div>
 
@@ -111,75 +158,86 @@
     </div>
 
     <script>
-        // --- DATA: EXERCISE LIBRARY (Expanded & Detailed) ---
-        // benefit: Explains WHY we do it.
+        // --- DATABASE ---
         const exerciseLibrary = [
             // CHEST
-            { id: 'pushup_std', name: 'Standard Pushups', muscle: 'Chest', equipment: 'None', benefit: 'Builds pectoral mass and core stability.', videoUrl: "" },
-            { id: 'db_press', name: 'Dumbbell Floor Press', muscle: 'Chest', equipment: 'Dumbbells', benefit: 'Allows heavy loading of the chest without shoulder strain.', videoUrl: "" },
-            { id: 'band_fly', name: 'Resistance Band Fly', muscle: 'Chest', equipment: 'Bands', benefit: 'Isolates the chest squeeze (adduction) which pushups miss.', videoUrl: "" },
-            { id: 'db_fly', name: 'Dumbbell Flys (Floor)', muscle: 'Chest', equipment: 'Dumbbells', benefit: 'Expands the chest cavity and targets outer pec fibers.', videoUrl: "" },
+            { id: 'pushup_std', name: 'Standard Pushups', muscle: 'Chest', equipment: 'None', howTo: 'Plank position. Hands shoulder width. Lower chest to floor.', benefit: 'Builds mass and core stability.', videoUrl: "" },
+            { id: 'db_press', name: 'Dumbbell Floor Press', muscle: 'Chest', equipment: 'Dumbbells', howTo: 'Lie on back. Press weights up over chest. Tap elbows to floor.', benefit: 'Heavy loading without shoulder strain.', videoUrl: "" },
+            { id: 'band_fly', name: 'Band Flys', muscle: 'Chest', equipment: 'Bands', howTo: 'Anchor band behind you. Hug a tree motion.', benefit: 'Isolates chest squeeze.', videoUrl: "" },
 
             // BACK
-            { id: 'pullup', name: 'Pull-ups', muscle: 'Back', equipment: 'Pullup Bar', benefit: 'The king of back exercises. Widens the lats for the V-taper.', videoUrl: "" },
-            { id: 'db_row', name: 'One-Arm DB Row', muscle: 'Back', equipment: 'Dumbbells', benefit: 'Thickens the mid-back and fixes muscle imbalances.', videoUrl: "" },
-            { id: 'band_row', name: 'Seated Band Row', muscle: 'Back', equipment: 'Bands', benefit: 'Targets the rhomboids and improves posture.', videoUrl: "" },
-            { id: 'superman', name: 'Supermans', muscle: 'Back', equipment: 'None', benefit: 'Strengthens the lower back erectors to prevent injury.', videoUrl: "" },
+            { id: 'pullup', name: 'Pull-ups', muscle: 'Back', equipment: 'Pullup Bar', howTo: 'Hang from bar. Pull chin over bar. Lower fully.', benefit: 'King of back exercises (V-taper).', videoUrl: "" },
+            { id: 'db_row', name: 'One-Arm DB Row', muscle: 'Back', equipment: 'Dumbbells', howTo: 'Hand on chair. Pull weight to hip, keeping back flat.', benefit: 'Thickens mid-back.', videoUrl: "" },
+            { id: 'superman', name: 'Supermans', muscle: 'Back', equipment: 'None', howTo: 'Lie on stomach. Lift arms/legs. Squeeze glutes/back.', benefit: 'Lower back health.', videoUrl: "" },
 
             // LEGS
-            { id: 'squat_body', name: 'Air Squats', muscle: 'Legs', equipment: 'None', benefit: 'Fundamental movement for quad and glute development.', videoUrl: "" },
-            { id: 'goblet_squat', name: 'Goblet Squats', muscle: 'Legs', equipment: 'Dumbbells', benefit: 'Adds load to squats while forcing core engagement.', videoUrl: "" },
-            { id: 'lunge_db', name: 'Weighted Lunges', muscle: 'Legs', equipment: 'Dumbbells', benefit: 'Increases leg stability and glute activation.', videoUrl: "" },
-            { id: 'rdl_band', name: 'Band RDLs', muscle: 'Legs', equipment: 'Bands', benefit: 'Isolates the hamstrings and glutes without heavy spinal load.', videoUrl: "" },
+            { id: 'squat_body', name: 'Air Squats', muscle: 'Legs', equipment: 'None', howTo: 'Feet shoulder width. Hips back and down below knees.', benefit: 'Fundamental leg strength.', videoUrl: "" },
+            { id: 'goblet_squat', name: 'Goblet Squats', muscle: 'Legs', equipment: 'Dumbbells', howTo: 'Hold weight at chest. Squat deep.', benefit: 'Adds load + core stability.', videoUrl: "" },
+            { id: 'lunge_walk', name: 'Walking Lunges', muscle: 'Legs', equipment: 'None', howTo: 'Step forward, drop back knee. Alternate legs.', benefit: 'Dynamic balance and glutes.', videoUrl: "" },
+            { id: 'glute_bridge', name: 'Glute Bridges', muscle: 'Legs', equipment: 'None', howTo: 'Lie on back, knees up. Drive hips to ceiling.', benefit: 'Isolates glutes.', videoUrl: "" },
 
             // SHOULDERS
-            { id: 'pike_pushup', name: 'Pike Pushups', muscle: 'Shoulders', equipment: 'None', benefit: 'Simulates overhead pressing using bodyweight.', videoUrl: "" },
-            { id: 'db_ohp', name: 'Seated DB Press', muscle: 'Shoulders', equipment: 'Dumbbells', benefit: 'Builds deltoid mass for broader shoulders.', videoUrl: "" },
-            { id: 'lat_raise_band', name: 'Band Lateral Raises', muscle: 'Shoulders', equipment: 'Bands', benefit: 'Targets the side delt to create shoulder width.', videoUrl: "" },
+            { id: 'pike_pushup', name: 'Pike Pushups', muscle: 'Shoulders', equipment: 'None', howTo: 'Downward dog position. Lower head to floor. Press up.', benefit: 'Overhead press with bodyweight.', videoUrl: "" },
+            { id: 'lat_raise', name: 'DB Lateral Raise', muscle: 'Shoulders', equipment: 'Dumbbells', howTo: 'Stand. Lift weights to side until shoulder height.', benefit: 'Side delts for width.', videoUrl: "" },
 
             // ARMS
-            { id: 'db_curl', name: 'Dumbbell Curls', muscle: 'Arms', equipment: 'Dumbbells', benefit: 'Isolates the biceps peak.', videoUrl: "" },
-            { id: 'tri_dip', name: 'Chair Dips', muscle: 'Arms', equipment: 'None', benefit: 'Hits all three heads of the triceps.', videoUrl: "" },
-            { id: 'band_pushdown', name: 'Band Tricep Pushdowns', muscle: 'Arms', equipment: 'Bands', benefit: 'Constant tension on the triceps without elbow stress.', videoUrl: "" },
+            { id: 'dip_chair', name: 'Chair Dips', muscle: 'Arms', equipment: 'None', howTo: 'Hands on chair behind you. Lower hips. Press up.', benefit: 'Tricep mass.', videoUrl: "" },
+            { id: 'bicep_curl', name: 'DB Curls', muscle: 'Arms', equipment: 'Dumbbells', howTo: 'Stand. Curl weight to shoulder. Squeeze.', benefit: 'Bicep peak.', videoUrl: "" },
 
             // CORE
-            { id: 'plank', name: 'Plank Hold', muscle: 'Core', equipment: 'None', benefit: 'Builds deep core stability and abdominal endurance.', videoUrl: "" },
-            { id: 'leg_raise', name: 'Lying Leg Raises', muscle: 'Core', equipment: 'None', benefit: 'Targets the lower abs specifically.', videoUrl: "" },
-            { id: 'r_twist', name: 'Russian Twists', muscle: 'Core', equipment: 'None', benefit: 'Targets the obliques for side-ab definition.', videoUrl: "" }
+            { id: 'plank', name: 'Plank', muscle: 'Core', equipment: 'None', howTo: 'Elbows under shoulders. Body straight. Hold.', benefit: 'Total core stability.', videoUrl: "" },
+            { id: 'leg_raise', name: 'Leg Raises', muscle: 'Core', equipment: 'None', howTo: 'Lie flat. Lift legs to 90 degrees. Lower slowly.', benefit: 'Lower abs.', videoUrl: "" }
         ];
 
         const warmups = {
-            'Chest': { move: 'Arm Circles & Wall Slides', why: 'Loosens the rotator cuff and chest fascia to prevent shoulder impingement.' },
-            'Back': { move: 'Cat-Cow & Band Pull-Aparts', why: 'Activates the scapula so you pull with your back, not your arms.' },
-            'Legs': { move: 'Leg Swings & Bodyweight Squats', why: 'Lubricates the knee joints and opens up tight hips.' },
-            'Shoulders': { move: 'Arm Cross Swings', why: 'Increases blood flow to the deltoids.' },
-            'Arms': { move: 'Wrist Circles', why: 'Prepares wrists for loading.' },
-            'Core': { move: 'Cobra Stretch', why: 'Stretches the abdominal wall.' }
+            'Chest': 'Arm Circles & Wall Slides',
+            'Back': 'Cat-Cow & Band Pull-Aparts',
+            'Legs': 'Leg Swings & Bodyweight Squats',
+            'Shoulders': 'Arm Cross Swings',
+            'Arms': 'Wrist Circles',
+            'Core': 'Cobra Stretch'
         };
 
+        const cooldowns = {
+            'Chest': 'Doorway Stretch',
+            'Back': 'Childs Pose',
+            'Legs': 'Quad Stretch & Toe Touch',
+            'Shoulders': 'Cross Body Stretch',
+            'Arms': 'Tricep Overhead Stretch',
+            'Core': 'Upward Dog'
+        };
+
+        // --- STATE ---
         let state = {
             user: { level: 1, xp: 0, streak: 0, lastDate: null },
             equipment: { 'Dumbbells': true, 'Bands': true, 'Pullup Bar': true, 'Barbell': false },
             exerciseData: {},
             history: []
         };
+        
+        let session = {
+            exercises: [],
+            isCircuit: false,
+            currentRound: 1,
+            totalRounds: 3,
+            startTime: 0,
+            timerInt: null,
+            duration: 30
+        };
+        
         let selectedMuscles = [];
-        let currentSession = [];
-        let timerInterval = null;
 
         // --- INIT ---
         function init() {
-            const saved = localStorage.getItem('fitLogicData_v2');
+            const saved = localStorage.getItem('fitLogicData_v3');
             if (saved) state = JSON.parse(saved);
-            updateUI();
+            updateDashboard();
             renderEquipmentToggles();
         }
 
-        function updateUI() {
+        function updateDashboard() {
             document.getElementById('streakDisplay').innerText = state.user.streak;
             document.getElementById('userLevel').innerText = "Lvl " + state.user.level;
-            
-            // Render History
             const histEl = document.getElementById('historyLog');
             histEl.innerHTML = state.history.length ? '' : '<p class="text-center text-gray-400 text-xs py-4">No workouts yet.</p>';
             state.history.slice(0, 3).forEach(log => {
@@ -202,167 +260,241 @@
                     </label>`;
             });
         }
-
-        function toggleEquipment(item) {
-            state.equipment[item] = !state.equipment[item];
-            saveData();
-        }
-
+        function toggleEquipment(item) { state.equipment[item] = !state.equipment[item]; saveData(); }
         function toggleMuscle(btn, muscle) {
             btn.classList.toggle('selected');
-            if (selectedMuscles.includes(muscle)) {
-                selectedMuscles = selectedMuscles.filter(m => m !== muscle);
-            } else {
-                selectedMuscles.push(muscle);
-            }
+            if (selectedMuscles.includes(muscle)) selectedMuscles = selectedMuscles.filter(m => m !== muscle);
+            else selectedMuscles.push(muscle);
         }
 
-        // --- GENERATOR ALGORITHM ---
+        // --- GENERATOR ---
         function generateWorkout() {
-            // 1. Determine Focus Area
+            const duration = parseInt(document.getElementById('durationSelector').value);
+            const isCircuit = document.getElementById('circuitToggle').checked;
+            
+            // Calc volume: Approx 5 mins per exercise (3 sets + rests)
+            const numExercises = Math.max(2, Math.floor(duration / 5));
+            
             const targets = selectedMuscles.length > 0 ? selectedMuscles : ['Chest', 'Back', 'Legs', 'Shoulders', 'Core', 'Arms'];
+            let pool = exerciseLibrary.filter(ex => targets.includes(ex.muscle) && (ex.equipment === 'None' || state.equipment[ex.equipment]));
             
-            // 2. Filter by Equipment AND Muscle
-            let sessionExercises = [];
-            
-            targets.forEach(muscle => {
-                // Find all valid exercises for this muscle
-                const candidates = exerciseLibrary.filter(ex => {
-                    if (ex.muscle !== muscle) return false;
-                    // Equipment Check: 'None' works always, otherwise check state
-                    return ex.equipment === 'None' || state.equipment[ex.equipment];
-                });
+            if (pool.length === 0) { alert("No exercises found! Check equipment."); return; }
 
-                if (candidates.length > 0) {
-                    // PREFERENCE LOGIC: If we have Dumbbells/Bands selected, try to pick them over 'None' 70% of the time
-                    // This fixes the "equipment doesn't do much" issue.
-                    const weighted = candidates.filter(c => c.equipment !== 'None');
-                    let choice;
-                    
-                    if (weighted.length > 0 && Math.random() > 0.3) {
-                        choice = weighted[Math.floor(Math.random() * weighted.length)];
-                    } else {
-                        choice = candidates[Math.floor(Math.random() * candidates.length)];
-                    }
-                    sessionExercises.push(choice);
-                }
-            });
-
-            if (sessionExercises.length === 0) {
-                alert("No exercises found for these settings! Try enabling more equipment.");
-                return;
+            // Random selection
+            let selected = [];
+            for (let i = 0; i < numExercises; i++) {
+                if (pool.length === 0) break;
+                const idx = Math.floor(Math.random() * pool.length);
+                selected.push(pool[idx]);
+                // Don't remove from pool to allow duplicates if pool is small, or remove to ensure variety?
+                // Let's remove to ensure variety unless pool is exhausted
+                pool.splice(idx, 1); 
             }
 
-            // 3. Build Session
-            currentSession = sessionExercises.map(ex => {
-                const history = state.exerciseData[ex.id] || { reps: 10 };
-                return { ...ex, targetReps: history.reps, sets: 3, completed: false };
+            // Setup Session
+            session.exercises = selected.map(ex => {
+                const hist = state.exerciseData[ex.id] || { reps: 10 };
+                return { ...ex, targetReps: hist.reps, sets: 3, completedSets: 0 };
             });
+            session.isCircuit = isCircuit;
+            session.currentRound = 1;
+            session.totalRounds = 3; // Standard 3 sets/rounds
+            session.duration = duration;
+            session.startTime = Date.now();
 
-            // 4. Update Modal UI
-            document.getElementById('workoutTitle').innerText = selectedMuscles.length > 0 ? selectedMuscles.join(' + ') : "Full Body";
-            document.getElementById('workoutSubtitle').innerText = `${currentSession.length} Exercises • Est. Time: ${currentSession.length * 5} mins`;
-            
-            renderWorkoutContent();
+            startWorkoutUI();
+        }
+
+        function startWorkoutUI() {
             document.getElementById('workout-modal').classList.remove('hidden');
+            document.getElementById('workoutTitle').innerText = session.isCircuit ? "Circuit Training" : "Standard Training";
+            document.getElementById('workoutSubtitle').innerText = `${session.duration} Min Target • ${session.exercises.length} Exercises`;
             
-            // Start Timer
+            // Toggle Controls
+            if (session.isCircuit) {
+                document.getElementById('circuit-controls').classList.remove('hidden');
+                document.getElementById('standard-controls').classList.add('hidden');
+            } else {
+                document.getElementById('circuit-controls').classList.add('hidden');
+                document.getElementById('standard-controls').classList.remove('hidden');
+            }
+
+            if (session.timerInt) clearInterval(session.timerInt);
             let sec = 0;
-            if (timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
+            session.timerInt = setInterval(() => {
                 sec++;
                 const m = Math.floor(sec / 60).toString().padStart(2, '0');
                 const s = (sec % 60).toString().padStart(2, '0');
                 document.getElementById('sessionTimer').innerText = `${m}:${s}`;
             }, 1000);
+
+            renderExercises();
         }
 
-        function renderWorkoutContent() {
+        function renderExercises() {
             const container = document.getElementById('workout-content');
             container.innerHTML = '';
 
-            // 1. SMART WARMUP
-            // We look at unique muscles in the current session and pull their specific warmups
-            const uniqueMuscles = [...new Set(currentSession.map(ex => ex.muscle))];
-            let warmupHTML = `<div class="bg-orange-50 p-4 rounded-xl border border-orange-100 mb-4">
-                <h3 class="text-orange-800 font-bold text-sm mb-2"><i class="fa-solid fa-heart-pulse mr-2"></i>Smart Warmup</h3>
-                <div class="space-y-3">`;
-            
-            uniqueMuscles.forEach(m => {
-                if(warmups[m]) {
-                    warmupHTML += `
-                    <div>
-                        <p class="text-xs font-bold text-gray-800">• ${warmups[m].move}</p>
-                        <p class="text-[10px] text-gray-500 italic">${warmups[m].why}</p>
-                    </div>`;
-                }
-            });
-            warmupHTML += `</div></div>`;
-            container.innerHTML += warmupHTML;
+            // WARMUP
+            const uniqueMuscles = [...new Set(session.exercises.map(ex => ex.muscle))];
+            let wHTML = `<div class="bg-orange-50 p-4 rounded-xl border border-orange-100 mb-4"><h3 class="text-orange-800 font-bold text-sm mb-2">Warmup</h3><div class="text-xs text-gray-600 space-y-1">`;
+            uniqueMuscles.forEach(m => { if(warmups[m]) wHTML += `<div>• <strong>${m}:</strong> ${warmups[m]}</div>`; });
+            wHTML += `</div></div>`;
+            container.innerHTML += wHTML;
 
-            // 2. EXERCISES
-            currentSession.forEach((ex, idx) => {
-                // Video Placeholder
+            // EXERCISES
+            session.exercises.forEach((ex, idx) => {
                 const videoBlock = ex.videoUrl ? 
                     `<iframe class="w-full h-40 rounded-lg mt-2" src="${ex.videoUrl}" frameborder="0" allowfullscreen></iframe>` : 
-                    `<div class="w-full h-24 bg-gray-200 rounded-lg mt-2 flex items-center justify-center text-xs text-gray-400 italic">Video Placeholder</div>`;
+                    `<div class="w-full h-24 bg-gray-100 rounded-lg mt-2 flex items-center justify-center text-xs text-gray-400 italic">Video Placeholder</div>`;
+                
+                let actionArea = '';
+                
+                if (session.isCircuit) {
+                    // Circuit Mode: Show simple info, check off implicitly by round
+                    actionArea = `<div class="mt-2 text-xs font-bold text-blue-600">Target: ${ex.targetReps} Reps</div>`;
+                } else {
+                    // Standard Mode: Checkboxes for sets
+                    let checks = '';
+                    for(let i=0; i<ex.sets; i++) {
+                        const isDone = i < ex.completedSets;
+                        checks += `<div onclick="completeSet(${idx}, ${i})" class="h-8 w-8 rounded-full border-2 flex items-center justify-center cursor-pointer ${isDone ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300 text-gray-300'}">${i+1}</div>`;
+                    }
+                    actionArea = `<div class="mt-3 flex gap-2 justify-center">${checks}</div>`;
+                }
 
                 container.innerHTML += `
-                <div class="card p-5 border-l-4 ${ex.completed ? 'border-green-500 opacity-60' : 'border-blue-500'}">
+                <div class="card p-5 border-l-4 border-blue-500 mb-4">
                     <div class="flex justify-between items-start">
                         <h4 class="font-bold text-lg">${ex.name}</h4>
-                        <span class="text-xs font-mono bg-gray-100 px-2 py-1 rounded text-gray-700">${ex.sets} x ${ex.targetReps}</span>
+                        <span class="text-xs font-mono bg-gray-100 px-2 py-1 rounded text-gray-700">${ex.muscle}</span>
                     </div>
                     
-                    <div class="mt-2 mb-3 bg-blue-50 p-2 rounded text-[11px] text-blue-800 border border-blue-100">
-                        <strong><i class="fa-solid fa-circle-info mr-1"></i> Why:</strong> ${ex.benefit}
-                    </div>
-
-                    ${videoBlock}
-
-                    <div class="grid grid-cols-3 gap-2 mt-4">
-                        <button onclick="rate(${idx}, 'hard')" class="py-2 rounded-lg bg-red-50 text-red-600 text-xs font-bold border border-red-100">Too Hard</button>
-                        <button onclick="rate(${idx}, 'good')" class="py-2 rounded-lg bg-green-50 text-green-600 text-xs font-bold border border-green-100">Just Right</button>
-                        <button onclick="rate(${idx}, 'easy')" class="py-2 rounded-lg bg-blue-50 text-blue-600 text-xs font-bold border border-blue-100">Too Easy</button>
+                    <details class="mt-2 text-xs text-gray-600 cursor-pointer">
+                        <summary class="font-bold text-blue-500">How to do it & Benefits <i class="fa-solid fa-chevron-down ml-1"></i></summary>
+                        <div class="mt-2 p-2 bg-gray-50 rounded border border-gray-100">
+                            <p class="mb-1"><strong>How:</strong> ${ex.howTo}</p>
+                            <p class="italic text-gray-500"><strong>Why:</strong> ${ex.benefit}</p>
+                            ${videoBlock}
+                        </div>
+                    </details>
+                    
+                    ${actionArea}
+                    
+                    <div class="mt-3 pt-3 border-t border-gray-100 flex justify-between items-center">
+                        <span class="text-[10px] text-gray-400">Difficulty:</span>
+                        <div class="flex gap-1">
+                            <button onclick="rate(${idx}, 'easy')" class="px-2 py-1 bg-gray-100 text-[10px] rounded hover:bg-blue-100">Easy</button>
+                            <button onclick="rate(${idx}, 'hard')" class="px-2 py-1 bg-gray-100 text-[10px] rounded hover:bg-red-100">Hard</button>
+                        </div>
                     </div>
                 </div>`;
             });
+            
+            // COOLDOWN
+            let cHTML = `<div class="bg-blue-50 p-4 rounded-xl border border-blue-100 mt-4"><h3 class="text-blue-800 font-bold text-sm mb-2">Cooldown</h3><div class="text-xs text-gray-600 space-y-1">`;
+            uniqueMuscles.forEach(m => { if(cooldowns[m]) cHTML += `<div>• <strong>${m}:</strong> ${cooldowns[m]}</div>`; });
+            cHTML += `</div></div>`;
+            container.innerHTML += cHTML;
+        }
+
+        // --- ACTIONS ---
+        function completeSet(exIdx, setIdx) {
+            // Standard Mode Only
+            if (setIdx === session.exercises[exIdx].completedSets) {
+                session.exercises[exIdx].completedSets++;
+                renderExercises();
+                triggerRest(60, "Next Set"); // Standard Rest
+            }
+        }
+
+        function completeRound() {
+            // Circuit Mode Only
+            if (session.currentRound < session.totalRounds) {
+                triggerRest(90, `Round ${session.currentRound + 1}`);
+                session.currentRound++;
+                document.getElementById('round-tracker').innerText = `Round ${session.currentRound}/${session.totalRounds}`;
+                // Suggest less rest if last round was rated easy?
+            } else {
+                finishWorkout();
+            }
+        }
+
+        // --- REST TIMER ---
+        let restInt = null;
+        function triggerRest(seconds, nextText) {
+            const overlay = document.getElementById('rest-overlay');
+            const display = document.getElementById('rest-countdown');
+            document.getElementById('up-next-text').innerText = nextText;
+            overlay.classList.remove('hidden');
+            
+            let timeLeft = seconds;
+            display.innerText = formatTime(timeLeft);
+            
+            if (restInt) clearInterval(restInt);
+            restInt = setInterval(() => {
+                timeLeft--;
+                display.innerText = formatTime(timeLeft);
+                if (timeLeft <= 0) skipRest();
+            }, 1000);
+        }
+
+        function formatTime(s) {
+            const min = Math.floor(s/60).toString().padStart(2,'0');
+            const sec = (s%60).toString().padStart(2,'0');
+            return `${min}:${sec}`;
+        }
+
+        function addRest(s) {
+            const display = document.getElementById('rest-countdown');
+            let curr = parseInt(display.innerText.split(':')[1]) + (parseInt(display.innerText.split(':')[0])*60);
+            curr += s;
+            if (restInt) clearInterval(restInt);
+            // restart logic simple
+            triggerRest(curr, document.getElementById('up-next-text').innerText);
+        }
+
+        function skipRest() {
+            document.getElementById('rest-overlay').classList.add('hidden');
+            if (restInt) clearInterval(restInt);
         }
 
         function rate(idx, rating) {
-            const ex = currentSession[idx];
-            currentSession[idx].completed = true;
-            
-            // Scaling Logic
-            if (!state.exerciseData[ex.id]) state.exerciseData[ex.id] = { reps: 10 };
+            const exId = session.exercises[idx].id;
+            if (!state.exerciseData[exId]) state.exerciseData[exId] = { reps: 10 };
             
             if (rating === 'easy') {
-                state.exerciseData[ex.id].reps += 2;
-                alert(`Too easy? Next time: ${state.exerciseData[ex.id].reps} Reps.`);
-            } else if (rating === 'hard') {
-                state.exerciseData[ex.id].reps = Math.max(5, state.exerciseData[ex.id].reps - 2);
-                alert(`Reducing volume. Next time: ${state.exerciseData[ex.id].reps} Reps.`);
+                state.exerciseData[exId].reps += 2;
+                alert("Next time: +2 Reps");
+            } else {
+                state.exerciseData[exId].reps = Math.max(5, state.exerciseData[exId].reps - 2);
+                alert("Next time: -2 Reps");
             }
-            
             saveData();
-            renderWorkoutContent();
+            // Re-render to show updated reps target?
+            if (session.isCircuit) renderExercises();
         }
 
         function finishWorkout() {
-            if (currentSession.some(e => !e.completed) && !confirm("Finish incomplete workout?")) return;
-            
-            const xp = 100 + (currentSession.length * 10);
+            if(!confirm("Finish Workout?")) return;
+            const xp = 100 + (session.exercises.length * 10);
             state.user.xp += xp;
             state.user.streak++;
             state.user.level = Math.floor(state.user.xp / 500) + 1;
-            
-            state.history.unshift({ date: Date.now(), title: document.getElementById('workoutTitle').innerText, xp: xp });
+            state.history.unshift({ date: Date.now(), title: session.isCircuit ? "Circuit" : "Standard", xp: xp });
             saveData();
             location.reload();
         }
 
-        function saveData() { localStorage.setItem('fitLogicData_v2', JSON.stringify(state)); }
-        function closeWorkout() { if(confirm("Discard session?")) { document.getElementById('workout-modal').classList.add('hidden'); clearInterval(timerInterval); }}
+        function closeWorkout() {
+            if(confirm("Exit session?")) {
+                document.getElementById('workout-modal').classList.add('hidden');
+                clearInterval(session.timerInt);
+                if (restInt) clearInterval(restInt);
+            }
+        }
+
+        function saveData() { localStorage.setItem('fitLogicData_v3', JSON.stringify(state)); }
         function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
         function exportData() {
             const a = document.createElement('a');
@@ -375,7 +507,7 @@
             reader.onload = (e) => { state = JSON.parse(e.target.result); saveData(); location.reload(); };
             reader.readAsText(input.files[0]);
         }
-        function resetApp() { if(confirm("Delete all data?")) { localStorage.removeItem('fitLogicData_v2'); location.reload(); }}
+        function resetApp() { if(confirm("Reset data?")) { localStorage.removeItem('fitLogicData_v3'); location.reload(); }}
 
         init();
     </script>
