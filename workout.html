@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FitLogic | Smart Trainer</title>
+    
+    <link rel="icon" type="image/png" href="icon.png">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* APP THEME: Clean / Apple Health Style */
+        body { font-family: 'Inter', sans-serif; background-color: #F2F2F7; color: #1C1C1E; -webkit-tap-highlight-color: transparent; }
+        
+        /* Smooth Transitions */
+        .page-transition { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Card Styling */
+        .card { background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        
+        /* Progress Bar */
+        .progress-ring__circle { transition: stroke-dashoffset 0.35s; transform: rotate(-90deg); transform-origin: 50% 50%; }
+
+        /* Toggle Switch */
+        .toggle-checkbox:checked { right: 0; border-color: #34C759; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #34C759; }
+
+        /* Custom Scrollbar */
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="min-h-screen pb-24">
+
+    <div id="app-header" class="bg-white sticky top-0 z-30 px-6 py-4 shadow-sm flex justify-between items-center">
+        <div>
+            <h1 class="text-xl font-extrabold tracking-tight text-gray-900">FitLogic</h1>
+            <p class="text-xs text-gray-500 font-medium" id="currentDate">Today</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="flex items-center gap-1 bg-orange-100 px-3 py-1 rounded-full border border-orange-200">
+                <i class="fa-solid fa-fire text-orange-500 text-sm"></i>
+                <span id="streakDisplay" class="text-xs font-bold text-orange-700">0</span>
+            </div>
+            <div class="relative w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center border-2 border-white shadow-sm" onclick="toggleSettings()">
+                <span id="userLevel" class="text-xs font-bold text-blue-600">Lvl 1</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-container" class="p-6 space-y-6 max-w-lg mx-auto page-transition">
+
+        <div class="card p-5">
+            <div class="flex justify-between items-end mb-2">
+                <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wide">Weekly Goal</h2>
+                <span class="text-xs font-bold text-blue-500" id="workoutsCompleted">0 / 3 Workouts</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-3">
+                <div id="weeklyProgressBar" class="bg-blue-500 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <p class="text-[10px] text-gray-400 mt-2 text-center">Consistency is the key to science-based growth.</p>
+        </div>
+
+        <button onclick="generateWorkout()" class="w-full bg-black text-white rounded-2xl py-5 shadow-lg active:scale-95 transition-transform flex flex-col items-center justify-center gap-1">
+            <span class="text-lg font-bold"><i class="fa-solid fa-play mr-2"></i> Start Today's Workout</span>
+            <span class="text-xs text-gray-400 font-medium">Full Body • Smart Progression</span>
+        </button>
+
+        <div class="card p-5">
+            <div class="flex justify-between items-center cursor-pointer" onclick="document.getElementById('equip-options').classList.toggle('hidden')">
+                <h3 class="font-bold text-gray-800"><i class="fa-solid fa-dumbbell mr-2 text-purple-500"></i> My Equipment</h3>
+                <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
+            </div>
+            <div id="equip-options" class="hidden mt-4 space-y-3 pt-3 border-t border-gray-100">
+                <div id="equipmentList"></div>
+            </div>
+        </div>
+
+        <div>
+            <h3 class="text-sm font-bold text-gray-900 mb-3 ml-1">Recent Activity</h3>
+            <div id="historyLog" class="space-y-3">
+                <p class="text-center text-gray-400 text-xs py-4">No workouts yet. Let's get moving!</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="workout-modal" class="fixed inset-0 bg-white z-50 hidden flex flex-col">
+        
+        <div class="bg-white border-b border-gray-100 p-4 flex justify-between items-center shadow-sm z-10">
+            <button onclick="closeWorkout()" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h2 class="font-bold text-lg" id="workoutTitle">Full Body Session</h2>
+            <div class="text-xs font-mono bg-gray-100 px-2 py-1 rounded text-gray-600" id="sessionTimer">00:00</div>
+        </div>
+
+        <div id="workout-content" class="flex-1 overflow-y-auto p-6 space-y-6 pb-20">
+            </div>
+
+        <div class="p-4 border-t border-gray-100 bg-white/95 backdrop-blur">
+            <button onclick="finishWorkout()" class="w-full bg-green-500 text-white font-bold py-4 rounded-xl shadow-md active:scale-95 transition-transform">
+                Complete Workout <i class="fa-solid fa-check ml-2"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-end sm:items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl page-transition">
+            <h2 class="font-bold text-xl mb-4">Data & Settings</h2>
+            
+            <div class="space-y-3">
+                <button onclick="exportData()" class="w-full bg-blue-50 text-blue-600 font-bold py-3 rounded-lg border border-blue-100 text-sm">
+                    <i class="fa-solid fa-download mr-2"></i> Backup Data (Export)
+                </button>
+                
+                <label class="block w-full cursor-pointer">
+                    <div class="w-full bg-gray-50 text-gray-600 font-bold py-3 rounded-lg border border-gray-200 text-sm text-center hover:bg-gray-100">
+                        <i class="fa-solid fa-upload mr-2"></i> Restore Data (Import)
+                    </div>
+                    <input type="file" id="importFile" onchange="importData(this)" class="hidden" accept=".json">
+                </label>
+
+                <button onclick="resetApp()" class="w-full text-red-500 text-xs font-bold py-3">
+                    Factory Reset App
+                </button>
+            </div>
+
+            <button onclick="toggleSettings()" class="mt-6 w-full bg-gray-900 text-white font-bold py-3 rounded-lg">Close</button>
+        </div>
+    </div>
+
+    <div id="debug-console" class="hidden fixed bottom-0 left-0 w-full bg-red-900 text-white text-[10px] font-mono p-2 z-[60] h-24 overflow-auto opacity-90">
+        <div class="font-bold border-b border-white/20 mb-1 flex justify-between">
+            <span>DEBUG LOG</span>
+            <button onclick="document.getElementById('debug-console').classList.add('hidden')">X</button>
+        </div>
+        <div id="debug-text"></div>
+    </div>
+
+    <script>
+        // --- A. THE DATABASE (Science-Backed Exercises) ---
+        const muscleGroups = ['Chest', 'Back', 'Legs', 'Shoulders', 'Core', 'Arms'];
+        
+        // EXERCISE LIBRARY: Add YouTube links inside videoUrl: ""
+        const exerciseLibrary = [
+            // --- PUSH (Chest/Tris/Shoulders) ---
+            { id: 'pushup_knee', name: 'Knee Pushups', muscle: 'Chest', equipment: 'None', difficulty: 1, videoUrl: "", instructions: "Keep back straight, knees on floor. Lower chest to ground." },
+            { id: 'pushup_std', name: 'Standard Pushups', muscle: 'Chest', equipment: 'None', difficulty: 2, videoUrl: "", instructions: "Plank position. Elbows at 45 degrees. Chest to floor." },
+            { id: 'pushup_diamond', name: 'Diamond Pushups', muscle: 'Chest', equipment: 'None', difficulty: 3, videoUrl: "", instructions: "Hands close together forming a diamond. Targets triceps." },
+            { id: 'db_press', name: 'Dumbbell Floor Press', muscle: 'Chest', equipment: 'Dumbbells', difficulty: 2, videoUrl: "", instructions: "Lie on back, press weights up. Tap elbows to floor." },
+            { id: 'band_press', name: 'Resistance Band Press', muscle: 'Chest', equipment: 'Bands', difficulty: 2, videoUrl: "", instructions: "Wrap band behind back. Press forward." },
+            
+            // --- PULL (Back/Bic) ---
+            { id: 'superman', name: 'Supermans', muscle: 'Back', equipment: 'None', difficulty: 1, videoUrl: "", instructions: "Lie on stomach. Lift arms and legs simultaneously. Squeeze lower back." },
+            { id: 'door_pull', name: 'Doorframe Rows', muscle: 'Back', equipment: 'None', difficulty: 1, videoUrl: "", instructions: "Grab doorframe, lean back, pull chest to door." },
+            { id: 'db_row', name: 'One-Arm DB Row', muscle: 'Back', equipment: 'Dumbbells', difficulty: 2, videoUrl: "", instructions: "Hand on bench/chair. Pull weight to hip." },
+            { id: 'pullup_band', name: 'Assisted Pull-ups', muscle: 'Back', equipment: 'Pullup Bar', difficulty: 2, videoUrl: "", instructions: "Use band for support. Chin over bar." },
+            { id: 'pullup', name: 'Pull-ups', muscle: 'Back', equipment: 'Pullup Bar', difficulty: 3, videoUrl: "", instructions: "Strict form. Full lockout at bottom." },
+            
+            // --- LEGS ---
+            { id: 'squat_body', name: 'Bodyweight Squats', muscle: 'Legs', equipment: 'None', difficulty: 1, videoUrl: "", instructions: "Feet shoulder width. Hips back. Break parallel." },
+            { id: 'lunge', name: 'Walking Lunges', muscle: 'Legs', equipment: 'None', difficulty: 2, videoUrl: "", instructions: "Step forward, back knee almost touches ground." },
+            { id: 'goblet_squat', name: 'Goblet Squats', muscle: 'Legs', equipment: 'Dumbbells', difficulty: 3, videoUrl: "", instructions: "Hold weight at chest. Squat deep." },
+            { id: 'glute_bridge', name: 'Glute Bridges', muscle: 'Legs', equipment: 'None', difficulty: 1, videoUrl: "", instructions: "Lie on back, knees up. Drive hips to ceiling." },
+            
+            // --- CORE ---
+            { id: 'plank', name: 'Plank', muscle: 'Core', equipment: 'None', difficulty: 1, videoUrl: "", instructions: "Elbows under shoulders. Straight line head to heels." },
+            { id: 'leg_raise', name: 'Lying Leg Raises', muscle: 'Core', equipment: 'None', difficulty: 2, videoUrl: "", instructions: "Lie flat. Lift legs to 90 degrees. Lower slowly." }
+        ];
+
+        const warmups = {
+            'Upper': ['Arm Circles (30s)', 'Cat-Cow Stretch (30s)', 'Wall Slides (10 reps)'],
+            'Lower': ['Leg Swings (30s)', 'Bodyweight Squats (10 reps)', 'Hip Openers (30s)']
+        };
+
+        const cooldowns = {
+            'Upper': ['Chest Doorway Stretch (30s)', 'Childs Pose (30s)'],
+            'Lower': ['Hamstring Stretch (30s)', 'Quad Stretch (30s)']
+        };
+
+        // --- B. APP STATE ---
+        let state = {
+            user: {
+                level: 1,
+                xp: 0,
+                streak: 0,
+                lastWorkoutDate: null,
+                workoutsCompleted: 0
+            },
+            equipment: {
+                'None': true, // Always true
+                'Dumbbells': true,
+                'Bands': true,
+                'Pullup Bar': true,
+                'Barbell': true
+            },
+            history: [], // Stores past workouts
+            exerciseData: {} // Stores max reps/difficulty for each exercise ID
+        };
+
+        // --- C. INITIALIZATION & DATA MANAGEMENT ---
+        function init() {
+            try {
+                loadData();
+                renderDashboard();
+                renderEquipmentToggles();
+                updateDate();
+            } catch (e) { logError(e); }
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('fitLogicData');
+            if (saved) { state = JSON.parse(saved); }
+        }
+
+        function saveData() {
+            localStorage.setItem('fitLogicData', JSON.stringify(state));
+            renderDashboard();
+        }
+
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "workout_data.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        function importData(input) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    state = JSON.parse(e.target.result);
+                    saveData();
+                    alert("Data restored successfully!");
+                    location.reload();
+                } catch(err) { alert("Invalid file format."); }
+            };
+            reader.readAsText(file);
+        }
+
+        function logError(e) {
+            const debug = document.getElementById('debug-text');
+            const consoleDiv = document.getElementById('debug-console');
+            consoleDiv.classList.remove('hidden');
+            debug.innerHTML += `<div class="mb-1 text-red-200">> ${e.message} at line ${e.lineNumber || '?'}</div>`;
+            console.error(e);
+        }
+        window.onerror = function(msg, url, line) { logError({message: msg, lineNumber: line}); };
+
+        // --- D. RENDER FUNCTIONS ---
+        function updateDate() {
+            const options = { weekday: 'long', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').innerText = new Date().toLocaleDateString('en-US', options);
+        }
+
+        function renderDashboard() {
+            // Update Streak
+            document.getElementById('streakDisplay').innerText = state.user.streak;
+            // Update Level
+            document.getElementById('userLevel').innerText = "Lvl " + state.user.level;
+            
+            // Update Progress Bar (Simple weekly goal: 3 workouts)
+            // Reset weekly if monday? (Simplified for now: Just rolling last 7 days)
+            const count = state.user.workoutsCompleted % 4; // Reset every 4 for visuals
+            document.getElementById('workoutsCompleted').innerText = `${count} / 3 Workouts`;
+            document.getElementById('weeklyProgressBar').style.width = `${(count / 3) * 100}%`;
+
+            // Render History
+            const historyContainer = document.getElementById('historyLog');
+            historyContainer.innerHTML = '';
+            if (state.history.length === 0) {
+                historyContainer.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">No activity recorded.</p>';
+            } else {
+                state.history.slice(0, 5).forEach(log => { // Show last 5
+                    historyContainer.innerHTML += `
+                        <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-xs">
+                                    <i class="fa-solid fa-check"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-gray-800">${log.title}</p>
+                                    <p class="text-[10px] text-gray-400">${new Date(log.date).toLocaleDateString()}</p>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold text-blue-500">+${log.xp} XP</span>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function renderEquipmentToggles() {
+            const container = document.getElementById('equipmentList');
+            container.innerHTML = '';
+            Object.keys(state.equipment).forEach(item => {
+                if (item === 'None') return; // Cannot toggle 'None'
+                const isChecked = state.equipment[item] ? 'checked' : '';
+                container.innerHTML += `
+                    <label class="flex items-center justify-between p-2">
+                        <span class="text-sm text-gray-700 font-medium">${item}</span>
+                        <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                            <input type="checkbox" name="toggle" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300" ${isChecked} onchange="toggleEquipment('${item}')"/>
+                            <label class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
+                        </div>
+                    </label>
+                `;
+            });
+        }
+
+        function toggleEquipment(item) {
+            state.equipment[item] = !state.equipment[item];
+            saveData();
+        }
+
+        function toggleSettings() {
+            const el = document.getElementById('settings-modal');
+            el.classList.toggle('hidden');
+        }
+
+        // --- E. WORKOUT GENERATOR LOGIC ---
+        let currentSession = [];
+        let sessionStartTime = 0;
+        let timerInterval = null;
+
+        function generateWorkout() {
+            // 1. Filter Exercises based on Equipment
+            const availableExercises = exerciseLibrary.filter(ex => {
+                if (ex.equipment === 'None') return true;
+                return state.equipment[ex.equipment];
+            });
+
+            // 2. Select Exercises (Simple Full Body Logic: 1 Push, 1 Pull, 1 Leg, 1 Core)
+            // Logic: Find the HARDEST difficulty the user can handle based on history, or default to level 1
+            const plan = [];
+            
+            ['Chest', 'Back', 'Legs', 'Core'].forEach(muscle => {
+                const candidates = availableExercises.filter(e => e.muscle === muscle);
+                // Smart select: Pick one
+                if (candidates.length > 0) {
+                    // For now, random. Future: Sort by difficulty based on user level
+                    const random = candidates[Math.floor(Math.random() * candidates.length)];
+                    plan.push(random);
+                }
+            });
+
+            // 3. Build Session Object
+            currentSession = plan.map(ex => {
+                // Determine Reps based on past history
+                const pastData = state.exerciseData[ex.id] || { level: 1, reps: 10 }; 
+                return {
+                    ...ex,
+                    targetReps: pastData.reps,
+                    sets: 3,
+                    completed: false
+                };
+            });
+
+            startWorkoutUI();
+        }
+
+        function startWorkoutUI() {
+            document.getElementById('workout-modal').classList.remove('hidden');
+            sessionStartTime = Date.now();
+            
+            // Start Timer
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                const diff = Math.floor((Date.now() - sessionStartTime) / 1000);
+                const m = Math.floor(diff / 60).toString().padStart(2, '0');
+                const s = (diff % 60).toString().padStart(2, '0');
+                document.getElementById('sessionTimer').innerText = `${m}:${s}`;
+            }, 1000);
+
+            renderWorkoutContent();
+        }
+
+        function renderWorkoutContent() {
+            const container = document.getElementById('workout-content');
+            container.innerHTML = '';
+
+            // WARMUP SECTION
+            container.innerHTML += `<div class="mb-4"><h3 class="font-bold text-gray-800 text-sm mb-2">🔥 Warmup (Do 1 Round)</h3><div class="bg-orange-50 p-4 rounded-xl border border-orange-100 text-sm text-gray-700 space-y-1">${warmups['Upper'].map(w => `<div>• ${w}</div>`).join('')}</div></div>`;
+
+            // EXERCISES
+            currentSession.forEach((ex, index) => {
+                // Video Embed Logic
+                let videoHTML = '';
+                if (ex.videoUrl && ex.videoUrl.includes('http')) {
+                    videoHTML = `<div class="aspect-video w-full rounded-lg overflow-hidden bg-black mt-2 mb-2"><iframe class="w-full h-full" src="${ex.videoUrl}" frameborder="0" allowfullscreen></iframe></div>`;
+                } else {
+                    // Placeholder for when you add videos later
+                    videoHTML = `<div class="w-full h-24 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 text-xs mt-2 mb-2 italic border border-dashed border-gray-300">Video Placeholder (Edit Code to Add)</div>`;
+                }
+
+                container.innerHTML += `
+                    <div class="card p-5 mb-4 border-l-4 ${ex.completed ? 'border-green-500 opacity-50' : 'border-blue-500'}">
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-bold text-lg">${ex.name}</h3>
+                            <span class="text-xs bg-gray-100 px-2 py-1 rounded font-mono">${ex.sets} Sets x ${ex.targetReps} Reps</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1 mb-2">${ex.instructions}</p>
+                        
+                        ${videoHTML}
+
+                        <div class="mt-4 flex gap-2">
+                            <button onclick="rateExercise(${index}, 'hard')" class="flex-1 bg-red-50 text-red-600 py-2 rounded-lg text-xs font-bold border border-red-100 hover:bg-red-100">Too Hard</button>
+                            <button onclick="rateExercise(${index}, 'good')" class="flex-1 bg-green-50 text-green-600 py-2 rounded-lg text-xs font-bold border border-green-100 hover:bg-green-100">Just Right</button>
+                            <button onclick="rateExercise(${index}, 'easy')" class="flex-1 bg-blue-50 text-blue-600 py-2 rounded-lg text-xs font-bold border border-blue-100 hover:bg-blue-100">Too Easy</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // COOLDOWN SECTION
+            container.innerHTML += `<div class="mt-6"><h3 class="font-bold text-gray-800 text-sm mb-2">❄️ Cooldown & Stretch</h3><div class="bg-blue-50 p-4 rounded-xl border border-blue-100 text-sm text-gray-700 space-y-1">${cooldowns['Upper'].map(c => `<div>• ${c}</div>`).join('')}</div></div>`;
+        }
+
+        // --- F. PROGRESSION ALGORITHM ---
+        function rateExercise(index, rating) {
+            const ex = currentSession[index];
+            const exId = ex.id;
+            
+            // Mark visually complete
+            currentSession[index].completed = true;
+            
+            // Initialize data if new
+            if (!state.exerciseData[exId]) { state.exerciseData[exId] = { reps: 10, difficultyFactor: 1 }; }
+
+            // ALGORITHM: Adjust for NEXT time
+            if (rating === 'easy') {
+                // Increase reps by 2
+                state.exerciseData[exId].reps += 2;
+                alert(`Great job! Next time we'll do ${state.exerciseData[exId].reps} reps.`);
+            } else if (rating === 'hard') {
+                // Deload: Decrease reps by 2 (min 5)
+                state.exerciseData[exId].reps = Math.max(5, state.exerciseData[exId].reps - 2);
+                alert(`Noted. We'll drop to ${state.exerciseData[exId].reps} reps next time to focus on form.`);
+            } else {
+                // Keep same
+                // Small chance to add 1 rep just for progress
+            }
+
+            saveData();
+            renderWorkoutContent();
+        }
+
+        function closeWorkout() {
+            if (confirm("Exit workout? Progress will not be saved.")) {
+                document.getElementById('workout-modal').classList.add('hidden');
+                clearInterval(timerInterval);
+            }
+        }
+
+        function finishWorkout() {
+            // Check completion
+            const incomplete = currentSession.filter(e => !e.completed).length;
+            if (incomplete > 0) {
+                if(!confirm(`You have ${incomplete} exercises unchecked. Finish anyway?`)) return;
+            }
+
+            // GAMIFICATION
+            const xpGained = 100 + (currentSession.length * 10);
+            state.user.xp += xpGained;
+            state.user.workoutsCompleted++;
+            
+            // Streak Logic (Simple: If last workout was not today, add streak)
+            const today = new Date().toDateString();
+            if (state.user.lastWorkoutDate !== today) {
+                state.user.streak++;
+                state.user.lastWorkoutDate = today;
+            }
+
+            // Level Up Logic (Level = XP / 500)
+            const newLevel = Math.floor(state.user.xp / 500) + 1;
+            if (newLevel > state.user.level) {
+                alert(`LEVEL UP! You are now Level ${newLevel}!`);
+                state.user.level = newLevel;
+            }
+
+            // Save to History
+            state.history.unshift({
+                date: Date.now(),
+                title: 'Full Body Session',
+                xp: xpGained
+            });
+
+            saveData();
+            document.getElementById('workout-modal').classList.add('hidden');
+            clearInterval(timerInterval);
+            init(); // Re-render dash
+            alert(`Workout Complete! +${xpGained} XP`);
+        }
+        
+        function resetApp() {
+            if(confirm("Delete all data and reset app? This cannot be undone.")) {
+                localStorage.removeItem('fitLogicData');
+                location.reload();
+            }
+        }
+
+        // Run
+        init();
+
+    </script>
+</body>
+</html>
