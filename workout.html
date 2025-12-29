@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="FitLogic">
     
-    <title>FitLogic 8.0 | Adaptive</title>
+    <title>FitLogic 9.0 | Holistic</title>
     
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
@@ -16,7 +16,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
@@ -26,16 +25,12 @@
         .card { background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
         .muscle-btn.selected { background-color: #007AFF; color: white; border-color: #007AFF; }
         .progress-bar { transition: width 0.5s ease-in-out; }
-        
         details > summary { list-style: none; }
         details > summary::-webkit-details-marker { display: none; }
         details[open] summary ~ * { animation: sweep .3s ease-in-out; }
         @keyframes sweep { 0% {opacity: 0; transform: translateY(-10px)} 100% {opacity: 1; transform: translateY(0)} }
-        
         .toggle-checkbox:checked { right: 0; border-color: #34C759; }
         .toggle-checkbox:checked + .toggle-label { background-color: #34C759; }
-
-        /* iOS Safe Area Padding */
         .safe-pb { padding-bottom: env(safe-area-inset-bottom); }
     </style>
 </head>
@@ -43,7 +38,7 @@
 
     <div id="app-header" class="bg-white/90 backdrop-blur sticky top-0 z-30 px-6 py-4 pt-12 shadow-sm flex justify-between items-center">
         <div>
-            <h1 class="text-xl font-extrabold tracking-tight text-gray-900">FitLogic <span class="text-blue-600">8.0</span></h1>
+            <h1 class="text-xl font-extrabold tracking-tight text-gray-900">FitLogic <span class="text-blue-600">9.0</span></h1>
             <p class="text-xs text-gray-500 font-medium" id="currentDate">Today</p>
         </div>
         <div class="flex items-center gap-3">
@@ -57,18 +52,41 @@
         </div>
     </div>
 
-    <div id="main-container" class="p-6 space-y-8 max-w-lg mx-auto page-transition">
+    <div id="main-container" class="p-6 space-y-6 max-w-lg mx-auto page-transition">
+
+        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-4 text-white shadow-lg relative overflow-hidden">
+            <div class="relative z-10">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="bg-white/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Tip of the Day</span>
+                </div>
+                <p class="text-sm font-medium leading-relaxed" id="dailyTipText">Loading tip...</p>
+            </div>
+            <i class="fa-solid fa-lightbulb absolute -bottom-4 -right-2 text-8xl text-white/10 rotate-12"></i>
+        </div>
+
+        <div>
+            <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wide mb-2">Daily Habits (5 Mins)</h3>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="startRoutine('morning')" class="card p-4 flex flex-col items-center justify-center gap-2 hover:bg-yellow-50 transition-colors border-b-4 border-yellow-400">
+                    <i class="fa-solid fa-sun text-2xl text-yellow-500"></i>
+                    <span class="text-xs font-bold text-gray-800">Morning Flow</span>
+                </button>
+                <button onclick="startRoutine('night')" class="card p-4 flex flex-col items-center justify-center gap-2 hover:bg-indigo-50 transition-colors border-b-4 border-indigo-400">
+                    <i class="fa-solid fa-moon text-2xl text-indigo-500"></i>
+                    <span class="text-xs font-bold text-gray-800">Sleep Stretch</span>
+                </button>
+            </div>
+        </div>
 
         <div id="active-plan-card" class="hidden">
             <div class="flex justify-between items-center mb-2">
                 <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wide">My Active Plan</h3>
                 <button onclick="quitPlan()" class="text-[10px] text-red-400 font-bold hover:text-red-600">Quit Plan</button>
             </div>
-            
             <div class="card p-5 border-2 border-blue-500/20 bg-blue-50/50 relative overflow-hidden">
                 <div class="relative z-10">
                     <h2 class="text-xl font-extrabold text-gray-900" id="planNameDisplay">Chest Builder</h2>
-                    <p class="text-xs text-blue-600 font-bold mt-1 mb-4" id="planProgressText">Workout 3 of 12 (Week 1)</p>
+                    <p class="text-xs text-blue-600 font-bold mt-1 mb-4" id="planProgressText">Workout 3 of 12</p>
                     <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4">
                         <div id="planProgressBar" class="bg-blue-600 h-2.5 rounded-full progress-bar" style="width: 0%"></div>
                     </div>
@@ -84,20 +102,12 @@
             <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wide mb-2">Available Plans (4 Weeks)</h3>
             <div class="space-y-3">
                 <div class="card p-4 flex justify-between items-center">
-                    <div><h4 class="font-bold text-gray-900">Full Body Alpha</h4><p class="text-xs text-gray-500">3x/Week • Strength & Size</p></div>
+                    <div><h4 class="font-bold text-gray-900">Full Body Alpha</h4><p class="text-xs text-gray-500">3x/Week • Strength</p></div>
                     <button onclick="startPlan('plan_full_body', 'Full Body Alpha')" class="bg-black text-white px-4 py-2 rounded-lg text-xs font-bold active:scale-95">Start</button>
                 </div>
                 <div class="card p-4 flex justify-between items-center">
-                    <div><h4 class="font-bold text-gray-900">Chest & Tri Builder</h4><p class="text-xs text-gray-500">3x/Week • Upper Body Focus</p></div>
-                    <button onclick="startPlan('plan_chest', 'Chest & Tri Builder')" class="bg-black text-white px-4 py-2 rounded-lg text-xs font-bold active:scale-95">Start</button>
-                </div>
-                <div class="card p-4 flex justify-between items-center">
-                    <div><h4 class="font-bold text-gray-900">Thick Thighs</h4><p class="text-xs text-gray-500">3x/Week • Glutes & Quads</p></div>
+                    <div><h4 class="font-bold text-gray-900">Thick Thighs</h4><p class="text-xs text-gray-500">3x/Week • Legs</p></div>
                     <button onclick="startPlan('plan_lower_mass', 'Thick Thighs')" class="bg-black text-white px-4 py-2 rounded-lg text-xs font-bold active:scale-95">Start</button>
-                </div>
-                <div class="card p-4 flex justify-between items-center">
-                    <div><h4 class="font-bold text-gray-900">Abs & Core</h4><p class="text-xs text-gray-500">3x/Week • Definition</p></div>
-                    <button onclick="startPlan('plan_abs', 'Abs & Core')" class="bg-black text-white px-4 py-2 rounded-lg text-xs font-bold active:scale-95">Start</button>
                 </div>
             </div>
         </div>
@@ -106,7 +116,7 @@
 
         <div>
             <div class="flex justify-between items-center mb-2">
-                <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wide">Freestyle / Quick Workout</h3>
+                <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wide">Freestyle</h3>
                 <button onclick="document.getElementById('freestyle-opts').classList.toggle('hidden')" class="text-xs text-blue-500 font-bold">Show Options</button>
             </div>
             
@@ -116,7 +126,6 @@
                     <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
                 </div>
                 <div id="equip-options" class="hidden grid grid-cols-2 gap-2 pt-2 border-t border-gray-100"></div>
-
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Duration</label>
                     <select id="durationSelector" class="w-full bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg p-2.5">
@@ -125,7 +134,6 @@
                         <option value="30">30 Mins</option>
                     </select>
                 </div>
-
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Targets</label>
                     <div class="grid grid-cols-3 gap-2" id="muscle-selector">
@@ -140,7 +148,7 @@
             </div>
 
             <button onclick="generateWorkout('freestyle')" class="w-full bg-white border-2 border-gray-200 text-gray-700 rounded-2xl py-4 font-bold shadow-sm active:scale-95 transition-transform">
-                <i class="fa-solid fa-shuffle mr-2"></i> Generate Random Workout
+                <i class="fa-solid fa-shuffle mr-2"></i> Random Workout
             </button>
         </div>
         
@@ -156,22 +164,10 @@
             </div>
             <div class="text-xs font-mono bg-gray-100 px-2 py-1 rounded text-gray-600" id="sessionTimer">00:00</div>
         </div>
-
         <div id="workout-content" class="flex-1 overflow-y-auto p-6 space-y-6 pb-40 bg-gray-50"></div>
-
-        <div id="circuit-controls" class="hidden absolute bottom-0 w-full bg-white border-t border-gray-200 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] safe-pb">
-            <div class="flex justify-between items-center mb-2">
-                <span class="text-xs font-bold text-gray-500" id="round-tracker">Round 1/3</span>
-                <span class="text-xs font-bold text-blue-500">Next: Rest</span>
-            </div>
-            <button onclick="completeRound()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-md active:scale-95 transition-transform">
-                Finish Round & Rest <i class="fa-solid fa-stopwatch ml-2"></i>
-            </button>
-        </div>
-        
-        <div id="standard-controls" class="absolute bottom-0 w-full bg-white border-t border-gray-200 p-4 hidden safe-pb">
+        <div class="absolute bottom-0 w-full bg-white border-t border-gray-200 p-4 safe-pb">
              <button onclick="finishWorkout()" class="w-full bg-green-500 text-white font-bold py-4 rounded-xl shadow-md active:scale-95 transition-transform">
-                Finish Workout <i class="fa-solid fa-check ml-2"></i>
+                Finish <i class="fa-solid fa-check ml-2"></i>
             </button>
         </div>
     </div>
@@ -208,89 +204,93 @@
     </div>
 
     <script>
-        // --- DATA & EXERCISES ---
+        // --- DATA & TIPS ---
+        const dailyTips = [
+            "Drink 16oz of water immediately upon waking to kickstart metabolism.",
+            "Eat 20-30g of protein within 2 hours of training to repair muscle.",
+            "Sleep is when muscles grow. Aim for 7-8 hours tonight.",
+            "Creatine Monohydrate is the most researched supplement for strength.",
+            "Reduce liquid sugar (soda/juice) to cut empty calories easily.",
+            "Dynamic stretching before workouts; Static stretching after.",
+            "Consistency > Intensity. A bad workout is better than no workout.",
+            "Magnesium before bed can improve sleep quality and recovery.",
+            "Feeling weak? You might be dehydrated. Drink water + pinch of salt.",
+            "Tracking your lifts is the only way to ensure Progressive Overload."
+        ];
+
         const exerciseLibrary = [
-            { id: 'pushup_std', name: 'Standard Pushups', muscle: 'Chest', equipment: 'None', howTo: 'Plank position. Hands shoulder width. Lower chest to floor.', benefit: 'Builds mass and core stability.', videoUrl: "" },
-            { id: 'db_press', name: 'Dumbbell Floor Press', muscle: 'Chest', equipment: 'Dumbbells', howTo: 'Lie on back. Press weights up over chest. Tap elbows to floor.', benefit: 'Heavy loading without shoulder strain.', videoUrl: "" },
-            { id: 'band_fly', name: 'Band Flys', muscle: 'Chest', equipment: 'Bands', howTo: 'Anchor band behind you. Hug a tree motion.', benefit: 'Isolates chest squeeze.', videoUrl: "" },
-            { id: 'db_fly', name: 'Dumbbell Flys', muscle: 'Chest', equipment: 'Dumbbells', howTo: 'Lie on floor/bench. Open arms wide, squeeze back together.', benefit: 'Targets outer pec fibers.', videoUrl: "" },
-            { id: 'pushup_wide', name: 'Wide Pushups', muscle: 'Chest', equipment: 'None', howTo: 'Hands wider than shoulders. Lower chest to floor.', benefit: 'Shifts focus to outer chest.', videoUrl: "" },
-            { id: 'pullup', name: 'Pull-ups', muscle: 'Back', equipment: 'Pullup Bar', howTo: 'Hang from bar. Pull chin over bar. Lower fully.', benefit: 'King of back exercises (V-taper).', videoUrl: "" },
-            { id: 'db_row', name: 'One-Arm DB Row', muscle: 'Back', equipment: 'Dumbbells', howTo: 'Hand on chair. Pull weight to hip, keeping back flat.', benefit: 'Thickens mid-back.', videoUrl: "" },
-            { id: 'band_row', name: 'Seated Band Row', muscle: 'Back', equipment: 'Bands', howTo: 'Sit legs straight. Loop band around feet. Pull to waist.', benefit: 'Improves posture/rhomboids.', videoUrl: "" },
-            { id: 'superman', name: 'Supermans', muscle: 'Back', equipment: 'None', howTo: 'Lie on stomach. Lift arms/legs. Squeeze glutes/back.', benefit: 'Lower back health.', videoUrl: "" },
-            { id: 'goblet_squat', name: 'Goblet Squats', muscle: 'Legs', equipment: 'Dumbbells', howTo: 'Hold weight at chest. Squat deep.', benefit: 'Adds load + core stability.', videoUrl: "" },
-            { id: 'rdl_db', name: 'Dumbbell RDL', muscle: 'Legs', equipment: 'Dumbbells', howTo: 'Hold weights. Hinge hips back. Slight knee bend.', benefit: 'Hamstring & Glute builder.', videoUrl: "" },
-            { id: 'bulgarian', name: 'Bulgarian Split Squat', muscle: 'Legs', equipment: 'Dumbbells', howTo: 'One foot on chair behind you. Squat with front leg.', benefit: 'Massive quad/glute growth.', videoUrl: "" },
-            { id: 'squat_jump', name: 'Jump Squats', muscle: 'Legs', equipment: 'None', howTo: 'Squat down, explode up into a jump.', benefit: 'Explosive power and high calorie burn.', videoUrl: "" },
-            { id: 'lunge_walk', name: 'Walking Lunges', muscle: 'Legs', equipment: 'None', howTo: 'Step forward, drop back knee. Alternate legs.', benefit: 'Dynamic balance and glutes.', videoUrl: "" },
-            { id: 'glute_bridge', name: 'Glute Bridges', muscle: 'Legs', equipment: 'None', howTo: 'Lie on back, knees up. Drive hips to ceiling.', benefit: 'Isolates glutes.', videoUrl: "" },
-            { id: 'pike_pushup', name: 'Pike Pushups', muscle: 'Shoulders', equipment: 'None', howTo: 'Downward dog position. Lower head to floor. Press up.', benefit: 'Overhead press with bodyweight.', videoUrl: "" },
-            { id: 'lat_raise', name: 'DB Lateral Raise', muscle: 'Shoulders', equipment: 'Dumbbells', howTo: 'Stand. Lift weights to side until shoulder height.', benefit: 'Side delts for width.', videoUrl: "" },
-            { id: 'ohp_db', name: 'Seated DB Press', muscle: 'Shoulders', equipment: 'Dumbbells', howTo: 'Sit down. Press weights from shoulder to overhead.', benefit: 'Overall shoulder mass.', videoUrl: "" },
-            { id: 'dip_chair', name: 'Chair Dips', muscle: 'Arms', equipment: 'None', howTo: 'Hands on chair behind you. Lower hips. Press up.', benefit: 'Tricep mass.', videoUrl: "" },
-            { id: 'tri_kickback', name: 'Tricep Kickbacks', muscle: 'Arms', equipment: 'Dumbbells', howTo: 'Lean forward. Extend arm back. Squeeze tricep.', benefit: 'Tones back of arm.', videoUrl: "" },
-            { id: 'pushup_diamond', name: 'Diamond Pushups', muscle: 'Arms', equipment: 'None', howTo: 'Hands form diamond shape. Lower chest.', benefit: 'Heavy tricep load.', videoUrl: "" },
-            { id: 'curl_db', name: 'Dumbbell Curls', muscle: 'Arms', equipment: 'Dumbbells', howTo: 'Stand. Curl weight to shoulder. Squeeze.', benefit: 'Bicep peak.', videoUrl: "" },
-            { id: 'curl_hammer', name: 'Hammer Curls', muscle: 'Arms', equipment: 'Dumbbells', howTo: 'Curl with palms facing each other.', benefit: 'Forearms and biceps width.', videoUrl: "" },
-            { id: 'plank', name: 'Plank', muscle: 'Core', equipment: 'None', howTo: 'Elbows under shoulders. Body straight. Hold.', benefit: 'Total core stability.', videoUrl: "" },
-            { id: 'leg_raise', name: 'Leg Raises', muscle: 'Core', equipment: 'None', howTo: 'Lie flat. Lift legs to 90 degrees. Lower slowly.', benefit: 'Lower abs.', videoUrl: "" },
-            { id: 'mountain_climber', name: 'Mountain Climbers', muscle: 'Core', equipment: 'None', howTo: 'Plank position. Run knees to chest fast.', benefit: 'Core cardio burn.', videoUrl: "" },
-            { id: 'r_twist', name: 'Russian Twists', muscle: 'Core', equipment: 'None', howTo: 'Sit. Lean back slightly. Twist torso left to right.', benefit: 'Obliques (side abs).', videoUrl: "" }
+            // Standard Library
+            { id: 'pushup_std', name: 'Standard Pushups', muscle: 'Chest', equipment: 'None', howTo: 'Plank position. Lower chest to floor.', benefit: 'Builds mass and core stability.', videoUrl: "" },
+            { id: 'db_press', name: 'Dumbbell Floor Press', muscle: 'Chest', equipment: 'Dumbbells', howTo: 'Lie on back. Press weights up.', benefit: 'Heavy loading safely.', videoUrl: "" },
+            { id: 'pullup', name: 'Pull-ups', muscle: 'Back', equipment: 'Pullup Bar', howTo: 'Chin over bar.', benefit: 'V-taper builder.', videoUrl: "" },
+            { id: 'db_row', name: 'DB Row', muscle: 'Back', equipment: 'Dumbbells', howTo: 'Hand on chair. Pull weight to hip.', benefit: 'Thickens mid-back.', videoUrl: "" },
+            { id: 'goblet_squat', name: 'Goblet Squats', muscle: 'Legs', equipment: 'Dumbbells', howTo: 'Hold weight at chest. Squat deep.', benefit: 'Legs & Core.', videoUrl: "" },
+            { id: 'squat_jump', name: 'Jump Squats', muscle: 'Legs', equipment: 'None', howTo: 'Squat and explode up.', benefit: 'Power & Cardio.', videoUrl: "" },
+            { id: 'plank', name: 'Plank', muscle: 'Core', equipment: 'None', howTo: 'Elbows under shoulders. Hold.', benefit: 'Core stability.', videoUrl: "" },
+            { id: 'leg_raise', name: 'Leg Raises', muscle: 'Core', equipment: 'None', howTo: 'Lie flat. Lift legs.', benefit: 'Lower abs.', videoUrl: "" },
+            // NEW Mobility/Stretch Moves
+            { id: 'neck_roll', name: 'Neck Rolls', muscle: 'Neck', equipment: 'None', howTo: 'Slowly roll head in circles. 30s each way.', benefit: 'Relieves desk tension.', videoUrl: "" },
+            { id: 'cat_cow', name: 'Cat-Cow', muscle: 'Back', equipment: 'None', howTo: 'Hands/knees. Arch back up, then sink belly down.', benefit: 'Spine mobility.', videoUrl: "" },
+            { id: 'child_pose', name: 'Childs Pose', muscle: 'Back', equipment: 'None', howTo: 'Kneel, sit on heels, reach arms forward.', benefit: 'Decompresses spine.', videoUrl: "" },
+            { id: 'butterfly', name: 'Butterfly Stretch', muscle: 'Legs', equipment: 'None', howTo: 'Sit. Feet together. Push knees down.', benefit: 'Opens hips.', videoUrl: "" },
+            { id: 'thoracic_twist', name: 'Thoracic Twists', muscle: 'Back', equipment: 'None', howTo: 'Hands/knees. Reach one arm to sky, look up.', benefit: 'Upper back mobility.', videoUrl: "" },
+            { id: 'forward_fold', name: 'Forward Fold', muscle: 'Legs', equipment: 'None', howTo: 'Stand. Reach for toes. Relax neck.', benefit: 'Hamstring release.', videoUrl: "" }
         ];
 
         const staticPlans = {
-            'plan_full_body': ['squat_jump', 'pushup_std', 'pullup', 'rdl_db', 'plank'],
-            'plan_upper': ['pushup_wide', 'db_row', 'ohp_db', 'curl_db', 'dip_chair'],
-            'plan_lower_mass': ['goblet_squat', 'rdl_db', 'bulgarian', 'glute_bridge'],
-            'plan_lower_cut': ['squat_jump', 'lunge_walk', 'glute_bridge', 'mountain_climber'],
-            'plan_chest': ['db_press', 'pushup_std', 'db_fly', 'band_fly', 'pushup_diamond'],
-            'plan_abs': ['leg_raise', 'plank', 'r_twist', 'mountain_climber', 'superman']
+            'plan_full_body': ['squat_jump', 'pushup_std', 'pullup', 'plank'],
+            'plan_lower_mass': ['goblet_squat', 'squat_jump', 'plank']
         };
 
-        const stretches = {
-            'Chest': { name: 'Doorway Stretch', how: 'Place forearm on doorframe. Lean forward.', why: 'Prevents rounded shoulders/slouching.' },
-            'Back': { name: 'Childs Pose', how: 'Kneel, sit on heels, reach arms forward on floor.', why: 'Decompresses the spine.' },
-            'Legs': { name: 'Standing Quad Stretch', how: 'Stand on one leg, pull heel to butt. Hold.', why: 'Loosens tight quads from sitting.' },
-            'Shoulders': { name: 'Cross Body Stretch', how: 'Pull one arm across chest with other arm.', why: 'Relaxes rear delts.' },
-            'Arms': { name: 'Overhead Tricep Stretch', how: 'Reach hand down back, push elbow down.', why: 'Increases overhead mobility.' },
-            'Core': { name: 'Cobra Stretch', how: 'Lie on stomach, press chest up with hands.', why: 'Stretches abdominal wall.' }
+        const routineFlows = {
+            'morning': ['neck_roll', 'cat_cow', 'thoracic_twist', 'squat_jump'],
+            'night': ['child_pose', 'butterfly', 'forward_fold', 'neck_roll']
         };
 
-        // --- STATE & AUDIO ---
+        // --- STATE ---
         let state = {
             user: { level: 1, xp: 0, streak: 0, audioOn: true },
             activePlan: { id: null, name: null, progress: 0, total: 12 },
-            equipment: { 'Dumbbells': true, 'Bands': true, 'Pullup Bar': true, 'Barbell': false },
+            equipment: { 'Dumbbells': true, 'Pullup Bar': true },
             exerciseData: {},
             history: []
         };
-        let session = { exercises: [], isPlan: false, startTime: 0, timerInt: null };
+        let session = { exercises: [], isPlan: false, timerInt: null };
         let selectedMuscles = [];
         let audioCtx = null;
         let wakeLock = null;
 
         function init() {
-            const saved = localStorage.getItem('fitLogicData_v8');
+            const saved = localStorage.getItem('fitLogicData_v9');
             if (saved) state = JSON.parse(saved);
             updateDashboard();
             renderEquipmentToggles();
+            renderTip();
             updateAudioBtn();
         }
 
-        // --- WAKE LOCK (Keep screen on) ---
-        async function requestWakeLock() {
-            try {
-                if ('wakeLock' in navigator) {
-                    wakeLock = await navigator.wakeLock.request('screen');
-                }
-            } catch (err) { console.log(err); }
-        }
-        async function releaseWakeLock() {
-            if (wakeLock !== null) { await wakeLock.release(); wakeLock = null; }
+        // --- FEATURES ---
+        function renderTip() {
+            // Pick tip based on day of year so it rotates daily for everyone
+            const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+            const tip = dailyTips[dayOfYear % dailyTips.length];
+            document.getElementById('dailyTipText').innerText = tip;
         }
 
-        // --- AUDIO ENGINE ---
+        function startRoutine(type) {
+            const flow = routineFlows[type];
+            session.exercises = flow.map(id => {
+                const ex = exerciseLibrary.find(e => e.id === id);
+                return { ...ex, targetReps: "1 Set", targetRest: 10, sets: 1, completedSets: 0 };
+            });
+            session.isPlan = false;
+            startWorkoutUI(`${type === 'morning' ? 'Morning' : 'Night'} Flow`);
+        }
+
+        // --- STANDARD LOGIC ---
+        function requestWakeLock() { if ('wakeLock' in navigator) navigator.wakeLock.request('screen').then(w => wakeLock = w).catch(() => {}); }
+        function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
+        
         function playBeep(freq, type) {
             if (!state.user.audioOn) return;
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -304,126 +304,75 @@
             osc.start();
             osc.stop(audioCtx.currentTime + 0.1);
         }
-        function toggleAudio() {
-            state.user.audioOn = !state.user.audioOn;
-            updateAudioBtn();
-            saveData();
-            // Init audio context on user click to unlock browser policy
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        function updateAudioBtn() {
-            const btn = document.getElementById('audioBtn');
-            btn.innerHTML = state.user.audioOn ? '<i class="fa-solid fa-volume-high"></i> Sound On' : '<i class="fa-solid fa-volume-xmark"></i> Sound Off';
-        }
+        function toggleAudio() { state.user.audioOn = !state.user.audioOn; updateAudioBtn(); saveData(); if(!audioCtx) audioCtx = new AudioContext(); }
+        function updateAudioBtn() { document.getElementById('audioBtn').innerHTML = state.user.audioOn ? '<i class="fa-solid fa-volume-high"></i> Sound On' : '<i class="fa-solid fa-volume-xmark"></i> Sound Off'; }
 
         function updateDashboard() {
             document.getElementById('streakDisplay').innerText = state.user.streak;
             document.getElementById('userLevel').innerText = "Lvl " + state.user.level;
-
             const planCard = document.getElementById('active-plan-card');
             const planLib = document.getElementById('plan-library');
-            
             if (state.activePlan && state.activePlan.id) {
-                planCard.classList.remove('hidden');
-                planLib.classList.add('hidden');
+                planCard.classList.remove('hidden'); planLib.classList.add('hidden');
                 document.getElementById('planNameDisplay').innerText = state.activePlan.name;
-                const week = Math.floor(state.activePlan.progress / 3) + 1;
-                document.getElementById('planProgressText').innerText = `Workout ${state.activePlan.progress + 1} of ${state.activePlan.total} (Week ${week})`;
-                const pct = (state.activePlan.progress / state.activePlan.total) * 100;
-                document.getElementById('planProgressBar').style.width = `${pct}%`;
+                document.getElementById('planProgressText').innerText = `Workout ${state.activePlan.progress + 1} of ${state.activePlan.total}`;
+                document.getElementById('planProgressBar').style.width = `${(state.activePlan.progress / state.activePlan.total) * 100}%`;
             } else {
-                planCard.classList.add('hidden');
-                planLib.classList.remove('hidden');
+                planCard.classList.add('hidden'); planLib.classList.remove('hidden');
             }
-
             const histEl = document.getElementById('historyLog');
             histEl.innerHTML = state.history.length ? '' : '<p class="text-center text-gray-400 text-xs py-4">No workouts yet.</p>';
             state.history.slice(0, 3).forEach(log => {
-                histEl.innerHTML += `
-                    <div class="flex justify-between items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
-                        <div><p class="text-sm font-bold">${log.title}</p><p class="text-[10px] text-gray-400">${new Date(log.date).toLocaleDateString()}</p></div>
-                        <span class="text-xs font-bold text-blue-500">+${log.xp} XP</span>
-                    </div>`;
+                histEl.innerHTML += `<div class="flex justify-between items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm"><div><p class="text-sm font-bold">${log.title}</p><p class="text-[10px] text-gray-400">${new Date(log.date).toLocaleDateString()}</p></div><span class="text-xs font-bold text-blue-500">+${log.xp} XP</span></div>`;
             });
         }
 
         function renderEquipmentToggles() {
-            const container = document.getElementById('equip-options');
-            container.innerHTML = '';
+            const container = document.getElementById('equip-options'); container.innerHTML = '';
             Object.keys(state.equipment).forEach(item => {
-                container.innerHTML += `
-                    <label class="flex items-center justify-between p-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 border border-gray-200">
-                        <span class="text-xs font-bold text-gray-700">${item}</span>
-                        <input type="checkbox" class="accent-blue-500 w-4 h-4" ${state.equipment[item] ? 'checked' : ''} onchange="toggleEquipment('${item}')">
-                    </label>`;
+                container.innerHTML += `<label class="flex items-center justify-between p-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 border border-gray-200"><span class="text-xs font-bold text-gray-700">${item}</span><input type="checkbox" class="accent-blue-500 w-4 h-4" ${state.equipment[item] ? 'checked' : ''} onchange="toggleEquipment('${item}')"></label>`;
             });
         }
         function toggleEquipment(item) { state.equipment[item] = !state.equipment[item]; saveData(); }
         function toggleMuscle(btn, muscle) {
             btn.classList.toggle('selected');
-            if (selectedMuscles.includes(muscle)) selectedMuscles = selectedMuscles.filter(m => m !== muscle);
-            else selectedMuscles.push(muscle);
+            if (selectedMuscles.includes(muscle)) selectedMuscles = selectedMuscles.filter(m => m !== muscle); else selectedMuscles.push(muscle);
         }
 
-        function startPlan(id, name) {
-            if(confirm(`Start "${name}" plan? This will run for 4 weeks (12 workouts).`)) {
-                state.activePlan = { id: id, name: name, progress: 0, total: 12 };
-                saveData();
-                updateDashboard();
-            }
-        }
-        function quitPlan() {
-            if(confirm("Quit current plan? Progress will be lost.")) {
-                state.activePlan = { id: null, name: null, progress: 0, total: 0 };
-                saveData();
-                updateDashboard();
-            }
-        }
+        function startPlan(id, name) { if(confirm(`Start "${name}" plan?`)) { state.activePlan = { id: id, name: name, progress: 0, total: 12 }; saveData(); updateDashboard(); }}
+        function quitPlan() { if(confirm("Quit plan?")) { state.activePlan = { id: null, name: null, progress: 0, total: 0 }; saveData(); updateDashboard(); }}
 
         function generateWorkout(mode) {
             let selectedList = [];
             session.isPlan = (mode === 'plan');
-            
             if (session.isPlan) {
                 const planIds = staticPlans[state.activePlan.id];
                 planIds.forEach(id => {
                     const ex = exerciseLibrary.find(e => e.id === id);
-                    if (ex) {
-                        if (ex.equipment !== 'None' && !state.equipment[ex.equipment]) {
-                            const sub = exerciseLibrary.find(s => s.muscle === ex.muscle && (s.equipment === 'None' || state.equipment[s.equipment]));
-                            selectedList.push(sub ? sub : ex);
-                        } else { selectedList.push(ex); }
-                    }
+                    if(ex) selectedList.push(ex);
                 });
             } else {
-                const duration = parseInt(document.getElementById('durationSelector').value);
-                const targets = selectedMuscles.length > 0 ? selectedMuscles : ['Chest', 'Back', 'Legs', 'Shoulders', 'Core', 'Arms'];
-                let pool = exerciseLibrary.filter(ex => targets.includes(ex.muscle) && (ex.equipment === 'None' || state.equipment[ex.equipment]));
-                const numExercises = Math.max(2, Math.floor(duration / 5));
-                for (let i = 0; i < numExercises; i++) {
+                const targets = selectedMuscles.length > 0 ? selectedMuscles : ['Chest', 'Back', 'Legs', 'Core'];
+                let pool = exerciseLibrary.filter(ex => targets.includes(ex.muscle));
+                const num = 4; // Simple count for freestyle
+                for (let i = 0; i < num; i++) {
                     if (pool.length === 0) break;
                     const idx = Math.floor(Math.random() * pool.length);
-                    selectedList.push(pool[idx]);
-                    pool.splice(idx, 1); 
+                    selectedList.push(pool[idx]); pool.splice(idx, 1);
                 }
             }
-
             if (selectedList.length === 0) { alert("No exercises found!"); return; }
-
             session.exercises = selectedList.map(ex => {
                 const hist = state.exerciseData[ex.id] || { reps: 10, rest: 45 };
-                // Ensure legacy data gets updated
-                if (hist.rest === undefined) hist.rest = 45;
                 return { ...ex, targetReps: hist.reps, targetRest: hist.rest, sets: 3, completedSets: 0 };
             });
-            session.startTime = Date.now();
-            startWorkoutUI();
+            startWorkoutUI(session.isPlan ? state.activePlan.name : "Freestyle Session");
         }
 
-        function startWorkoutUI() {
+        function startWorkoutUI(title) {
             requestWakeLock();
             document.getElementById('workout-modal').classList.remove('hidden');
-            document.getElementById('workoutTitle').innerText = session.isPlan ? state.activePlan.name : "Freestyle Session";
+            document.getElementById('workoutTitle').innerText = title;
             if (session.timerInt) clearInterval(session.timerInt);
             let sec = 0;
             session.timerInt = setInterval(() => {
@@ -436,134 +385,50 @@
         }
 
         function renderExercises() {
-            const container = document.getElementById('workout-content');
-            container.innerHTML = '';
-            
-            // WARMUP
-            const uniqueMuscles = [...new Set(session.exercises.map(ex => ex.muscle))];
-            let wHTML = `<details class="bg-orange-50 p-3 rounded-xl border border-orange-100 mb-4 cursor-pointer">
-                <summary class="font-bold text-orange-800 text-sm flex justify-between">Warmup Stretches <i class="fa-solid fa-chevron-down"></i></summary>
-                <div class="mt-2 space-y-2">`;
-            uniqueMuscles.forEach(m => {
-                if(stretches[m]) wHTML += `<div class="bg-white p-2 rounded text-xs border border-orange-200">
-                    <span class="font-bold text-orange-900">${stretches[m].name}</span><br>
-                    <span class="font-semibold text-gray-700">How:</span> ${stretches[m].how}<br>
-                    <span class="italic text-gray-500">Why:</span> ${stretches[m].why}
-                </div>`;
-            });
-            wHTML += `</div></details>`;
-            container.innerHTML += wHTML;
-
+            const container = document.getElementById('workout-content'); container.innerHTML = '';
             session.exercises.forEach((ex, idx) => {
-                const videoBlock = ex.videoUrl ? 
-                    `<iframe class="w-full h-40 rounded-lg mt-2" src="${ex.videoUrl}" frameborder="0" allowfullscreen></iframe>` : 
-                    `<div class="w-full h-24 bg-gray-100 rounded-lg mt-2 flex items-center justify-center text-xs text-gray-400 italic">Video Placeholder</div>`;
-
                 let checks = '';
                 for(let i=0; i<ex.sets; i++) {
                     const isDone = i < ex.completedSets;
                     checks += `<div onclick="completeSet(${idx}, ${i})" class="h-8 w-8 rounded-full border-2 flex items-center justify-center cursor-pointer ${isDone ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300 text-gray-300'}">${i+1}</div>`;
                 }
-
+                const repDisplay = isNaN(ex.targetReps) ? ex.targetReps : `${ex.targetReps} Reps`;
+                const rateUI = session.isPlan || ex.sets > 1 ? `<div class="mt-3 pt-3 border-t border-gray-100 flex justify-between items-center"><span class="text-[10px] text-gray-400">Rate:</span><div class="flex gap-1"><button onclick="rate(${idx}, 'easy')" class="px-3 py-1 bg-gray-100 text-[10px] rounded hover:bg-blue-100 font-bold">Too Easy</button><button onclick="rate(${idx}, 'hard')" class="px-3 py-1 bg-gray-100 text-[10px] rounded hover:bg-red-100 font-bold">Too Hard</button></div></div>` : '';
+                
                 container.innerHTML += `
                 <div class="card p-5 border-l-4 border-blue-500 mb-4">
-                    <div class="flex justify-between items-start">
-                        <h4 class="font-bold text-lg">${ex.name}</h4>
-                        <span class="text-xs font-mono bg-gray-100 px-2 py-1 rounded text-gray-700">${ex.muscle}</span>
-                    </div>
-                    <details class="mt-2 text-xs text-gray-600 cursor-pointer">
-                        <summary class="font-bold text-blue-500">How & Why <i class="fa-solid fa-chevron-down ml-1"></i></summary>
-                        <div class="mt-2 p-2 bg-gray-50 rounded border border-gray-100">
-                            <p class="mb-1"><strong>How:</strong> ${ex.howTo}</p>
-                            <p class="mb-1 text-blue-700"><strong>Benefit:</strong> ${ex.benefit}</p>
-                            ${videoBlock}
-                        </div>
-                    </details>
+                    <div class="flex justify-between items-start"><h4 class="font-bold text-lg">${ex.name}</h4></div>
+                    <p class="text-xs text-gray-500 mt-1">${ex.howTo}</p>
                     <div class="mt-3 flex gap-2 justify-center">${checks}</div>
-                    <div class="flex justify-between mt-1 px-4 text-xs text-gray-400">
-                        <span>Reps: <span id="target-${idx}" class="font-bold text-black">${ex.targetReps}</span></span>
-                        <span>Rest: <span class="font-bold text-black">${ex.targetRest}s</span></span>
-                    </div>
-                    <div class="mt-3 pt-3 border-t border-gray-100 flex justify-between items-center">
-                        <span class="text-[10px] text-gray-400">Rate for Next Time:</span>
-                        <div class="flex gap-1">
-                            <button onclick="rate(${idx}, 'easy')" class="px-3 py-1 bg-gray-100 text-[10px] rounded hover:bg-blue-100 font-bold">Too Easy</button>
-                            <button onclick="rate(${idx}, 'hard')" class="px-3 py-1 bg-gray-100 text-[10px] rounded hover:bg-red-100 font-bold">Too Hard</button>
-                        </div>
-                    </div>
+                    <div class="flex justify-between mt-1 px-4 text-xs text-gray-400"><span>Target: <span id="target-${idx}" class="font-bold text-black">${repDisplay}</span></span><span>Rest: <span class="font-bold text-black">${ex.targetRest}s</span></span></div>
+                    ${rateUI}
                 </div>`;
             });
-            
-            let cHTML = `<details class="bg-blue-50 p-3 rounded-xl border border-blue-100 mt-4 cursor-pointer">
-                <summary class="font-bold text-blue-800 text-sm flex justify-between">Cooldown Stretches <i class="fa-solid fa-chevron-down"></i></summary>
-                <div class="mt-2 space-y-2">`;
-            uniqueMuscles.forEach(m => {
-                if(stretches[m]) cHTML += `<div class="bg-white p-2 rounded text-xs border border-blue-200">
-                    <span class="font-bold text-blue-900">${stretches[m].name}</span><br>
-                    <span class="font-semibold text-gray-700">How:</span> ${stretches[m].how}<br>
-                    <span class="italic text-gray-500">Why:</span> ${stretches[m].why}
-                </div>`;
-            });
-            cHTML += `</div></details>`;
-            container.innerHTML += cHTML;
         }
 
         function completeSet(exIdx, setIdx) {
             if (setIdx === session.exercises[exIdx].completedSets) {
                 session.exercises[exIdx].completedSets++;
                 renderExercises();
-                // Use adaptive rest
-                const restTime = session.exercises[exIdx].targetRest || 45;
-                triggerRest(restTime, "Next Set");
-            }
-        }
-        function completeRound() {
-            if (session.currentRound < session.totalRounds) {
-                triggerRest(90, `Round ${session.currentRound + 1}`);
-                session.currentRound++;
-                document.getElementById('round-tracker').innerText = `Round ${session.currentRound}/${session.totalRounds}`;
-            } else {
-                finishWorkout();
+                triggerRest(session.exercises[exIdx].targetRest || 45, "Next Set");
             }
         }
 
-        // --- ADAPTIVE RATING ---
         function rate(idx, rating) {
             const exId = session.exercises[idx].id;
-            
-            // Initial data
             if (!state.exerciseData[exId]) state.exerciseData[exId] = { reps: 10, rest: 45 };
-            // Legacy data fix
             if (state.exerciseData[exId].rest === undefined) state.exerciseData[exId].rest = 45;
-
-            let repChange = 0;
-            let restChange = 0;
-
-            if (rating === 'easy') {
-                repChange = 2; // Increase reps
-                // Decrease Rest (Intensity UP) - Min 15s
-                state.exerciseData[exId].rest = Math.max(15, state.exerciseData[exId].rest - 5);
-                restChange = -5;
-            } else {
-                repChange = -2; // Decrease reps
-                // Increase Rest (Recovery UP) - Max 120s
-                state.exerciseData[exId].rest = Math.min(120, state.exerciseData[exId].rest + 10);
-                restChange = 10;
-            }
-
+            let repChange = rating === 'easy' ? 2 : -2;
+            let restChange = rating === 'easy' ? -5 : 10;
             state.exerciseData[exId].reps = Math.max(5, state.exerciseData[exId].reps + repChange);
+            state.exerciseData[exId].rest = Math.max(15, Math.min(120, state.exerciseData[exId].rest + restChange));
             saveData();
-            
-            // Live Update UI
             session.exercises[idx].targetReps = state.exerciseData[exId].reps;
             session.exercises[idx].targetRest = state.exerciseData[exId].rest;
-            
-            document.getElementById(`target-${idx}`).innerText = session.exercises[idx].targetReps;
-            alert(`${rating === 'easy' ? 'Too Easy?' : 'Too Hard?'} Adjusting next round:\nReps: ${repChange > 0 ? '+' : ''}${repChange}\nRest: ${restChange > 0 ? '+' : ''}${restChange}s`);
+            alert(`${rating === 'easy' ? 'Too Easy?' : 'Too Hard?'} Adjusting next round.\nRep Goal: ${repChange>0?'+':''}${repChange}\nRest: ${restChange>0?'+':''}${restChange}s`);
             renderExercises();
         }
 
-        // --- REST TIMER ---
         let restInt = null;
         function triggerRest(seconds, nextText) {
             const overlay = document.getElementById('rest-overlay');
@@ -571,16 +436,15 @@
             document.getElementById('up-next-text').innerText = nextText;
             overlay.classList.remove('hidden');
             let timeLeft = seconds;
-            display.innerText = formatTime(timeLeft);
+            display.innerText = `${Math.floor(timeLeft/60).toString().padStart(2,'0')}:${(timeLeft%60).toString().padStart(2,'0')}`;
             if (restInt) clearInterval(restInt);
             restInt = setInterval(() => {
                 timeLeft--;
-                display.innerText = formatTime(timeLeft);
-                if (timeLeft <= 3 && timeLeft > 0) playBeep(440, 'sine'); // 3-2-1 BEEP
-                if (timeLeft === 0) { playBeep(880, 'square'); skipRest(); }
+                display.innerText = `${Math.floor(timeLeft/60).toString().padStart(2,'0')}:${(timeLeft%60).toString().padStart(2,'0')}`;
+                if (timeLeft <= 3 && timeLeft > 0) playBeep(440);
+                if (timeLeft === 0) { playBeep(880); skipRest(); }
             }, 1000);
         }
-        function formatTime(s) { return `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`; }
         function addRest(s) { triggerRest(parseInt(document.getElementById('rest-countdown').innerText.split(':')[1]) + s, document.getElementById('up-next-text').innerText); }
         function skipRest() { document.getElementById('rest-overlay').classList.add('hidden'); if (restInt) clearInterval(restInt); }
 
@@ -588,31 +452,23 @@
             if(!confirm("Finish & Save?")) return;
             confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
             const xp = 100 + (session.exercises.length * 10);
-            state.user.xp += xp;
-            state.user.streak++;
-            state.user.level = Math.floor(state.user.xp / 500) + 1;
+            state.user.xp += xp; state.user.streak++; state.user.level = Math.floor(state.user.xp / 500) + 1;
             if (session.isPlan) {
                 state.activePlan.progress++;
-                if(state.activePlan.progress >= state.activePlan.total) {
-                    alert("CONGRATULATIONS! You finished the plan!");
-                    state.activePlan = { id: null, name: null, progress: 0, total: 0 };
-                }
+                if(state.activePlan.progress >= state.activePlan.total) { alert("CONGRATULATIONS! Plan Finished!"); state.activePlan = { id: null, name: null, progress: 0, total: 0 }; }
             }
             state.history.unshift({ date: Date.now(), title: document.getElementById('workoutTitle').innerText, xp: xp });
             saveData();
             releaseWakeLock();
-            setTimeout(() => location.reload(), 2000);
+            setTimeout(() => { alert("Great job! Don't forget to hydrate!"); location.reload(); }, 2000);
         }
 
         function closeWorkout() { if(confirm("Exit?")) { document.getElementById('workout-modal').classList.add('hidden'); clearInterval(session.timerInt); releaseWakeLock(); }}
-        function saveData() { localStorage.setItem('fitLogicData_v8', JSON.stringify(state)); }
+        function saveData() { localStorage.setItem('fitLogicData_v9', JSON.stringify(state)); }
         function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
-        function exportData() {
-            const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
-            a.download = "fitlogic_backup.json"; document.body.appendChild(a); a.click(); a.remove();
-        }
+        function exportData() { const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state)); a.download = "fitlogic_backup.json"; document.body.appendChild(a); a.click(); a.remove(); }
         function importData(input) { const r = new FileReader(); r.onload = (e) => { state = JSON.parse(e.target.result); saveData(); location.reload(); }; r.readAsText(input.files[0]); }
-        function resetApp() { if(confirm("Reset data?")) { localStorage.removeItem('fitLogicData_v8'); location.reload(); }}
+        function resetApp() { if(confirm("Reset data?")) { localStorage.removeItem('fitLogicData_v9'); location.reload(); }}
 
         init();
     </script>
