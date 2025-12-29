@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -8,165 +8,204 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="FitLogic">
     
-    <title>FitLogic 9.0 | Holistic</title>
+    <title>FitLogic X</title>
     
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { extend: { colors: { darkbg: '#121212', darkcard: '#1E1E1E' } } }
+        }
+    </script>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #F2F2F7; color: #1C1C1E; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         .page-transition { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .card { background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-        .muscle-btn.selected { background-color: #007AFF; color: white; border-color: #007AFF; }
+        
+        /* Custom Scrollbar Hide */
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
         .progress-bar { transition: width 0.5s ease-in-out; }
         details > summary { list-style: none; }
         details > summary::-webkit-details-marker { display: none; }
         details[open] summary ~ * { animation: sweep .3s ease-in-out; }
         @keyframes sweep { 0% {opacity: 0; transform: translateY(-10px)} 100% {opacity: 1; transform: translateY(0)} }
+        
+        /* Toggle Switch */
         .toggle-checkbox:checked { right: 0; border-color: #34C759; }
         .toggle-checkbox:checked + .toggle-label { background-color: #34C759; }
+        
+        /* iOS Safe Area */
         .safe-pb { padding-bottom: env(safe-area-inset-bottom); }
+        .safe-pt { padding-top: env(safe-area-inset-top); }
     </style>
 </head>
-<body class="min-h-screen pb-32">
+<body class="bg-[#F2F2F7] dark:bg-darkbg text-gray-900 dark:text-gray-100 min-h-screen pb-32 transition-colors duration-300">
 
-    <div id="app-header" class="bg-white/90 backdrop-blur sticky top-0 z-30 px-6 py-4 pt-12 shadow-sm flex justify-between items-center">
+    <div id="app-header" class="bg-white/90 dark:bg-darkcard/90 backdrop-blur sticky top-0 z-30 px-6 py-4 pt-14 shadow-sm flex justify-between items-center transition-colors duration-300 border-b dark:border-gray-800">
         <div>
-            <h1 class="text-xl font-extrabold tracking-tight text-gray-900">FitLogic <span class="text-blue-600">9.0</span></h1>
-            <p class="text-xs text-gray-500 font-medium" id="currentDate">Today</p>
+            <h1 class="text-xl font-extrabold tracking-tight">FitLogic <span class="text-blue-600 dark:text-blue-400">X</span></h1>
+            <p class="text-xs text-gray-500 dark:text-gray-400 font-medium" id="currentDate">Today</p>
         </div>
-        <div class="flex items-center gap-3">
-            <div class="flex items-center gap-1 bg-orange-100 px-3 py-1 rounded-full border border-orange-200">
+        <div class="flex items-center gap-4">
+            <button onclick="toggleDarkMode()" class="text-gray-400 hover:text-blue-500 dark:text-yellow-400 transition-colors">
+                <i class="fa-solid fa-moon text-xl" id="themeIcon"></i>
+            </button>
+            
+            <div class="flex items-center gap-1 bg-orange-100 dark:bg-orange-900/30 px-3 py-1 rounded-full border border-orange-200 dark:border-orange-800">
                 <i class="fa-solid fa-fire text-orange-500 text-sm"></i>
-                <span id="streakDisplay" class="text-xs font-bold text-orange-700">0</span>
+                <span id="streakDisplay" class="text-xs font-bold text-orange-700 dark:text-orange-400">0</span>
             </div>
-            <div class="relative w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center border-2 border-white shadow-sm cursor-pointer hover:scale-105 transition-transform" onclick="toggleSettings()">
-                <span id="userLevel" class="text-xs font-bold text-blue-600">Lvl 1</span>
+            
+            <div class="relative w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center border-2 border-white dark:border-gray-700 shadow-sm cursor-pointer" onclick="toggleSettings()">
+                <span id="userLevel" class="text-xs font-bold text-blue-600 dark:text-blue-400">Lvl 1</span>
             </div>
         </div>
     </div>
 
     <div id="main-container" class="p-6 space-y-6 max-w-lg mx-auto page-transition">
 
+        <div class="bg-white dark:bg-darkcard rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-800">
+            <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-3">This Week</h3>
+            <div class="flex justify-between items-center" id="week-visualizer">
+                </div>
+        </div>
+
         <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-4 text-white shadow-lg relative overflow-hidden">
             <div class="relative z-10">
                 <div class="flex items-center gap-2 mb-2">
-                    <span class="bg-white/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Tip of the Day</span>
+                    <span class="bg-white/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Daily Tip</span>
                 </div>
-                <p class="text-sm font-medium leading-relaxed" id="dailyTipText">Loading tip...</p>
+                <p class="text-sm font-medium leading-relaxed" id="dailyTipText">Loading...</p>
             </div>
             <i class="fa-solid fa-lightbulb absolute -bottom-4 -right-2 text-8xl text-white/10 rotate-12"></i>
         </div>
 
         <div>
-            <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wide mb-2">Daily Habits (5 Mins)</h3>
+            <h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Quick Flows (5 Mins)</h3>
             <div class="grid grid-cols-2 gap-3">
-                <button onclick="startRoutine('morning')" class="card p-4 flex flex-col items-center justify-center gap-2 hover:bg-yellow-50 transition-colors border-b-4 border-yellow-400">
+                <button onclick="startRoutine('morning')" class="bg-white dark:bg-darkcard rounded-xl p-4 flex flex-col items-center justify-center gap-2 border-b-4 border-yellow-400 shadow-sm hover:brightness-95 transition-all">
                     <i class="fa-solid fa-sun text-2xl text-yellow-500"></i>
-                    <span class="text-xs font-bold text-gray-800">Morning Flow</span>
+                    <span class="text-xs font-bold">Morning Flow</span>
                 </button>
-                <button onclick="startRoutine('night')" class="card p-4 flex flex-col items-center justify-center gap-2 hover:bg-indigo-50 transition-colors border-b-4 border-indigo-400">
+                <button onclick="startRoutine('night')" class="bg-white dark:bg-darkcard rounded-xl p-4 flex flex-col items-center justify-center gap-2 border-b-4 border-indigo-400 shadow-sm hover:brightness-95 transition-all">
                     <i class="fa-solid fa-moon text-2xl text-indigo-500"></i>
-                    <span class="text-xs font-bold text-gray-800">Sleep Stretch</span>
+                    <span class="text-xs font-bold">Sleep Stretch</span>
                 </button>
             </div>
         </div>
 
         <div id="active-plan-card" class="hidden">
             <div class="flex justify-between items-center mb-2">
-                <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wide">My Active Plan</h3>
-                <button onclick="quitPlan()" class="text-[10px] text-red-400 font-bold hover:text-red-600">Quit Plan</button>
+                <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wide">Current Plan</h3>
+                <button onclick="quitPlan()" class="text-[10px] text-red-400 font-bold hover:text-red-500">Quit</button>
             </div>
-            <div class="card p-5 border-2 border-blue-500/20 bg-blue-50/50 relative overflow-hidden">
+            <div class="bg-blue-50/50 dark:bg-blue-900/10 border-2 border-blue-500/20 rounded-2xl p-5 relative overflow-hidden">
                 <div class="relative z-10">
-                    <h2 class="text-xl font-extrabold text-gray-900" id="planNameDisplay">Chest Builder</h2>
-                    <p class="text-xs text-blue-600 font-bold mt-1 mb-4" id="planProgressText">Workout 3 of 12</p>
-                    <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+                    <h2 class="text-xl font-extrabold" id="planNameDisplay">Plan Name</h2>
+                    <p class="text-xs text-blue-600 dark:text-blue-400 font-bold mt-1 mb-4" id="planProgressText">Progress</p>
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-4">
                         <div id="planProgressBar" class="bg-blue-600 h-2.5 rounded-full progress-bar" style="width: 0%"></div>
                     </div>
-                    <button onclick="generateWorkout('plan')" class="w-full bg-blue-600 text-white rounded-xl py-3 shadow-md active:scale-95 transition-transform font-bold flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-play"></i> Start Next Workout
+                    <button onclick="generateWorkout('plan')" class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 shadow-md font-bold flex items-center justify-center gap-2 transition-colors">
+                        <i class="fa-solid fa-play"></i> Start Next Session
                     </button>
                 </div>
-                <i class="fa-solid fa-trophy absolute -bottom-4 -right-4 text-8xl text-blue-100 z-0 opacity-50"></i>
+                <i class="fa-solid fa-trophy absolute -bottom-4 -right-4 text-8xl text-blue-100 dark:text-blue-900/20 z-0"></i>
             </div>
         </div>
 
         <div id="plan-library" class="hidden">
-            <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wide mb-2">Available Plans (4 Weeks)</h3>
+            <h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">4-Week Plans</h3>
             <div class="space-y-3">
-                <div class="card p-4 flex justify-between items-center">
-                    <div><h4 class="font-bold text-gray-900">Full Body Alpha</h4><p class="text-xs text-gray-500">3x/Week • Strength</p></div>
-                    <button onclick="startPlan('plan_full_body', 'Full Body Alpha')" class="bg-black text-white px-4 py-2 rounded-lg text-xs font-bold active:scale-95">Start</button>
+                <div class="bg-white dark:bg-darkcard p-4 rounded-xl shadow-sm flex justify-between items-center border border-gray-100 dark:border-gray-800">
+                    <div><h4 class="font-bold">Full Body Alpha</h4><p class="text-xs text-gray-500">3x/Week • Strength</p></div>
+                    <button onclick="startPlan('plan_full_body', 'Full Body Alpha')" class="bg-black dark:bg-white dark:text-black text-white px-4 py-2 rounded-lg text-xs font-bold">Start</button>
                 </div>
-                <div class="card p-4 flex justify-between items-center">
-                    <div><h4 class="font-bold text-gray-900">Thick Thighs</h4><p class="text-xs text-gray-500">3x/Week • Legs</p></div>
-                    <button onclick="startPlan('plan_lower_mass', 'Thick Thighs')" class="bg-black text-white px-4 py-2 rounded-lg text-xs font-bold active:scale-95">Start</button>
+                <div class="bg-white dark:bg-darkcard p-4 rounded-xl shadow-sm flex justify-between items-center border border-gray-100 dark:border-gray-800">
+                    <div><h4 class="font-bold">Thick Thighs</h4><p class="text-xs text-gray-500">3x/Week • Legs</p></div>
+                    <button onclick="startPlan('plan_lower_mass', 'Thick Thighs')" class="bg-black dark:bg-white dark:text-black text-white px-4 py-2 rounded-lg text-xs font-bold">Start</button>
                 </div>
             </div>
         </div>
 
-        <hr class="border-gray-200">
+        <hr class="border-gray-200 dark:border-gray-800">
 
         <div>
             <div class="flex justify-between items-center mb-2">
                 <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wide">Freestyle</h3>
-                <button onclick="document.getElementById('freestyle-opts').classList.toggle('hidden')" class="text-xs text-blue-500 font-bold">Show Options</button>
+                <button onclick="document.getElementById('freestyle-opts').classList.toggle('hidden')" class="text-xs text-blue-500 font-bold">Options</button>
             </div>
             
-            <div id="freestyle-opts" class="card p-5 mb-4 space-y-4 hidden">
+            <div id="freestyle-opts" class="bg-white dark:bg-darkcard rounded-xl p-5 mb-4 space-y-4 hidden border border-gray-100 dark:border-gray-800">
                 <div class="flex justify-between items-center cursor-pointer" onclick="document.getElementById('equip-options').classList.toggle('hidden')">
-                    <h3 class="font-bold text-gray-800 text-sm"><i class="fa-solid fa-toolbox text-gray-500 mr-2"></i>My Gear</h3>
+                    <h3 class="font-bold text-sm"><i class="fa-solid fa-toolbox text-gray-500 mr-2"></i>My Gear</h3>
                     <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
                 </div>
-                <div id="equip-options" class="hidden grid grid-cols-2 gap-2 pt-2 border-t border-gray-100"></div>
+                <div id="equip-options" class="hidden grid grid-cols-2 gap-2 pt-2 border-t border-gray-100 dark:border-gray-700"></div>
+                
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Duration</label>
-                    <select id="durationSelector" class="w-full bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg p-2.5">
+                    <select id="durationSelector" class="w-full bg-gray-50 dark:bg-gray-800 border-none text-sm rounded-lg p-2.5 text-gray-900 dark:text-white">
                         <option value="10">10 Mins</option>
                         <option value="20" selected>20 Mins</option>
                         <option value="30">30 Mins</option>
                     </select>
                 </div>
+
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Targets</label>
                     <div class="grid grid-cols-3 gap-2" id="muscle-selector">
-                        <button onclick="toggleMuscle(this, 'Chest')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-2 text-xs font-bold text-gray-600 shadow-sm">Chest</button>
-                        <button onclick="toggleMuscle(this, 'Back')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-2 text-xs font-bold text-gray-600 shadow-sm">Back</button>
-                        <button onclick="toggleMuscle(this, 'Legs')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-2 text-xs font-bold text-gray-600 shadow-sm">Legs</button>
-                        <button onclick="toggleMuscle(this, 'Arms')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-2 text-xs font-bold text-gray-600 shadow-sm">Arms</button>
-                        <button onclick="toggleMuscle(this, 'Core')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-2 text-xs font-bold text-gray-600 shadow-sm">Core</button>
-                        <button onclick="toggleMuscle(this, 'Shoulders')" class="muscle-btn bg-white border border-gray-200 rounded-xl py-2 text-xs font-bold text-gray-600 shadow-sm">Shoulders</button>
+                        <button onclick="toggleMuscle(this, 'Chest')" class="muscle-btn bg-gray-50 dark:bg-gray-800 dark:text-gray-300 rounded-xl py-2 text-xs font-bold">Chest</button>
+                        <button onclick="toggleMuscle(this, 'Back')" class="muscle-btn bg-gray-50 dark:bg-gray-800 dark:text-gray-300 rounded-xl py-2 text-xs font-bold">Back</button>
+                        <button onclick="toggleMuscle(this, 'Legs')" class="muscle-btn bg-gray-50 dark:bg-gray-800 dark:text-gray-300 rounded-xl py-2 text-xs font-bold">Legs</button>
+                        <button onclick="toggleMuscle(this, 'Arms')" class="muscle-btn bg-gray-50 dark:bg-gray-800 dark:text-gray-300 rounded-xl py-2 text-xs font-bold">Arms</button>
+                        <button onclick="toggleMuscle(this, 'Core')" class="muscle-btn bg-gray-50 dark:bg-gray-800 dark:text-gray-300 rounded-xl py-2 text-xs font-bold">Core</button>
+                        <button onclick="toggleMuscle(this, 'Shoulders')" class="muscle-btn bg-gray-50 dark:bg-gray-800 dark:text-gray-300 rounded-xl py-2 text-xs font-bold">Shoulders</button>
                     </div>
                 </div>
             </div>
 
-            <button onclick="generateWorkout('freestyle')" class="w-full bg-white border-2 border-gray-200 text-gray-700 rounded-2xl py-4 font-bold shadow-sm active:scale-95 transition-transform">
+            <button onclick="generateWorkout('freestyle')" class="w-full bg-white dark:bg-darkcard border-2 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-2xl py-4 font-bold shadow-sm active:scale-95 transition-transform hover:bg-gray-50 dark:hover:bg-gray-800">
                 <i class="fa-solid fa-shuffle mr-2"></i> Random Workout
             </button>
         </div>
         
         <div id="historyLog" class="space-y-2 pb-10"></div>
+        
+        <div id="ios-install-banner" class="hidden fixed bottom-6 left-4 right-4 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 z-40 flex items-center justify-between animate-bounce">
+            <div class="flex items-center gap-3">
+                <div class="bg-gray-200 dark:bg-gray-700 w-10 h-10 rounded-lg flex items-center justify-center"><i class="fa-brands fa-apple text-xl"></i></div>
+                <div class="text-xs">
+                    <p class="font-bold">Install App</p>
+                    <p class="text-gray-500">Tap <i class="fa-solid fa-arrow-up-from-bracket mx-1"></i> then "Add to Home Screen"</p>
+                </div>
+            </div>
+            <button onclick="document.getElementById('ios-install-banner').classList.add('hidden')" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
     </div>
 
-    <div id="workout-modal" class="fixed inset-0 bg-white z-50 hidden flex flex-col pt-12">
-        <div class="bg-white border-b border-gray-100 p-4 flex justify-between items-center shadow-sm z-10">
+    <div id="workout-modal" class="fixed inset-0 bg-white dark:bg-darkbg z-50 hidden flex flex-col pt-12">
+        <div class="bg-white dark:bg-darkcard border-b border-gray-100 dark:border-gray-800 p-4 flex justify-between items-center shadow-sm z-10">
             <button onclick="closeWorkout()" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
             <div class="text-center">
                 <h2 class="font-bold text-lg" id="workoutTitle">Session</h2>
-                <div class="text-[10px] text-gray-400" id="workoutSubtitle"></div>
             </div>
-            <div class="text-xs font-mono bg-gray-100 px-2 py-1 rounded text-gray-600" id="sessionTimer">00:00</div>
+            <div class="text-xs font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-gray-600 dark:text-gray-300" id="sessionTimer">00:00</div>
         </div>
-        <div id="workout-content" class="flex-1 overflow-y-auto p-6 space-y-6 pb-40 bg-gray-50"></div>
-        <div class="absolute bottom-0 w-full bg-white border-t border-gray-200 p-4 safe-pb">
-             <button onclick="finishWorkout()" class="w-full bg-green-500 text-white font-bold py-4 rounded-xl shadow-md active:scale-95 transition-transform">
+        <div id="workout-content" class="flex-1 overflow-y-auto p-6 space-y-6 pb-40 bg-gray-50 dark:bg-darkbg"></div>
+        <div class="absolute bottom-0 w-full bg-white dark:bg-darkcard border-t border-gray-200 dark:border-gray-800 p-4 safe-pb">
+             <button onclick="finishWorkout()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl shadow-md active:scale-95 transition-transform">
                 Finish <i class="fa-solid fa-check ml-2"></i>
             </button>
         </div>
@@ -189,37 +228,36 @@
     </div>
 
     <div id="settings-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl">
+        <div class="bg-white dark:bg-darkcard w-full max-w-sm rounded-2xl p-6 shadow-2xl">
             <h2 class="font-bold text-xl mb-4">Settings</h2>
             <div class="space-y-3">
-                <button onclick="exportData()" class="w-full bg-blue-50 text-blue-600 font-bold py-3 rounded-lg border border-blue-100 text-sm">Backup Data</button>
+                <button onclick="exportData()" class="w-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-bold py-3 rounded-lg border border-blue-100 dark:border-blue-900 text-sm">Backup Data</button>
                 <label class="block w-full cursor-pointer">
-                    <div class="w-full bg-gray-50 text-gray-600 font-bold py-3 rounded-lg border border-gray-200 text-sm text-center">Restore Data</div>
+                    <div class="w-full bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-bold py-3 rounded-lg border border-gray-200 dark:border-gray-700 text-sm text-center">Restore Data</div>
                     <input type="file" onchange="importData(this)" class="hidden" accept=".json">
                 </label>
                 <button onclick="resetApp()" class="w-full text-red-500 text-xs font-bold py-3">Factory Reset</button>
             </div>
-            <button onclick="toggleSettings()" class="mt-6 w-full bg-gray-900 text-white font-bold py-3 rounded-lg">Close</button>
+            <button onclick="toggleSettings()" class="mt-6 w-full bg-gray-900 dark:bg-white text-white dark:text-black font-bold py-3 rounded-lg">Close</button>
         </div>
     </div>
 
     <script>
-        // --- DATA & TIPS ---
+        // --- DATA ---
         const dailyTips = [
-            "Drink 16oz of water immediately upon waking to kickstart metabolism.",
-            "Eat 20-30g of protein within 2 hours of training to repair muscle.",
-            "Sleep is when muscles grow. Aim for 7-8 hours tonight.",
-            "Creatine Monohydrate is the most researched supplement for strength.",
-            "Reduce liquid sugar (soda/juice) to cut empty calories easily.",
-            "Dynamic stretching before workouts; Static stretching after.",
-            "Consistency > Intensity. A bad workout is better than no workout.",
-            "Magnesium before bed can improve sleep quality and recovery.",
-            "Feeling weak? You might be dehydrated. Drink water + pinch of salt.",
-            "Tracking your lifts is the only way to ensure Progressive Overload."
+            "Drink 16oz of water immediately upon waking.",
+            "Eat 20-30g of protein within 2 hours of training.",
+            "Sleep is when muscles grow. Aim for 7-8 hours.",
+            "Creatine Monohydrate helps strength & brain function.",
+            "Reduce liquid sugar to cut empty calories easily.",
+            "Dynamic stretching before; Static stretching after.",
+            "Consistency > Intensity. Just show up.",
+            "Magnesium before bed can improve sleep quality.",
+            "Feeling weak? You might be dehydrated.",
+            "Tracking lifts is key to Progressive Overload."
         ];
 
         const exerciseLibrary = [
-            // Standard Library
             { id: 'pushup_std', name: 'Standard Pushups', muscle: 'Chest', equipment: 'None', howTo: 'Plank position. Lower chest to floor.', benefit: 'Builds mass and core stability.', videoUrl: "" },
             { id: 'db_press', name: 'Dumbbell Floor Press', muscle: 'Chest', equipment: 'Dumbbells', howTo: 'Lie on back. Press weights up.', benefit: 'Heavy loading safely.', videoUrl: "" },
             { id: 'pullup', name: 'Pull-ups', muscle: 'Back', equipment: 'Pullup Bar', howTo: 'Chin over bar.', benefit: 'V-taper builder.', videoUrl: "" },
@@ -228,32 +266,24 @@
             { id: 'squat_jump', name: 'Jump Squats', muscle: 'Legs', equipment: 'None', howTo: 'Squat and explode up.', benefit: 'Power & Cardio.', videoUrl: "" },
             { id: 'plank', name: 'Plank', muscle: 'Core', equipment: 'None', howTo: 'Elbows under shoulders. Hold.', benefit: 'Core stability.', videoUrl: "" },
             { id: 'leg_raise', name: 'Leg Raises', muscle: 'Core', equipment: 'None', howTo: 'Lie flat. Lift legs.', benefit: 'Lower abs.', videoUrl: "" },
-            // NEW Mobility/Stretch Moves
-            { id: 'neck_roll', name: 'Neck Rolls', muscle: 'Neck', equipment: 'None', howTo: 'Slowly roll head in circles. 30s each way.', benefit: 'Relieves desk tension.', videoUrl: "" },
-            { id: 'cat_cow', name: 'Cat-Cow', muscle: 'Back', equipment: 'None', howTo: 'Hands/knees. Arch back up, then sink belly down.', benefit: 'Spine mobility.', videoUrl: "" },
-            { id: 'child_pose', name: 'Childs Pose', muscle: 'Back', equipment: 'None', howTo: 'Kneel, sit on heels, reach arms forward.', benefit: 'Decompresses spine.', videoUrl: "" },
-            { id: 'butterfly', name: 'Butterfly Stretch', muscle: 'Legs', equipment: 'None', howTo: 'Sit. Feet together. Push knees down.', benefit: 'Opens hips.', videoUrl: "" },
-            { id: 'thoracic_twist', name: 'Thoracic Twists', muscle: 'Back', equipment: 'None', howTo: 'Hands/knees. Reach one arm to sky, look up.', benefit: 'Upper back mobility.', videoUrl: "" },
-            { id: 'forward_fold', name: 'Forward Fold', muscle: 'Legs', equipment: 'None', howTo: 'Stand. Reach for toes. Relax neck.', benefit: 'Hamstring release.', videoUrl: "" }
+            { id: 'neck_roll', name: 'Neck Rolls', muscle: 'Neck', equipment: 'None', howTo: 'Slowly roll head. 30s.', benefit: 'Relieves desk tension.', videoUrl: "" },
+            { id: 'cat_cow', name: 'Cat-Cow', muscle: 'Back', equipment: 'None', howTo: 'Hands/knees. Arch back/sink belly.', benefit: 'Spine mobility.', videoUrl: "" },
+            { id: 'child_pose', name: 'Childs Pose', muscle: 'Back', equipment: 'None', howTo: 'Kneel, reach forward.', benefit: 'Decompresses spine.', videoUrl: "" },
+            { id: 'butterfly', name: 'Butterfly Stretch', muscle: 'Legs', equipment: 'None', howTo: 'Sit. Feet together. Knees down.', benefit: 'Opens hips.', videoUrl: "" },
+            { id: 'thoracic_twist', name: 'Thoracic Twists', muscle: 'Back', equipment: 'None', howTo: 'Reach arm to sky.', benefit: 'Upper back mobility.', videoUrl: "" },
+            { id: 'forward_fold', name: 'Forward Fold', muscle: 'Legs', equipment: 'None', howTo: 'Stand. Reach toes.', benefit: 'Hamstring release.', videoUrl: "" }
         ];
 
-        const staticPlans = {
-            'plan_full_body': ['squat_jump', 'pushup_std', 'pullup', 'plank'],
-            'plan_lower_mass': ['goblet_squat', 'squat_jump', 'plank']
-        };
-
-        const routineFlows = {
-            'morning': ['neck_roll', 'cat_cow', 'thoracic_twist', 'squat_jump'],
-            'night': ['child_pose', 'butterfly', 'forward_fold', 'neck_roll']
-        };
+        const staticPlans = { 'plan_full_body': ['squat_jump', 'pushup_std', 'pullup', 'plank'], 'plan_lower_mass': ['goblet_squat', 'squat_jump', 'plank'] };
+        const routineFlows = { 'morning': ['neck_roll', 'cat_cow', 'thoracic_twist', 'squat_jump'], 'night': ['child_pose', 'butterfly', 'forward_fold', 'neck_roll'] };
 
         // --- STATE ---
         let state = {
-            user: { level: 1, xp: 0, streak: 0, audioOn: true },
+            user: { level: 1, xp: 0, streak: 0, audioOn: true, darkMode: false },
             activePlan: { id: null, name: null, progress: 0, total: 12 },
             equipment: { 'Dumbbells': true, 'Pullup Bar': true },
             exerciseData: {},
-            history: []
+            history: [] // { date: timestamp }
         };
         let session = { exercises: [], isPlan: false, timerInt: null };
         let selectedMuscles = [];
@@ -261,20 +291,84 @@
         let wakeLock = null;
 
         function init() {
-            const saved = localStorage.getItem('fitLogicData_v9');
+            const saved = localStorage.getItem('fitLogicData_v10');
             if (saved) state = JSON.parse(saved);
+            
+            // Apply Dark Mode
+            if(state.user.darkMode) document.documentElement.classList.add('dark');
+            else document.documentElement.classList.remove('dark');
+            updateThemeIcon();
+
             updateDashboard();
             renderEquipmentToggles();
             renderTip();
-            updateAudioBtn();
+            renderWeekVisualizer();
+            checkIOSInstall();
         }
 
-        // --- FEATURES ---
+        // --- THEME ---
+        function toggleDarkMode() {
+            state.user.darkMode = !state.user.darkMode;
+            if(state.user.darkMode) document.documentElement.classList.add('dark');
+            else document.documentElement.classList.remove('dark');
+            updateThemeIcon();
+            saveData();
+        }
+        function updateThemeIcon() {
+            const icon = document.getElementById('themeIcon');
+            icon.className = state.user.darkMode ? 'fa-solid fa-sun text-xl' : 'fa-solid fa-moon text-xl';
+        }
+
+        // --- VISUALS & LOGIC ---
+        function renderWeekVisualizer() {
+            const container = document.getElementById('week-visualizer');
+            const days = ['S','M','T','W','T','F','S'];
+            const today = new Date();
+            const currentDayIdx = today.getDay(); // 0 = Sun
+            
+            // Get last 7 days activity
+            let html = '';
+            for(let i=0; i<7; i++) {
+                // Calculate date for this slot (start from Sunday of current week)
+                const d = new Date(today);
+                const diff = today.getDay() - i; 
+                // Simple logic: Highlight today, check history for this day
+                const isToday = (i === currentDayIdx);
+                
+                // Check if workout done on this day of week (simplified for visuals)
+                // In a real app we'd match exact dates. Here we just check if we did a workout Today.
+                // For simplicity in this PWA: Show checkmark if Today has history.
+                // Grey circles for others.
+                
+                // Advanced: Check history for matching day in current week
+                // Find if any history entry matches "This Week's Sunday + i days"
+                
+                let activeClass = "bg-gray-100 dark:bg-gray-800 text-gray-300 dark:text-gray-600";
+                
+                // Check if we worked out today
+                if (isToday) {
+                    const workedOutToday = state.history.some(h => new Date(h.date).toDateString() === today.toDateString());
+                    activeClass = workedOutToday ? "bg-green-500 text-white shadow-green-200" : "bg-blue-100 dark:bg-blue-900 text-blue-500 border-2 border-blue-500";
+                }
+                
+                html += `<div class="flex flex-col items-center gap-1">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${activeClass}">${days[i]}</div>
+                </div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function checkIOSInstall() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+            if (isIOS && !isStandalone) {
+                document.getElementById('ios-install-banner').classList.remove('hidden');
+            }
+        }
+
         function renderTip() {
-            // Pick tip based on day of year so it rotates daily for everyone
             const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
-            const tip = dailyTips[dayOfYear % dailyTips.length];
-            document.getElementById('dailyTipText').innerText = tip;
+            document.getElementById('dailyTipText').innerText = dailyTips[dayOfYear % dailyTips.length];
         }
 
         function startRoutine(type) {
@@ -287,7 +381,7 @@
             startWorkoutUI(`${type === 'morning' ? 'Morning' : 'Night'} Flow`);
         }
 
-        // --- STANDARD LOGIC ---
+        // --- CORE FUNCTIONS ---
         function requestWakeLock() { if ('wakeLock' in navigator) navigator.wakeLock.request('screen').then(w => wakeLock = w).catch(() => {}); }
         function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
         
@@ -321,16 +415,17 @@
                 planCard.classList.add('hidden'); planLib.classList.remove('hidden');
             }
             const histEl = document.getElementById('historyLog');
-            histEl.innerHTML = state.history.length ? '' : '<p class="text-center text-gray-400 text-xs py-4">No workouts yet.</p>';
+            histEl.innerHTML = state.history.length ? '' : '<p class="text-center text-gray-400 dark:text-gray-500 text-xs py-4">No workouts yet.</p>';
             state.history.slice(0, 3).forEach(log => {
-                histEl.innerHTML += `<div class="flex justify-between items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm"><div><p class="text-sm font-bold">${log.title}</p><p class="text-[10px] text-gray-400">${new Date(log.date).toLocaleDateString()}</p></div><span class="text-xs font-bold text-blue-500">+${log.xp} XP</span></div>`;
+                histEl.innerHTML += `<div class="flex justify-between items-center bg-white dark:bg-darkcard p-3 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm"><div><p class="text-sm font-bold">${log.title}</p><p class="text-[10px] text-gray-400">${new Date(log.date).toLocaleDateString()}</p></div><span class="text-xs font-bold text-blue-500">+${log.xp} XP</span></div>`;
             });
+            renderWeekVisualizer();
         }
 
         function renderEquipmentToggles() {
             const container = document.getElementById('equip-options'); container.innerHTML = '';
             Object.keys(state.equipment).forEach(item => {
-                container.innerHTML += `<label class="flex items-center justify-between p-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 border border-gray-200"><span class="text-xs font-bold text-gray-700">${item}</span><input type="checkbox" class="accent-blue-500 w-4 h-4" ${state.equipment[item] ? 'checked' : ''} onchange="toggleEquipment('${item}')"></label>`;
+                container.innerHTML += `<label class="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"><span class="text-xs font-bold text-gray-700 dark:text-gray-300">${item}</span><input type="checkbox" class="accent-blue-500 w-4 h-4" ${state.equipment[item] ? 'checked' : ''} onchange="toggleEquipment('${item}')"></label>`;
             });
         }
         function toggleEquipment(item) { state.equipment[item] = !state.equipment[item]; saveData(); }
@@ -347,19 +442,11 @@
             session.isPlan = (mode === 'plan');
             if (session.isPlan) {
                 const planIds = staticPlans[state.activePlan.id];
-                planIds.forEach(id => {
-                    const ex = exerciseLibrary.find(e => e.id === id);
-                    if(ex) selectedList.push(ex);
-                });
+                planIds.forEach(id => { const ex = exerciseLibrary.find(e => e.id === id); if(ex) selectedList.push(ex); });
             } else {
                 const targets = selectedMuscles.length > 0 ? selectedMuscles : ['Chest', 'Back', 'Legs', 'Core'];
                 let pool = exerciseLibrary.filter(ex => targets.includes(ex.muscle));
-                const num = 4; // Simple count for freestyle
-                for (let i = 0; i < num; i++) {
-                    if (pool.length === 0) break;
-                    const idx = Math.floor(Math.random() * pool.length);
-                    selectedList.push(pool[idx]); pool.splice(idx, 1);
-                }
+                for (let i = 0; i < 4; i++) { if (pool.length === 0) break; const idx = Math.floor(Math.random() * pool.length); selectedList.push(pool[idx]); pool.splice(idx, 1); }
             }
             if (selectedList.length === 0) { alert("No exercises found!"); return; }
             session.exercises = selectedList.map(ex => {
@@ -390,17 +477,17 @@
                 let checks = '';
                 for(let i=0; i<ex.sets; i++) {
                     const isDone = i < ex.completedSets;
-                    checks += `<div onclick="completeSet(${idx}, ${i})" class="h-8 w-8 rounded-full border-2 flex items-center justify-center cursor-pointer ${isDone ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300 text-gray-300'}">${i+1}</div>`;
+                    checks += `<div onclick="completeSet(${idx}, ${i})" class="h-8 w-8 rounded-full border-2 flex items-center justify-center cursor-pointer ${isDone ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300 dark:border-gray-600 text-gray-300 dark:text-gray-600'}">${i+1}</div>`;
                 }
                 const repDisplay = isNaN(ex.targetReps) ? ex.targetReps : `${ex.targetReps} Reps`;
-                const rateUI = session.isPlan || ex.sets > 1 ? `<div class="mt-3 pt-3 border-t border-gray-100 flex justify-between items-center"><span class="text-[10px] text-gray-400">Rate:</span><div class="flex gap-1"><button onclick="rate(${idx}, 'easy')" class="px-3 py-1 bg-gray-100 text-[10px] rounded hover:bg-blue-100 font-bold">Too Easy</button><button onclick="rate(${idx}, 'hard')" class="px-3 py-1 bg-gray-100 text-[10px] rounded hover:bg-red-100 font-bold">Too Hard</button></div></div>` : '';
+                const rateUI = session.isPlan || ex.sets > 1 ? `<div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center"><span class="text-[10px] text-gray-400">Rate:</span><div class="flex gap-1"><button onclick="rate(${idx}, 'easy')" class="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-[10px] rounded hover:bg-blue-100 dark:hover:bg-blue-900 font-bold">Too Easy</button><button onclick="rate(${idx}, 'hard')" class="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-[10px] rounded hover:bg-red-100 dark:hover:bg-red-900 font-bold">Too Hard</button></div></div>` : '';
                 
                 container.innerHTML += `
-                <div class="card p-5 border-l-4 border-blue-500 mb-4">
+                <div class="bg-white dark:bg-darkcard p-5 border-l-4 border-blue-500 mb-4 rounded-xl shadow-sm">
                     <div class="flex justify-between items-start"><h4 class="font-bold text-lg">${ex.name}</h4></div>
                     <p class="text-xs text-gray-500 mt-1">${ex.howTo}</p>
                     <div class="mt-3 flex gap-2 justify-center">${checks}</div>
-                    <div class="flex justify-between mt-1 px-4 text-xs text-gray-400"><span>Target: <span id="target-${idx}" class="font-bold text-black">${repDisplay}</span></span><span>Rest: <span class="font-bold text-black">${ex.targetRest}s</span></span></div>
+                    <div class="flex justify-between mt-1 px-4 text-xs text-gray-400"><span>Target: <span id="target-${idx}" class="font-bold text-black dark:text-white">${repDisplay}</span></span><span>Rest: <span class="font-bold text-black dark:text-white">${ex.targetRest}s</span></span></div>
                     ${rateUI}
                 </div>`;
             });
@@ -425,7 +512,7 @@
             saveData();
             session.exercises[idx].targetReps = state.exerciseData[exId].reps;
             session.exercises[idx].targetRest = state.exerciseData[exId].rest;
-            alert(`${rating === 'easy' ? 'Too Easy?' : 'Too Hard?'} Adjusting next round.\nRep Goal: ${repChange>0?'+':''}${repChange}\nRest: ${restChange>0?'+':''}${restChange}s`);
+            alert(`${rating === 'easy' ? 'Too Easy?' : 'Too Hard?'} Adjusting.\nReps: ${repChange>0?'+':''}${repChange}\nRest: ${restChange>0?'+':''}${restChange}s`);
             renderExercises();
         }
 
@@ -460,15 +547,15 @@
             state.history.unshift({ date: Date.now(), title: document.getElementById('workoutTitle').innerText, xp: xp });
             saveData();
             releaseWakeLock();
-            setTimeout(() => { alert("Great job! Don't forget to hydrate!"); location.reload(); }, 2000);
+            setTimeout(() => { location.reload(); }, 2000);
         }
 
         function closeWorkout() { if(confirm("Exit?")) { document.getElementById('workout-modal').classList.add('hidden'); clearInterval(session.timerInt); releaseWakeLock(); }}
-        function saveData() { localStorage.setItem('fitLogicData_v9', JSON.stringify(state)); }
+        function saveData() { localStorage.setItem('fitLogicData_v10', JSON.stringify(state)); }
         function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
         function exportData() { const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state)); a.download = "fitlogic_backup.json"; document.body.appendChild(a); a.click(); a.remove(); }
         function importData(input) { const r = new FileReader(); r.onload = (e) => { state = JSON.parse(e.target.result); saveData(); location.reload(); }; r.readAsText(input.files[0]); }
-        function resetApp() { if(confirm("Reset data?")) { localStorage.removeItem('fitLogicData_v9'); location.reload(); }}
+        function resetApp() { if(confirm("Reset data?")) { localStorage.removeItem('fitLogicData_v10'); location.reload(); }}
 
         init();
     </script>
