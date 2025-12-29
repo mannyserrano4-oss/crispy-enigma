@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="FitLogic">
     
-    <title>FitLogic X</title>
+    <title>FitLogic 11.0</title>
     
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
@@ -29,43 +29,37 @@
         body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         .page-transition { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Custom Scrollbar Hide */
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-
         .progress-bar { transition: width 0.5s ease-in-out; }
         details > summary { list-style: none; }
         details > summary::-webkit-details-marker { display: none; }
         details[open] summary ~ * { animation: sweep .3s ease-in-out; }
         @keyframes sweep { 0% {opacity: 0; transform: translateY(-10px)} 100% {opacity: 1; transform: translateY(0)} }
-        
-        /* Toggle Switch */
         .toggle-checkbox:checked { right: 0; border-color: #34C759; }
         .toggle-checkbox:checked + .toggle-label { background-color: #34C759; }
-        
-        /* iOS Safe Area */
         .safe-pb { padding-bottom: env(safe-area-inset-bottom); }
-        .safe-pt { padding-top: env(safe-area-inset-top); }
+        
+        /* Modal Animation */
+        .modal-enter { animation: modalPop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes modalPop { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
     </style>
 </head>
 <body class="bg-[#F2F2F7] dark:bg-darkbg text-gray-900 dark:text-gray-100 min-h-screen pb-32 transition-colors duration-300">
 
     <div id="app-header" class="bg-white/90 dark:bg-darkcard/90 backdrop-blur sticky top-0 z-30 px-6 py-4 pt-14 shadow-sm flex justify-between items-center transition-colors duration-300 border-b dark:border-gray-800">
         <div>
-            <h1 class="text-xl font-extrabold tracking-tight">FitLogic <span class="text-blue-600 dark:text-blue-400">X</span></h1>
+            <h1 class="text-xl font-extrabold tracking-tight">FitLogic <span class="text-blue-600 dark:text-blue-400">11.0</span></h1>
             <p class="text-xs text-gray-500 dark:text-gray-400 font-medium" id="currentDate">Today</p>
         </div>
         <div class="flex items-center gap-4">
             <button onclick="toggleDarkMode()" class="text-gray-400 hover:text-blue-500 dark:text-yellow-400 transition-colors">
                 <i class="fa-solid fa-moon text-xl" id="themeIcon"></i>
             </button>
-            
             <div class="flex items-center gap-1 bg-orange-100 dark:bg-orange-900/30 px-3 py-1 rounded-full border border-orange-200 dark:border-orange-800">
                 <i class="fa-solid fa-fire text-orange-500 text-sm"></i>
                 <span id="streakDisplay" class="text-xs font-bold text-orange-700 dark:text-orange-400">0</span>
             </div>
-            
             <div class="relative w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center border-2 border-white dark:border-gray-700 shadow-sm cursor-pointer" onclick="toggleSettings()">
                 <span id="userLevel" class="text-xs font-bold text-blue-600 dark:text-blue-400">Lvl 1</span>
             </div>
@@ -76,8 +70,7 @@
 
         <div class="bg-white dark:bg-darkcard rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-800">
             <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-3">This Week</h3>
-            <div class="flex justify-between items-center" id="week-visualizer">
-                </div>
+            <div class="flex justify-between items-center" id="week-visualizer"></div>
         </div>
 
         <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-4 text-white shadow-lg relative overflow-hidden">
@@ -107,7 +100,7 @@
         <div id="active-plan-card" class="hidden">
             <div class="flex justify-between items-center mb-2">
                 <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wide">Current Plan</h3>
-                <button onclick="quitPlan()" class="text-[10px] text-red-400 font-bold hover:text-red-500">Quit</button>
+                <button onclick="promptQuitPlan()" class="text-[10px] text-red-400 font-bold hover:text-red-500">Quit</button>
             </div>
             <div class="bg-blue-50/50 dark:bg-blue-900/10 border-2 border-blue-500/20 rounded-2xl p-5 relative overflow-hidden">
                 <div class="relative z-10">
@@ -129,11 +122,11 @@
             <div class="space-y-3">
                 <div class="bg-white dark:bg-darkcard p-4 rounded-xl shadow-sm flex justify-between items-center border border-gray-100 dark:border-gray-800">
                     <div><h4 class="font-bold">Full Body Alpha</h4><p class="text-xs text-gray-500">3x/Week • Strength</p></div>
-                    <button onclick="startPlan('plan_full_body', 'Full Body Alpha')" class="bg-black dark:bg-white dark:text-black text-white px-4 py-2 rounded-lg text-xs font-bold">Start</button>
+                    <button onclick="promptStartPlan('plan_full_body', 'Full Body Alpha')" class="bg-black dark:bg-white dark:text-black text-white px-4 py-2 rounded-lg text-xs font-bold">Start</button>
                 </div>
                 <div class="bg-white dark:bg-darkcard p-4 rounded-xl shadow-sm flex justify-between items-center border border-gray-100 dark:border-gray-800">
                     <div><h4 class="font-bold">Thick Thighs</h4><p class="text-xs text-gray-500">3x/Week • Legs</p></div>
-                    <button onclick="startPlan('plan_lower_mass', 'Thick Thighs')" class="bg-black dark:bg-white dark:text-black text-white px-4 py-2 rounded-lg text-xs font-bold">Start</button>
+                    <button onclick="promptStartPlan('plan_lower_mass', 'Thick Thighs')" class="bg-black dark:bg-white dark:text-black text-white px-4 py-2 rounded-lg text-xs font-bold">Start</button>
                 </div>
             </div>
         </div>
@@ -145,14 +138,12 @@
                 <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wide">Freestyle</h3>
                 <button onclick="document.getElementById('freestyle-opts').classList.toggle('hidden')" class="text-xs text-blue-500 font-bold">Options</button>
             </div>
-            
             <div id="freestyle-opts" class="bg-white dark:bg-darkcard rounded-xl p-5 mb-4 space-y-4 hidden border border-gray-100 dark:border-gray-800">
                 <div class="flex justify-between items-center cursor-pointer" onclick="document.getElementById('equip-options').classList.toggle('hidden')">
                     <h3 class="font-bold text-sm"><i class="fa-solid fa-toolbox text-gray-500 mr-2"></i>My Gear</h3>
                     <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
                 </div>
                 <div id="equip-options" class="hidden grid grid-cols-2 gap-2 pt-2 border-t border-gray-100 dark:border-gray-700"></div>
-                
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Duration</label>
                     <select id="durationSelector" class="w-full bg-gray-50 dark:bg-gray-800 border-none text-sm rounded-lg p-2.5 text-gray-900 dark:text-white">
@@ -161,7 +152,6 @@
                         <option value="30">30 Mins</option>
                     </select>
                 </div>
-
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Targets</label>
                     <div class="grid grid-cols-3 gap-2" id="muscle-selector">
@@ -174,30 +164,26 @@
                     </div>
                 </div>
             </div>
-
             <button onclick="generateWorkout('freestyle')" class="w-full bg-white dark:bg-darkcard border-2 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-2xl py-4 font-bold shadow-sm active:scale-95 transition-transform hover:bg-gray-50 dark:hover:bg-gray-800">
                 <i class="fa-solid fa-shuffle mr-2"></i> Random Workout
             </button>
         </div>
         
         <div id="historyLog" class="space-y-2 pb-10"></div>
-        
-        <div id="ios-install-banner" class="hidden fixed bottom-6 left-4 right-4 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 z-40 flex items-center justify-between animate-bounce">
-            <div class="flex items-center gap-3">
-                <div class="bg-gray-200 dark:bg-gray-700 w-10 h-10 rounded-lg flex items-center justify-center"><i class="fa-brands fa-apple text-xl"></i></div>
-                <div class="text-xs">
-                    <p class="font-bold">Install App</p>
-                    <p class="text-gray-500">Tap <i class="fa-solid fa-arrow-up-from-bracket mx-1"></i> then "Add to Home Screen"</p>
-                </div>
-            </div>
-            <button onclick="document.getElementById('ios-install-banner').classList.add('hidden')" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button>
-        </div>
+    </div>
 
+    <div id="custom-modal" class="fixed inset-0 bg-black/60 z-[70] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white dark:bg-[#1C1C1E] w-full max-w-sm rounded-2xl p-6 shadow-2xl transform transition-all modal-enter">
+            <h3 id="modal-title" class="text-lg font-bold text-gray-900 dark:text-white mb-2 text-center">Title</h3>
+            <p id="modal-message" class="text-sm text-gray-500 dark:text-gray-400 text-center mb-6">Message goes here</p>
+            <div class="grid grid-cols-2 gap-3" id="modal-buttons">
+                </div>
+        </div>
     </div>
 
     <div id="workout-modal" class="fixed inset-0 bg-white dark:bg-darkbg z-50 hidden flex flex-col pt-12">
         <div class="bg-white dark:bg-darkcard border-b border-gray-100 dark:border-gray-800 p-4 flex justify-between items-center shadow-sm z-10">
-            <button onclick="closeWorkout()" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <button onclick="promptCloseWorkout()" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
             <div class="text-center">
                 <h2 class="font-bold text-lg" id="workoutTitle">Session</h2>
             </div>
@@ -205,7 +191,7 @@
         </div>
         <div id="workout-content" class="flex-1 overflow-y-auto p-6 space-y-6 pb-40 bg-gray-50 dark:bg-darkbg"></div>
         <div class="absolute bottom-0 w-full bg-white dark:bg-darkcard border-t border-gray-200 dark:border-gray-800 p-4 safe-pb">
-             <button onclick="finishWorkout()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl shadow-md active:scale-95 transition-transform">
+             <button onclick="promptFinishWorkout()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl shadow-md active:scale-95 transition-transform">
                 Finish <i class="fa-solid fa-check ml-2"></i>
             </button>
         </div>
@@ -236,241 +222,152 @@
                     <div class="w-full bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-bold py-3 rounded-lg border border-gray-200 dark:border-gray-700 text-sm text-center">Restore Data</div>
                     <input type="file" onchange="importData(this)" class="hidden" accept=".json">
                 </label>
-                <button onclick="resetApp()" class="w-full text-red-500 text-xs font-bold py-3">Factory Reset</button>
+                <button onclick="promptResetApp()" class="w-full text-red-500 text-xs font-bold py-3">Factory Reset</button>
             </div>
             <button onclick="toggleSettings()" class="mt-6 w-full bg-gray-900 dark:bg-white text-white dark:text-black font-bold py-3 rounded-lg">Close</button>
         </div>
     </div>
 
     <script>
-        // --- DATA ---
-        const dailyTips = [
-            "Drink 16oz of water immediately upon waking.",
-            "Eat 20-30g of protein within 2 hours of training.",
-            "Sleep is when muscles grow. Aim for 7-8 hours.",
-            "Creatine Monohydrate helps strength & brain function.",
-            "Reduce liquid sugar to cut empty calories easily.",
-            "Dynamic stretching before; Static stretching after.",
-            "Consistency > Intensity. Just show up.",
-            "Magnesium before bed can improve sleep quality.",
-            "Feeling weak? You might be dehydrated.",
-            "Tracking lifts is key to Progressive Overload."
-        ];
+        // --- VISUAL THEMES ---
+        // Color mapping for muscles
+        const muscleThemes = {
+            'Chest': 'bg-blue-50 dark:bg-blue-900/10 border-blue-500 text-blue-900 dark:text-blue-100',
+            'Back': 'bg-purple-50 dark:bg-purple-900/10 border-purple-500 text-purple-900 dark:text-purple-100',
+            'Legs': 'bg-red-50 dark:bg-red-900/10 border-red-500 text-red-900 dark:text-red-100',
+            'Arms': 'bg-pink-50 dark:bg-pink-900/10 border-pink-500 text-pink-900 dark:text-pink-100',
+            'Shoulders': 'bg-indigo-50 dark:bg-indigo-900/10 border-indigo-500 text-indigo-900 dark:text-indigo-100',
+            'Core': 'bg-emerald-50 dark:bg-emerald-900/10 border-emerald-500 text-emerald-900 dark:text-emerald-100',
+            'Neck': 'bg-gray-50 dark:bg-gray-800 border-gray-400 text-gray-900 dark:text-gray-100'
+        };
 
+        const dailyTips = ["Drink 16oz water immediately.", "20-30g protein after training.", "Aim for 7-8h sleep.", "Creatine helps brain & muscle.", "Cut liquid sugar.", "Dynamic warmups, Static cooldowns.", "Consistency > Intensity.", "Magnesium for sleep.", "Pinch of salt for hydration.", "Track your lifts."];
         const exerciseLibrary = [
-            { id: 'pushup_std', name: 'Standard Pushups', muscle: 'Chest', equipment: 'None', howTo: 'Plank position. Lower chest to floor.', benefit: 'Builds mass and core stability.', videoUrl: "" },
-            { id: 'db_press', name: 'Dumbbell Floor Press', muscle: 'Chest', equipment: 'Dumbbells', howTo: 'Lie on back. Press weights up.', benefit: 'Heavy loading safely.', videoUrl: "" },
-            { id: 'pullup', name: 'Pull-ups', muscle: 'Back', equipment: 'Pullup Bar', howTo: 'Chin over bar.', benefit: 'V-taper builder.', videoUrl: "" },
-            { id: 'db_row', name: 'DB Row', muscle: 'Back', equipment: 'Dumbbells', howTo: 'Hand on chair. Pull weight to hip.', benefit: 'Thickens mid-back.', videoUrl: "" },
-            { id: 'goblet_squat', name: 'Goblet Squats', muscle: 'Legs', equipment: 'Dumbbells', howTo: 'Hold weight at chest. Squat deep.', benefit: 'Legs & Core.', videoUrl: "" },
-            { id: 'squat_jump', name: 'Jump Squats', muscle: 'Legs', equipment: 'None', howTo: 'Squat and explode up.', benefit: 'Power & Cardio.', videoUrl: "" },
-            { id: 'plank', name: 'Plank', muscle: 'Core', equipment: 'None', howTo: 'Elbows under shoulders. Hold.', benefit: 'Core stability.', videoUrl: "" },
-            { id: 'leg_raise', name: 'Leg Raises', muscle: 'Core', equipment: 'None', howTo: 'Lie flat. Lift legs.', benefit: 'Lower abs.', videoUrl: "" },
-            { id: 'neck_roll', name: 'Neck Rolls', muscle: 'Neck', equipment: 'None', howTo: 'Slowly roll head. 30s.', benefit: 'Relieves desk tension.', videoUrl: "" },
-            { id: 'cat_cow', name: 'Cat-Cow', muscle: 'Back', equipment: 'None', howTo: 'Hands/knees. Arch back/sink belly.', benefit: 'Spine mobility.', videoUrl: "" },
-            { id: 'child_pose', name: 'Childs Pose', muscle: 'Back', equipment: 'None', howTo: 'Kneel, reach forward.', benefit: 'Decompresses spine.', videoUrl: "" },
-            { id: 'butterfly', name: 'Butterfly Stretch', muscle: 'Legs', equipment: 'None', howTo: 'Sit. Feet together. Knees down.', benefit: 'Opens hips.', videoUrl: "" },
-            { id: 'thoracic_twist', name: 'Thoracic Twists', muscle: 'Back', equipment: 'None', howTo: 'Reach arm to sky.', benefit: 'Upper back mobility.', videoUrl: "" },
-            { id: 'forward_fold', name: 'Forward Fold', muscle: 'Legs', equipment: 'None', howTo: 'Stand. Reach toes.', benefit: 'Hamstring release.', videoUrl: "" }
+            { id: 'pushup_std', name: 'Standard Pushups', muscle: 'Chest', equipment: 'None', howTo: 'Plank position. Lower chest.', benefit: 'Mass & Core.', videoUrl: "" },
+            { id: 'db_press', name: 'DB Floor Press', muscle: 'Chest', equipment: 'Dumbbells', howTo: 'Lie back. Press up.', benefit: 'Heavy loading.', videoUrl: "" },
+            { id: 'pullup', name: 'Pull-ups', muscle: 'Back', equipment: 'Pullup Bar', howTo: 'Chin over bar.', benefit: 'V-Taper.', videoUrl: "" },
+            { id: 'db_row', name: 'DB Row', muscle: 'Back', equipment: 'Dumbbells', howTo: 'Pull weight to hip.', benefit: 'Thick Back.', videoUrl: "" },
+            { id: 'goblet_squat', name: 'Goblet Squat', muscle: 'Legs', equipment: 'Dumbbells', howTo: 'Hold weight at chest. Squat.', benefit: 'Legs & Core.', videoUrl: "" },
+            { id: 'squat_jump', name: 'Jump Squats', muscle: 'Legs', equipment: 'None', howTo: 'Explode up.', benefit: 'Power.', videoUrl: "" },
+            { id: 'plank', name: 'Plank', muscle: 'Core', equipment: 'None', howTo: 'Hold straight line.', benefit: 'Stability.', videoUrl: "" },
+            { id: 'leg_raise', name: 'Leg Raises', muscle: 'Core', equipment: 'None', howTo: 'Lift legs.', benefit: 'Lower Abs.', videoUrl: "" },
+            { id: 'neck_roll', name: 'Neck Rolls', muscle: 'Neck', equipment: 'None', howTo: 'Roll head.', benefit: 'Tension relief.', videoUrl: "" },
+            { id: 'cat_cow', name: 'Cat-Cow', muscle: 'Back', equipment: 'None', howTo: 'Arch/Sink spine.', benefit: 'Mobility.', videoUrl: "" },
+            { id: 'child_pose', name: 'Childs Pose', muscle: 'Back', equipment: 'None', howTo: 'Sit on heels.', benefit: 'Decompress.', videoUrl: "" },
+            { id: 'butterfly', name: 'Butterfly', muscle: 'Legs', equipment: 'None', howTo: 'Feet together.', benefit: 'Hips.', videoUrl: "" },
+            { id: 'thoracic_twist', name: 'T-Spine Twist', muscle: 'Back', equipment: 'None', howTo: 'Reach sky.', benefit: 'Mobility.', videoUrl: "" },
+            { id: 'forward_fold', name: 'Forward Fold', muscle: 'Legs', equipment: 'None', howTo: 'Touch toes.', benefit: 'Hamstrings.', videoUrl: "" }
         ];
-
         const staticPlans = { 'plan_full_body': ['squat_jump', 'pushup_std', 'pullup', 'plank'], 'plan_lower_mass': ['goblet_squat', 'squat_jump', 'plank'] };
         const routineFlows = { 'morning': ['neck_roll', 'cat_cow', 'thoracic_twist', 'squat_jump'], 'night': ['child_pose', 'butterfly', 'forward_fold', 'neck_roll'] };
 
-        // --- STATE ---
-        let state = {
-            user: { level: 1, xp: 0, streak: 0, audioOn: true, darkMode: false },
-            activePlan: { id: null, name: null, progress: 0, total: 12 },
-            equipment: { 'Dumbbells': true, 'Pullup Bar': true },
-            exerciseData: {},
-            history: [] // { date: timestamp }
-        };
+        let state = { user: { level: 1, xp: 0, streak: 0, audioOn: true, darkMode: false }, activePlan: { id: null, name: null, progress: 0, total: 12 }, equipment: { 'Dumbbells': true, 'Pullup Bar': true }, exerciseData: {}, history: [] };
         let session = { exercises: [], isPlan: false, timerInt: null };
         let selectedMuscles = [];
-        let audioCtx = null;
-        let wakeLock = null;
+        let audioCtx = null; let wakeLock = null;
 
         function init() {
-            const saved = localStorage.getItem('fitLogicData_v10');
+            const saved = localStorage.getItem('fitLogicData_v11');
             if (saved) state = JSON.parse(saved);
-            
-            // Apply Dark Mode
             if(state.user.darkMode) document.documentElement.classList.add('dark');
-            else document.documentElement.classList.remove('dark');
             updateThemeIcon();
-
             updateDashboard();
             renderEquipmentToggles();
             renderTip();
             renderWeekVisualizer();
-            checkIOSInstall();
+            updateAudioBtn();
         }
 
-        // --- THEME ---
-        function toggleDarkMode() {
-            state.user.darkMode = !state.user.darkMode;
-            if(state.user.darkMode) document.documentElement.classList.add('dark');
-            else document.documentElement.classList.remove('dark');
-            updateThemeIcon();
-            saveData();
-        }
-        function updateThemeIcon() {
-            const icon = document.getElementById('themeIcon');
-            icon.className = state.user.darkMode ? 'fa-solid fa-sun text-xl' : 'fa-solid fa-moon text-xl';
-        }
-
-        // --- VISUALS & LOGIC ---
-        function renderWeekVisualizer() {
-            const container = document.getElementById('week-visualizer');
-            const days = ['S','M','T','W','T','F','S'];
-            const today = new Date();
-            const currentDayIdx = today.getDay(); // 0 = Sun
+        // --- CUSTOM MODAL LOGIC ---
+        function showModal(title, message, buttons) {
+            const modal = document.getElementById('custom-modal');
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+            const btnContainer = document.getElementById('modal-buttons');
+            btnContainer.innerHTML = '';
             
-            // Get last 7 days activity
-            let html = '';
-            for(let i=0; i<7; i++) {
-                // Calculate date for this slot (start from Sunday of current week)
-                const d = new Date(today);
-                const diff = today.getDay() - i; 
-                // Simple logic: Highlight today, check history for this day
-                const isToday = (i === currentDayIdx);
-                
-                // Check if workout done on this day of week (simplified for visuals)
-                // In a real app we'd match exact dates. Here we just check if we did a workout Today.
-                // For simplicity in this PWA: Show checkmark if Today has history.
-                // Grey circles for others.
-                
-                // Advanced: Check history for matching day in current week
-                // Find if any history entry matches "This Week's Sunday + i days"
-                
-                let activeClass = "bg-gray-100 dark:bg-gray-800 text-gray-300 dark:text-gray-600";
-                
-                // Check if we worked out today
-                if (isToday) {
-                    const workedOutToday = state.history.some(h => new Date(h.date).toDateString() === today.toDateString());
-                    activeClass = workedOutToday ? "bg-green-500 text-white shadow-green-200" : "bg-blue-100 dark:bg-blue-900 text-blue-500 border-2 border-blue-500";
-                }
-                
-                html += `<div class="flex flex-col items-center gap-1">
-                    <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${activeClass}">${days[i]}</div>
-                </div>`;
-            }
-            container.innerHTML = html;
-        }
-
-        function checkIOSInstall() {
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-            if (isIOS && !isStandalone) {
-                document.getElementById('ios-install-banner').classList.remove('hidden');
-            }
-        }
-
-        function renderTip() {
-            const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
-            document.getElementById('dailyTipText').innerText = dailyTips[dayOfYear % dailyTips.length];
-        }
-
-        function startRoutine(type) {
-            const flow = routineFlows[type];
-            session.exercises = flow.map(id => {
-                const ex = exerciseLibrary.find(e => e.id === id);
-                return { ...ex, targetReps: "1 Set", targetRest: 10, sets: 1, completedSets: 0 };
+            buttons.forEach(btn => {
+                const b = document.createElement('button');
+                b.innerText = btn.text;
+                b.className = `w-full py-3 rounded-xl font-bold text-sm ${btn.class}`;
+                b.onclick = () => {
+                    modal.classList.add('hidden');
+                    if (btn.action) btn.action();
+                };
+                btnContainer.appendChild(b);
             });
-            session.isPlan = false;
-            startWorkoutUI(`${type === 'morning' ? 'Morning' : 'Night'} Flow`);
+            modal.classList.remove('hidden');
         }
 
-        // --- CORE FUNCTIONS ---
-        function requestWakeLock() { if ('wakeLock' in navigator) navigator.wakeLock.request('screen').then(w => wakeLock = w).catch(() => {}); }
-        function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
-        
-        function playBeep(freq, type) {
-            if (!state.user.audioOn) return;
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = type || 'sine';
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.1);
+        // --- PROMPTS ---
+        function promptFinishWorkout() {
+            showModal("Finish Workout?", "Great job! Ready to save progress?", [
+                { text: "No, Not Yet", class: "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300" },
+                { text: "Yes, Finish", class: "bg-green-500 text-white", action: executeFinish }
+            ]);
         }
-        function toggleAudio() { state.user.audioOn = !state.user.audioOn; updateAudioBtn(); saveData(); if(!audioCtx) audioCtx = new AudioContext(); }
-        function updateAudioBtn() { document.getElementById('audioBtn').innerHTML = state.user.audioOn ? '<i class="fa-solid fa-volume-high"></i> Sound On' : '<i class="fa-solid fa-volume-xmark"></i> Sound Off'; }
-
-        function updateDashboard() {
-            document.getElementById('streakDisplay').innerText = state.user.streak;
-            document.getElementById('userLevel').innerText = "Lvl " + state.user.level;
-            const planCard = document.getElementById('active-plan-card');
-            const planLib = document.getElementById('plan-library');
-            if (state.activePlan && state.activePlan.id) {
-                planCard.classList.remove('hidden'); planLib.classList.add('hidden');
-                document.getElementById('planNameDisplay').innerText = state.activePlan.name;
-                document.getElementById('planProgressText').innerText = `Workout ${state.activePlan.progress + 1} of ${state.activePlan.total}`;
-                document.getElementById('planProgressBar').style.width = `${(state.activePlan.progress / state.activePlan.total) * 100}%`;
-            } else {
-                planCard.classList.add('hidden'); planLib.classList.remove('hidden');
-            }
-            const histEl = document.getElementById('historyLog');
-            histEl.innerHTML = state.history.length ? '' : '<p class="text-center text-gray-400 dark:text-gray-500 text-xs py-4">No workouts yet.</p>';
-            state.history.slice(0, 3).forEach(log => {
-                histEl.innerHTML += `<div class="flex justify-between items-center bg-white dark:bg-darkcard p-3 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm"><div><p class="text-sm font-bold">${log.title}</p><p class="text-[10px] text-gray-400">${new Date(log.date).toLocaleDateString()}</p></div><span class="text-xs font-bold text-blue-500">+${log.xp} XP</span></div>`;
-            });
-            renderWeekVisualizer();
+        function promptCloseWorkout() {
+            showModal("Exit Session?", "Progress will not be saved.", [
+                { text: "Resume", class: "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300" },
+                { text: "Exit", class: "bg-red-500 text-white", action: executeClose }
+            ]);
         }
-
-        function renderEquipmentToggles() {
-            const container = document.getElementById('equip-options'); container.innerHTML = '';
-            Object.keys(state.equipment).forEach(item => {
-                container.innerHTML += `<label class="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"><span class="text-xs font-bold text-gray-700 dark:text-gray-300">${item}</span><input type="checkbox" class="accent-blue-500 w-4 h-4" ${state.equipment[item] ? 'checked' : ''} onchange="toggleEquipment('${item}')"></label>`;
-            });
+        function promptStartPlan(id, name) {
+            showModal("Start Plan?", `Begin 4-week program: ${name}`, [
+                { text: "Cancel", class: "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300" },
+                { text: "Start Plan", class: "bg-blue-600 text-white", action: () => { state.activePlan = { id: id, name: name, progress: 0, total: 12 }; saveData(); updateDashboard(); } }
+            ]);
         }
-        function toggleEquipment(item) { state.equipment[item] = !state.equipment[item]; saveData(); }
-        function toggleMuscle(btn, muscle) {
-            btn.classList.toggle('selected');
-            if (selectedMuscles.includes(muscle)) selectedMuscles = selectedMuscles.filter(m => m !== muscle); else selectedMuscles.push(muscle);
+        function promptQuitPlan() {
+            showModal("Quit Plan?", "You will lose your current plan progress.", [
+                { text: "Keep Plan", class: "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300" },
+                { text: "Quit", class: "bg-red-500 text-white", action: () => { state.activePlan = { id: null, name: null, progress: 0, total: 0 }; saveData(); updateDashboard(); } }
+            ]);
+        }
+        function promptResetApp() {
+             showModal("Factory Reset?", "ALL data will be deleted forever.", [
+                { text: "Cancel", class: "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300" },
+                { text: "Delete Everything", class: "bg-red-600 text-white", action: () => { localStorage.removeItem('fitLogicData_v11'); location.reload(); } }
+            ]);
+        }
+        function promptRate(idx, rating) {
+             const type = rating === 'easy' ? 'Too Easy?' : 'Too Hard?';
+             const change = rating === 'easy' ? 'Reps +2, Rest -5s' : 'Reps -2, Rest +10s';
+             showModal(type, `Next time: ${change}`, [
+                 { text: "Cancel", class: "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300" },
+                 { text: "Confirm", class: "bg-blue-600 text-white", action: () => executeRate(idx, rating) }
+             ]);
         }
 
-        function startPlan(id, name) { if(confirm(`Start "${name}" plan?`)) { state.activePlan = { id: id, name: name, progress: 0, total: 12 }; saveData(); updateDashboard(); }}
-        function quitPlan() { if(confirm("Quit plan?")) { state.activePlan = { id: null, name: null, progress: 0, total: 0 }; saveData(); updateDashboard(); }}
-
-        function generateWorkout(mode) {
-            let selectedList = [];
-            session.isPlan = (mode === 'plan');
+        // --- CORE LOGIC ---
+        function executeFinish() {
+            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+            const xp = 100 + (session.exercises.length * 10);
+            state.user.xp += xp; state.user.streak++; state.user.level = Math.floor(state.user.xp / 500) + 1;
             if (session.isPlan) {
-                const planIds = staticPlans[state.activePlan.id];
-                planIds.forEach(id => { const ex = exerciseLibrary.find(e => e.id === id); if(ex) selectedList.push(ex); });
-            } else {
-                const targets = selectedMuscles.length > 0 ? selectedMuscles : ['Chest', 'Back', 'Legs', 'Core'];
-                let pool = exerciseLibrary.filter(ex => targets.includes(ex.muscle));
-                for (let i = 0; i < 4; i++) { if (pool.length === 0) break; const idx = Math.floor(Math.random() * pool.length); selectedList.push(pool[idx]); pool.splice(idx, 1); }
+                state.activePlan.progress++;
+                if(state.activePlan.progress >= state.activePlan.total) { state.activePlan = { id: null, name: null, progress: 0, total: 0 }; showModal("Plan Complete!", "Incredible dedication.", [{text:"Awesome", class:"bg-blue-600 text-white", action:()=>location.reload()}]); return; }
             }
-            if (selectedList.length === 0) { alert("No exercises found!"); return; }
-            session.exercises = selectedList.map(ex => {
-                const hist = state.exerciseData[ex.id] || { reps: 10, rest: 45 };
-                return { ...ex, targetReps: hist.reps, targetRest: hist.rest, sets: 3, completedSets: 0 };
-            });
-            startWorkoutUI(session.isPlan ? state.activePlan.name : "Freestyle Session");
+            state.history.unshift({ date: Date.now(), title: document.getElementById('workoutTitle').innerText, xp: xp });
+            saveData(); releaseWakeLock();
+            setTimeout(() => location.reload(), 1500);
         }
-
-        function startWorkoutUI(title) {
-            requestWakeLock();
-            document.getElementById('workout-modal').classList.remove('hidden');
-            document.getElementById('workoutTitle').innerText = title;
-            if (session.timerInt) clearInterval(session.timerInt);
-            let sec = 0;
-            session.timerInt = setInterval(() => {
-                sec++;
-                const m = Math.floor(sec / 60).toString().padStart(2, '0');
-                const s = (sec % 60).toString().padStart(2, '0');
-                document.getElementById('sessionTimer').innerText = `${m}:${s}`;
-            }, 1000);
+        function executeClose() { document.getElementById('workout-modal').classList.add('hidden'); clearInterval(session.timerInt); releaseWakeLock(); }
+        
+        function executeRate(idx, rating) {
+            const exId = session.exercises[idx].id;
+            if (!state.exerciseData[exId]) state.exerciseData[exId] = { reps: 10, rest: 45 };
+            let repChange = rating === 'easy' ? 2 : -2;
+            let restChange = rating === 'easy' ? -5 : 10;
+            state.exerciseData[exId].reps = Math.max(5, state.exerciseData[exId].reps + repChange);
+            state.exerciseData[exId].rest = Math.max(15, Math.min(120, state.exerciseData[exId].rest + restChange));
+            saveData();
+            session.exercises[idx].targetReps = state.exerciseData[exId].reps;
+            session.exercises[idx].targetRest = state.exerciseData[exId].rest;
             renderExercises();
         }
 
+        // --- RENDERERS ---
         function renderExercises() {
             const container = document.getElementById('workout-content'); container.innerHTML = '';
             session.exercises.forEach((ex, idx) => {
@@ -480,83 +377,74 @@
                     checks += `<div onclick="completeSet(${idx}, ${i})" class="h-8 w-8 rounded-full border-2 flex items-center justify-center cursor-pointer ${isDone ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300 dark:border-gray-600 text-gray-300 dark:text-gray-600'}">${i+1}</div>`;
                 }
                 const repDisplay = isNaN(ex.targetReps) ? ex.targetReps : `${ex.targetReps} Reps`;
-                const rateUI = session.isPlan || ex.sets > 1 ? `<div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center"><span class="text-[10px] text-gray-400">Rate:</span><div class="flex gap-1"><button onclick="rate(${idx}, 'easy')" class="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-[10px] rounded hover:bg-blue-100 dark:hover:bg-blue-900 font-bold">Too Easy</button><button onclick="rate(${idx}, 'hard')" class="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-[10px] rounded hover:bg-red-100 dark:hover:bg-red-900 font-bold">Too Hard</button></div></div>` : '';
+                const theme = muscleThemes[ex.muscle] || 'bg-gray-50 dark:bg-gray-800 border-gray-400 text-gray-900 dark:text-gray-100';
+                
+                // New Record Badge Logic (Visual Only for now)
+                const isPR = false; // Placeholder logic
                 
                 container.innerHTML += `
-                <div class="bg-white dark:bg-darkcard p-5 border-l-4 border-blue-500 mb-4 rounded-xl shadow-sm">
-                    <div class="flex justify-between items-start"><h4 class="font-bold text-lg">${ex.name}</h4></div>
-                    <p class="text-xs text-gray-500 mt-1">${ex.howTo}</p>
+                <div class="${theme} p-5 border-l-4 mb-4 rounded-xl shadow-sm relative overflow-hidden">
+                    <div class="flex justify-between items-start"><h4 class="font-bold text-lg">${ex.name}</h4><span class="text-[10px] font-bold opacity-70 uppercase tracking-widest">${ex.muscle}</span></div>
+                    <p class="text-xs opacity-80 mt-1">${ex.howTo}</p>
                     <div class="mt-3 flex gap-2 justify-center">${checks}</div>
-                    <div class="flex justify-between mt-1 px-4 text-xs text-gray-400"><span>Target: <span id="target-${idx}" class="font-bold text-black dark:text-white">${repDisplay}</span></span><span>Rest: <span class="font-bold text-black dark:text-white">${ex.targetRest}s</span></span></div>
-                    ${rateUI}
+                    <div class="flex justify-between mt-2 px-4 text-xs font-bold opacity-90"><span>Target: <span id="target-${idx}">${repDisplay}</span></span><span>Rest: ${ex.targetRest}s</span></div>
+                    <div class="mt-3 pt-3 border-t border-black/10 dark:border-white/10 flex justify-between items-center">
+                        <span class="text-[10px] opacity-70">Difficulty:</span>
+                        <div class="flex gap-1">
+                            <button onclick="promptRate(${idx}, 'easy')" class="px-3 py-1 bg-white/50 dark:bg-black/20 text-[10px] rounded hover:bg-white font-bold transition-colors">Too Easy</button>
+                            <button onclick="promptRate(${idx}, 'hard')" class="px-3 py-1 bg-white/50 dark:bg-black/20 text-[10px] rounded hover:bg-white font-bold transition-colors">Too Hard</button>
+                        </div>
+                    </div>
                 </div>`;
             });
         }
 
-        function completeSet(exIdx, setIdx) {
-            if (setIdx === session.exercises[exIdx].completedSets) {
-                session.exercises[exIdx].completedSets++;
-                renderExercises();
-                triggerRest(session.exercises[exIdx].targetRest || 45, "Next Set");
+        // --- BOILERPLATE ---
+        function toggleDarkMode() { state.user.darkMode = !state.user.darkMode; if(state.user.darkMode) document.documentElement.classList.add('dark'); else document.documentElement.classList.remove('dark'); updateThemeIcon(); saveData(); }
+        function updateThemeIcon() { document.getElementById('themeIcon').className = state.user.darkMode ? 'fa-solid fa-sun text-xl' : 'fa-solid fa-moon text-xl'; }
+        function renderWeekVisualizer() {
+            const container = document.getElementById('week-visualizer'); const days = ['S','M','T','W','T','F','S']; const today = new Date(); const currentDayIdx = today.getDay();
+            let html = '';
+            for(let i=0; i<7; i++) {
+                const isToday = (i === currentDayIdx);
+                let activeClass = "bg-gray-100 dark:bg-gray-800 text-gray-300 dark:text-gray-600";
+                if (isToday) { const workedOut = state.history.some(h => new Date(h.date).toDateString() === today.toDateString()); activeClass = workedOut ? "bg-green-500 text-white" : "bg-blue-100 dark:bg-blue-900 text-blue-500 border-2 border-blue-500"; }
+                html += `<div class="flex flex-col items-center gap-1"><div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${activeClass}">${days[i]}</div></div>`;
             }
+            container.innerHTML = html;
         }
-
-        function rate(idx, rating) {
-            const exId = session.exercises[idx].id;
-            if (!state.exerciseData[exId]) state.exerciseData[exId] = { reps: 10, rest: 45 };
-            if (state.exerciseData[exId].rest === undefined) state.exerciseData[exId].rest = 45;
-            let repChange = rating === 'easy' ? 2 : -2;
-            let restChange = rating === 'easy' ? -5 : 10;
-            state.exerciseData[exId].reps = Math.max(5, state.exerciseData[exId].reps + repChange);
-            state.exerciseData[exId].rest = Math.max(15, Math.min(120, state.exerciseData[exId].rest + restChange));
-            saveData();
-            session.exercises[idx].targetReps = state.exerciseData[exId].reps;
-            session.exercises[idx].targetRest = state.exerciseData[exId].rest;
-            alert(`${rating === 'easy' ? 'Too Easy?' : 'Too Hard?'} Adjusting.\nReps: ${repChange>0?'+':''}${repChange}\nRest: ${restChange>0?'+':''}${restChange}s`);
-            renderExercises();
+        function renderTip() { document.getElementById('dailyTipText').innerText = dailyTips[Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000) % dailyTips.length]; }
+        function renderEquipmentToggles() { const c = document.getElementById('equip-options'); c.innerHTML = ''; Object.keys(state.equipment).forEach(i => c.innerHTML += `<label class="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg cursor-pointer"><span class="text-xs font-bold text-gray-700 dark:text-gray-300">${i}</span><input type="checkbox" class="accent-blue-500 w-4 h-4" ${state.equipment[i]?'checked':''} onchange="toggleEquipment('${i}')"></label>`); }
+        function toggleEquipment(i) { state.equipment[i] = !state.equipment[i]; saveData(); }
+        function toggleMuscle(b, m) { b.classList.toggle('selected'); if(selectedMuscles.includes(m)) selectedMuscles = selectedMuscles.filter(x=>x!==m); else selectedMuscles.push(m); }
+        
+        function requestWakeLock() { if ('wakeLock' in navigator) navigator.wakeLock.request('screen').then(w => wakeLock = w).catch(() => {}); }
+        function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
+        function playBeep(f) { if(!state.user.audioOn)return; if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.type='sine';o.frequency.setValueAtTime(f,audioCtx.currentTime);g.gain.setValueAtTime(0.1,audioCtx.currentTime);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+0.1); }
+        function toggleAudio() { state.user.audioOn = !state.user.audioOn; updateAudioBtn(); saveData(); if(!audioCtx)audioCtx=new AudioContext(); }
+        function updateAudioBtn() { document.getElementById('audioBtn').innerHTML = state.user.audioOn ? '<i class="fa-solid fa-volume-high"></i> Sound On' : '<i class="fa-solid fa-volume-xmark"></i> Sound Off'; }
+        
+        function startRoutine(type) { const flow = routineFlows[type]; session.exercises = flow.map(id => { const ex = exerciseLibrary.find(e => e.id === id); return { ...ex, targetReps: "1 Set", targetRest: 10, sets: 1, completedSets: 0 }; }); session.isPlan = false; startWorkoutUI(`${type === 'morning' ? 'Morning' : 'Night'} Flow`); }
+        function generateWorkout(mode) {
+            let list = []; session.isPlan = (mode === 'plan');
+            if (session.isPlan) { staticPlans[state.activePlan.id].forEach(id => { const ex = exerciseLibrary.find(e => e.id === id); if(ex) list.push(ex); }); }
+            else { const t = selectedMuscles.length > 0 ? selectedMuscles : ['Chest','Back','Legs','Core']; let p = exerciseLibrary.filter(ex => t.includes(ex.muscle)); for(let i=0; i<4; i++) { if(p.length===0)break; const idx = Math.floor(Math.random()*p.length); list.push(p[idx]); p.splice(idx,1); } }
+            if (list.length === 0) { alert("No exercises found!"); return; }
+            session.exercises = list.map(ex => { const h = state.exerciseData[ex.id] || { reps: 10, rest: 45 }; return { ...ex, targetReps: h.reps, targetRest: h.rest, sets: 3, completedSets: 0 }; });
+            startWorkoutUI(session.isPlan ? state.activePlan.name : "Freestyle Session");
         }
-
+        function startWorkoutUI(t) { requestWakeLock(); document.getElementById('workout-modal').classList.remove('hidden'); document.getElementById('workoutTitle').innerText = t; if(session.timerInt) clearInterval(session.timerInt); let s=0; session.timerInt = setInterval(() => { s++; document.getElementById('sessionTimer').innerText = `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`; }, 1000); renderExercises(); }
+        function completeSet(eI, sI) { if (sI === session.exercises[eI].completedSets) { session.exercises[eI].completedSets++; renderExercises(); triggerRest(session.exercises[eI].targetRest || 45, "Next Set"); } }
         let restInt = null;
-        function triggerRest(seconds, nextText) {
-            const overlay = document.getElementById('rest-overlay');
-            const display = document.getElementById('rest-countdown');
-            document.getElementById('up-next-text').innerText = nextText;
-            overlay.classList.remove('hidden');
-            let timeLeft = seconds;
-            display.innerText = `${Math.floor(timeLeft/60).toString().padStart(2,'0')}:${(timeLeft%60).toString().padStart(2,'0')}`;
-            if (restInt) clearInterval(restInt);
-            restInt = setInterval(() => {
-                timeLeft--;
-                display.innerText = `${Math.floor(timeLeft/60).toString().padStart(2,'0')}:${(timeLeft%60).toString().padStart(2,'0')}`;
-                if (timeLeft <= 3 && timeLeft > 0) playBeep(440);
-                if (timeLeft === 0) { playBeep(880); skipRest(); }
-            }, 1000);
-        }
+        function triggerRest(s, t) { const o = document.getElementById('rest-overlay'); const d = document.getElementById('rest-countdown'); document.getElementById('up-next-text').innerText = t; o.classList.remove('hidden'); let l = s; d.innerText = fmt(l); if(restInt) clearInterval(restInt); restInt = setInterval(() => { l--; d.innerText = fmt(l); if(l<=3 && l>0) playBeep(440); if(l===0) { playBeep(880); skipRest(); } }, 1000); }
+        function fmt(s) { return `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`; }
         function addRest(s) { triggerRest(parseInt(document.getElementById('rest-countdown').innerText.split(':')[1]) + s, document.getElementById('up-next-text').innerText); }
-        function skipRest() { document.getElementById('rest-overlay').classList.add('hidden'); if (restInt) clearInterval(restInt); }
-
-        function finishWorkout() {
-            if(!confirm("Finish & Save?")) return;
-            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-            const xp = 100 + (session.exercises.length * 10);
-            state.user.xp += xp; state.user.streak++; state.user.level = Math.floor(state.user.xp / 500) + 1;
-            if (session.isPlan) {
-                state.activePlan.progress++;
-                if(state.activePlan.progress >= state.activePlan.total) { alert("CONGRATULATIONS! Plan Finished!"); state.activePlan = { id: null, name: null, progress: 0, total: 0 }; }
-            }
-            state.history.unshift({ date: Date.now(), title: document.getElementById('workoutTitle').innerText, xp: xp });
-            saveData();
-            releaseWakeLock();
-            setTimeout(() => { location.reload(); }, 2000);
-        }
-
-        function closeWorkout() { if(confirm("Exit?")) { document.getElementById('workout-modal').classList.add('hidden'); clearInterval(session.timerInt); releaseWakeLock(); }}
-        function saveData() { localStorage.setItem('fitLogicData_v10', JSON.stringify(state)); }
+        function skipRest() { document.getElementById('rest-overlay').classList.add('hidden'); if(restInt) clearInterval(restInt); }
+        function saveData() { localStorage.setItem('fitLogicData_v11', JSON.stringify(state)); }
         function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
         function exportData() { const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state)); a.download = "fitlogic_backup.json"; document.body.appendChild(a); a.click(); a.remove(); }
         function importData(input) { const r = new FileReader(); r.onload = (e) => { state = JSON.parse(e.target.result); saveData(); location.reload(); }; r.readAsText(input.files[0]); }
-        function resetApp() { if(confirm("Reset data?")) { localStorage.removeItem('fitLogicData_v10'); location.reload(); }}
-
+        
         init();
     </script>
 </body>
