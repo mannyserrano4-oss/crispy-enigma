@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weddings & Events | MAS Barbery</title>
+    <link rel="icon" type="image/png" href="icon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; } /* Fancy font for weddings */
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-900">
+
+    <div class="relative bg-violet-900 h-96 flex flex-col items-center justify-center text-center px-4 overflow-hidden">
+        <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-stone-50/10"></div>
+        
+        <div class="relative z-10 text-white animate-fade-in-up">
+            <p class="text-xs font-bold tracking-[0.2em] text-yellow-400 uppercase mb-2">Tampa Bay • Zephyrhills • St. Pete</p>
+            <h1 class="text-5xl mb-4 italic">The Wedding Day<br>Protocol</h1>
+            <p class="text-violet-100 max-w-md mx-auto text-sm leading-relaxed">
+                A premium grooming experience delivered to your hotel suite or venue. Relax, drink, and get sharp before the photos.
+            </p>
+        </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto px-4 -mt-16 relative z-20 space-y-6 pb-12">
+
+        <div class="bg-white p-8 rounded-xl shadow-xl border-t-4 border-yellow-500">
+            <h2 class="text-2xl font-bold text-violet-900 mb-4 flex items-center">
+                <i class="fa-solid fa-chair text-yellow-500 mr-3 text-xl"></i> The Setup
+            </h2>
+            <p class="text-gray-600 mb-6 text-sm leading-relaxed">
+                We don't just bring clippers. We bring the barbershop atmosphere to you.
+            </p>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="flex items-center gap-3 p-3 bg-stone-100 rounded-lg">
+                    <i class="fa-solid fa-couch text-violet-600"></i>
+                    <span class="text-xs font-bold">Portable Chair</span>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-stone-100 rounded-lg">
+                    <i class="fa-solid fa-lightbulb text-violet-600"></i>
+                    <span class="text-xs font-bold">Studio Lighting</span>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-stone-100 rounded-lg">
+                    <i class="fa-solid fa-clock text-violet-600"></i>
+                    <span class="text-xs font-bold">Time Mgmt.</span>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-stone-100 rounded-lg">
+                    <i class="fa-solid fa-camera text-violet-600"></i>
+                    <span class="text-xs font-bold">Photo Ready</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-8 rounded-xl shadow-xl">
+            <h2 class="text-2xl font-bold text-violet-900 mb-2">The Services</h2>
+            <p class="text-xs text-gray-400 uppercase tracking-wider font-bold mb-6">Minimum Booking: $300</p>
+
+            <div class="space-y-6">
+                <div class="flex gap-4">
+                    <div class="w-12 h-12 bg-violet-100 rounded-full flex items-center justify-center flex-shrink-0 text-violet-600">
+                        <i class="fa-solid fa-scissors"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg">Signature Haircuts</h3>
+                        <p class="text-sm text-gray-600 mt-1">
+                            Fades, tapers, or scissor cuts tailored to each groomsman. Includes detailed neckline cleanup and styling with premium products.
+                        </p>
+                    </div>
+                </div>
+
+                <div id="shave-section" class=""> 
+                    <div class="flex gap-4">
+                        <div class="w-12 h-12 bg-violet-100 rounded-full flex items-center justify-center flex-shrink-0 text-violet-600">
+                            <i class="fa-solid fa-soap"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg">Hot Towel Shave</h3>
+                            <p class="text-sm text-gray-600 mt-1">
+                                The ultimate luxury. Steaming hot towels, hot lather, and a straight razor finish. Perfect for the Groom's "getting ready" video.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                </div>
+        </div>
+
+        <div class="bg-stone-900 text-white p-8 rounded-xl shadow-2xl relative overflow-hidden">
+            <div class="relative z-10">
+                <h2 class="text-2xl font-bold mb-2 text-yellow-400">Request a Quote</h2>
+                <p class="text-stone-400 text-sm mb-6">Tell me about the big day. I'll text you a custom package price.</p>
+                
+                <div class="space-y-4 text-stone-900">
+                    <input type="text" id="wName" placeholder="Your Name (Groom/Planner)" class="w-full p-3 rounded-lg border-none focus:ring-2 focus:ring-yellow-400 outline-none">
+                    <input type="date" id="wDate" class="w-full p-3 rounded-lg border-none focus:ring-2 focus:ring-yellow-400 outline-none">
+                    <input type="text" id="wLocation" placeholder="Venue/Hotel Location (City)" class="w-full p-3 rounded-lg border-none focus:ring-2 focus:ring-yellow-400 outline-none">
+                    <div class="flex gap-2">
+                        <input type="number" id="wCount" placeholder="# of Guys" class="w-1/2 p-3 rounded-lg border-none focus:ring-2 focus:ring-yellow-400 outline-none">
+                        <select id="wServices" class="w-1/2 p-3 rounded-lg border-none focus:ring-2 focus:ring-yellow-400 outline-none bg-white">
+                            <option value="Cuts Only">Cuts Only</option>
+                            <option value="Cuts & Shaves">Cuts & Shaves</option>
+                        </select>
+                    </div>
+                    
+                    <button onclick="sendWeddingInquiry()" class="w-full bg-yellow-500 hover:bg-yellow-400 text-stone-900 font-bold py-4 rounded-lg transition-colors mt-4 shadow-lg active:scale-95 transform">
+                        Check Availability & Price
+                    </button>
+                </div>
+            </div>
+            
+            <i class="fa-solid fa-champagne-glasses absolute -bottom-6 -right-6 text-9xl text-white/5 rotate-12"></i>
+        </div>
+
+        <div class="text-center pt-8 pb-4">
+            <a href="index.html" class="text-violet-900 font-bold text-sm hover:underline">&larr; Back to Main Site</a>
+        </div>
+
+    </div>
+
+    <script>
+        function sendWeddingInquiry() {
+            const name = document.getElementById('wName').value;
+            const date = document.getElementById('wDate').value;
+            const loc = document.getElementById('wLocation').value;
+            const count = document.getElementById('wCount').value;
+            const type = document.getElementById('wServices').value;
+
+            if(!name || !date || !loc || !count) {
+                alert("Please fill out all fields so I can give you an accurate quote.");
+                return;
+            }
+
+            // The text message logic
+            const msg = `Yo Manny, looking for a wedding quote.\n\nName: ${name}\nDate: ${date}\nLocation: ${loc}\nHeadcount: ${count} Guys\nServices: ${type}\n\nAre you available?`;
+
+            // Detect mobile to use & or ?
+            const sep = navigator.userAgent.match(/iPhone|iPad|iPod/i) ? '&' : '?';
+            window.location.href = `sms:9014437338${sep}body=${encodeURIComponent(msg)}`;
+        }
+    </script>
+</body>
+</html>
