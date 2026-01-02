@@ -87,7 +87,49 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div class="bg-violet-50 p-8 rounded-xl shadow-inner border border-violet-100">
+            <h2 class="text-2xl font-bold text-violet-900 mb-6 text-center">Common Questions</h2>
+            
+            <div class="grid md:grid-cols-2 gap-8 text-left">
+                <div>
+                    <h3 class="font-bold text-lg text-stone-800 mb-2">
+                        <i class="fa-solid fa-calendar-check text-yellow-500 mr-2"></i> How do we book?
+                    </h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        Fill out the form below. If I'm available, I'll send you a custom invoice. A <strong>50% retainer</strong> is required to lock in your date. The balance is due on the wedding day.
+                    </p>
                 </div>
+
+                <div>
+                    <h3 class="font-bold text-lg text-stone-800 mb-2">
+                        <i class="fa-solid fa-ban text-red-400 mr-2"></i> What if we cancel?
+                    </h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        If you cancel more than <strong>30 days</strong> before the event, your deposit is refunded minus a <strong>$50 admin fee</strong>. Cancellations within 30 days are non-refundable.
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-lg text-stone-800 mb-2">
+                        <i class="fa-solid fa-road text-stone-500 mr-2"></i> Do you travel?
+                    </h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        Absolutely. I serve Tampa, Zephyrhills, and St. Pete. Travel within 20 miles of my shop is free; beyond that, a small travel fee applies.
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-lg text-stone-800 mb-2">
+                        <i class="fa-solid fa-clock text-stone-500 mr-2"></i> Timing?
+                    </h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        I budget roughly <strong>45 mins per haircut</strong> or <strong>60 mins for a cut & shave</strong>. I create a schedule so no one is rushed.
+                    </p>
+                </div>
+            </div>
         </div>
 
         <div class="bg-stone-900 text-white p-8 rounded-xl shadow-2xl relative overflow-hidden">
@@ -97,13 +139,16 @@
                 
                 <div class="space-y-4 text-stone-900">
                     <input type="text" id="wName" placeholder="Your Name (Groom/Planner)" class="w-full p-3 rounded-lg border-none focus:ring-2 focus:ring-yellow-400 outline-none">
+                    
                     <input type="text" 
                        id="wDate" 
                        placeholder="Date of Event" 
                        onfocus="(this.type='date')" 
                        onblur="(this.value ? this.type='date' : this.type='text')" 
                        class="w-full p-3 h-[50px] rounded-lg border-none focus:ring-2 focus:ring-yellow-400 outline-none appearance-none placeholder-stone-400">
+                    
                     <input type="text" id="wLocation" placeholder="Venue/Hotel Location (City)" class="w-full p-3 rounded-lg border-none focus:ring-2 focus:ring-yellow-400 outline-none">
+                    
                     <div class="flex gap-2">
                         <input type="number" id="wCount" placeholder="# of Guys" class="w-1/2 p-3 rounded-lg border-none focus:ring-2 focus:ring-yellow-400 outline-none">
                         <select id="wServices" class="w-1/2 p-3 rounded-lg border-none focus:ring-2 focus:ring-yellow-400 outline-none bg-white">
@@ -112,7 +157,7 @@
                         </select>
                     </div>
                     
-                    <button onclick="sendWeddingInquiry()" class="w-full bg-yellow-500 hover:bg-yellow-400 text-stone-900 font-bold py-4 rounded-lg transition-colors mt-4 shadow-lg active:scale-95 transform">
+                    <button onclick="sendWeddingInquiry()" class="w-full bg-yellow-500 hover:bg-yellow-400 text-stone-900 font-bold py-4 rounded-lg transition-colors mt-4 shadow-lg active:scale-95 transform cursor-pointer">
                         Check Availability & Price
                     </button>
                 </div>
@@ -129,61 +174,43 @@
 
     <script>
         function sendWeddingInquiry() {
+            // 1. Get values from inputs
             const name = document.getElementById('wName').value;
-            const date = document.getElementById('wDate').value;
+            const rawDate = document.getElementById('wDate').value; // Comes in as YYYY-MM-DD
             const loc = document.getElementById('wLocation').value;
             const count = document.getElementById('wCount').value;
             const type = document.getElementById('wServices').value;
 
-            if(!name || !date || !loc || !count) {
-                alert("Please fill out all fields so I can give you an accurate quote.");
-                return;
-            }
-
-            // The text message logic
-            const msg = `Yo Manny, looking for a wedding quote.\n\nName: ${name}\nDate: ${date}\nLocation: ${loc}\nHeadcount: ${count} Guys\nServices: ${type}\n\nAre you available?`;
-
-            // Detect mobile to use & or ?
-            const sep = navigator.userAgent.match(/iPhone|iPad|iPod/i) ? '&' : '?';
-            window.location.href = `sms:9014437338${sep}body=${encodeURIComponent(msg)}`;
-        }
-
-<script>
-        function sendWeddingInquiry() {
-            const name = document.getElementById('wName').value;
-            const rawDate = document.getElementById('wDate').value; // This gets "2026-01-22"
-            const loc = document.getElementById('wLocation').value;
-            const count = document.getElementById('wCount').value;
-            const type = document.getElementById('wServices').value;
-
+            // 2. Validate (make sure fields aren't empty)
             if(!name || !rawDate || !loc || !count) {
                 alert("Please fill out all fields so I can give you an accurate quote.");
                 return;
             }
 
-            // --- DATE FIX START ---
-            // 1. Split the "2026-01-22" into pieces so we don't get timezone errors
-            const parts = rawDate.split('-'); 
-            const year = parts[0];
-            const monthIndex = parseInt(parts[1]) - 1; // months are 0-11 in code
-            const day = parts[2];
+            // 3. DATE FIX LOGIC
+            // Convert "2026-01-22" -> "Jan. 22, 2026"
+            let formattedDate = rawDate; // Default fallback
+            if(rawDate.includes('-')) {
+                const parts = rawDate.split('-'); // Splits into [2026, 01, 22]
+                const year = parts[0];
+                const monthIndex = parseInt(parts[1]) - 1; // 01 becomes index 0
+                const day = parts[2];
 
-            // 2. Define the month names
-            const months = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "Jun.", "Jul.", "Aug.", "Sep.", "Oct.", "Nov.", "Dec."];
-            
-            // 3. Create the clean date: "Jan. 22, 2026"
-            const formattedDate = `${months[monthIndex]} ${day}, ${year}`;
-            // --- DATE FIX END ---
+                const months = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "Jun.", "Jul.", "Aug.", "Sep.", "Oct.", "Nov.", "Dec."];
+                
+                formattedDate = `${months[monthIndex]} ${day}, ${year}`;
+            }
 
-            // Now use 'formattedDate' inside the message instead of 'rawDate'
+            // 4. Create the message body
             const msg = `Yo Manny, looking for a wedding quote.\n\nName: ${name}\nDate: ${formattedDate}\nLocation: ${loc}\nHeadcount: ${count} Guys\nServices: ${type}\n\nAre you available?`;
 
-            // Detect mobile to use & or ?
-            const sep = navigator.userAgent.match(/iPhone|iPad|iPod/i) ? '&' : '?';
+            // 5. Detect device (iPhone needs '&', Android needs '?')
+            const isIOS = navigator.userAgent.match(/iPhone|iPad|iPod/i);
+            const sep = isIOS ? '&' : '?';
+
+            // 6. Send the text
             window.location.href = `sms:9014437338${sep}body=${encodeURIComponent(msg)}`;
         }
-    </script>
-        
     </script>
 </body>
 </html>
