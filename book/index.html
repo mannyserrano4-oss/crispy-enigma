@@ -201,9 +201,14 @@
                 </div>
             </div>
 
-            <div>
-                <label class="block text-xs font-bold text-violet-700 uppercase tracking-wider mb-1">Requested Time</label>
-                <input type="datetime-local" id="cDate" class="form-input cursor-pointer">
+             <div>
+                    <label class="block text-xs font-bold text-violet-700 uppercase tracking-wider mb-1">Requested Time</label>
+                    <input type="text" 
+                           id="cDate" 
+                           placeholder="Select Date & Time..." 
+                           onfocus="(this.type='datetime-local')" 
+                           onblur="(this.value ? this.type='datetime-local' : this.type='text')" 
+                           class="form-input cursor-pointer placeholder-gray-400">
             </div>
 
             <div>
