@@ -18,6 +18,33 @@
         
         /* Smooth scrolling for anchor links */
         html { scroll-behavior: smooth; }
+
+        /* Custom Toast Notification */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #ef4444; /* Red color */
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 12px;
+            position: fixed;
+            z-index: 50;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            font-size: 0.9rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s;
+        }
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+        
     </style>
 </head>
 <body class="bg-stone-50 text-stone-900">
@@ -172,6 +199,8 @@
         </div>
     </div>
 
+        <div id="toast"><i class="fa-solid fa-circle-exclamation mr-2"></i> <span id="toastMsg">Error</span></div>
+
         <div class="bg-violet-50 p-8 rounded-xl shadow-inner border border-violet-100">
             <h2 class="text-2xl font-bold text-violet-900 mb-6 text-center">Common Questions</h2>
             
@@ -255,7 +284,7 @@
                     <button onclick="sendWeddingInquiry()" class="w-full bg-yellow-500 hover:bg-yellow-400 text-stone-900 font-bold py-4 rounded-lg transition-colors mt-4 shadow-lg active:scale-95 transform cursor-pointer">
                         Request Availability & Price
                     </button>
-                    <p class="text-stone-500 text-xs text-center mt-2">I will reply via email within 72 hours.</p>
+                    <p class="text-stone-500 text-xs text-center mt-2">I will reply via email within 24 hours.</p>
                 </div>
             </div>
             
@@ -282,7 +311,15 @@
 
     </div>
 
-    <script>
+<script>
+        // Helper: Shows the red error popup
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            document.getElementById("toastMsg").innerText = message;
+            toast.className = "show";
+            setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
         function sendWeddingInquiry() {
             // 1. Get values from inputs
             const name = document.getElementById('wName').value;
@@ -291,15 +328,15 @@
             const loc = document.getElementById('wLocation').value;
             const count = document.getElementById('wCount').value;
             const type = document.getElementById('wServices').value;
-            const notes = document.getElementById('wNotes').value; // Get notes
+            const notes = document.getElementById('wNotes').value; 
 
-            // 2. Validate
+            // 2. Validate using the Toast Notification
             if(!name || !rawDate || !loc || !count) {
-                alert("Please fill out all fields so I can give you an accurate quote.");
+                showToast("Please fill out all fields for an accurate quote.");
                 return;
             }
 
-            // 3. DATE FIX LOGIC (Jan. 22, 2026)
+            // 3. DATE FIX LOGIC
             let formattedDate = rawDate; 
             if(rawDate.includes('-')) {
                 const parts = rawDate.split('-'); 
@@ -310,7 +347,7 @@
                 formattedDate = `${months[monthIndex]} ${day}, ${year}`;
             }
 
-            // 4. TIME FIX LOGIC (2:30 PM)
+            // 4. TIME FIX LOGIC
             let formattedTime = rawTime ? rawTime : "Not specified";
             if (rawTime.includes(':')) {
                 const [hourString, minute] = rawTime.split(':');
@@ -320,9 +357,8 @@
                 formattedTime = `${standardHour}:${minute} ${ampm}`;
             }
 
-            // 5. Create Professional Email Subject & Body
+            // 5. Create Professional Email
             const subject = `Private Event Inquiry: ${formattedDate} - ${name}`;
-            
             const body = `Hi Manny,
 
 I would like to request a quote for a private grooming event.
@@ -343,9 +379,12 @@ Please let me know your availability and pricing.
 Best regards,
 ${name}`;
 
-            // 6. Send via Email (Mailto)
+            // 6. Send via Email
             window.location.href = `mailto:mannyserrano4@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         }
     </script>
+
+    
+    
 </body>
 </html>
