@@ -147,6 +147,43 @@
             const sep = navigator.userAgent.match(/iPhone|iPad|iPod/i) ? '&' : '?';
             window.location.href = `sms:9014437338${sep}body=${encodeURIComponent(msg)}`;
         }
+
+<script>
+        function sendWeddingInquiry() {
+            const name = document.getElementById('wName').value;
+            const rawDate = document.getElementById('wDate').value; // This gets "2026-01-22"
+            const loc = document.getElementById('wLocation').value;
+            const count = document.getElementById('wCount').value;
+            const type = document.getElementById('wServices').value;
+
+            if(!name || !rawDate || !loc || !count) {
+                alert("Please fill out all fields so I can give you an accurate quote.");
+                return;
+            }
+
+            // --- DATE FIX START ---
+            // 1. Split the "2026-01-22" into pieces so we don't get timezone errors
+            const parts = rawDate.split('-'); 
+            const year = parts[0];
+            const monthIndex = parseInt(parts[1]) - 1; // months are 0-11 in code
+            const day = parts[2];
+
+            // 2. Define the month names
+            const months = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "Jun.", "Jul.", "Aug.", "Sep.", "Oct.", "Nov.", "Dec."];
+            
+            // 3. Create the clean date: "Jan. 22, 2026"
+            const formattedDate = `${months[monthIndex]} ${day}, ${year}`;
+            // --- DATE FIX END ---
+
+            // Now use 'formattedDate' inside the message instead of 'rawDate'
+            const msg = `Yo Manny, looking for a wedding quote.\n\nName: ${name}\nDate: ${formattedDate}\nLocation: ${loc}\nHeadcount: ${count} Guys\nServices: ${type}\n\nAre you available?`;
+
+            // Detect mobile to use & or ?
+            const sep = navigator.userAgent.match(/iPhone|iPad|iPod/i) ? '&' : '?';
+            window.location.href = `sms:9014437338${sep}body=${encodeURIComponent(msg)}`;
+        }
+    </script>
+        
     </script>
 </body>
 </html>
