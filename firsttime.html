@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Client Exclusive | MAS Barbery</title>
+    <link rel="icon" type="image/png" href="gitpp.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-stone-900 flex items-center justify-center min-h-screen p-4">
+
+    <div class="bg-white w-full max-w-sm rounded-xl overflow-hidden shadow-2xl relative">
+        
+        <div class="h-2 bg-yellow-500 w-full"></div>
+        
+        <div class="p-8 text-center">
+            <p class="text-xs font-bold text-stone-400 uppercase tracking-[0.3em] mb-4">Manny Serrano • MAS Barbery</p>
+            
+            <h1 class="font-['Playfair_Display'] text-4xl font-bold text-stone-900 mb-2">First Time?</h1>
+            <p class="text-stone-500 text-sm mb-8">Experience the premium service for less.</p>
+
+            <div class="border-2 border-dashed border-stone-300 bg-stone-50 p-6 rounded-lg mb-8 relative group cursor-pointer" onclick="revealCode()">
+                
+                <div id="hiddenState" class="absolute inset-0 flex items-center justify-center bg-stone-800 rounded-lg transition-opacity duration-500">
+                    <span class="text-yellow-500 font-bold uppercase tracking-widest text-sm animate-pulse">Tap to Reveal Code</span>
+                </div>
+
+                <p class="text-xs text-stone-400 uppercase mb-1">Your Voucher Code</p>
+                <h2 class="text-3xl font-black text-stone-900 tracking-widest">NEWGUY10</h2>
+                <p class="text-xs text-green-600 font-bold mt-2">Valid for $10 Off First Cut</p>
+            </div>
+
+            <a href="https://mannyserrano4-oss.github.io/crispy-enigma/book/" class="block w-full bg-yellow-500 hover:bg-yellow-400 text-stone-900 font-bold py-4 rounded-lg shadow-lg transition-transform transform active:scale-95">
+                Book Appointment Now
+            </a>
+            
+            <p class="text-[10px] text-stone-400 mt-4">
+                *Show this screen to Manny at checkout. Valid for new clients only.
+            </p>
+        </div>
+
+        <div class="absolute top-1/2 -left-3 w-6 h-6 bg-stone-900 rounded-full"></div>
+        <div class="absolute top-1/2 -right-3 w-6 h-6 bg-stone-900 rounded-full"></div>
+    </div>
+
+    <script>
+        function revealCode() {
+            const cover = document.getElementById('hiddenState');
+            cover.style.opacity = '0';
+            setTimeout(() => {
+                cover.style.display = 'none';
+            }, 500);
+        }
+    </script>
+</body>
+</html>
