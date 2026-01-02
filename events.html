@@ -97,7 +97,12 @@
                 
                 <div class="space-y-4 text-stone-900">
                     <input type="text" id="wName" placeholder="Your Name (Groom/Planner)" class="w-full p-3 rounded-lg border-none focus:ring-2 focus:ring-yellow-400 outline-none">
-                    <input type="date" id="wDate" class="w-full p-3 rounded-lg border-none focus:ring-2 focus:ring-yellow-400 outline-none">
+                    <input type="text" 
+                       id="wDate" 
+                       placeholder="Date of Event" 
+                       onfocus="(this.type='date')" 
+                       onblur="(this.value ? this.type='date' : this.type='text')" 
+                       class="w-full p-3 h-[50px] rounded-lg border-none focus:ring-2 focus:ring-yellow-400 outline-none appearance-none placeholder-stone-400">
                     <input type="text" id="wLocation" placeholder="Venue/Hotel Location (City)" class="w-full p-3 rounded-lg border-none focus:ring-2 focus:ring-yellow-400 outline-none">
                     <div class="flex gap-2">
                         <input type="number" id="wCount" placeholder="# of Guys" class="w-1/2 p-3 rounded-lg border-none focus:ring-2 focus:ring-yellow-400 outline-none">
