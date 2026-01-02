@@ -165,7 +165,7 @@
         <div id="book-now" class="bg-stone-900 text-white p-8 rounded-xl shadow-2xl relative overflow-hidden border-t-4 border-yellow-500">
             <div class="relative z-10">
                 <h2 class="text-2xl font-bold mb-2 text-yellow-400">Request a Quote</h2>
-                <p class="text-stone-400 text-sm mb-6">Tell me about the event. I'll text you a custom package price.</p>
+                <p class="text-stone-400 text-sm mb-6">Tell me about the event. I'll email you a custom package price.</p>
                 
                 <div class="space-y-4 text-stone-900">
                     <input type="text" id="wName" placeholder="Your Name (Organizer/Client)" class="w-full p-3 rounded-lg border-none focus:ring-2 focus:ring-yellow-400 outline-none">
@@ -197,11 +197,13 @@
                             <option value="Cuts & Shaves">Cuts & Shaves</option>
                         </select>
                     </div>
+
+                    <textarea id="wNotes" placeholder="Additional Notes (Special requests, parking info, etc.)" class="w-full p-3 rounded-lg border-none focus:ring-2 focus:ring-yellow-400 outline-none h-24 resize-none"></textarea>
                     
                     <button onclick="sendWeddingInquiry()" class="w-full bg-yellow-500 hover:bg-yellow-400 text-stone-900 font-bold py-4 rounded-lg transition-colors mt-4 shadow-lg active:scale-95 transform cursor-pointer">
-                        Check Availability & Price
+                        Request Availability & Price
                     </button>
-                    <p class="text-stone-500 text-xs text-center mt-2">I will reply via text within 72 hours.</p>
+                    <p class="text-stone-500 text-xs text-center mt-2">I will reply via email within 24 hours.</p>
                 </div>
             </div>
             
@@ -219,10 +221,11 @@
             // 1. Get values from inputs
             const name = document.getElementById('wName').value;
             const rawDate = document.getElementById('wDate').value; 
-            const rawTime = document.getElementById('wTime').value; // Comes in as 14:30
+            const rawTime = document.getElementById('wTime').value; 
             const loc = document.getElementById('wLocation').value;
             const count = document.getElementById('wCount').value;
             const type = document.getElementById('wServices').value;
+            const notes = document.getElementById('wNotes').value; // Get notes
 
             // 2. Validate
             if(!name || !rawDate || !loc || !count) {
@@ -241,7 +244,7 @@
                 formattedDate = `${months[monthIndex]} ${day}, ${year}`;
             }
 
-            // 4. TIME FIX LOGIC (Convert 14:30 to 2:30 PM)
+            // 4. TIME FIX LOGIC (2:30 PM)
             let formattedTime = rawTime ? rawTime : "Not specified";
             if (rawTime.includes(':')) {
                 const [hourString, minute] = rawTime.split(':');
@@ -251,14 +254,31 @@
                 formattedTime = `${standardHour}:${minute} ${ampm}`;
             }
 
-            // 5. Create the message body
-            // CHANGED: "wedding quote" -> "private event quote"
-            const msg = `Yo Manny, looking for a private event quote.\n\nName: ${name}\nDate: ${formattedDate}\nReady By: ${formattedTime}\nLocation: ${loc}\nHeadcount: ${count} People\nServices: ${type}\n\nAre you available?`;
+            // 5. Create Professional Email Subject & Body
+            const subject = `Private Event Inquiry: ${formattedDate} - ${name}`;
+            
+            const body = `Hi Manny,
 
-            // 6. Detect device and send
-            const isIOS = navigator.userAgent.match(/iPhone|iPad|iPod/i);
-            const sep = isIOS ? '&' : '?';
-            window.location.href = `sms:9014437338${sep}body=${encodeURIComponent(msg)}`;
+I would like to request a quote for a private grooming event.
+
+Event Details:
+- Name: ${name}
+- Date: ${formattedDate}
+- Ready By: ${formattedTime}
+- Location: ${loc}
+- Headcount: ${count} People
+- Services Requested: ${type}
+
+Additional Notes:
+${notes ? notes : "None provided."}
+
+Please let me know your availability and pricing.
+
+Best regards,
+${name}`;
+
+            // 6. Send via Email (Mailto)
+            window.location.href = `mailto:mannyserrano4@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         }
     </script>
 </body>
