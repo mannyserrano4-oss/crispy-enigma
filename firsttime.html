@@ -3,18 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Style Lookbook | Manny Serrano</title>
-    <link rel="icon" type="image/png" href="gitpp.png">
+    <title>New Client Exclusive | Manny Serrano</title>
     
+    <meta property="og:title" content="Your $10 Voucher">
+    <meta property="og:description" content="Exclusive offer for new clients at MAS Barbery. Tap to redeem.">
+    <meta property="og:image" content="https://mannyserrano4-oss.github.io/crispy-enigma/gitpp.png">
+    
+    <link rel="icon" type="image/png" href="gitpp.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
-            /* THE SIGNATURE PURPLE ANIMATED BACKGROUND */
-            background: linear-gradient(-45deg, #e9d5ff, #f5d0fe, #c4b5fd, #a78bfa);
+            background: linear-gradient(-45deg, #4c1d95, #6d28d9, #8b5cf6, #a78bfa);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
         }
@@ -25,72 +28,63 @@
         }
     </style>
 </head>
-<body class="text-gray-800 pb-12">
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
 
-    <div class="text-center pt-10 pb-6 px-4">
-        <h1 class="text-3xl font-extrabold text-violet-900 mb-2">The Lookbook</h1>
-        <p class="text-sm text-violet-800 font-medium">Don't guess. Point & Pick.</p>
-    </div>
+    <a href="index.html" class="absolute top-6 text-violet-200 text-xs font-bold uppercase tracking-widest hover:text-white transition-colors">
+        &larr; Back to Main Profile
+    </a>
 
-    <div class="max-w-md mx-auto px-4 space-y-6">
-
-        <div class="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl overflow-hidden border border-white/50">
-            <div class="h-64 bg-gray-200 relative group">
-                <img src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=600&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                <div class="absolute top-3 right-3 bg-violet-600 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-lg">Most Popular</div>
-            </div>
-            <div class="p-6">
-                <h2 class="text-xl font-bold text-violet-900 mb-1">The Mid-Bald Fade</h2>
-                <p class="text-xs text-gray-500 mb-4 uppercase tracking-wider font-bold">Sharp • Modern • Clean</p>
-                <p class="text-sm text-gray-700 leading-relaxed mb-4">
-                    Skin tight on the sides, blended smoothly into the top. The cleanest look for Florida heat.
-                </p>
-                <div class="bg-violet-50 p-3 rounded-lg text-xs text-violet-800 border-l-4 border-violet-500">
-                    <strong>Ask for:</strong> "Mid skin fade, keep length on top to style."
-                </div>
+    <div class="bg-white w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl relative mt-8 transform transition hover:scale-[1.01]">
+        
+        <div class="h-48 bg-gray-200 relative">
+            <img src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=600&fit=crop" class="w-full h-full object-cover">
+            
+            <div class="absolute bottom-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
+                <i class="fa-solid fa-star text-yellow-500 text-xs"></i>
+                <span class="text-xs font-bold text-violet-900">5.0 Star Rated</span>
             </div>
         </div>
 
-        <div class="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl overflow-hidden border border-white/50">
-            <div class="h-64 bg-gray-200 relative group">
-                <img src="https://images.unsplash.com/photo-1593702295094-aea8c5c13d99?q=80&w=600&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-            </div>
-            <div class="p-6">
-                <h2 class="text-xl font-bold text-violet-900 mb-1">The Classic Taper</h2>
-                <p class="text-xs text-gray-500 mb-4 uppercase tracking-wider font-bold">Professional • Timeless</p>
-                <p class="text-sm text-gray-700 leading-relaxed mb-4">
-                    Keeps hair around the ears but fades out the sideburns and neckline. Great for business settings.
-                </p>
-                <div class="bg-violet-50 p-3 rounded-lg text-xs text-violet-800 border-l-4 border-violet-500">
-                    <strong>Ask for:</strong> "Low taper on the neck and sides. Scissor cut top."
+        <div class="p-8 text-center relative z-10">
+            
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-2">Manny Serrano • MAS Barbery</p>
+            <h1 class="text-3xl font-black text-violet-900 leading-tight mb-2">First Time?</h1>
+            <p class="text-gray-500 text-sm mb-6">Upgrade your look. Save money doing it.</p>
+
+            <div class="border-2 border-dashed border-violet-200 bg-violet-50 p-6 rounded-xl mb-6 relative group cursor-pointer overflow-hidden shadow-inner" onclick="revealCode()">
+                
+                <div id="hiddenState" class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-violet-600 to-indigo-600 transition-transform duration-500 z-20">
+                    <i class="fa-solid fa-hand-pointer text-white text-2xl mb-2 animate-bounce"></i>
+                    <span class="text-white font-black uppercase tracking-widest text-sm shadow-sm">Tap to Reveal</span>
+                </div>
+
+                <p class="text-[10px] text-gray-400 uppercase font-bold mb-1">Voucher Code</p>
+                <h2 class="text-3xl font-black text-violet-900 tracking-widest font-mono">NEWGUY10</h2>
+                <div class="flex justify-center items-center gap-2 mt-2 text-green-700 font-bold text-sm bg-green-100 py-1 px-3 rounded-full inline-block border border-green-200">
+                    <i class="fa-solid fa-check-circle"></i>
+                    <span>$10 OFF</span>
                 </div>
             </div>
-        </div>
 
-        <div class="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl overflow-hidden border border-white/50">
-            <div class="h-64 bg-gray-200 relative group">
-                <img src="https://images.unsplash.com/photo-1622286342621-4bd786c2447c?q=80&w=600&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-            </div>
-            <div class="p-6">
-                <h2 class="text-xl font-bold text-violet-900 mb-1">Beard Sculpt</h2>
-                <p class="text-xs text-gray-500 mb-4 uppercase tracking-wider font-bold">Defined Jawline</p>
-                <p class="text-sm text-gray-700 leading-relaxed mb-4">
-                    We fade the sideburns into the beard and create a razor-sharp line on the cheek to define your jaw.
-                </p>
-                <div class="bg-violet-50 p-3 rounded-lg text-xs text-violet-800 border-l-4 border-violet-500">
-                    <strong>Ask for:</strong> "Beard trim, line up the cheeks, fade the burns."
-                </div>
-            </div>
-        </div>
-
-        <div class="text-center pt-6 pb-8">
-            <a href="index.html" class="inline-block bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-transform transform hover:-translate-y-1 mb-4">
-                Book That Look
+            <a href="https://mannyserrano4-oss.github.io/crispy-enigma/book/" class="block w-full bg-violet-600 hover:bg-violet-700 text-white font-bold py-4 rounded-xl shadow-lg transition-transform transform active:scale-95">
+                Book & Redeem Now
             </a>
-            <br>
-            <a href="index.html" class="text-violet-700 font-bold text-xs hover:underline">&larr; Back to Main Profile</a>
+            
+            <p class="text-[10px] text-gray-400 mt-4 leading-tight">
+                *Limit one per customer. Valid for first-time clients only.<br>Screenshot this page to save your code.
+            </p>
         </div>
 
+        <div class="absolute top-[200px] -left-3 w-6 h-6 bg-[#6d28d9] rounded-full z-20"></div>
+        <div class="absolute top-[200px] -right-3 w-6 h-6 bg-[#6d28d9] rounded-full z-20"></div>
     </div>
+
+    <script>
+        function revealCode() {
+            const cover = document.getElementById('hiddenState');
+            // Slide the cover up
+            cover.style.transform = 'translateY(-100%)';
+        }
+    </script>
 </body>
 </html>
