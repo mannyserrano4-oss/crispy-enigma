@@ -2,134 +2,193 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Style Guide | MAS Barbery</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Look Book | MAS Barbery</title>
     <link rel="icon" type="image/png" href="icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    <style>body{font-family:'Inter',sans-serif;}</style>
+    <style>
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
 </head>
 <body class="bg-gray-50 text-gray-900 pb-20">
 
     <div class="bg-violet-900 p-6 text-center text-white sticky top-0 z-20 shadow-md">
-        <h1 class="text-xl font-black uppercase tracking-wider">Look Book</h1>
-        <p class="text-violet-200 text-xs mt-1">Tap a style to learn how to ask for it.</p>
+        <h1 class="text-xl font-black uppercase tracking-wider">Style Guide</h1>
+        <p class="text-violet-200 text-xs mt-1">Tap for details & terminology.</p>
     </div>
 
     <div class="flex gap-2 overflow-x-auto p-4 bg-white border-b border-gray-200 sticky top-[88px] z-10 hide-scroll">
-        <button onclick="filterSelection('all')" class="filter-btn active bg-violet-600 text-white px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap">All</button>
-        <button onclick="filterSelection('fade')" class="filter-btn bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap hover:bg-violet-50">Fades</button>
-        <button onclick="filterSelection('taper')" class="filter-btn bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap hover:bg-violet-50">Tapers</button>
-        <button onclick="filterSelection('beard')" class="filter-btn bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap hover:bg-violet-50">Beards</button>
+        <button onclick="renderGallery('all')" class="filter-btn active bg-violet-900 text-white px-5 py-2 rounded-full text-xs font-bold whitespace-nowrap shadow-md transition-all">All</button>
+        <button onclick="renderGallery('fade')" class="filter-btn bg-gray-100 text-gray-600 px-5 py-2 rounded-full text-xs font-bold whitespace-nowrap hover:bg-violet-50 transition-all">Fades</button>
+        <button onclick="renderGallery('taper')" class="filter-btn bg-gray-100 text-gray-600 px-5 py-2 rounded-full text-xs font-bold whitespace-nowrap hover:bg-violet-50 transition-all">Tapers</button>
+        <button onclick="renderGallery('beard')" class="filter-btn bg-gray-100 text-gray-600 px-5 py-2 rounded-full text-xs font-bold whitespace-nowrap hover:bg-violet-50 transition-all">Beards</button>
     </div>
 
-    <div class="grid grid-cols-2 gap-3 p-4">
+    <div id="gallery-grid" class="grid grid-cols-2 gap-3 p-4"></div>
 
-        <div class="style-card fade group relative aspect-[3/4] rounded-xl overflow-hidden bg-gray-200 cursor-pointer shadow-sm" onclick="openModal('Mid Drop Fade', 'Ask for: A mid-drop fade, keeping the C-cup dark. Leave 2 inches on top for texture.')">
-            <img src="https://source.unsplash.com/featured/?barber,fade" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-            <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-3 pt-10">
-                <p class="text-white font-bold text-sm">Mid Drop Fade</p>
-            </div>
-        </div>
-
-        <div class="style-card beard group relative aspect-[3/4] rounded-xl overflow-hidden bg-gray-200 cursor-pointer shadow-sm" onclick="openModal('Sculpted Beard', 'Ask for: Line up the cheeks with a straight razor, fade the sideburns into the beard, and shape the chin to be boxy.')">
-            <img src="https://source.unsplash.com/featured/?beard,man" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-            <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-3 pt-10">
-                <p class="text-white font-bold text-sm">Box Beard</p>
-            </div>
-        </div>
-
-        <div class="style-card taper group relative aspect-[3/4] rounded-xl overflow-hidden bg-gray-200 cursor-pointer shadow-sm" onclick="openModal('Low Taper', 'Ask for: A low taper on the neck and sideburns only. Keep the outline natural behind the ears.')">
-            <img src="https://source.unsplash.com/featured/?haircut,man" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-            <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-3 pt-10">
-                <p class="text-white font-bold text-sm">Low Taper</p>
-            </div>
-        </div>
-
-        <div class="style-card fade group relative aspect-[3/4] rounded-xl overflow-hidden bg-gray-200 cursor-pointer shadow-sm" onclick="openModal('Skin Fade Crop', 'Ask for: High skin fade. Textured crop on top pushed forward. Blunt fringe.')">
-            <img src="https://source.unsplash.com/featured/?barber,haircut" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-            <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-3 pt-10">
-                <p class="text-white font-bold text-sm">Textured Crop</p>
-            </div>
-        </div>
-
-    </div>
-
-    <div id="info-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm opacity-0 transition-opacity duration-300">
-        <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl transform scale-95 transition-transform duration-300" id="modal-content">
-            <div class="flex justify-between items-start mb-4">
-                <h2 class="text-xl font-black text-violet-900 uppercase" id="modal-title">Style Name</h2>
-                <button onclick="closeModal()" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
+    <div id="info-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+        <div class="bg-white w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col max-h-[90vh]" id="modal-content">
             
-            <div class="bg-violet-50 p-4 rounded-xl border border-violet-100 mb-6">
-                <p class="text-xs text-violet-600 font-bold uppercase mb-1"><i class="fa-solid fa-comment-dots mr-1"></i> How to ask for it:</p>
-                <p class="text-sm text-gray-800 leading-relaxed italic" id="modal-desc">Description goes here.</p>
+            <div class="relative h-64 bg-gray-900 flex-shrink-0">
+                <img id="modal-img" src="" class="w-full h-full object-cover">
+                <button onclick="closeModal()" class="absolute top-4 right-4 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm hover:bg-red-500 transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
 
-            <a href="book.html" class="block w-full bg-black text-white text-center py-4 rounded-xl font-bold hover:bg-gray-800 active:scale-95 transition-all">
-                Book This Cut
-            </a>
+            <div class="p-6 flex flex-col flex-1 overflow-y-auto">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-xs font-bold text-violet-600 uppercase tracking-widest" id="modal-cat">Category</span>
+                    <span class="text-xs text-gray-400 font-mono" id="modal-index">1/4</span>
+                </div>
+                <h2 class="text-2xl font-black text-gray-900 uppercase leading-none mb-4" id="modal-title">Style Name</h2>
+                
+                <div class="bg-violet-50 p-4 rounded-xl border-l-4 border-violet-600 mb-6">
+                    <p class="text-[10px] text-violet-600 font-bold uppercase mb-1"><i class="fa-solid fa-comment-dots mr-1"></i> Technical Ask:</p>
+                    <p class="text-sm text-gray-800 leading-relaxed font-medium" id="modal-desc">Description goes here.</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mt-auto">
+                    <button onclick="changeSlide(-1)" class="py-3 rounded-lg bg-gray-100 text-gray-600 font-bold text-sm hover:bg-gray-200 transition-colors">
+                        <i class="fa-solid fa-arrow-left mr-2"></i> Previous
+                    </button>
+                    <button onclick="changeSlide(1)" class="py-3 rounded-lg bg-black text-white font-bold text-sm hover:bg-gray-800 transition-colors shadow-lg">
+                        Next Style <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="fixed bottom-0 w-full bg-white border-t border-gray-200 p-4 flex justify-around items-center z-20">
-        <a href="index.html" class="text-gray-400 hover:text-violet-600 flex flex-col items-center gap-1">
-            <i class="fa-solid fa-home text-lg"></i>
+    <div class="fixed bottom-0 w-full bg-white border-t border-gray-200 p-4 flex justify-around items-center z-20 pb-safe">
+        <a href="index.html" class="text-gray-400 hover:text-violet-600 flex flex-col items-center gap-1 transition-colors">
+            <i class="fa-solid fa-home text-xl"></i>
             <span class="text-[10px] font-bold">Home</span>
         </a>
-        <a href="book.html" class="text-gray-400 hover:text-violet-600 flex flex-col items-center gap-1">
-            <i class="fa-solid fa-calendar text-lg"></i>
+        <a href="book.html" class="text-gray-400 hover:text-violet-600 flex flex-col items-center gap-1 transition-colors">
+            <i class="fa-solid fa-calendar text-xl"></i>
             <span class="text-[10px] font-bold">Book</span>
         </a>
-        <a href="#" class="text-violet-600 flex flex-col items-center gap-1">
-            <i class="fa-solid fa-camera text-lg"></i>
+        <a href="#" class="text-violet-600 flex flex-col items-center gap-1 transition-colors">
+            <i class="fa-solid fa-camera text-xl"></i>
             <span class="text-[10px] font-bold">Styles</span>
         </a>
     </div>
 
     <script>
-        // Filter Logic
-        function filterSelection(c) {
-            const x = document.getElementsByClassName("style-card");
+        // --- 1. YOUR PORTFOLIO DATA (EDIT THIS LIST) ---
+        // Replace the 'img' links with your own file names (e.g. 'images/fade1.jpg')
+        const styles = [
+            {
+                id: 0,
+                category: 'fade',
+                title: 'Mid Drop Fade',
+                desc: 'Ask for: A mid-drop fade, keeping the C-cup dark. Leave 2 inches on top for texture. Line up the front natural.',
+                img: 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=800&auto=format&fit=crop'
+            },
+            {
+                id: 1,
+                category: 'beard',
+                title: 'Boxed Beard',
+                desc: 'Ask for: Line up the cheeks with a straight razor (high line). Fade the sideburns into the beard. Shape the chin to be square/boxy.',
+                img: 'https://images.unsplash.com/photo-1622286342621-4bd786c2447c?q=80&w=800&auto=format&fit=crop'
+            },
+            {
+                id: 2,
+                category: 'taper',
+                title: 'Low Taper Blowout',
+                desc: 'Ask for: A low taper on the neck and sideburns only. Keep the outline natural behind the ears. lots of volume on top.',
+                img: 'https://images.unsplash.com/photo-1593702295094-aea8c5c13d99?q=80&w=800&auto=format&fit=crop'
+            },
+            {
+                id: 3,
+                category: 'fade',
+                title: 'Skin Fade Crop',
+                desc: 'Ask for: High skin fade. Textured crop on top pushed forward. Blunt fringe (Caesar cut).',
+                img: 'https://images.unsplash.com/photo-1559582105-f7511c520ebd?q=80&w=800&auto=format&fit=crop'
+            },
+            {
+                id: 4,
+                category: 'shear',
+                title: 'Classic Scissor Cut',
+                desc: 'Ask for: All shears, no clippers. Taper the neck by hand. Leave length over the ears for a flow look.',
+                img: 'https://images.unsplash.com/photo-1605497788044-5a32c7078486?q=80&w=800&auto=format&fit=crop'
+            }
+        ];
+
+        // --- 2. LOGIC ---
+        let currentFilter = 'all';
+        let currentIndex = 0;
+        let filteredList = [];
+
+        function renderGallery(cat) {
+            currentFilter = cat;
+            const grid = document.getElementById('gallery-grid');
+            grid.innerHTML = '';
             
             // Update Buttons
-            const btns = document.getElementsByClassName("filter-btn");
-            for (let b of btns) {
-                b.classList.remove("bg-violet-600", "text-white");
-                b.classList.add("bg-gray-100", "text-gray-600");
-                if ((c === 'all' && b.innerText === 'All') || b.innerText.toLowerCase().includes(c)) {
-                    b.classList.remove("bg-gray-100", "text-gray-600");
-                    b.classList.add("bg-violet-600", "text-white");
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                const text = btn.innerText.toLowerCase();
+                if ((cat === 'all' && text === 'all') || text.includes(cat)) {
+                    btn.className = "filter-btn bg-violet-900 text-white px-5 py-2 rounded-full text-xs font-bold whitespace-nowrap shadow-md transition-all";
+                } else {
+                    btn.className = "filter-btn bg-gray-100 text-gray-600 px-5 py-2 rounded-full text-xs font-bold whitespace-nowrap hover:bg-violet-50 transition-all";
                 }
-            }
+            });
 
-            // Show/Hide Cards
-            if (c == "all") c = "";
-            for (let i = 0; i < x.length; i++) {
-                x[i].classList.remove("hidden");
-                if (x[i].className.indexOf(c) == -1) {
-                    x[i].classList.add("hidden");
-                }
-            }
+            // Filter Data
+            filteredList = styles.filter(s => cat === 'all' || s.category === cat);
+
+            // Generate HTML
+            filteredList.forEach((s, index) => {
+                grid.innerHTML += `
+                <div class="group relative aspect-[3/4] rounded-xl overflow-hidden bg-gray-200 cursor-pointer shadow-sm hover:shadow-xl transition-all" onclick="openModal(${s.id})">
+                    <img src="${s.img}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 pt-12">
+                        <p class="text-white font-bold text-sm tracking-wide">${s.title}</p>
+                        <p class="text-gray-300 text-[10px] uppercase tracking-widest font-medium">${s.category}</p>
+                    </div>
+                </div>`;
+            });
         }
 
-        // Modal Logic
-        function openModal(title, desc) {
+        function openModal(id) {
             const modal = document.getElementById('info-modal');
             const content = document.getElementById('modal-content');
             
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-desc').innerText = desc;
-            
-            modal.classList.remove('hidden');
-            // Small delay to allow 'hidden' removal before animating opacity
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                content.classList.remove('scale-95');
-                content.classList.add('scale-100');
-            }, 10);
+            // Find index in current filtered list for navigation
+            const foundIndex = filteredList.findIndex(s => s.id === id);
+            if(foundIndex !== -1) {
+                currentIndex = foundIndex;
+                updateModalContent();
+                
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    content.classList.remove('scale-95');
+                    content.classList.add('scale-100');
+                }, 10);
+            }
+        }
+
+        function updateModalContent() {
+            const s = filteredList[currentIndex];
+            document.getElementById('modal-img').src = s.img;
+            document.getElementById('modal-cat').innerText = s.category;
+            document.getElementById('modal-title').innerText = s.title;
+            document.getElementById('modal-desc').innerText = s.desc;
+            document.getElementById('modal-index').innerText = `${currentIndex + 1}/${filteredList.length}`;
+        }
+
+        function changeSlide(dir) {
+            currentIndex += dir;
+            if (currentIndex >= filteredList.length) currentIndex = 0;
+            if (currentIndex < 0) currentIndex = filteredList.length - 1;
+            updateModalContent();
         }
 
         function closeModal() {
@@ -144,6 +203,9 @@
                 modal.classList.add('hidden');
             }, 300);
         }
+
+        // Init
+        renderGallery('all');
     </script>
 </body>
 </html>
