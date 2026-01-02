@@ -4,54 +4,75 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Client Exclusive | MAS Barbery</title>
+    
+    <meta property="og:title" content="Your $10 Voucher">
+    <meta property="og:description" content="Exclusive offer for new clients at MAS Barbery. Tap to redeem.">
+    <meta property="og:image" content="https://mannyserrano4-oss.github.io/crispy-enigma/gitpp.png">
+    
     <link rel="icon" type="image/png" href="gitpp.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        .gold-gradient { background: linear-gradient(135deg, #fcd34d 0%, #d97706 100%); }
+    </style>
 </head>
-<body class="bg-stone-900 flex items-center justify-center min-h-screen p-4">
+<body class="bg-stone-900 min-h-screen flex flex-col items-center justify-center p-4">
 
-    <div class="bg-white w-full max-w-sm rounded-xl overflow-hidden shadow-2xl relative">
+    <a href="index.html" class="absolute top-6 text-stone-400 text-xs font-bold uppercase tracking-widest hover:text-white transition-colors">
+        &larr; Back to Main Profile
+    </a>
+
+    <div class="bg-white w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl relative mt-8">
         
-        <div class="h-2 bg-yellow-500 w-full"></div>
-        
-        <div class="p-8 text-center">
-            <p class="text-xs font-bold text-stone-400 uppercase tracking-[0.3em] mb-4">Manny Serrano • MAS Barbery</p>
+        <div class="h-40 bg-gray-200 relative">
+            <img src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=600&fit=crop" class="w-full h-full object-cover">
             
-            <h1 class="font-['Playfair_Display'] text-4xl font-bold text-stone-900 mb-2">First Time?</h1>
-            <p class="text-stone-500 text-sm mb-8">Experience the premium service for less.</p>
+            <div class="absolute bottom-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
+                <i class="fa-solid fa-star text-yellow-500 text-xs"></i>
+                <span class="text-xs font-bold text-stone-900">5.0 Star Rated</span>
+            </div>
+        </div>
 
-            <div class="border-2 border-dashed border-stone-300 bg-stone-50 p-6 rounded-lg mb-8 relative group cursor-pointer" onclick="revealCode()">
+        <div class="p-8 text-center relative z-10">
+            
+            <p class="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] mb-2">Manny Serrano • MAS Barbery</p>
+            <h1 class="font-['Playfair_Display'] text-3xl font-bold text-stone-900 leading-tight mb-2">The "First Time"<br>Exclusive</h1>
+            <p class="text-stone-500 text-sm mb-6">Upgrade your look. Save money doing it.</p>
+
+            <div class="border-2 border-dashed border-yellow-500/50 bg-yellow-50 p-6 rounded-xl mb-6 relative group cursor-pointer overflow-hidden" onclick="revealCode()">
                 
-                <div id="hiddenState" class="absolute inset-0 flex items-center justify-center bg-stone-800 rounded-lg transition-opacity duration-500">
-                    <span class="text-yellow-500 font-bold uppercase tracking-widest text-sm animate-pulse">Tap to Reveal Code</span>
+                <div id="hiddenState" class="absolute inset-0 flex flex-col items-center justify-center gold-gradient transition-transform duration-500 z-20">
+                    <i class="fa-solid fa-hand-pointer text-white text-2xl mb-2 animate-bounce"></i>
+                    <span class="text-white font-black uppercase tracking-widest text-sm shadow-sm">Tap to Reveal</span>
                 </div>
 
-                <p class="text-xs text-stone-400 uppercase mb-1">Your Voucher Code</p>
-                <h2 class="text-3xl font-black text-stone-900 tracking-widest">NEWGUY10</h2>
-                <p class="text-xs text-green-600 font-bold mt-2">Valid for $10 Off First Cut</p>
+                <p class="text-[10px] text-stone-400 uppercase font-bold mb-1">Voucher Code</p>
+                <h2 class="text-3xl font-black text-stone-900 tracking-widest font-mono">NEWGUY10</h2>
+                <div class="flex justify-center items-center gap-2 mt-2 text-green-700 font-bold text-sm bg-green-100 py-1 px-3 rounded-full inline-block">
+                    <i class="fa-solid fa-check-circle"></i>
+                    <span>$10 OFF</span>
+                </div>
             </div>
 
-            <a href="https://mannyserrano4-oss.github.io/crispy-enigma/book/" class="block w-full bg-yellow-500 hover:bg-yellow-400 text-stone-900 font-bold py-4 rounded-lg shadow-lg transition-transform transform active:scale-95">
-                Book Appointment Now
+            <a href="https://mannyserrano4-oss.github.io/crispy-enigma/book/" class="block w-full bg-stone-900 hover:bg-black text-white font-bold py-4 rounded-xl shadow-lg transition-transform transform active:scale-95 border border-stone-800">
+                Book & Redeem Now
             </a>
             
-            <p class="text-[10px] text-stone-400 mt-4">
-                *Show this screen to Manny at checkout. Valid for new clients only.
+            <p class="text-[10px] text-stone-400 mt-4 leading-tight">
+                *Limit one per customer. Valid for first-time clients only.<br>Screenshot this page to save your code.
             </p>
         </div>
 
-        <div class="absolute top-1/2 -left-3 w-6 h-6 bg-stone-900 rounded-full"></div>
-        <div class="absolute top-1/2 -right-3 w-6 h-6 bg-stone-900 rounded-full"></div>
+        <div class="absolute top-[160px] -left-3 w-6 h-6 bg-stone-900 rounded-full z-20"></div>
+        <div class="absolute top-[160px] -right-3 w-6 h-6 bg-stone-900 rounded-full z-20"></div>
     </div>
 
     <script>
         function revealCode() {
             const cover = document.getElementById('hiddenState');
-            cover.style.opacity = '0';
-            setTimeout(() => {
-                cover.style.display = 'none';
-            }, 500);
+            // Slide the cover up like a ticket machine
+            cover.style.transform = 'translateY(-100%)';
         }
     </script>
 </body>
