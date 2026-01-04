@@ -7,12 +7,18 @@
 
     <link rel="icon" type="image/png" href="gitpp.png">
     
-    <meta name="description" content="Official links for Manny Serrano. Tampa-based barber and comedian. Sharp fades, mobile service, and questionable humor.">
+    <meta name="description" content="The official links page for Manny Serrano. Find all my socials, book a haircut, and check out my latest standup clips.">
+    
     <meta property="og:title" content="Manny Serrano | Tampa Barber & Comedian">
-    <meta property="og:description" content="Book a haircut, watch standup clips, or get in touch.">
+    <meta property="og:description" content="The official links page for Manny Serrano. Find all my socials, book a haircut, and check out my latest standup clips.">
     <meta property="og:image" content="https://mannyserrano4-oss.github.io/crispy-enigma/gitpp.png">
     <meta property="og:url" content="https://mannyserrano4-oss.github.io/crispy-enigma/">
     <meta property="og:type" content="website">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Manny Serrano | Tampa Barber & Comedian">
+    <meta name="twitter:description" content="The official links page for Manny Serrano. Find all my socials, book a haircut, and check out my latest standup clips.">
+    <meta name="twitter:image" content="https://mannyserrano4-oss.github.io/crispy-enigma/gitpp.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -21,6 +27,7 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            /* Animated Gradient Background */
             background: linear-gradient(-45deg, #4c1d95, #7e22ce, #a855f7, #c084fc);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
@@ -75,7 +82,7 @@
                 Your local Tampa comic slash barber. <br>
                 <span class="font-semibold text-white">Sharp tapers. Clean fades. Mobile convenience.</span>
                 <br>
-                <span class="text-xs opacity-75 italic mt-2 block">(And questionable humor included free of charge)</span>
+                <span class="text-xs opacity-75 italic mt-2 block">(Handled with care, attention to detail, and questionable humor.)</span>
             </p>
         </div>
     </div>
@@ -91,10 +98,40 @@
             <i class="fa-solid fa-chevron-right opacity-50"></i>
         </a>
 
-        <a href="https://mannyserrano4-oss.github.io/crispy-enigma/portfolio" class="glass-btn flex items-center justify-center w-full text-gray-800 font-bold py-3 px-6 rounded-xl shadow-md">
+        <a href="https://mannyserrano4-oss.github.io/crispy-enigma/portfolio" class="hidden glass-btn flex items-center justify-center w-full text-gray-800 font-bold py-3 px-6 rounded-xl shadow-md">
             <i class="fa-solid fa-camera mr-3 text-violet-600"></i>
             <span>View Portfolio</span>
         </a>
+
+        <div class="hidden w-full mb-2 mt-4"> <div class="flex justify-between items-end mb-2 px-1">
+                <span class="text-xs font-bold text-white uppercase tracking-wider">Recent Work</span>
+                <a href="https://www.instagram.com/mas_barbery" target="_blank" class="text-[10px] font-bold text-violet-200 hover:text-white transition-colors">
+                    See More on IG &rarr;
+                </a>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <div class="rounded-lg overflow-hidden h-32 border border-white/30 shadow-sm bg-violet-200">
+                    <img src="https://images.unsplash.com/photo-1593702295094-aea8c5c13d99?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-300" alt="Clean Fade">
+                </div>
+                <div class="rounded-lg overflow-hidden h-32 border border-white/30 shadow-sm bg-violet-200">
+                    <img src="https://images.unsplash.com/photo-1622286342621-4bd786c2447c?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-300" alt="Beard Trim">
+                </div>
+                <div class="rounded-lg overflow-hidden h-32 border border-white/30 shadow-sm bg-violet-200">
+                    <img src="https://images.unsplash.com/photo-1503951914290-934c20301876?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-300" alt="Hot Towel">
+                </div>
+                <div class="rounded-lg overflow-hidden h-32 border border-white/30 shadow-sm bg-violet-200">
+                    <img src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-300" alt="Styling">
+                </div>
+            </div>
+        </div>
+
+        <div class="hidden w-full mb-4">
+            <p class="text-xs font-bold text-white/80 uppercase tracking-widest text-center mb-2">Upcoming Shows</p>
+            <a href="https://www.instagram.com/reel/DP2oq43FCj7/?igsh=dGV2NmFvNXkxNzFq" target="_blank" rel="noopener noreferrer" class="glass-btn flex items-center justify-center w-full text-violet-700 font-bold py-3 px-6 rounded-lg shadow-md border-2 border-yellow-400 relative z-10">
+                <i class="fa-solid fa-star text-yellow-500 mr-3"></i>
+                <span>Featured Show: Nov 22nd 8pm</span>
+            </a>
+        </div>
 
         <div class="rounded-xl overflow-hidden shadow-2xl border-4 border-white/20 mt-6 mb-6">
             <div class="aspect-video bg-black">
@@ -102,7 +139,7 @@
             </div>
         </div>
 
-        <p class="text-xs font-bold text-white/80 uppercase tracking-widest text-center mt-6 mb-2">Socials</p>
+        <p class="text-xs font-bold text-white/80 uppercase tracking-widest text-center mt-6 mb-2">Follow Me</p>
         
         <div class="grid grid-cols-2 gap-3">
             <a href="https://www.instagram.com/mas_barbery" target="_blank" class="glass-btn flex flex-col items-center justify-center p-4 rounded-xl">
@@ -120,7 +157,7 @@
             <span>Facebook</span>
         </a>
 
-        <p class="text-xs font-bold text-white/80 uppercase tracking-widest text-center mt-6 mb-2">Connect</p>
+        <p class="text-xs font-bold text-white/80 uppercase tracking-widest text-center mt-6 mb-2">Support & Bookings</p>
 
         <a href="sms:+19014437338" class="glass-btn flex items-center justify-center w-full text-blue-900 font-bold py-3 px-6 rounded-xl">
             <i class="fa-solid fa-comment-sms mr-3 text-blue-500"></i>
@@ -128,18 +165,35 @@
         </a>
 
         <button onclick="downloadVCard()" class="glass-btn flex items-center justify-center w-full text-green-900 font-bold py-3 px-6 rounded-xl">
-            <i class="fa-solid fa-address-card mr-3 text-green-600"></i>
-            <span>Save to Contacts</span>
+            <i class="fa-solid fa-user-plus mr-3 text-green-600"></i>
+            <span>Add to Contacts</span>
         </button>
+
+        <a href="https://mannyserrano4-oss.github.io/crispy-enigma/aftercare/" class="glass-btn flex items-center justify-center w-full text-violet-800 font-bold py-3 px-6 rounded-xl">
+            <i class="fa-solid fa-hand-sparkles mr-3 text-violet-500"></i>
+            <span>Read Aftercare Guide</span>
+        </a>
+
+        <a href="https://mannyserrano4-oss.github.io/crispy-enigma/events" class="hidden glass-btn flex items-center justify-center w-full text-yellow-900 font-bold py-3 px-6 rounded-xl border-2 border-yellow-400 bg-yellow-50/90">
+            <i class="fa-solid fa-champagne-glasses mr-3 text-yellow-600"></i>
+            <span>Private Event Barbering</span>
+        </a>
 
         <a href="mailto:mannyserrano4@gmail.com" class="glass-btn flex items-center justify-center w-full text-gray-800 font-bold py-3 px-6 rounded-xl">
             <i class="fa-solid fa-envelope mr-3 text-gray-500"></i>
-            <span>Email Me</span>
+            <span>Booking Inquiries</span>
+        </a>
+
+        <p class="text-xs font-bold text-white/80 uppercase tracking-widest text-center mt-6 mb-2">Feedback</p>
+
+        <a href="https://mannyserrano4-oss.github.io/crispy-enigma/reviews" class="glass-btn flex items-center justify-center w-full text-violet-900 font-bold py-3 px-6 rounded-xl">
+            <i class="fa-solid fa-star mr-3 text-yellow-500"></i>
+            <span>How did I do?</span>
         </a>
 
         <button onclick="sharePage()" class="glass-btn flex items-center justify-center w-full text-violet-900 font-bold py-3 px-6 rounded-xl mt-4 border-violet-300">
             <i class="fa-solid fa-share-nodes mr-3"></i>
-            <span>Share Profile</span>
+            <span>Share My Page</span>
         </button>
 
         <div class="text-center mt-12 mb-6">
@@ -225,6 +279,20 @@
       "telephone": "+1-901-443-7338",
       "priceRange": "$$",
       "url": "https://mannyserrano4-oss.github.io/crispy-enigma/",
+      "areaServed": [
+        {
+          "@type": "City",
+          "name": "Tampa"
+        },
+        {
+          "@type": "City",
+          "name": "St. Petersburg"
+        },
+        {
+          "@type": "City",
+          "name": "Wesley Chapel"
+        }
+      ],
       "address": {
         "@type": "PostalAddress",
         "addressLocality": "Tampa",
