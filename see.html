@@ -7,8 +7,6 @@
 
     <link rel="icon" type="image/png" href="gitpp.png">
     
-    <meta name="description" content="The official links page for Manny Serrano. Find all my socials, book a haircut, and check out my latest standup clips.">
-    
     <meta property="og:title" content="Manny Serrano | Tampa Barber & Comedian">
     <meta property="og:description" content="The official links page for Manny Serrano. Find all my socials, book a haircut, and check out my latest standup clips.">
     <meta property="og:image" content="https://mannyserrano4-oss.github.io/crispy-enigma/gitpp.png">
@@ -19,19 +17,19 @@
     <meta name="twitter:title" content="Manny Serrano | Tampa Barber & Comedian">
     <meta name="twitter:description" content="The official links page for Manny Serrano. Find all my socials, book a haircut, and check out my latest standup clips.">
     <meta name="twitter:image" content="https://mannyserrano4-oss.github.io/crispy-enigma/gitpp.png">
-
+    
+    <meta name="description" content="The official links page for Manny Serrano, a Tampa-based comedian and barber. Find all my socials, book a haircut, and check out my latest standup clips.">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            /* Animated Gradient Background */
-            background: linear-gradient(-45deg, #4c1d95, #7e22ce, #a855f7, #c084fc);
+            background: linear-gradient(-45deg, #e9d5ff, #f5d0fe, #c4b5fd, #a78bfa);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
-            min-height: 100vh;
         }
 
         @keyframes gradientBG {
@@ -40,178 +38,195 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Glassmorphism Effect for Buttons */
-        .glass-btn {
-            background: rgba(255, 255, 255, 0.9);
+        /* --- THE LIQUID GLASS BUTTON STYLE --- */
+        .ios-btn {
+            /* The Glass Effect */
+            background: rgba(255, 255, 255, 0.75); /* Milky transparency */
+            backdrop-filter: blur(12px); /* The "Frosted" look behind it */
+            -webkit-backdrop-filter: blur(12px); /* Safari support */
+            border: 1px solid rgba(255, 255, 255, 0.6); /* Subtle white edge */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            
+            /* Physics */
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        /* Hover: Lift & Glow */
+        .ios-btn:hover {
+            background: rgba(255, 255, 255, 0.95); /* Becomes solid */
+            transform: translateY(-3px) scale(1.01); /* Lift up */
+            box-shadow: 0 15px 30px -5px rgba(109, 40, 217, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1); /* Soft purple shadow */
+            border-color: rgba(255, 255, 255, 1);
+        }
+
+        /* Click: Squish */
+        .ios-btn:active {
+            transform: scale(0.97) translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Primary Action Button (Purple Glass) */
+        .ios-btn-primary {
+            background: rgba(124, 58, 237, 0.85); /* Violet */
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(167, 139, 250, 0.5);
+            color: white;
+        }
+        .ios-btn-primary:hover {
+            background: rgba(124, 58, 237, 1);
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 15px 30px -5px rgba(109, 40, 217, 0.4);
         }
 
-        .glass-btn:hover {
-            background: rgba(255, 255, 255, 1);
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        /* Icon Animation */
+        .ios-btn:hover i, .ios-btn-primary:hover i {
+            transform: scale(1.1) rotate(-5deg);
+            transition: transform 0.3s ease;
         }
 
-        .glass-btn:active {
-            transform: scale(0.98);
-        }
-
-        /* Profile Glow */
-        .profile-glow {
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+        a:focus-visible, button:focus-visible {
+            outline: 3px solid #6d28d9;
+            outline-offset: 4px;
+            border-radius: 0.75rem;
         }
     </style>
 </head>
-<body class="text-gray-900 flex flex-col items-center py-10 px-4">
+<body class="text-gray-800 min-h-screen flex flex-col items-center py-10 px-4">
 
-    <div class="w-full max-w-md text-center mb-8">
-        <div class="relative inline-block">
-            <img src="gitpp.png" alt="Manny Serrano" class="w-32 h-32 rounded-full border-4 border-white profile-glow mx-auto object-cover">
-            </div>
+    <div class="w-full max-w-md text-center">
         
-        <h1 class="text-3xl font-extrabold text-white mt-4 drop-shadow-md">Manny Serrano</h1>
-        <p class="text-violet-100 font-medium text-lg">Barber & Comedian</p>
-        
-        <div class="bg-white/10 backdrop-blur-md rounded-xl p-4 mt-4 mx-4 border border-white/20">
-            <p class="text-sm text-white/90 leading-relaxed">
-                Your local Tampa comic slash barber. <br>
-                <span class="font-semibold text-white">Sharp tapers. Clean fades. Mobile convenience.</span>
-                <br>
-                <span class="text-xs opacity-75 italic mt-2 block">(Handled with care, attention to detail, and questionable humor.)</span>
-            </p>
+        <div class="relative inline-block mb-6">
+            <img src="gitpp.png" alt="Manny Serrano" class="w-32 h-32 rounded-full border-[3px] border-white shadow-xl object-cover">
         </div>
-    </div>
 
-    <div class="w-full max-w-md space-y-4">
+        <h1 class="text-3xl font-black text-violet-900 tracking-tight">Manny Serrano</h1>
+        <p class="text-lg text-violet-700 font-medium mb-2">Barber & Comedian</p>
+        
+        <p class="text-sm text-gray-600 mb-8 leading-relaxed px-4">
+            Specializing in sharp tapers, clean fades, and mobile convenience. <br>
+            <span class="italic text-xs text-violet-600 opacity-80 mt-1 block">Handled with care, attention to detail, (and questionable humor).</span>
+        </p>
+        
+        <div class="mb-8 rounded-2xl overflow-hidden shadow-2xl border-4 border-white/50 w-full transform transition hover:scale-[1.02] duration-500">
+            <div class="aspect-video">
+                <iframe class="w-full h-full" src="https://www.youtube.com/embed/MeMbIu-wulQ" title="Standup Clip" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+        </div>
 
-        <a href="https://mannyserrano4-oss.github.io/crispy-enigma/book/" class="glass-btn flex items-center justify-between w-full text-violet-900 font-black py-4 px-6 rounded-2xl shadow-lg relative overflow-hidden group">
-            <div class="absolute left-0 top-0 h-full w-2 bg-violet-600"></div>
-            <div class="flex items-center gap-3">
-                <i class="fa-solid fa-calendar-check text-xl group-hover:scale-110 transition-transform"></i>
+        <div class="space-y-3">
+
+            <a href="https://mannyserrano4-oss.github.io/crispy-enigma/book/" class="ios-btn-primary flex items-center justify-center font-bold py-4 px-6 rounded-2xl shadow-lg mb-4">
+                <i class="fa-solid fa-calendar-check mr-3 text-xl"></i>
                 <span class="text-lg">Book a Haircut</span>
+            </a>
+
+            <a href="https://mannyserrano4-oss.github.io/crispy-enigma/portfolio" class="hidden ios-btn w-full mt-3 font-bold py-3 px-6 rounded-2xl flex items-center justify-center gap-2">
+                <i class="fa-solid fa-camera text-violet-600"></i> My Portfolio
+            </a>
+
+            <div class="hidden w-full mb-6"> <p class="text-xs font-extrabold text-violet-800 uppercase tracking-widest text-center mb-3">Upcoming Shows</p>
+                
+                <a href="LINK_TO_BIG_SHOW" target="_blank" rel="noopener noreferrer" class="ios-btn flex items-center justify-center w-full font-bold py-4 px-6 rounded-2xl border-2 border-yellow-400/50 mb-2 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-yellow-50/50 -z-10"></div> <i class="fa-solid fa-star text-yellow-500 mr-3 text-lg animate-pulse"></i>
+                    <span class="text-violet-900">Featured: Nov 22nd 8pm - Dogpound</span>
+                </a>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <a href="#" target="_blank" class="ios-btn flex flex-col items-center justify-center py-3 rounded-2xl">
+                        <span class="text-xs font-bold text-violet-900">Nov 23rd 7pm</span>
+                        <span class="text-[10px] text-gray-500 font-medium">Java Kava</span>
+                    </a>
+                    <a href="#" target="_blank" class="ios-btn flex flex-col items-center justify-center py-3 rounded-2xl">
+                        <span class="text-xs font-bold text-violet-900">Dec 3rd 8pm</span>
+                        <span class="text-[10px] text-gray-500 font-medium">Side Splitters</span>
+                    </a>
+                </div>
             </div>
-            <i class="fa-solid fa-chevron-right opacity-50"></i>
-        </a>
 
-        <a href="https://mannyserrano4-oss.github.io/crispy-enigma/portfolio" class="glass-btn flex items-center justify-center w-full text-gray-800 font-bold py-3 px-6 rounded-xl shadow-md">
-            <i class="fa-solid fa-camera mr-3 text-violet-600"></i>
-            <span>View Portfolio</span>
-        </a>
+            <div class="hidden w-full mt-6 mb-6"> <div class="flex justify-between items-end mb-2 px-1">
+                    <span class="text-xs font-bold text-violet-900 uppercase tracking-wider">Recent Work</span>
+                    <a href="https://www.instagram.com/mas_barbery" target="_blank" class="text-[10px] font-bold text-violet-600 hover:text-violet-800 transition-colors">
+                        See More on IG &rarr;
+                    </a>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="rounded-xl overflow-hidden h-32 border border-white/50 shadow-sm">
+                        <img src="https://images.unsplash.com/photo-1593702295094-aea8c5c13d99?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-300" alt="Clean Fade">
+                    </div>
+                    <div class="rounded-xl overflow-hidden h-32 border border-white/50 shadow-sm">
+                        <img src="https://images.unsplash.com/photo-1622286342621-4bd786c2447c?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-300" alt="Beard Trim">
+                    </div>
+                    <div class="rounded-xl overflow-hidden h-32 border border-white/50 shadow-sm">
+                        <img src="https://images.unsplash.com/photo-1503951914290-934c20301876?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-300" alt="Hot Towel">
+                    </div>
+                    <div class="rounded-xl overflow-hidden h-32 border border-white/50 shadow-sm">
+                        <img src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-300" alt="Styling">
+                    </div>
+                </div>
+            </div>
 
-        <div class="w-full mb-4">
-            <p class="text-xs font-bold text-white/80 uppercase tracking-widest text-center mb-2">Upcoming Shows</p>
+            <p class="text-xs font-bold text-violet-800 uppercase tracking-widest text-center mb-2 mt-6">Follow Me</p>
             
-            <a href="LINK_TO_BIG_SHOW" target="_blank" rel="noopener noreferrer" class="glass-btn flex items-center justify-center w-full text-violet-700 font-bold py-4 px-6 rounded-xl shadow-md border-2 border-yellow-400 relative z-10 mb-2">
-                <i class="fa-solid fa-star text-yellow-500 mr-3"></i>
-                <span>Main Event: Nov 22nd 8pm</span>
-            </a>
-
-            <div class="grid grid-cols-2 gap-2">
-                <a href="LINK_TO_SMALL_1" target="_blank" class="glass-btn flex flex-col items-center justify-center py-3 rounded-xl text-center">
-                    <span class="text-xs font-bold text-violet-900">Nov 23rd 7pm</span>
-                    <span class="text-[10px] text-gray-600">Java Kava</span>
+            <div class="grid grid-cols-2 gap-3">
+                <a href="https://www.instagram.com/mas_barbery" target="_blank" class="ios-btn flex flex-col items-center justify-center p-3 rounded-2xl">
+                    <i class="fa-brands fa-instagram text-2xl text-pink-600 mb-1"></i>
+                    <span class="text-xs font-bold text-violet-900">Barbering</span>
                 </a>
-                <a href="LINK_TO_SMALL_2" target="_blank" class="glass-btn flex flex-col items-center justify-center py-3 rounded-xl text-center">
-                    <span class="text-xs font-bold text-violet-900">Dec 3rd 8pm</span>
-                    <span class="text-[10px] text-gray-600">Side Splitters</span>
+                <a href="https://www.instagram.com/monotonebaritone" target="_blank" class="ios-btn flex flex-col items-center justify-center p-3 rounded-2xl">
+                    <i class="fa-brands fa-instagram text-2xl text-purple-600 mb-1"></i>
+                    <span class="text-xs font-bold text-violet-900">Comedy</span>
                 </a>
             </div>
-        </div>
 
-        <div class="w-full mb-2 mt-4"> <div class="flex justify-between items-end mb-2 px-1">
-                <span class="text-xs font-bold text-white uppercase tracking-wider">Recent Work</span>
-                <a href="https://www.instagram.com/mas_barbery" target="_blank" class="text-[10px] font-bold text-violet-200 hover:text-white transition-colors">
-                    See More on IG &rarr;
-                </a>
-            </div>
-            <div class="grid grid-cols-2 gap-2">
-                <div class="rounded-lg overflow-hidden h-32 border border-white/30 shadow-sm bg-violet-200">
-                    <img src="https://images.unsplash.com/photo-1593702295094-aea8c5c13d99?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-300" alt="Clean Fade">
-                </div>
-                <div class="rounded-lg overflow-hidden h-32 border border-white/30 shadow-sm bg-violet-200">
-                    <img src="https://images.unsplash.com/photo-1622286342621-4bd786c2447c?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-300" alt="Beard Trim">
-                </div>
-                <div class="rounded-lg overflow-hidden h-32 border border-white/30 shadow-sm bg-violet-200">
-                    <img src="https://images.unsplash.com/photo-1503951914290-934c20301876?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-300" alt="Hot Towel">
-                </div>
-                <div class="rounded-lg overflow-hidden h-32 border border-white/30 shadow-sm bg-violet-200">
-                    <img src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-300" alt="Styling">
-                </div>
-            </div>
-        </div>
-
-        <div class="rounded-xl overflow-hidden shadow-2xl border-4 border-white/20 mt-6 mb-6">
-            <div class="aspect-video bg-black">
-                <iframe class="w-full h-full" src="https://www.youtube.com/embed/MeMbIu-wulQ" title="Standup Clip" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
-        </div>
-
-        <p class="text-xs font-bold text-white/80 uppercase tracking-widest text-center mt-6 mb-2">Follow Me</p>
-        
-        <div class="grid grid-cols-2 gap-3">
-            <a href="https://www.instagram.com/mas_barbery" target="_blank" class="glass-btn flex flex-col items-center justify-center p-4 rounded-xl">
-                <i class="fa-brands fa-instagram text-2xl text-pink-600 mb-1"></i>
-                <span class="text-xs font-bold">Barbering</span>
+            <a href="https://www.facebook.com/share/1ChXo1WokK/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" class="ios-btn block w-full text-violet-900 font-semibold py-3 px-6 rounded-2xl">
+                <i class="fa-brands fa-facebook mr-3 text-blue-600"></i>
+                <span>Facebook</span>
             </a>
-            <a href="https://www.instagram.com/monotonebaritone" target="_blank" class="glass-btn flex flex-col items-center justify-center p-4 rounded-xl">
-                <i class="fa-brands fa-instagram text-2xl text-purple-600 mb-1"></i>
-                <span class="text-xs font-bold">Comedy</span>
+
+            <p class="text-xs font-bold text-violet-800 uppercase tracking-widest text-center mb-2 mt-6">Support & Bookings</p>
+
+            <a href="sms:+19014437338" class="ios-btn flex items-center justify-center w-full text-blue-800 font-bold py-3 px-6 rounded-2xl border border-blue-100">
+                <i class="fa-solid fa-comment-sms mr-3 text-blue-500"></i>
+                <span>Text for Appointment</span>
             </a>
-        </div>
-        
-        <a href="https://www.facebook.com/share/1ChXo1WokK/?mibextid=wwXIfr" target="_blank" class="glass-btn flex items-center justify-center w-full text-gray-800 font-bold py-3 px-6 rounded-xl">
-            <i class="fa-brands fa-facebook mr-3 text-blue-600"></i>
-            <span>Facebook</span>
-        </a>
 
-        <p class="text-xs font-bold text-white/80 uppercase tracking-widest text-center mt-6 mb-2">Support & Bookings</p>
+            <button onclick="downloadVCard()" class="ios-btn flex items-center justify-center w-full text-green-800 font-semibold py-3 px-6 rounded-2xl border border-green-100">
+                <i class="fa-solid fa-user-plus mr-3 text-green-500"></i>
+                <span>Add to Contacts</span>
+            </button>
 
-        <a href="sms:+19014437338" class="glass-btn flex items-center justify-center w-full text-blue-900 font-bold py-3 px-6 rounded-xl">
-            <i class="fa-solid fa-comment-sms mr-3 text-blue-500"></i>
-            <span>Text for Appointment</span>
-        </a>
+            <a href="https://mannyserrano4-oss.github.io/crispy-enigma/aftercare/" class="ios-btn flex items-center justify-center w-full text-violet-800 font-semibold py-3 px-6 rounded-2xl">
+                <i class="fa-solid fa-hand-sparkles mr-3 text-violet-500"></i>
+                <span>Read Aftercare Guide</span>
+            </a>
 
-        <button onclick="downloadVCard()" class="glass-btn flex items-center justify-center w-full text-green-900 font-bold py-3 px-6 rounded-xl">
-            <i class="fa-solid fa-user-plus mr-3 text-green-600"></i>
-            <span>Add to Contacts</span>
-        </button>
+            <a href="https://mannyserrano4-oss.github.io/crispy-enigma/events" class="hidden ios-btn flex items-center justify-center w-full text-yellow-900 font-bold py-3 px-6 rounded-2xl border border-yellow-400 bg-yellow-50/50">
+                <i class="fa-solid fa-champagne-glasses mr-3 text-yellow-600"></i>
+                <span>Private Event Barbering</span>
+            </a>
 
-        <a href="https://mannyserrano4-oss.github.io/crispy-enigma/aftercare/" class="glass-btn flex items-center justify-center w-full text-violet-800 font-bold py-3 px-6 rounded-xl">
-            <i class="fa-solid fa-hand-sparkles mr-3 text-violet-500"></i>
-            <span>Read Aftercare Guide</span>
-        </a>
+            <a href="mailto:mannyserrano4@gmail.com" class="ios-btn flex items-center justify-center w-full text-gray-700 font-semibold py-3 px-6 rounded-2xl">
+                <i class="fa-solid fa-envelope mr-3 text-gray-400"></i>
+                <span>Booking Inquiries</span>
+            </a>
 
-        <a href="https://mannyserrano4-oss.github.io/crispy-enigma/events" class="glass-btn flex items-center justify-center w-full text-yellow-900 font-bold py-3 px-6 rounded-xl border-2 border-yellow-400 bg-yellow-50/90">
-            <i class="fa-solid fa-champagne-glasses mr-3 text-yellow-600"></i>
-            <span>Private Event Barbering</span>
-        </a>
+            <p class="text-xs font-bold text-violet-800 uppercase tracking-widest text-center mb-2 mt-6">Feedback</p>
 
-        <a href="mailto:mannyserrano4@gmail.com" class="glass-btn flex items-center justify-center w-full text-gray-800 font-bold py-3 px-6 rounded-xl">
-            <i class="fa-solid fa-envelope mr-3 text-gray-500"></i>
-            <span>Booking Inquiries</span>
-        </a>
+            <a href="https://mannyserrano4-oss.github.io/crispy-enigma/reviews" class="ios-btn flex items-center justify-center w-full text-violet-900 font-semibold py-3 px-6 rounded-2xl">
+                <i class="fa-solid fa-star mr-3 text-yellow-500"></i>
+                <span>How did I do?</span>
+            </a>
 
-        <p class="text-xs font-bold text-white/80 uppercase tracking-widest text-center mt-6 mb-2">Feedback</p>
+            <button onclick="sharePage()" class="ios-btn flex items-center justify-center w-full text-violet-900 font-bold py-3 px-6 rounded-2xl mt-4 border border-violet-200">
+                <i class="fa-solid fa-share-nodes mr-3 text-violet-500"></i>
+                <span>Share My Page</span>
+            </button>
 
-        <a href="https://mannyserrano4-oss.github.io/crispy-enigma/reviews" class="glass-btn flex items-center justify-center w-full text-violet-900 font-bold py-3 px-6 rounded-xl">
-            <i class="fa-solid fa-star mr-3 text-yellow-500"></i>
-            <span>How did I do?</span>
-        </a>
-
-        <button onclick="sharePage()" class="glass-btn flex items-center justify-center w-full text-violet-900 font-bold py-3 px-6 rounded-xl mt-4 border-violet-300">
-            <i class="fa-solid fa-share-nodes mr-3"></i>
-            <span>Share My Page</span>
-        </button>
-
-        <div class="text-center mt-12 mb-6">
-            <p class="text-xs text-white/60">
-                &copy; 2025 Manny Serrano.<br>
-                <span class="italic opacity-70">Made by me at work because I have too much downtime.</span>
+            <p class="text-xs text-violet-800 opacity-60 mt-10 mb-4 font-medium">
+                Made by me at work, because I have too much downtime.
             </p>
+            
         </div>
-
     </div>
 
     <script>
@@ -223,23 +238,18 @@
                 url: window.location.href
             };
 
-            // Use native share if available (Mobile), otherwise fallback to copy
             if (navigator.share) {
-                try {
-                    await navigator.share(shareData);
-                } catch (err) {
-                    console.log('Share canceled');
-                }
+                try { await navigator.share(shareData); } 
+                catch (err) { console.log('Share canceled'); }
             } else {
-                // Fallback for Desktop
                 navigator.clipboard.writeText(window.location.href);
                 alert("Link copied to clipboard!");
             }
         }
 
-        // 2. DYNAMIC VCARD GENERATOR (No file needed!)
+        // 2. DYNAMIC VCARD GENERATOR
         function downloadVCard() {
-            // Define Contact Data
+            // EDIT THIS DATA TO UPDATE YOUR CONTACT INFO
             const contact = {
                 name: "Manny Serrano",
                 org: "MAS Barbery",
@@ -251,7 +261,6 @@
                 city: "Tampa, FL"
             };
 
-            // Build VCF String
             const vCardData = [
                 'BEGIN:VCARD',
                 'VERSION:3.0',
@@ -267,12 +276,10 @@
                 'END:VCARD'
             ].join('\n');
 
-            // Create Blob and Download
             const blob = new Blob([vCardData], { type: 'text/vcard' });
             const url = window.URL.createObjectURL(blob);
             const newLink = document.createElement('a');
             newLink.download = "MannySerrano.vcf";
-            newLink.textContent = contact.name;
             newLink.href = url;
             newLink.click();
             window.URL.revokeObjectURL(url);
@@ -289,18 +296,9 @@
       "priceRange": "$$",
       "url": "https://mannyserrano4-oss.github.io/crispy-enigma/",
       "areaServed": [
-        {
-          "@type": "City",
-          "name": "Tampa"
-        },
-        {
-          "@type": "City",
-          "name": "St. Petersburg"
-        },
-        {
-          "@type": "City",
-          "name": "Wesley Chapel"
-        }
+        { "@type": "City", "name": "Tampa" },
+        { "@type": "City", "name": "St. Petersburg" },
+        { "@type": "City", "name": "Wesley Chapel" }
       ],
       "address": {
         "@type": "PostalAddress",
