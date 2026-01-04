@@ -40,26 +40,21 @@
 
         /* --- THE LIQUID GLASS BUTTON STYLE --- */
         .ios-btn {
-            /* The Glass Effect */
-            background: rgba(255, 255, 255, 0.75); /* Milky transparency */
-            backdrop-filter: blur(12px); /* The "Frosted" look behind it */
-            -webkit-backdrop-filter: blur(12px); /* Safari support */
-            border: 1px solid rgba(255, 255, 255, 0.6); /* Subtle white edge */
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            
-            /* Physics */
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
-        /* Hover: Lift & Glow */
         .ios-btn:hover {
-            background: rgba(255, 255, 255, 0.95); /* Becomes solid */
-            transform: translateY(-3px) scale(1.01); /* Lift up */
-            box-shadow: 0 15px 30px -5px rgba(109, 40, 217, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1); /* Soft purple shadow */
+            background: rgba(255, 255, 255, 0.95);
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 15px 30px -5px rgba(109, 40, 217, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
             border-color: rgba(255, 255, 255, 1);
         }
 
-        /* Click: Squish */
         .ios-btn:active {
             transform: scale(0.97) translateY(0);
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -67,7 +62,7 @@
 
         /* Primary Action Button (Purple Glass) */
         .ios-btn-primary {
-            background: rgba(124, 58, 237, 0.85); /* Violet */
+            background: rgba(124, 58, 237, 0.85);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(167, 139, 250, 0.5);
             color: white;
@@ -100,12 +95,16 @@
         </div>
 
         <h1 class="text-3xl font-black text-violet-900 tracking-tight">Manny Serrano</h1>
-        <p class="text-lg text-violet-700 font-medium mb-2">Barber & Comedian</p>
+        <p class="text-lg text-violet-700 font-medium mb-4">Barber & Comedian</p>
         
-        <p class="text-sm text-gray-600 mb-8 leading-relaxed px-4">
-            Specializing in sharp tapers, clean fades, and mobile convenience. <br>
-            <span class="italic text-xs text-violet-600 opacity-80 mt-1 block">Handled with care, attention to detail, (and questionable humor).</span>
-        </p>
+        <div class="bg-white/30 backdrop-blur-md rounded-2xl p-5 mb-8 mx-2 border border-white/40 shadow-sm">
+            <p class="text-sm text-gray-700 leading-relaxed font-medium">
+                Your local Tampa comic slash barber. <br>
+                <span class="text-violet-900 font-bold">Sharp tapers. Clean fades. Mobile convenience.</span>
+                <br>
+                <span class="text-xs text-violet-800 opacity-80 mt-2 block italic">(Handled with care, attention to detail, and questionable humor.)</span>
+            </p>
+        </div>
         
         <div class="mb-8 rounded-2xl overflow-hidden shadow-2xl border-4 border-white/50 w-full transform transition hover:scale-[1.02] duration-500">
             <div class="aspect-video">
@@ -120,11 +119,11 @@
                 <span class="text-lg">Book a Haircut</span>
             </a>
 
-            <a href="https://mannyserrano4-oss.github.io/crispy-enigma/portfolio" class="ios-btn w-full mt-3 font-bold py-3 px-6 rounded-2xl flex items-center justify-center gap-2">
+            <a href="https://mannyserrano4-oss.github.io/crispy-enigma/portfolio" class="hidden ios-btn w-full mt-3 font-bold py-3 px-6 rounded-2xl flex items-center justify-center gap-2">
                 <i class="fa-solid fa-camera text-violet-600"></i> My Portfolio
             </a>
 
-            <div class="w-full mb-6"> <p class="text-xs font-extrabold text-violet-800 uppercase tracking-widest text-center mb-3">Upcoming Shows</p>
+            <div class="hidden w-full mb-6"> <p class="text-xs font-extrabold text-violet-800 uppercase tracking-widest text-center mb-3">Upcoming Shows</p>
                 
                 <a href="LINK_TO_BIG_SHOW" target="_blank" rel="noopener noreferrer" class="ios-btn flex items-center justify-center w-full font-bold py-4 px-6 rounded-2xl border-2 border-yellow-400/50 mb-2 relative overflow-hidden">
                     <div class="absolute inset-0 bg-yellow-50/50 -z-10"></div> <i class="fa-solid fa-star text-yellow-500 mr-3 text-lg animate-pulse"></i>
@@ -143,7 +142,7 @@
                 </div>
             </div>
 
-            <div class="w-full mt-6 mb-6"> <div class="flex justify-between items-end mb-2 px-1">
+            <div class="hidden w-full mt-6 mb-6"> <div class="flex justify-between items-end mb-2 px-1">
                     <span class="text-xs font-bold text-violet-900 uppercase tracking-wider">Recent Work</span>
                     <a href="https://www.instagram.com/mas_barbery" target="_blank" class="text-[10px] font-bold text-violet-600 hover:text-violet-800 transition-colors">
                         See More on IG &rarr;
@@ -200,7 +199,7 @@
                 <span>Read Aftercare Guide</span>
             </a>
 
-            <a href="https://mannyserrano4-oss.github.io/crispy-enigma/events" class="ios-btn flex items-center justify-center w-full text-yellow-900 font-bold py-3 px-6 rounded-2xl border border-yellow-400 bg-yellow-50/50">
+            <a href="https://mannyserrano4-oss.github.io/crispy-enigma/events" class="hidden ios-btn flex items-center justify-center w-full text-yellow-900 font-bold py-3 px-6 rounded-2xl border border-yellow-400 bg-yellow-50/50">
                 <i class="fa-solid fa-champagne-glasses mr-3 text-yellow-600"></i>
                 <span>Private Event Barbering</span>
             </a>
@@ -222,9 +221,14 @@
                 <span>Share My Page</span>
             </button>
 
-            <p class="text-xs text-violet-800 opacity-60 mt-10 mb-4 font-medium">
-                Made by me at work, because I have too much downtime.
-            </p>
+            <div class="text-center mt-12 mb-6">
+                <p class="text-xs text-violet-900 font-bold opacity-80 mb-1">
+                    &copy; 2025 Manny Serrano.
+                </p>
+                <p class="text-[10px] text-violet-800 opacity-60 italic">
+                    Made by me at work, because I have too much downtime.
+                </p>
+            </div>
             
         </div>
     </div>
