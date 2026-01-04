@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manny Serrano | Barber & Comedian</title>
-
+    <!-- Favicon Links -->
     <link rel="icon" type="image/png" href="gitpp.png">
     
     <meta property="og:title" content="Manny Serrano | Tampa Barber & Comedian">
@@ -17,7 +17,8 @@
     <meta name="twitter:title" content="Manny Serrano | Tampa Barber & Comedian">
     <meta name="twitter:description" content="The official links page for Manny Serrano. Find all my socials, book a haircut, and check out my latest standup clips.">
     <meta name="twitter:image" content="https://mannyserrano4-oss.github.io/crispy-enigma/gitpp.png">
-    
+
+    <!-- SEO Meta Tags -->
     <meta name="description" content="The official links page for Manny Serrano, a Tampa-based comedian and barber. Find all my socials, book a haircut, and check out my latest standup clips.">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -85,6 +86,16 @@
             border-radius: 0.75rem;
         }
     </style>
+
+    <!-- 
+    INSTRUCTIONS FOR FUTURE ANALYTICS:
+    1. Go to plausible.io and sign up for a free account.
+    2. Add your site and get your unique script tag. It will look like the line below.
+    3. Replace the placeholder comment with your actual script tag from Plausible.
+
+    <script defer data-domain="your-username.github.io" src="https://plausible.io/js/script.js"></script>
+-->
+    
 </head>
 <body class="text-gray-800 min-h-screen flex flex-col items-center py-10 px-4">
 
@@ -102,10 +113,11 @@
                 Your local Tampa comic slash barber. <br>
                 <span class="text-violet-900 font-bold">Sharp tapers. Clean fades. Mobile convenience.</span>
                 <br>
-                <span class="text-xs text-violet-800 opacity-80 mt-2 block italic">(Handled with care, attention to detail, and questionable humor.)</span>
+                <span class="text-xs text-violet-800 opacity-80 mt-2 block italic">(And questionable humor includeed free of charge)</span>
             </p>
         </div>
-        
+
+            <!-- YOUTUBE VIDEO: Go to your video on YouTube, click Share > Embed, and copy the src="" link here. -->
         <div class="mb-8 rounded-2xl overflow-hidden shadow-2xl border-4 border-white/50 w-full transform transition hover:scale-[1.02] duration-500">
             <div class="aspect-video">
                 <iframe class="w-full h-full" src="https://www.youtube.com/embed/MeMbIu-wulQ" title="Standup Clip" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
@@ -123,7 +135,7 @@
                 <i class="fa-solid fa-camera text-violet-600"></i> My Portfolio
             </a>
                 <!-- add hidden here to hide -->
-            <div class="w-full mb-6"> <p class="text-xs font-extrabold text-violet-800 uppercase tracking-widest text-center mb-3">Upcoming Shows</p>
+            <div class="hidden w-full mb-6"> <p class="text-xs font-extrabold text-violet-800 uppercase tracking-widest text-center mb-3">Upcoming Shows</p>
                 
                 <a href="LINK_TO_BIG_SHOW" target="_blank" rel="noopener noreferrer" class="ios-btn flex items-center justify-center w-full font-bold py-4 px-6 rounded-2xl border-2 border-yellow-400/50 mb-2 relative overflow-hidden">
                     <div class="absolute inset-0 bg-yellow-50/50 -z-10"></div> <i class="fa-solid fa-star text-yellow-500 mr-3 text-lg animate-pulse"></i>
@@ -143,7 +155,7 @@
             </div>
 
                     <!-- add hidden here to hide -->
-            <div class="w-full mt-6 mb-6"> <div class="flex justify-between items-end mb-2 px-1">
+            <div class="hidden w-full mt-6 mb-6"> <div class="flex justify-between items-end mb-2 px-1">
                     <span class="text-xs font-bold text-violet-900 uppercase tracking-wider">Recent Work</span>
                     <a href="https://www.instagram.com/mas_barbery" target="_blank" class="text-[10px] font-bold text-violet-600 hover:text-violet-800 transition-colors">
                         See More on IG &rarr;
@@ -201,7 +213,7 @@
             </a>
 
                                                                                 <!-- add hidden here to hide -->
-            <a href="https://mannyserrano4-oss.github.io/crispy-enigma/events" class="ios-btn flex items-center justify-center w-full text-yellow-900 font-bold py-3 px-6 rounded-2xl border border-yellow-400 bg-yellow-50/50">
+            <a href="https://mannyserrano4-oss.github.io/crispy-enigma/events" class="hidden ios-btn flex items-center justify-center w-full text-yellow-900 font-bold py-3 px-6 rounded-2xl border border-yellow-400 bg-yellow-50/50">
                 <i class="fa-solid fa-champagne-glasses mr-3 text-yellow-600"></i>
                 <span>Private Event Barbering</span>
             </a>
@@ -218,6 +230,23 @@
                 <span>How did I do?</span>
             </a>
 
+                          <!-- MAILING LIST SIGNUP 
+                    <div class="mt-8 pt-8 border-t border-violet-300 w-full">
+                        <h3 class="text-lg font-semibold text-violet-800 mb-2">Join My Newsletter</h3>
+                        <p class="text-sm text-violet-700 mb-4">Get updates on new shows and barbering content.</p>
+                        <!-- IMPORTANT: Replace the # in action="#" with the form action URL from your email service (e.g., Mailchimp) 
+                        <form action="#" method="post" target="_blank" class="flex flex-col sm:flex-row gap-2">
+                            <input type="email" name="EMAIL" placeholder="Enter your email" required class="flex-grow px-4 py-2 rounded-md border border-violet-300 focus:outline-none focus:ring-2 focus:ring-violet-600">
+                            <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white font-bold py-2 px-6 rounded-md shadow-md transition-transform transform hover:-translate-y-1">
+                                Subscribe
+                            </button>
+                        </form>
+                    </div>
+        
+                    Final, Important Step for the Mailing List: To make the mailing list work, you'll need to sign up for a free service like Mailchimp or Substack. 
+                    Inside their platform, they will give you a special "Form Action URL." You must copy that URL and paste it into the action="#" part of the <form> tag you just added.
+                    -->
+            
             <button onclick="sharePage()" class="ios-btn flex items-center justify-center w-full text-violet-900 font-bold py-3 px-6 rounded-2xl mt-4 border border-violet-200">
                 <i class="fa-solid fa-share-nodes mr-3 text-violet-500"></i>
                 <span>Share My Page</span>
@@ -257,13 +286,13 @@
         function downloadVCard() {
             // EDIT THIS DATA TO UPDATE YOUR CONTACT INFO
             const contact = {
-                name: "Manny Serrano",
-                org: "MAS Barbery",
-                title: "Barber & Comedian",
-                phone: "19014437338",
-                email: "mannyserrano4@gmail.com",
+                name: "Manny Serrano",                     // <--- Change Name Here
+                org: "MAS Barbery",                        // <--- Change Business Name
+                title: "Barber & Comedian",                // <--- Change Title
+                phone: "19014437338",                      // <--- Change Phone
+                email: "mannyserrano4@gmail.com",          // <--- Change Email
                 website: "https://mannyserrano4-oss.github.io/crispy-enigma/",
-                instagram: "mas_barbery",
+                instagram: "mas_barbery",                  // <--- Change IG
                 city: "Tampa, FL"
             };
 
@@ -302,9 +331,18 @@
       "priceRange": "$$",
       "url": "https://mannyserrano4-oss.github.io/crispy-enigma/",
       "areaServed": [
-        { "@type": "City", "name": "Tampa" },
-        { "@type": "City", "name": "St. Petersburg" },
-        { "@type": "City", "name": "Wesley Chapel" }
+        {
+          "@type": "City",
+          "name": "Tampa"
+        },
+        {
+          "@type": "City",
+          "name": "St. Petersburg"
+        },
+        {
+          "@type": "City",
+          "name": "Wesley Chapel"
+        }
       ],
       "address": {
         "@type": "PostalAddress",
