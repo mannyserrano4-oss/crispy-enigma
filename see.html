@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manny Serrano | Barber & Comedian</title>
+
+    <link rel="icon" type="image/png" href="gitpp.png">
+    
+    <meta name="description" content="Official links for Manny Serrano. Tampa-based barber and comedian. Sharp fades, mobile service, and questionable humor.">
+    <meta property="og:title" content="Manny Serrano | Tampa Barber & Comedian">
+    <meta property="og:description" content="Book a haircut, watch standup clips, or get in touch.">
+    <meta property="og:image" content="https://mannyserrano4-oss.github.io/crispy-enigma/gitpp.png">
+    <meta property="og:url" content="https://mannyserrano4-oss.github.io/crispy-enigma/">
+    <meta property="og:type" content="website">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(-45deg, #4c1d95, #7e22ce, #a855f7, #c084fc);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Glassmorphism Effect for Buttons */
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-btn:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .glass-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Profile Glow */
+        .profile-glow {
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+        }
+    </style>
+</head>
+<body class="text-gray-900 flex flex-col items-center py-10 px-4">
+
+    <div class="w-full max-w-md text-center mb-8">
+        <div class="relative inline-block">
+            <img src="gitpp.png" alt="Manny Serrano" class="w-32 h-32 rounded-full border-4 border-white profile-glow mx-auto object-cover">
+            <div class="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-1.5 border-2 border-white shadow-sm">
+                <i class="fa-solid fa-check text-xs"></i>
+            </div>
+        </div>
+        
+        <h1 class="text-3xl font-extrabold text-white mt-4 drop-shadow-md">Manny Serrano</h1>
+        <p class="text-violet-100 font-medium text-lg">Barber & Comedian</p>
+        
+        <div class="bg-white/10 backdrop-blur-md rounded-xl p-4 mt-4 mx-4 border border-white/20">
+            <p class="text-sm text-white/90 leading-relaxed">
+                Your local Tampa comic slash barber. <br>
+                <span class="font-semibold text-white">Sharp tapers. Clean fades. Mobile convenience.</span>
+                <br>
+                <span class="text-xs opacity-75 italic mt-2 block">(And questionable humor included free of charge)</span>
+            </p>
+        </div>
+    </div>
+
+    <div class="w-full max-w-md space-y-4">
+
+        <a href="https://mannyserrano4-oss.github.io/crispy-enigma/book/" class="glass-btn flex items-center justify-between w-full text-violet-900 font-black py-4 px-6 rounded-2xl shadow-lg relative overflow-hidden group">
+            <div class="absolute left-0 top-0 h-full w-2 bg-violet-600"></div>
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-calendar-check text-xl group-hover:scale-110 transition-transform"></i>
+                <span class="text-lg">Book a Haircut</span>
+            </div>
+            <i class="fa-solid fa-chevron-right opacity-50"></i>
+        </a>
+
+        <a href="https://mannyserrano4-oss.github.io/crispy-enigma/portfolio" class="glass-btn flex items-center justify-center w-full text-gray-800 font-bold py-3 px-6 rounded-xl shadow-md">
+            <i class="fa-solid fa-camera mr-3 text-violet-600"></i>
+            <span>View Portfolio</span>
+        </a>
+
+        <div class="rounded-xl overflow-hidden shadow-2xl border-4 border-white/20 mt-6 mb-6">
+            <div class="aspect-video bg-black">
+                <iframe class="w-full h-full" src="https://www.youtube.com/embed/MeMbIu-wulQ" title="Standup Clip" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+
+        <p class="text-xs font-bold text-white/80 uppercase tracking-widest text-center mt-6 mb-2">Socials</p>
+        
+        <div class="grid grid-cols-2 gap-3">
+            <a href="https://www.instagram.com/mas_barbery" target="_blank" class="glass-btn flex flex-col items-center justify-center p-4 rounded-xl">
+                <i class="fa-brands fa-instagram text-2xl text-pink-600 mb-1"></i>
+                <span class="text-xs font-bold">Barbering</span>
+            </a>
+            <a href="https://www.instagram.com/monotonebaritone" target="_blank" class="glass-btn flex flex-col items-center justify-center p-4 rounded-xl">
+                <i class="fa-brands fa-instagram text-2xl text-purple-600 mb-1"></i>
+                <span class="text-xs font-bold">Comedy</span>
+            </a>
+        </div>
+        
+        <a href="https://www.facebook.com/share/1ChXo1WokK/?mibextid=wwXIfr" target="_blank" class="glass-btn flex items-center justify-center w-full text-gray-800 font-bold py-3 px-6 rounded-xl">
+            <i class="fa-brands fa-facebook mr-3 text-blue-600"></i>
+            <span>Facebook</span>
+        </a>
+
+        <p class="text-xs font-bold text-white/80 uppercase tracking-widest text-center mt-6 mb-2">Connect</p>
+
+        <a href="sms:+19014437338" class="glass-btn flex items-center justify-center w-full text-blue-900 font-bold py-3 px-6 rounded-xl">
+            <i class="fa-solid fa-comment-sms mr-3 text-blue-500"></i>
+            <span>Text for Appointment</span>
+        </a>
+
+        <button onclick="downloadVCard()" class="glass-btn flex items-center justify-center w-full text-green-900 font-bold py-3 px-6 rounded-xl">
+            <i class="fa-solid fa-address-card mr-3 text-green-600"></i>
+            <span>Save to Contacts</span>
+        </button>
+
+        <a href="mailto:mannyserrano4@gmail.com" class="glass-btn flex items-center justify-center w-full text-gray-800 font-bold py-3 px-6 rounded-xl">
+            <i class="fa-solid fa-envelope mr-3 text-gray-500"></i>
+            <span>Email Me</span>
+        </a>
+
+        <button onclick="sharePage()" class="glass-btn flex items-center justify-center w-full text-violet-900 font-bold py-3 px-6 rounded-xl mt-4 border-violet-300">
+            <i class="fa-solid fa-share-nodes mr-3"></i>
+            <span>Share Profile</span>
+        </button>
+
+        <div class="text-center mt-12 mb-6">
+            <p class="text-xs text-white/60">
+                &copy; 2025 Manny Serrano.<br>
+                <span class="italic opacity-70">Made by me at work because I have too much downtime.</span>
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        // 1. NATIVE SHARE FUNCTION
+        async function sharePage() {
+            const shareData = {
+                title: 'Manny Serrano | Barber & Comic',
+                text: 'Check out Manny Serrano - Tampa Barber & Comedian.',
+                url: window.location.href
+            };
+
+            // Use native share if available (Mobile), otherwise fallback to copy
+            if (navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                } catch (err) {
+                    console.log('Share canceled');
+                }
+            } else {
+                // Fallback for Desktop
+                navigator.clipboard.writeText(window.location.href);
+                alert("Link copied to clipboard!");
+            }
+        }
+
+        // 2. DYNAMIC VCARD GENERATOR (No file needed!)
+        function downloadVCard() {
+            // Define Contact Data
+            const contact = {
+                name: "Manny Serrano",
+                org: "MAS Barbery",
+                title: "Barber & Comedian",
+                phone: "19014437338",
+                email: "mannyserrano4@gmail.com",
+                website: "https://mannyserrano4-oss.github.io/crispy-enigma/",
+                instagram: "mas_barbery",
+                city: "Tampa, FL"
+            };
+
+            // Build VCF String
+            const vCardData = [
+                'BEGIN:VCARD',
+                'VERSION:3.0',
+                `FN:${contact.name}`,
+                `ORG:${contact.org}`,
+                `TITLE:${contact.title}`,
+                `TEL;TYPE=CELL:${contact.phone}`,
+                `EMAIL;TYPE=WORK:${contact.email}`,
+                `URL:${contact.website}`,
+                `ADR;TYPE=WORK:;;${contact.city};;;;`,
+                `X-SOCIALPROFILE;type=instagram:x-apple:${contact.instagram}`,
+                `NOTE:Bookings: ${contact.website}`,
+                'END:VCARD'
+            ].join('\n');
+
+            // Create Blob and Download
+            const blob = new Blob([vCardData], { type: 'text/vcard' });
+            const url = window.URL.createObjectURL(blob);
+            const newLink = document.createElement('a');
+            newLink.download = "MannySerrano.vcf";
+            newLink.textContent = contact.name;
+            newLink.href = url;
+            newLink.click();
+            window.URL.revokeObjectURL(url);
+        }
+    </script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BarberShop",
+      "name": "MAS Barbery and Beardcraft",
+      "image": "https://mannyserrano4-oss.github.io/crispy-enigma/gitpp.png",
+      "telephone": "+1-901-443-7338",
+      "priceRange": "$$",
+      "url": "https://mannyserrano4-oss.github.io/crispy-enigma/",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Tampa",
+        "addressRegion": "FL",
+        "addressCountry": "US"
+      }
+    }
+    </script>
+
+</body>
+</html>
