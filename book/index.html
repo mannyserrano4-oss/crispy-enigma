@@ -468,7 +468,7 @@
             }
         }
 
-       // 3. SAVE CONTACT FUNCTION (FIXED NAME)
+      // 3. SAVE CONTACT FUNCTION (With Substack Link)
         function downloadContact() {
             const contact = {
                 firstName: "Manny",
@@ -478,6 +478,8 @@
                 phone: BARBER_PHONE, 
                 email: "mannyserrano4@gmail.com",
                 website: "https://mannyserrano4-oss.github.io/crispy-enigma/",
+                // 🚨 ADD YOUR SUBSTACK LINK HERE 🚨
+                newsletter: "https://mannyserrano.substack.com/", 
                 instagram: "mas_barbery",
                 city: "Tampa, FL"
             };
@@ -485,18 +487,17 @@
             const vcard = [
                 "BEGIN:VCARD",
                 "VERSION:3.0",
-                // The 'N' field is what actually fills the First/Last name boxes
                 `N:${contact.lastName};${contact.firstName};;;`,
-                // The 'FN' field is what shows up in the contact list view
                 `FN:${contact.firstName} ${contact.lastName}`,
                 `ORG:${contact.org}`,
                 `TITLE:${contact.title}`,
                 `TEL;TYPE=CELL:${contact.phone}`,
                 `EMAIL:${contact.email}`,
-                `URL:${contact.website}`,
+                `URL:${contact.website}`, // This creates the main "Website" button
                 `ADR;TYPE=WORK:;;${contact.city};;;;`,
                 `X-SOCIALPROFILE;type=instagram:https://www.instagram.com/${contact.instagram}`,
-                `NOTE:Book here: ${contact.website}`,
+                // 🚨 THIS IS THE NEW MARKETING NOTE 🚨
+                `NOTE:✂️ Need a deal? Join my VIP List for last-minute openings & discounts: ${contact.newsletter}`,
                 "END:VCARD"
             ].join("\n");
 
