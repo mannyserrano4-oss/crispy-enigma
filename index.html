@@ -305,42 +305,43 @@
             }
         }
 
-        // 2. DYNAMIC VCARD GENERATOR
+       // 3. SAVE CONTACT FUNCTION (For Business Card)
         function downloadVCard() {
-            // EDIT THIS DATA TO UPDATE YOUR CONTACT INFO
             const contact = {
-                name: "Manny Serrano",                     // <--- Change Name Here
-                org: "MAS Barbery",                        // <--- Change Business Name
-                title: "Barber & Comedian",                // <--- Change Title
-                phone: "19014437338",                      // <--- Change Phone
-                email: "mannyserrano4@gmail.com",          // <--- Change Email
+                firstName: "Manny",
+                lastName: "Serrano",
+                org: "MAS Barbery",
+                title: "Barber",
+                phone: "9014437338", // <--- Put the actual number here in quotes
+                email: "mannyserrano4@gmail.com",
                 website: "https://mannyserrano4-oss.github.io/crispy-enigma/",
-                instagram: "mas_barbery",                  // <--- Change IG
+                instagram: "mas_barbery",
                 city: "Tampa, FL"
             };
 
-            const vCardData = [
-                'BEGIN:VCARD',
-                'VERSION:3.0',
-                `FN:${contact.name}`,
+            const vcard = [
+                "BEGIN:VCARD",
+                "VERSION:3.0",
+                `N:${contact.lastName};${contact.firstName};;;`,
+                `FN:${contact.firstName} ${contact.lastName}`,
                 `ORG:${contact.org}`,
                 `TITLE:${contact.title}`,
                 `TEL;TYPE=CELL:${contact.phone}`,
-                `EMAIL;TYPE=WORK:${contact.email}`,
+                `EMAIL:${contact.email}`,
                 `URL:${contact.website}`,
                 `ADR;TYPE=WORK:;;${contact.city};;;;`,
-                `X-SOCIALPROFILE;type=instagram:x-apple:${contact.instagram}`,
-                `NOTE:Bookings: ${contact.website}`,
-                'END:VCARD'
-            ].join('\n');
+                `X-SOCIALPROFILE;type=instagram:https://www.instagram.com/${contact.instagram}`,
+                `NOTE:Book here: ${contact.website}`,
+                "END:VCARD"
+            ].join("\n");
 
-            const blob = new Blob([vCardData], { type: 'text/vcard' });
-            const url = window.URL.createObjectURL(blob);
+            const blob = new Blob([vcard], { type: "text/vcard" });
+            const url = URL.createObjectURL(blob);
             const newLink = document.createElement('a');
-            newLink.download = "MannySerrano.vcf";
+            newLink.download = "Manny_Barber.vcf";
             newLink.href = url;
             newLink.click();
-            window.URL.revokeObjectURL(url);
+            URL.revokeObjectURL(url);
         }
     </script>
 
