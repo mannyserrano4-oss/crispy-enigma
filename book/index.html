@@ -266,6 +266,12 @@
             </div>
 
             <div class="pt-2 space-y-3">
+                <div class="text-center mb-1">
+                    <button onclick="downloadContact()" class="text-[10px] font-bold text-violet-500 hover:text-violet-700 underline decoration-dotted transition-colors">
+                        <i class="fa-solid fa-user-plus mr-1"></i> Tap here to save my number first
+                    </button>
+                </div>
+                
                 <button onclick="sendRequest('sms')" class="w-full bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:-translate-y-1 flex items-center justify-center gap-2">
                     <i class="fa-solid fa-comment-sms"></i> Send via Text
                 </button>
@@ -461,6 +467,42 @@
                 window.open(`https://wa.me/${BARBER_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
             }
         }
+
+        // 3. SAVE CONTACT FUNCTION (Code-Only Version)
+        function downloadContact() {
+            // Define Contact Info
+            const contact = {
+                name: "Manny Serrano",
+                job: "Barber",
+                phone: BARBER_PHONE, // Uses the config variable from top of script
+                email: "mannyserrano4@gmail.com",
+                website: "https://mannyserrano4-oss.github.io/crispy-enigma/",
+                instagram: "mas_barbery"
+            };
+
+            // Generate vCard Content
+            const vcard = [
+                "BEGIN:VCARD",
+                "VERSION:3.0",
+                `FN:${contact.name}`,
+                `ORG:${contact.job} @ MAS Barbery`,
+                `TEL;TYPE=CELL:${contact.phone}`,
+                `EMAIL:${contact.email}`,
+                `URL:${contact.website}`,
+                `X-SOCIALPROFILE;type=instagram:https://www.instagram.com/${contact.instagram}`,
+                "END:VCARD"
+            ].join("\n");
+
+            // Create Blob and Trigger Download
+            const blob = new Blob([vcard], { type: "text/vcard" });
+            const url = URL.createObjectURL(blob);
+            const newLink = document.createElement('a');
+            newLink.download = "Manny_Barber.vcf";
+            newLink.href = url;
+            newLink.click();
+            URL.revokeObjectURL(url);
+        }
+       
     </script>
 </body>
 </html>
