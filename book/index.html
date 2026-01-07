@@ -468,32 +468,38 @@
             }
         }
 
-        // 3. SAVE CONTACT FUNCTION (Code-Only Version)
+       // 3. SAVE CONTACT FUNCTION (FIXED NAME)
         function downloadContact() {
-            // Define Contact Info
             const contact = {
-                name: "Manny Serrano",
-                job: "Barber",
-                phone: BARBER_PHONE, // Uses the config variable from top of script
+                firstName: "Manny",
+                lastName: "Serrano",
+                org: "MAS Barbery",
+                title: "Barber",
+                phone: BARBER_PHONE, 
                 email: "mannyserrano4@gmail.com",
                 website: "https://mannyserrano4-oss.github.io/crispy-enigma/",
-                instagram: "mas_barbery"
+                instagram: "mas_barbery",
+                city: "Tampa, FL"
             };
 
-            // Generate vCard Content
             const vcard = [
                 "BEGIN:VCARD",
                 "VERSION:3.0",
-                `FN:${contact.name}`,
-                `ORG:${contact.job} @ MAS Barbery`,
+                // The 'N' field is what actually fills the First/Last name boxes
+                `N:${contact.lastName};${contact.firstName};;;`,
+                // The 'FN' field is what shows up in the contact list view
+                `FN:${contact.firstName} ${contact.lastName}`,
+                `ORG:${contact.org}`,
+                `TITLE:${contact.title}`,
                 `TEL;TYPE=CELL:${contact.phone}`,
                 `EMAIL:${contact.email}`,
                 `URL:${contact.website}`,
+                `ADR;TYPE=WORK:;;${contact.city};;;;`,
                 `X-SOCIALPROFILE;type=instagram:https://www.instagram.com/${contact.instagram}`,
+                `NOTE:Book here: ${contact.website}`,
                 "END:VCARD"
             ].join("\n");
 
-            // Create Blob and Trigger Download
             const blob = new Blob([vcard], { type: "text/vcard" });
             const url = URL.createObjectURL(blob);
             const newLink = document.createElement('a');
