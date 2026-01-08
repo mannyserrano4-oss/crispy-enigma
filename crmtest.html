@@ -29,6 +29,7 @@
             --p-purple: #CDB4DB;
             --p-purple-dark: #9D4EDD;
             --p-yellow: #FDE2E4;
+            --p-gold: #FFD700;
             
             --status-due: #FFD6A5;
             --status-overdue: #FFA69E;
@@ -55,6 +56,7 @@
             --p-pink-dark: #FF4D6D;
             --p-purple: #9D4EDD;
             --p-purple-dark: #C77DFF;
+            --p-gold: #FFD700;
             
             --status-due: #FF9E00;
             --status-overdue: #FF0054;
@@ -200,7 +202,7 @@
         }
         .discount-opt.selected { border-color: var(--p-green-dark); background: rgba(183, 228, 199, 0.2); }
         
-        /* NEW TAG STYLES */
+        /* TAG STYLES */
         .tag-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
         .tag-pill {
             padding: 6px 12px; border-radius: 20px; background: var(--input-bg); border: 1px solid var(--border);
@@ -211,6 +213,27 @@
             padding: 4px 10px; border-radius: 6px; background: var(--input-bg); font-size: 0.75rem; 
             color: var(--text-sub); border: 1px solid var(--border); font-weight: 600;
         }
+
+        /* ICEBREAKER STYLES */
+        .icebreaker-box {
+            background: linear-gradient(135deg, #fff9c4 0%, #fff176 100%);
+            border: 2px solid var(--p-gold);
+            color: #5d4037;
+            padding: 15px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.2);
+            animation: popIn 0.3s ease-out;
+        }
+        body.dark-mode .icebreaker-box {
+            background: linear-gradient(135deg, #fbc02d 0%, #f9a825 100%);
+            color: #212121;
+        }
+        @keyframes popIn { from{transform:scale(0.95); opacity:0;} to{transform:scale(1); opacity:1;} }
 
         .hist-item { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
         .confirm-box {
@@ -295,6 +318,10 @@
             <p id="vSub" style="color:var(--text-sub); margin-top:-10px;">Phone</p>
             <div id="vBadges" style="margin-bottom:15px; display:flex; gap:5px;"></div>
             
+            <div id="vIcebreaker" class="icebreaker-box" style="display:none;">
+                <i class="fas fa-lightbulb"></i> <span id="vIceText"></span>
+            </div>
+
             <div id="vTags" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:15px;"></div>
 
             <div class="formula-box" id="vFormula">"No cut formula saved."</div>
@@ -422,9 +449,18 @@
                 </div>
                 <div style="border:2px solid var(--p-purple); padding:15px; border-radius:15px; margin-bottom:15px; background:rgba(205,180,219,0.1);">
                     <label style="color:var(--p-purple)">Connection & Vibe</label>
+                    
+                    <label style="color:var(--p-purple-dark); margin-bottom:5px;">💡 Icebreaker (Ask next time)</label>
+                    <input type="text" id="eIcebreaker" placeholder="e.g. Ask how the Mexico trip was" style="border-color:var(--p-gold); background:#fffde7;">
+                    
                     <input type="text" id="eRef" placeholder="Referred By..." oninput="searchRef(this.value)">
                     <div id="refResults" style="background:var(--bg-card); display:none; border:1px solid var(--border); padding:10px;"></div>
-                    <textarea id="eNotes" rows="3" placeholder="Notes..."></textarea>
+                    
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <label>Permanent Notes</label>
+                        <span onclick="insertDate()" style="font-size:0.7rem; color:var(--p-blue-dark); cursor:pointer; font-weight:bold;">+ Insert Date</span>
+                    </div>
+                    <textarea id="eNotes" rows="3" placeholder="Permanent info (Wife, Job, etc)"></textarea>
                     
                     <label style="margin-top:10px;">Vibe Tags</label>
                     <div class="tag-grid" id="eTags"></div>
@@ -523,7 +559,6 @@
         let isDark = false;
         let viewArchives = false;
         
-        // NEW: Tag Definitions
         const VIBE_TAGS = ['Silent', 'Talkative', 'Tipper', 'Sensitive Skin', 'Sports', 'Chill', 'Late', 'Cash Only', 'Politics', 'Family'];
 
         window.onerror = function(msg, url, line) {
@@ -629,7 +664,16 @@
             if(c.first && isAnniversary(c.first)) b += `<span style="background:var(--p-purple); color:black; padding:5px 10px; border-radius:10px; font-size:0.8rem; font-weight:bold;">🏅 Anniversary Month</span>`;
             document.getElementById('vBadges').innerHTML = b;
 
-            // NEW: TAGS DISPLAY
+            // RENDER ICEBREAKER
+            const iceBox = document.getElementById('vIcebreaker');
+            if(c.icebreaker && c.icebreaker.trim() !== '') {
+                document.getElementById('vIceText').innerText = "Ask about: " + c.icebreaker;
+                iceBox.style.display = 'flex';
+            } else {
+                iceBox.style.display = 'none';
+            }
+
+            // TAGS DISPLAY
             const tagDiv = document.getElementById('vTags');
             tagDiv.innerHTML = '';
             if(c.tags && c.tags.length > 0) {
@@ -771,6 +815,15 @@
             if(day === 3 || day === 23) suff = 'rd';
             return `${mon} ${day}${suff}, ${y}`;
         }
+
+        // NEW: Helper to insert date
+        function insertDate() {
+            const txt = document.getElementById('eNotes');
+            const now = new Date();
+            const str = `\n[${now.getMonth()+1}/${now.getDate()}]: `;
+            txt.value += str;
+            txt.focus();
+        }
         
         // --- BOILERPLATE (Modal, Theme, Save) ---
         function getClient(id) { return clients.find(x => x.id === id); }
@@ -801,11 +854,11 @@
             html += '<h1>Black Book Report</h1><p>Generated: ' + new Date().toLocaleDateString() + '</p>';
             
             // --- TABLE 1: ACTIVE CLIENTS ---
-            html += '<h2>Active Client Database</h2><table><tr><th>Name</th><th>Phone</th><th>Status</th><th>Strikes</th><th>LTV</th><th>Last Cut</th><th>The Formula</th></tr>';
+            html += '<h2>Active Client Database</h2><table><tr><th>Name</th><th>Phone</th><th>Status</th><th>Strikes</th><th>LTV</th><th>Last Cut</th><th>The Formula</th><th>Icebreaker</th></tr>';
             
             let hasActive = false;
             clients.forEach(c => { 
-                if(c.archived) return; // Skip archived people here
+                if(c.archived) return; 
                 hasActive = true;
                 
                 const stat = getStatus(c); 
@@ -813,30 +866,23 @@
                 if(stat === 'due') statClass = 'due'; 
                 if(stat === 'overdue') statClass = 'overdue'; 
                 
-                html += `<tr><td><b>${c.name}</b></td><td>${c.phone || ''}</td><td class="${statClass}">${stat.toUpperCase()}</td><td>${'🚩'.repeat(c.strikes || 0)}</td><td>$${(c.spent||0).toFixed(2)}</td><td>${formatPretty(c.last)||''}</td><td>${c.formula||''}</td></tr>`; 
+                html += `<tr><td><b>${c.name}</b></td><td>${c.phone || ''}</td><td class="${statClass}">${stat.toUpperCase()}</td><td>${'🚩'.repeat(c.strikes || 0)}</td><td>$${(c.spent||0).toFixed(2)}</td><td>${formatPretty(c.last)||''}</td><td>${c.formula||''}</td><td>${c.icebreaker||''}</td></tr>`; 
             });
             if(!hasActive) html += '<tr><td colspan="7" style="text-align:center; padding:20px;">No active clients found.</td></tr>';
             html += '</table>';
 
-            // --- TABLE 2: ARCHIVED CLIENTS ---
+            // --- TABLE 2: ARCHIVED ---
             const archivedList = clients.filter(c => c.archived);
-            
             if(archivedList.length > 0) {
                 html += '<h2 style="color:#666;">Archived / Inactive Clients</h2><table style="border:1px solid #ccc;">';
                 html += '<tr style="background:#999;"><th>Name</th><th>Phone</th><th>LTV (Final)</th><th>Last Cut</th></tr>';
-                
                 archivedList.forEach(c => {
-                    html += `<tr class="archived-row">
-                        <td>${c.name}</td>
-                        <td>${c.phone || ''}</td>
-                        <td>$${(c.spent||0).toFixed(2)}</td>
-                        <td>${formatPretty(c.last)||''}</td>
-                    </tr>`;
+                    html += `<tr class="archived-row"><td>${c.name}</td><td>${c.phone || ''}</td><td>$${(c.spent||0).toFixed(2)}</td><td>${formatPretty(c.last)||''}</td></tr>`;
                 });
                 html += '</table>';
             }
 
-            // --- TABLE 3: TRANSACTION HISTORY ---
+            // --- TABLE 3: HISTORY ---
             html += '<h2>Transaction History</h2><table><tr><th>Date</th><th>Client Name</th><th>Amount</th></tr>';
             history.forEach(h => { 
                 html += `<tr><td>${formatPretty(h.date)}</td><td>${h.clientName || 'Unknown'}</td><td><b>$${h.amount.toFixed(2)}</b></td></tr>`; 
@@ -866,7 +912,7 @@
             document.getElementById('customDiscBox').style.display = 'none'; 
             selectedDisc = 'none'; 
             
-            // NEW: CALCULATE SMART DATE
+            // SMART DATE
             const nextDate = new Date();
             nextDate.setDate(nextDate.getDate() + ((c.freq || 4) * 7));
             document.getElementById('sbDate').innerText = nextDate.toLocaleDateString(undefined, {month:'short', day:'numeric'});
@@ -886,10 +932,7 @@
             const c = getClient(activeId);
             const nextDate = new Date();
             nextDate.setDate(nextDate.getDate() + ((c.freq || 4) * 7));
-            
-            // Format for input value: YYYY-MM-DDTHH:MM
             const iso = nextDate.toISOString().slice(0, 10) + "T10:00";
-            
             document.getElementById('schedDate').value = iso;
             closeModal('checkoutModal');
             closeModal('viewModal');
@@ -900,8 +943,7 @@
         function calcTotal() { const base = parseFloat(document.getElementById('payPrice').value) || 0; const tip = parseFloat(document.getElementById('payTip').value) || 0; let discount = 0; if(selectedDisc === 'free') discount = base; if(selectedDisc === 'half') discount = base * 0.5; if(selectedDisc === 'credit') discount = Math.min(base, 5); if(selectedDisc === 'custom') { const pct = parseFloat(document.getElementById('payCustomPct').value) || 0; discount = base * (pct / 100); } checkoutGiveback = discount; checkoutTotal = (base - discount) + tip; document.getElementById('payTotal').innerText = `$${checkoutTotal.toFixed(2)}`; document.getElementById('givebackDisplay').innerText = `Giveback: $${checkoutGiveback.toFixed(2)}`; }
         
         // Edit Logic
-        function openAddModal() { document.getElementById('eTitle').innerText = 'New Client'; document.getElementById('eId').value = ''; document.getElementById('eName').value = ''; document.getElementById('ePhone').value = ''; document.getElementById('eInsta').value = ''; document.getElementById('eEmail').value = ''; document.getElementById('eAddr').value = ''; document.getElementById('eRef').value = ''; document.getElementById('eNotes').value = ''; document.getElementById('eFormula').value = ''; document.getElementById('ePrice').value = 35; document.getElementById('eFreq').value = 4; document.getElementById('eDob').value = ''; document.getElementById('eFirst').value = new Date().toLocaleDateString('en-CA'); 
-            // Render tags (empty)
+        function openAddModal() { document.getElementById('eTitle').innerText = 'New Client'; document.getElementById('eId').value = ''; document.getElementById('eName').value = ''; document.getElementById('ePhone').value = ''; document.getElementById('eInsta').value = ''; document.getElementById('eEmail').value = ''; document.getElementById('eAddr').value = ''; document.getElementById('eRef').value = ''; document.getElementById('eNotes').value = ''; document.getElementById('eIcebreaker').value = ''; document.getElementById('eFormula').value = ''; document.getElementById('ePrice').value = 35; document.getElementById('eFreq').value = 4; document.getElementById('eDob').value = ''; document.getElementById('eFirst').value = new Date().toLocaleDateString('en-CA'); 
             const tagBox = document.getElementById('eTags'); tagBox.innerHTML = ''; VIBE_TAGS.forEach(t => { const pill = document.createElement('div'); pill.className = 'tag-pill'; pill.innerText = t; pill.onclick = () => pill.classList.toggle('active'); tagBox.appendChild(pill); });
             openModal('editModal'); 
         }
@@ -922,6 +964,7 @@
             document.getElementById('eDob').value = c.dob; 
             document.getElementById('eRef').value = c.refBy || ''; 
             document.getElementById('eNotes').value = c.notes; 
+            document.getElementById('eIcebreaker').value = c.icebreaker || '';
             document.getElementById('eFormula').value = c.formula || ''; 
             
             // RENDER TAGS
@@ -954,9 +997,7 @@
                 } 
             } 
 
-            // NEW: GATHER TAGS
             const selectedTags = Array.from(document.querySelectorAll('#eTags .tag-pill.active')).map(x => x.innerText);
-
             const formFirst = document.getElementById('eFirst').value; 
             const data = { 
                 id: id, 
@@ -971,10 +1012,9 @@
                 dob: document.getElementById('eDob').value, 
                 refBy: refName, 
                 notes: document.getElementById('eNotes').value, 
+                icebreaker: document.getElementById('eIcebreaker').value, // SAVING ICEBREAKER
                 formula: document.getElementById('eFormula').value, 
-                
-                tags: selectedTags, // SAVING TAGS HERE
-
+                tags: selectedTags,
                 credit: isNew ? creditAdd : getClient(id).credit, 
                 banked: isNew ? 0 : getClient(id).banked, 
                 loyalty: isNew ? 0 : getClient(id).loyalty, 
@@ -1005,8 +1045,6 @@
             if(type === 'confirm') msg = `Yo ${first}, just confirming our cut. You still good?`; 
             if(type === 'longtime') msg = `Hey ${first}, been a while! Time to clean up that cut?`; 
             if(type === 'followup') msg = `Appreciate you coming through ${first}! How's the cut treating you?`; 
-            
-            // NEW REVIEW LOGIC
             if(type === 'review') msg = `Yo ${first}, appreciate the cut! If you have a sec, rate it here:\n\nhttps://mannyserrano4-oss.github.io/crispy-enigma/reviews`; 
             
             window.location.href = `sms:${c.phone}&body=${encodeURIComponent(msg)}`; 
@@ -1019,18 +1057,13 @@
             r.onload = (e) => {
                 try {
                     const d = JSON.parse(e.target.result);
-                    // Check if file is valid
                     if(d.clients) { 
                         clients = d.clients; 
                         settings = d.settings || settings; 
                         history = d.history || [];
-                        
-                        // Save to phone storage
                         saveData(); 
                         localStorage.setItem('bbHistory', JSON.stringify(history));
                         localStorage.setItem('bbSettings', JSON.stringify(settings));
-                        
-                        // Refresh screen
                         render(); 
                         alert('Database Restored Successfully!'); 
                         closeModal('settingsModal'); 
@@ -1043,7 +1076,6 @@
             };
             r.readAsText(input.files[0]);
         }
-        
     </script>
 </body>
 </html>
