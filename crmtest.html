@@ -27,6 +27,7 @@
             --p-pink: #FFC8DD;
             --p-pink-dark: #FF8FAB;
             --p-purple: #CDB4DB;
+            --p-purple-dark: #9D4EDD;
             --p-yellow: #FDE2E4;
             
             --status-due: #FFD6A5;
@@ -53,6 +54,7 @@
             --p-pink: #FF758F;
             --p-pink-dark: #FF4D6D;
             --p-purple: #9D4EDD;
+            --p-purple-dark: #C77DFF;
             
             --status-due: #FF9E00;
             --status-overdue: #FF0054;
@@ -198,6 +200,18 @@
         }
         .discount-opt.selected { border-color: var(--p-green-dark); background: rgba(183, 228, 199, 0.2); }
         
+        /* NEW TAG STYLES */
+        .tag-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+        .tag-pill {
+            padding: 6px 12px; border-radius: 20px; background: var(--input-bg); border: 1px solid var(--border);
+            font-size: 0.8rem; cursor: pointer; transition: all 0.2s; user-select: none;
+        }
+        .tag-pill.active { background: var(--p-blue); color: black; border-color: var(--p-blue-dark); font-weight: bold; }
+        .tag-badge {
+            padding: 4px 10px; border-radius: 6px; background: var(--input-bg); font-size: 0.75rem; 
+            color: var(--text-sub); border: 1px solid var(--border); font-weight: 600;
+        }
+
         .hist-item { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
         .confirm-box {
             background: var(--bg-card); padding: 30px; border-radius: 20px; text-align: center; width: 80%;
@@ -280,6 +294,8 @@
             </div>
             <p id="vSub" style="color:var(--text-sub); margin-top:-10px;">Phone</p>
             <div id="vBadges" style="margin-bottom:15px; display:flex; gap:5px;"></div>
+            
+            <div id="vTags" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:15px;"></div>
 
             <div class="formula-box" id="vFormula">"No cut formula saved."</div>
 
@@ -367,6 +383,11 @@
             </div>
 
             <button class="btn btn-green" onclick="finalizeCut()">Confirm & Save</button>
+            
+            <button class="btn btn-ghost" id="btnSmartBook" onclick="smartBook()" style="margin-top:10px; border-color:var(--p-purple-dark); color:var(--p-purple-dark);">
+                <i class="fas fa-calendar-plus"></i> Book Next: <span id="sbDate">...</span>
+            </button>
+
             <button class="btn btn-red" onclick="closeModal('checkoutModal')">Cancel</button>
         </div>
     </div>
@@ -400,10 +421,13 @@
                     <input type="text" id="eFormula" placeholder="e.g. Mid fade, #1.5 into #3">
                 </div>
                 <div style="border:2px solid var(--p-purple); padding:15px; border-radius:15px; margin-bottom:15px; background:rgba(205,180,219,0.1);">
-                    <label style="color:var(--p-purple)">Connection</label>
+                    <label style="color:var(--p-purple)">Connection & Vibe</label>
                     <input type="text" id="eRef" placeholder="Referred By..." oninput="searchRef(this.value)">
                     <div id="refResults" style="background:var(--bg-card); display:none; border:1px solid var(--border); padding:10px;"></div>
                     <textarea id="eNotes" rows="3" placeholder="Notes..."></textarea>
+                    
+                    <label style="margin-top:10px;">Vibe Tags</label>
+                    <div class="tag-grid" id="eTags"></div>
                 </div>
                 <button class="btn btn-primary">Save Client</button>
                 <button type="button" class="btn btn-red" onclick="deleteClient()">Delete</button>
@@ -498,6 +522,9 @@
         let activeFilter = 'all';
         let isDark = false;
         let viewArchives = false;
+        
+        // NEW: Tag Definitions
+        const VIBE_TAGS = ['Silent', 'Talkative', 'Tipper', 'Sensitive Skin', 'Sports', 'Chill', 'Late', 'Cash Only', 'Politics', 'Family'];
 
         window.onerror = function(msg, url, line) {
             showCrashScreen(msg + " (Line " + line + ")");
@@ -601,6 +628,15 @@
             if(c.dob && isMonth(c.dob)) b += `<span style="background:var(--p-pink); color:black; padding:5px 10px; border-radius:10px; font-size:0.8rem; font-weight:bold;">🎂 Birthday Month</span>`;
             if(c.first && isAnniversary(c.first)) b += `<span style="background:var(--p-purple); color:black; padding:5px 10px; border-radius:10px; font-size:0.8rem; font-weight:bold;">🏅 Anniversary Month</span>`;
             document.getElementById('vBadges').innerHTML = b;
+
+            // NEW: TAGS DISPLAY
+            const tagDiv = document.getElementById('vTags');
+            tagDiv.innerHTML = '';
+            if(c.tags && c.tags.length > 0) {
+                c.tags.forEach(t => {
+                    tagDiv.innerHTML += `<span class="tag-badge">${t}</span>`;
+                });
+            }
 
             document.getElementById('vLoyalty').innerText = getLoyaltyVisual(c.loyalty);
             document.getElementById('vCredit').innerText = `$${(c.credit||0).toFixed(2)}`;
@@ -759,7 +795,7 @@
         function getLoyaltyVisual(n) { n = n || 0; let s = ''; for(let i=0; i<5; i++) { s += (i < n) ? '✂️' : '⚪'; } return s; }
         
         // Export Robust Excel
-    function exportRobustExcel() {
+        function exportRobustExcel() {
             let html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:sans-serif; padding:20px;} table{width:100%; border-collapse:collapse; margin-bottom:40px;} th{background:#4472C4; color:white; padding:10px; text-align:left;} td{border:1px solid #ddd; padding:8px;} tr:nth-child(even){background:#f2f2f2;} .due{color:#e67e22; font-weight:bold;} .overdue{color:#e74c3c; font-weight:bold;} .archived-row{color:#999; font-style:italic;}</style></head><body>';
             
             html += '<h1>Black Book Report</h1><p>Generated: ' + new Date().toLocaleDateString() + '</p>';
@@ -782,8 +818,7 @@
             if(!hasActive) html += '<tr><td colspan="7" style="text-align:center; padding:20px;">No active clients found.</td></tr>';
             html += '</table>';
 
-            // --- TABLE 2: ARCHIVED CLIENTS (THE NEW SECTION) ---
-            // We verify if there are any archived clients first to avoid an empty table
+            // --- TABLE 2: ARCHIVED CLIENTS ---
             const archivedList = clients.filter(c => c.archived);
             
             if(archivedList.length > 0) {
@@ -823,14 +858,139 @@
         
         // Checkout Math
         let checkoutTotal = 0; let checkoutGiveback = 0; let selectedDisc = 'none';
-        function openCheckout() { const c = getClient(activeId); document.getElementById('payPrice').value = c.price || 35; document.getElementById('payTip').value = 0; document.getElementById('payDate').value = new Date().toLocaleDateString('en-CA'); document.getElementById('customDiscBox').style.display = 'none'; selectedDisc = 'none'; const opts = document.getElementById('discountList'); opts.innerHTML = ''; addOpt(opts, 'none', 'No Discount', true); if((c.banked || 0) > 0) addOpt(opts, 'free', `Redeem 1 Free Cut (Banked: ${c.banked})`); if((c.credit || 0) > 0) addOpt(opts, 'credit', `Redeem $5 Credit (Bal: $${c.credit})`); if( (c.dob && isMonth(c.dob)) || (c.first && isAnniversary(c.first)) ) { addOpt(opts, 'half', `Redeem 50% Off (Special Month)`); } addOpt(opts, 'custom', 'Custom % Discount'); openModal('checkoutModal'); calcTotal(); }
+        function openCheckout() { 
+            const c = getClient(activeId); 
+            document.getElementById('payPrice').value = c.price || 35; 
+            document.getElementById('payTip').value = 0; 
+            document.getElementById('payDate').value = new Date().toLocaleDateString('en-CA'); 
+            document.getElementById('customDiscBox').style.display = 'none'; 
+            selectedDisc = 'none'; 
+            
+            // NEW: CALCULATE SMART DATE
+            const nextDate = new Date();
+            nextDate.setDate(nextDate.getDate() + ((c.freq || 4) * 7));
+            document.getElementById('sbDate').innerText = nextDate.toLocaleDateString(undefined, {month:'short', day:'numeric'});
+            
+            const opts = document.getElementById('discountList'); 
+            opts.innerHTML = ''; 
+            addOpt(opts, 'none', 'No Discount', true); 
+            if((c.banked || 0) > 0) addOpt(opts, 'free', `Redeem 1 Free Cut (Banked: ${c.banked})`); 
+            if((c.credit || 0) > 0) addOpt(opts, 'credit', `Redeem $5 Credit (Bal: $${c.credit})`); 
+            if( (c.dob && isMonth(c.dob)) || (c.first && isAnniversary(c.first)) ) { addOpt(opts, 'half', `Redeem 50% Off (Special Month)`); } 
+            addOpt(opts, 'custom', 'Custom % Discount'); 
+            openModal('checkoutModal'); 
+            calcTotal(); 
+        }
+        
+        function smartBook() {
+            const c = getClient(activeId);
+            const nextDate = new Date();
+            nextDate.setDate(nextDate.getDate() + ((c.freq || 4) * 7));
+            
+            // Format for input value: YYYY-MM-DDTHH:MM
+            const iso = nextDate.toISOString().slice(0, 10) + "T10:00";
+            
+            document.getElementById('schedDate').value = iso;
+            closeModal('checkoutModal');
+            closeModal('viewModal');
+            openModal('schedModal');
+        }
+
         function addOpt(parent, val, label, selected = false) { const div = document.createElement('div'); div.className = `discount-opt ${selected ? 'selected' : ''}`; div.innerText = label; div.onclick = () => { document.querySelectorAll('.discount-opt').forEach(d => d.classList.remove('selected')); div.classList.add('selected'); selectedDisc = val; document.getElementById('customDiscBox').style.display = val === 'custom' ? 'block' : 'none'; calcTotal(); }; parent.appendChild(div); }
         function calcTotal() { const base = parseFloat(document.getElementById('payPrice').value) || 0; const tip = parseFloat(document.getElementById('payTip').value) || 0; let discount = 0; if(selectedDisc === 'free') discount = base; if(selectedDisc === 'half') discount = base * 0.5; if(selectedDisc === 'credit') discount = Math.min(base, 5); if(selectedDisc === 'custom') { const pct = parseFloat(document.getElementById('payCustomPct').value) || 0; discount = base * (pct / 100); } checkoutGiveback = discount; checkoutTotal = (base - discount) + tip; document.getElementById('payTotal').innerText = `$${checkoutTotal.toFixed(2)}`; document.getElementById('givebackDisplay').innerText = `Giveback: $${checkoutGiveback.toFixed(2)}`; }
         
         // Edit Logic
-        function openAddModal() { document.getElementById('eTitle').innerText = 'New Client'; document.getElementById('eId').value = ''; document.getElementById('eName').value = ''; document.getElementById('ePhone').value = ''; document.getElementById('eInsta').value = ''; document.getElementById('eEmail').value = ''; document.getElementById('eAddr').value = ''; document.getElementById('eRef').value = ''; document.getElementById('eNotes').value = ''; document.getElementById('eFormula').value = ''; document.getElementById('ePrice').value = 35; document.getElementById('eFreq').value = 4; document.getElementById('eDob').value = ''; document.getElementById('eFirst').value = new Date().toLocaleDateString('en-CA'); openModal('editModal'); }
-        function editClient() { closeModal('viewModal'); const c = getClient(activeId); document.getElementById('eTitle').innerText = 'Edit Client'; document.getElementById('eId').value = c.id; document.getElementById('eName').value = c.name; document.getElementById('ePhone').value = c.phone; document.getElementById('eInsta').value = c.insta; document.getElementById('eEmail').value = c.email || ''; document.getElementById('ePrice').value = c.price; document.getElementById('eAddr').value = c.address; document.getElementById('eFreq').value = c.freq; document.getElementById('eFirst').value = c.first; document.getElementById('eDob').value = c.dob; document.getElementById('eRef').value = c.refBy || ''; document.getElementById('eNotes').value = c.notes; document.getElementById('eFormula').value = c.formula || ''; openModal('editModal'); }
-        async function saveClient() { const id = document.getElementById('eId').value || Date.now().toString(); const isNew = !document.getElementById('eId').value; const refName = document.getElementById('eRef').value; let creditAdd = 0; if(isNew && refName) { const referee = clients.find(x => x.name.toLowerCase() === refName.toLowerCase()); if(referee) { referee.credit = (referee.credit || 0) + 5; creditAdd = 5; await customConfirm(`Linked to ${referee.name}! $5 added to both.`); } } const formFirst = document.getElementById('eFirst').value; const data = { id: id, name: document.getElementById('eName').value, phone: document.getElementById('ePhone').value, insta: document.getElementById('eInsta').value, email: document.getElementById('eEmail').value, address: document.getElementById('eAddr').value, price: parseFloat(document.getElementById('ePrice').value), freq: parseInt(document.getElementById('eFreq').value), first: formFirst, dob: document.getElementById('eDob').value, refBy: refName, notes: document.getElementById('eNotes').value, formula: document.getElementById('eFormula').value, credit: isNew ? creditAdd : getClient(id).credit, banked: isNew ? 0 : getClient(id).banked, loyalty: isNew ? 0 : getClient(id).loyalty, spent: isNew ? 0 : getClient(id).spent, giveback: isNew ? 0 : getClient(id).giveback, cuts: isNew ? 0 : getClient(id).cuts, last: isNew ? formFirst : getClient(id).last, strikes: isNew ? 0 : (getClient(id).strikes || 0), archived: isNew ? false : (getClient(id).archived || false) }; if(isNew) clients.push(data); else { const idx = clients.findIndex(x => x.id === id); clients[idx] = data; } saveData(); closeModal('editModal'); render(); }
+        function openAddModal() { document.getElementById('eTitle').innerText = 'New Client'; document.getElementById('eId').value = ''; document.getElementById('eName').value = ''; document.getElementById('ePhone').value = ''; document.getElementById('eInsta').value = ''; document.getElementById('eEmail').value = ''; document.getElementById('eAddr').value = ''; document.getElementById('eRef').value = ''; document.getElementById('eNotes').value = ''; document.getElementById('eFormula').value = ''; document.getElementById('ePrice').value = 35; document.getElementById('eFreq').value = 4; document.getElementById('eDob').value = ''; document.getElementById('eFirst').value = new Date().toLocaleDateString('en-CA'); 
+            // Render tags (empty)
+            const tagBox = document.getElementById('eTags'); tagBox.innerHTML = ''; VIBE_TAGS.forEach(t => { const pill = document.createElement('div'); pill.className = 'tag-pill'; pill.innerText = t; pill.onclick = () => pill.classList.toggle('active'); tagBox.appendChild(pill); });
+            openModal('editModal'); 
+        }
+        
+        function editClient() { 
+            closeModal('viewModal'); 
+            const c = getClient(activeId); 
+            document.getElementById('eTitle').innerText = 'Edit Client'; 
+            document.getElementById('eId').value = c.id; 
+            document.getElementById('eName').value = c.name; 
+            document.getElementById('ePhone').value = c.phone; 
+            document.getElementById('eInsta').value = c.insta; 
+            document.getElementById('eEmail').value = c.email || ''; 
+            document.getElementById('ePrice').value = c.price; 
+            document.getElementById('eAddr').value = c.address; 
+            document.getElementById('eFreq').value = c.freq; 
+            document.getElementById('eFirst').value = c.first; 
+            document.getElementById('eDob').value = c.dob; 
+            document.getElementById('eRef').value = c.refBy || ''; 
+            document.getElementById('eNotes').value = c.notes; 
+            document.getElementById('eFormula').value = c.formula || ''; 
+            
+            // RENDER TAGS
+            const tagBox = document.getElementById('eTags');
+            tagBox.innerHTML = '';
+            const myTags = c.tags || [];
+            VIBE_TAGS.forEach(t => {
+                const pill = document.createElement('div');
+                pill.className = `tag-pill ${myTags.includes(t) ? 'active' : ''}`;
+                pill.innerText = t;
+                pill.onclick = () => pill.classList.toggle('active');
+                tagBox.appendChild(pill);
+            });
+
+            openModal('editModal'); 
+        }
+
+        async function saveClient() { 
+            const id = document.getElementById('eId').value || Date.now().toString(); 
+            const isNew = !document.getElementById('eId').value; 
+            const refName = document.getElementById('eRef').value; 
+            let creditAdd = 0; 
+            
+            if(isNew && refName) { 
+                const referee = clients.find(x => x.name.toLowerCase() === refName.toLowerCase()); 
+                if(referee) { 
+                    referee.credit = (referee.credit || 0) + 5; 
+                    creditAdd = 5; 
+                    await customConfirm(`Linked to ${referee.name}! $5 added to both.`); 
+                } 
+            } 
+
+            // NEW: GATHER TAGS
+            const selectedTags = Array.from(document.querySelectorAll('#eTags .tag-pill.active')).map(x => x.innerText);
+
+            const formFirst = document.getElementById('eFirst').value; 
+            const data = { 
+                id: id, 
+                name: document.getElementById('eName').value, 
+                phone: document.getElementById('ePhone').value, 
+                insta: document.getElementById('eInsta').value, 
+                email: document.getElementById('eEmail').value, 
+                address: document.getElementById('eAddr').value, 
+                price: parseFloat(document.getElementById('ePrice').value), 
+                freq: parseInt(document.getElementById('eFreq').value), 
+                first: formFirst, 
+                dob: document.getElementById('eDob').value, 
+                refBy: refName, 
+                notes: document.getElementById('eNotes').value, 
+                formula: document.getElementById('eFormula').value, 
+                
+                tags: selectedTags, // SAVING TAGS HERE
+
+                credit: isNew ? creditAdd : getClient(id).credit, 
+                banked: isNew ? 0 : getClient(id).banked, 
+                loyalty: isNew ? 0 : getClient(id).loyalty, 
+                spent: isNew ? 0 : getClient(id).spent, 
+                giveback: isNew ? 0 : getClient(id).giveback, 
+                cuts: isNew ? 0 : getClient(id).cuts, 
+                last: isNew ? formFirst : getClient(id).last, 
+                strikes: isNew ? 0 : (getClient(id).strikes || 0), 
+                archived: isNew ? false : (getClient(id).archived || false) 
+            }; 
+            
+            if(isNew) clients.push(data); 
+            else { const idx = clients.findIndex(x => x.id === id); clients[idx] = data; } 
+            saveData(); closeModal('editModal'); render(); 
+        }
+        
         async function deleteClient() { if(await customConfirm("Permanently delete this client?")) { clients = clients.filter(c => c.id !== document.getElementById('eId').value); saveData(); closeModal('editModal'); render(); } }
         async function addStrike() { const c = getClient(activeId); if(await customConfirm(`Mark ${c.name} as a No-Show? \n\nAdds a Strike 🚩.`)) { c.strikes = (c.strikes || 0) + 1; saveData(); closeModal('viewModal'); render(); } }
         async function removeStrike() { const c = getClient(activeId); if(await customConfirm("Remove one Strike 🚩?")) { c.strikes = Math.max(0, (c.strikes || 0) - 1); saveData(); closeModal('viewModal'); render(); } }
@@ -853,7 +1013,7 @@
             closeModal('smsModal'); 
         }
 
-        // --- RESTORE FUNCTION (Missing Fix) ---
+        // --- RESTORE FUNCTION ---
         function restoreData(input) {
             const r = new FileReader();
             r.onload = (e) => {
