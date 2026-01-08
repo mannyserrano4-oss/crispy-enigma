@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skin Treatments | Manny Serrano</title>
+    <title>Skin & Science | Manny Serrano</title>
 
     <meta property="og:title" content="Skin & Science | Manny Serrano">
     <meta property="og:description" content="Upgrade your cut. Ozone steamers, enzyme exfoliation, and hot towel finishes. See the difference between a wash and a treatment.">
@@ -40,6 +40,15 @@
         details > summary::-webkit-details-marker { display: none; }
         details[open] summary ~ * { animation: sweep .3s ease-in-out; }
         @keyframes sweep { 0% {opacity: 0; transform: translateY(-10px)} 100% {opacity: 1; transform: translateY(0)} }
+
+        /* Gentle Pulse for Best Value Badge */
+        @keyframes pulse-subtle {
+            0%, 100% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+            50% { transform: translate(-50%, 0) scale(1.05); opacity: 0.9; }
+        }
+        .best-value-badge {
+            animation: pulse-subtle 2s infinite ease-in-out;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4 text-gray-800">
@@ -65,7 +74,7 @@
                     <div class="p-3 text-xs font-bold text-violet-700">EXPRESS<br><span class="text-[10px] text-gray-500 font-normal">$20</span></div>
                     
                     <div class="p-3 text-xs font-bold text-violet-800 bg-violet-100/50 relative">
-                        <div class="absolute top-0 left-1/2 -translate-x-1/2 bg-yellow-400 text-[8px] font-bold px-2 py-[2px] rounded-b-md text-violet-900 shadow-sm uppercase tracking-wide w-full max-w-[80%]">
+                        <div class="best-value-badge absolute top-0 left-1/2 bg-yellow-400 text-[8px] font-bold px-2 py-[2px] rounded-b-md text-violet-900 shadow-sm uppercase tracking-wide w-full max-w-[80%]">
                             Best Value
                         </div>
                         <span class="mt-2 block">DELUXE</span>
@@ -289,7 +298,7 @@
 
         <div class="bg-gray-50 border-t border-gray-100 p-4 text-center">
             <a href="https://mannyserrano4-oss.github.io/crispy-enigma/book/" class="block w-full bg-violet-600 text-white font-bold py-3 rounded-xl hover:bg-violet-700 transition-colors shadow-md flex items-center justify-center gap-2">
-                <i class="fa-solid fa-calendar-check"></i> Book Your Treatment Now
+                <i class="fa-solid fa-calendar-check"></i> Book Your Treatment <span class="text-xs font-normal opacity-90 hidden sm:inline">(Perfect Add-On to Haircut)</span>
             </a>
         </div>
 
