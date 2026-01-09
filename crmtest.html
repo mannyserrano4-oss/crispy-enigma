@@ -176,6 +176,10 @@
         .btn-green { background: var(--p-green); color: #000; box-shadow: 0 4px 12px rgba(183, 228, 199, 0.4); }
         .btn-red { background: var(--p-pink); color: #000; }
         .btn-ghost { background: transparent; border: 2px solid var(--border); color: var(--text-sub); }
+        /* NEW BUTTON COLORS */
+        .btn-teal { background: #2dd4bf; color: #000; box-shadow: 0 4px 12px rgba(45, 212, 191, 0.4); }
+        .btn-orange { background: #fb923c; color: #000; box-shadow: 0 4px 12px rgba(251, 146, 60, 0.4); }
+        .btn-indigo { background: #818cf8; color: white; box-shadow: 0 4px 12px rgba(129, 140, 248, 0.4); }
 
         .v-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
         .v-box { background: var(--input-bg); padding: 15px; border-radius: 14px; text-align: center; border: 1px solid var(--border); }
@@ -535,16 +539,16 @@
             <button class="btn btn-ghost" onclick="exportHistoryCSV()">
                 <i class="fas fa-table"></i> Download Transaction CSV (Tax)
             </button>
-            <button class="btn btn-ghost" onclick="exportSimpleCSV()">
+            <button class="btn btn-teal" onclick="exportSimpleCSV()">
                 <i class="fas fa-user-tag"></i> Download Client List CSV
             </button>
-            <button class="btn btn-ghost" style="border: 2px solid var(--p-green-dark); color:var(--p-green-dark);" onclick="exportData()">
+            <button class="btn btn-indigo" style="border: 2px solid var(--p-green-dark); color:var(--p-green-dark);" onclick="exportData()">
                 <i class="fas fa-save"></i> Save Full Backup (.json)
             </button>
             
             <hr style="border-color:var(--border); margin:20px 0;">
             <input type="file" id="restoreFile" hidden onchange="restoreData(this)">
-            <button class="btn btn-ghost" onclick="document.getElementById('restoreFile').click()">Restore From Backup</button>
+            <button class="btn btn-orange" onclick="document.getElementById('restoreFile').click()">Restore From Backup</button>
             <button class="btn btn-red" onclick="closeModal('settingsModal')">Close</button>
         </div>
     </div>
