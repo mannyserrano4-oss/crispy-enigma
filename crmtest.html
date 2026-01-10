@@ -932,14 +932,21 @@
             calcTotal(); 
         }
         
-        function smartBook() {
+        async function smartBook() {
+            // 1. Save today's cut data first before moving on
+            // We use 'await' because finalizeCut might show a "High Five" alert
+            await finalizeCut(); 
+        
+            // 2. Now that data is saved, set up the next date
             const c = getClient(activeId);
             const nextDate = new Date();
             nextDate.setDate(nextDate.getDate() + ((c.freq || 4) * 7));
+            
+            // Format date for the datetime-local input (YYYY-MM-DDTHH:MM)
             const iso = nextDate.toISOString().slice(0, 10) + "T10:00";
             document.getElementById('schedDate').value = iso;
-            closeModal('checkoutModal');
-            closeModal('viewModal');
+        
+            // 3. Open the scheduling modal
             openModal('schedModal');
         }
 
