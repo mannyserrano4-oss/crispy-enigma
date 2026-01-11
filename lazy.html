@@ -168,6 +168,17 @@
         }
         input:focus { border-color: var(--p-blue-dark); outline: none; background: var(--bg-card); }
 
+    /* 1. Force dark text for the Icebreaker input to contrast with its yellow background */
+        #eIcebreaker {
+            color: #1a1a1a !important;
+        }
+        
+        /* 2. Ensure referral search results are visible in both modes */
+        #refResults div {
+            color: var(--text-main);
+            background: var(--bg-card);
+        }
+
         .btn {
             width: 100%; padding: 18px; border-radius: 16px; border: none; font-size: 1rem; font-weight: 700;
             cursor: pointer; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 10px;
