@@ -319,6 +319,9 @@
             <i class="fas fa-search search-icon"></i>
             <input type="text" class="search-input" placeholder="Search..." oninput="render(this.value)">
         </div>
+        <div class="fab" style="background:var(--p-blue); margin-right:10px;" onclick="openWalkIn()">
+            <i class="fas fa-bolt"></i>
+        </div>
         <div class="fab" onclick="openAddModal()">
             <i class="fas fa-plus"></i>
         </div>
@@ -448,6 +451,21 @@
                     </div>
                     <input type="email" id="eEmail" placeholder="Email Address">
                     <input type="text" id="eAddr" placeholder="Address">
+                </div>
+                <div id="walkInModal" class="overlay" style="z-index:700;">
+                    <div class="sheet">
+                        <h3>Quick Walk-In</h3>
+                        <p style="color:var(--text-sub); margin-top:-10px; font-size:0.8rem;">Fast revenue entry (No profile needed).</p>
+                        
+                        <label>Service Price ($)</label>
+                        <input type="number" id="wPrice" value="35" inputmode="decimal">
+            
+                        <label>Tip ($)</label>
+                        <input type="number" id="wTip" value="0" inputmode="decimal">
+            
+                        <button class="btn btn-green" onclick="saveWalkIn()">Record Walk-In</button>
+                        <button class="btn btn-ghost" onclick="closeModal('walkInModal')">Cancel</button>
+                    </div>
                 </div>
                 <div style="border:2px solid var(--p-green); padding:15px; border-radius:15px; margin-bottom:15px; background:rgba(183,228,199,0.1);">
                     <label style="color:var(--p-green-dark)">Service</label>
@@ -762,6 +780,34 @@
             const iso = nextDate.toISOString().slice(0, 10) + "T10:00";
             document.getElementById('schedDate').value = iso;
             openModal('schedModal');
+        }
+
+        // --- QUICK WALK-IN FUNCTIONS ---
+        function openWalkIn() {
+            document.getElementById('wPrice').value = 35;
+            document.getElementById('wTip').value = 0;
+            openModal('walkInModal');
+        }
+
+        function saveWalkIn() {
+            const price = parseFloat(document.getElementById('wPrice').value) || 0;
+            const tip = parseFloat(document.getElementById('wTip').value) || 0;
+            const total = price + tip;
+
+            if (total <= 0) return alert("Enter an amount.");
+
+            // Record to history with a generic name so it shows in your reports
+            history.push({
+                clientId: 'walkin',
+                clientName: '🚶 Walk-In Client',
+                date: new Date().toLocaleDateString('en-CA'),
+                amount: total
+            });
+
+            saveAll();
+            closeModal('walkInModal');
+            render(); // Refresh the top metrics (Today's Take)
+            alert(`Walk-In Recorded: $${total.toFixed(2)}`);
         }
 
         // --- UNDO / DELETE TRANSACTION ---
