@@ -18,7 +18,6 @@
         body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
         .handwritten { font-family: 'Caveat', cursive; }
         
-        /* Moving Background Gradient */
         .bg-animate {
             background: linear-gradient(-45deg, #f3e8ff, #fce7f3, #e0e7ff);
             background-size: 400% 400%;
@@ -30,7 +29,6 @@
             100% { background-position: 0% 50%; } 
         }
 
-        /* Glassmorphism Effect */
         .glass {
             background: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(12px);
@@ -39,24 +37,19 @@
         }
     </style>
 </head>
-<body class="bg-animate min-h-screen text-gray-800">
+<body class="bg-animate min-h-screen text-gray-800 pb-12">
 
     <div id="toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50 translate-y-20 opacity-0 transition-all duration-500 ease-out">
         <div class="glass border-violet-400 border-2 px-6 py-3 rounded-full shadow-2xl flex items-center gap-3">
-            <div class="bg-violet-500 text-white rounded-full p-1">
-                <i class="fa-solid fa-check text-xs"></i>
-            </div>
+            <div class="bg-violet-500 text-white rounded-full p-1"><i class="fa-solid fa-check text-xs"></i></div>
             <span class="text-sm font-bold text-gray-800">Nomination Sent! Thanks, Manny.</span>
         </div>
     </div>
 
     <header class="max-w-2xl mx-auto px-6 py-12 text-center">
         <img src="icon.png" alt="Manny Serrano" class="w-24 h-24 rounded-full mx-auto mb-6 border-4 border-white shadow-xl object-cover">
-        
-        <h1 class="text-4xl md:text-5xl font-black mb-2 tracking-tight text-gray-900 leading-tight">More Than A Cut.</h1>
-        <p class="text-xl text-violet-700 font-medium mb-6 handwritten rotate-[-2deg] inline-block">
-            Restoring Dignity & Spreading Joy
-        </p>
+        <h1 class="text-4xl md:text-5xl font-black mb-2 tracking-tight text-gray-900 leading-tight uppercase">More Than A Cut.</h1>
+        <p class="text-xl text-violet-700 font-medium mb-6 handwritten rotate-[-2deg] inline-block">Restoring Dignity & Spreading Joy</p>
         
         <div class="mb-10 italic text-gray-600 max-w-lg mx-auto border-l-4 border-violet-400 pl-4 py-2 text-left bg-white/30 rounded-r-xl">
             "I've seen a simple fade give a person the confidence to walk into a job interview and change their life. It’s never just about the hair."
@@ -75,13 +68,13 @@
                 <div class="text-xs text-gray-500 uppercase tracking-wide font-bold">Benefit Shows</div>
             </div>
             <div class="glass rounded-2xl p-4 shadow-sm">
-                <i class="fa-solid fa-location-dot text-red-500 text-2xl mb-2"></i>
-                <div class="text-2xl font-black text-gray-800">Tampa</div>
-                <div class="text-xs text-gray-500 uppercase tracking-wide font-bold">Primary Focus</div>
+                <i class="fa-solid fa-heart text-red-500 text-2xl mb-2"></i>
+                <div class="text-2xl font-black text-gray-800">100%</div>
+                <div class="text-xs text-gray-500 uppercase tracking-wide font-bold">Volunteer Heart</div>
             </div>
         </div>
 
-        <div class="max-w-md mx-auto mb-12">
+        <div class="max-w-md mx-auto mb-6">
             <div class="flex justify-between mb-2 text-[10px] font-black uppercase tracking-widest text-violet-600">
                 <span id="goal-text">Goal: 100 Cuts</span>
                 <span id="percent-text">0% Complete</span>
@@ -92,91 +85,110 @@
         </div>
     </header>
 
-    <main class="max-w-4xl mx-auto px-4 pb-16">
+    <nav class="sticky top-4 z-40 max-w-fit mx-auto glass rounded-full px-6 py-2 mb-12 shadow-lg flex gap-6 text-[10px] font-bold uppercase tracking-widest">
+        <a href="#gallery" class="hover:text-violet-600 transition-colors">Gallery</a>
+        <a href="#partners" class="hover:text-violet-600 transition-colors">Partners</a>
+        <a href="#nominate" class="hover:text-violet-600 transition-colors">Nominate</a>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4">
         
-        <section class="mb-20">
+        <section id="gallery" class="mb-24">
             <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-8 text-center">— Impact Gallery —</h2>
-            
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="group relative overflow-hidden rounded-2xl aspect-square shadow-lg">
+                    <img src="https://placehold.co/600x600/2e1065/white?text=Community+Event" class="object-cover w-full h-full transition-transform duration-500 md:group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-violet-900/95 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                        <p class="text-white font-bold text-sm">Metro Ministries Cut Day</p>
+                        <p class="text-violet-200 text-xs uppercase tracking-tighter">Jan 21, 2026</p>
+                    </div>
+                </div>
+                <div class="group relative overflow-hidden rounded-2xl aspect-square shadow-lg">
+                    <img src="https://placehold.co/600x600/4c1d95/white?text=Shelter+Visit" class="object-cover w-full h-full transition-transform duration-500 md:group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-violet-900/95 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                        <p class="text-white font-bold text-sm">Tampa Hope Initiative</p>
+                        <p class="text-violet-200 text-xs uppercase tracking-tighter">Nov 15, 2025</p>
+                    </div>
+                </div>
+                <div class="group relative overflow-hidden rounded-2xl aspect-square shadow-lg">
+                    <img src="https://placehold.co/600x600/7c3aed/white?text=Youth+Smiles" class="object-cover w-full h-full transition-transform duration-500 md:group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-violet-900/95 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                        <p class="text-white font-bold text-sm">Back-to-School Fades</p>
+                        <p class="text-violet-200 text-xs uppercase tracking-tighter">Aug 10, 2025</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="partners" class="mb-24 scroll-mt-20">
+            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-8 text-center">— Organizations I Serve —</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
-                <div class="group relative overflow-hidden rounded-2xl aspect-square shadow-lg">
-                    <img src="https://placehold.co/600x600/2e1065/white?text=Community+Event" class="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110">
-                    <div class="absolute inset-0 bg-gradient-to-t from-violet-900/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                        <p class="text-white font-bold text-sm">Metro Ministries Cut Event</p>
-                        <p class="text-violet-200 text-xs">1/21/26</p>
+                <div class="glass p-8 rounded-3xl flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xl font-black text-gray-900 mb-2">Tampa Hope</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed mb-6">
+                            Provides shelter and comprehensive support for individuals experiencing homelessness in Tampa. My focus here is preparing residents for successful job entry.
+                        </p>
+                    </div>
+                    <div class="flex gap-4">
+                        <a href="https://catholiccharitieslp.org/tampahope" target="_blank" class="text-[10px] font-bold text-violet-600 hover:text-violet-800 uppercase tracking-wider">Visit Website →</a>
+                        <a href="#" class="text-[10px] font-bold text-gray-400 hover:text-red-500 uppercase tracking-wider"><i class="fa-solid fa-heart mr-1"></i>Donate</a>
                     </div>
                 </div>
 
-                <div class="group relative overflow-hidden rounded-2xl aspect-square shadow-lg">
-                    <img src="https://placehold.co/600x600/4c1d95/white?text=Shelter+Visit" class="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110">
-                    <div class="absolute inset-0 bg-gradient-to-t from-violet-900/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                        <p class="text-white font-bold text-sm">Tampa Hope Shelter Day</p>
-                        <p class="text-violet-200 text-xs">11/15/25</p>
+                <div class="glass p-8 rounded-3xl flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xl font-black text-gray-900 mb-2">Metro Ministries</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed mb-6">
+                            A local staple for community care. From food assistance to youth education, they are at the heart of St. Pete and Tampa outreach efforts.
+                        </p>
                     </div>
-                </div>
-
-                <div class="group relative overflow-hidden rounded-2xl aspect-square shadow-lg">
-                    <img src="https://placehold.co/600x600/7c3aed/white?text=Youth+Smiles" class="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110">
-                    <div class="absolute inset-0 bg-gradient-to-t from-violet-900/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                        <p class="text-white font-bold text-sm">Back-to-School Drive</p>
-                        <p class="text-violet-200 text-xs">8/10/25</p>
+                    <div class="flex gap-4">
+                        <a href="https://www.metromin.org/" target="_blank" class="text-[10px] font-bold text-violet-600 hover:text-violet-800 uppercase tracking-wider">Visit Website →</a>
+                        <a href="#" class="text-[10px] font-bold text-gray-400 hover:text-red-500 uppercase tracking-wider"><i class="fa-solid fa-heart mr-1"></i>Donate</a>
                     </div>
                 </div>
 
             </div>
-            <p class="text-center text-[10px] text-gray-400 mt-4 uppercase tracking-widest">Hover images for event details</p>
         </section>
 
-        <section class="max-w-xl mx-auto mb-20">
-            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 text-center">— Impact Stories —</h2>
-            <div class="space-y-4">
-                <div class="glass p-6 rounded-2xl italic text-sm text-gray-700 relative">
-                    <i class="fa-solid fa-quote-left absolute top-2 left-2 text-violet-200 text-2xl"></i>
-                    "Manny brought an energy to our facility that we haven't seen in a long time. The residents felt like kings."
-                    <span class="block mt-2 not-italic font-bold text-violet-600 text-xs uppercase">— Shelter Coordinator</span>
-                </div>
-            </div>
-        </section>
-
-        <section class="max-w-xl mx-auto relative bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-10 text-center text-white overflow-hidden shadow-2xl mb-20">
+        <section class="relative bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-10 text-center text-white overflow-hidden shadow-2xl mb-24">
             <div class="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
             <i class="fa-solid fa-masks-theater text-4xl mb-4 text-pink-500 animate-bounce"></i>
-            <h3 class="text-2xl font-bold mb-2 uppercase tracking-tighter">Laughter is Medicine</h3>
-            <p class="text-gray-300 text-sm mb-6 max-w-xs mx-auto">I'm working on bringing benefit shows to Tampa hospitals and shelters. Because sometimes, a laugh is the best cure.</p>
-            <span class="inline-block border border-pink-500/50 bg-pink-500/10 text-pink-300 text-xs font-bold px-4 py-2 rounded-full uppercase tracking-widest">Targeting Summer 2026</span>
+            <h3 class="text-2xl font-bold mb-2 uppercase tracking-tighter italic">Laughter is Medicine</h3>
+            <p class="text-gray-300 text-sm mb-6 max-w-xs mx-auto">Comedy benefit shows are coming to Tampa hospitals and shelters. Because sometimes, a laugh is the best cure.</p>
+            <span class="inline-block border border-pink-500/50 bg-pink-500/10 text-pink-300 text-xs font-bold px-4 py-2 rounded-full uppercase tracking-widest">Coming Summer 2026</span>
         </section>
 
-        <section class="max-w-xl mx-auto bg-white rounded-3xl p-8 shadow-xl border border-violet-100 mb-20">
-            <h3 class="text-gray-900 font-black text-xl mb-2 text-center">Nominate a Cause</h3>
-            <p class="text-gray-500 text-sm mb-6 text-center">Know a Tampa nonprofit that needs grooming services or a fundraising host?</p>
+        <section id="nominate" class="max-w-xl mx-auto bg-white rounded-3xl p-10 shadow-xl border border-violet-100 scroll-mt-20">
+            <h3 class="text-gray-900 font-black text-2xl mb-2 text-center">Nominate a Cause</h3>
+            <p class="text-gray-500 text-sm mb-8 text-center px-4">Know a shelter, school, or organization in Tampa Bay that needs grooming or a fundraising host?</p>
             
             <form id="nominationForm" class="space-y-4">
-                <input type="text" name="org-name" placeholder="Organization Name" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-transparent focus:border-violet-500 focus:bg-white outline-none transition-all">
-                <input type="email" name="email" placeholder="Your Email" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-transparent focus:border-violet-500 focus:bg-white outline-none transition-all">
-                <textarea name="message" placeholder="Tell me about the need..." rows="3" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-transparent focus:border-violet-500 focus:bg-white outline-none transition-all"></textarea>
-                <button type="submit" id="submitBtn" class="w-full bg-violet-600 hover:bg-violet-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-[0.98] flex justify-center items-center gap-2">
-                    <span>Submit Nomination</span>
+                <input type="text" name="org-name" placeholder="Organization Name" required class="w-full px-4 py-4 rounded-2xl bg-gray-50 border border-transparent focus:border-violet-500 focus:bg-white outline-none transition-all">
+                <input type="email" name="email" placeholder="Your Best Email" required class="w-full px-4 py-4 rounded-2xl bg-gray-50 border border-transparent focus:border-violet-500 focus:bg-white outline-none transition-all">
+                <textarea name="message" placeholder="How can I help this group?" rows="4" required class="w-full px-4 py-4 rounded-2xl bg-gray-50 border border-transparent focus:border-violet-500 focus:bg-white outline-none transition-all"></textarea>
+                <button type="submit" id="submitBtn" class="w-full bg-violet-600 hover:bg-violet-700 text-white font-black py-5 rounded-2xl shadow-lg transition-all active:scale-[0.98]">
+                    SEND NOMINATION
                 </button>
             </form>
         </section>
 
     </main>
 
-    <footer class="max-w-xl mx-auto px-4 text-center">
-        <div class="flex justify-center gap-8 border-t border-gray-200 pt-8">
+    <footer class="mt-24 text-center">
+        <div class="flex justify-center gap-10 mb-8">
             <a href="index.html" class="text-gray-400 hover:text-violet-600 transition-colors"><i class="fa-solid fa-house text-xl"></i></a>
             <a href="portfolio.html" class="text-gray-400 hover:text-violet-600 transition-colors"><i class="fa-solid fa-camera text-xl"></i></a>
             <a href="https://www.instagram.com/mas_barbery" target="_blank" class="text-gray-400 hover:text-pink-600 transition-colors"><i class="fa-brands fa-instagram text-xl"></i></a>
         </div>
-        <p class="text-[10px] text-gray-400 mt-8 pb-10 uppercase tracking-widest font-bold">&copy; 2026 Manny Serrano • Built for Tampa Bay</p>
+        <p class="text-[10px] text-gray-400 uppercase tracking-[0.3em] font-bold">&copy; 2026 Manny Serrano • TAMPA BAY IMPACT</p>
     </footer>
 
     <script>
         /**
-         * 1. AUTOMATED METER LOGIC
-         * -----------------------
-         * UPDATE 'currentCuts' and 'goalCuts' here. 
-         * The bar and numbers will update automatically.
+         * UPDATE METER LOGIC
          */
         const currentCuts = 54; 
         const goalCuts = 100;
@@ -188,9 +200,7 @@
         document.getElementById('stat-cuts').innerText = currentCuts;
 
         /**
-         * 2. FORM SUBMISSION & TOAST NOTIFICATION
-         * --------------------------------------
-         * Uses Fetch to send email via Formspree without leaving the page.
+         * FORM SUBMISSION & TOAST
          */
         const form = document.getElementById('nominationForm');
         const toast = document.getElementById('toast');
@@ -199,14 +209,11 @@
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // Visual feedback on button
-            submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin"></i> Sending...';
+            submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin"></i> SENDING...';
             submitBtn.disabled = true;
 
             const data = new FormData(form);
-            
-            // UPDATE: Replace 'your-id' with your actual Formspree ID
-            const formspreeID = "your-id"; 
+            const formspreeID = "YOUR_ID"; // UPDATE THIS
 
             try {
                 const response = await fetch(`https://formspree.io/f/${formspreeID}`, {
@@ -216,22 +223,18 @@
                 });
 
                 if (response.ok) {
-                    // Show custom toast
                     toast.classList.remove('translate-y-20', 'opacity-0');
                     toast.classList.add('translate-y-0', 'opacity-100');
-
                     form.reset();
-                    
-                    // Hide toast after 4 seconds
                     setTimeout(() => {
                         toast.classList.add('translate-y-20', 'opacity-0');
                         toast.classList.remove('translate-y-0', 'opacity-100');
                     }, 4000);
                 }
             } catch (error) {
-                alert("Technical error. Please email me directly at mannyserrano4@gmail.com");
+                alert("Please email me directly at mannyserrano4@gmail.com");
             } finally {
-                submitBtn.innerHTML = 'Submit Nomination';
+                submitBtn.innerHTML = 'SEND NOMINATION';
                 submitBtn.disabled = false;
             }
         });
