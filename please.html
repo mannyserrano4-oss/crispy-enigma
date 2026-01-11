@@ -624,15 +624,23 @@
             const list = document.getElementById('list');
             list.innerHTML = '';
 
-            const totalRev = clients.reduce((s,c) => s + (c.spent || 0), 0);
-            const totalGive = clients.reduce((s,c) => s + (c.giveback || 0), 0);
+            // --- FIXED REVENUE LOGIC ---
+            // Calculate Total Revenue from the History (The true ledger)
+            const totalRev = history.reduce((s, h) => s + (h.amount || 0), 0);
+            
+            // Calculate Total Giveback from Clients
+            const totalGive = clients.reduce((s, c) => s + (c.giveback || 0), 0);
+            
+            // Today's Take (Already pulling from history, so this stays correct)
             const todayStr = new Date().toLocaleDateString('en-CA');
-            const todayRev = history.filter(h => h.date === todayStr).reduce((s,h) => s + h.amount, 0);
+            const todayRev = history.filter(h => h.date === todayStr).reduce((s, h) => s + h.amount, 0);
 
+            // Update Header UI
             document.getElementById('mToday').innerText = '$' + todayRev.toLocaleString(undefined, {minimumFractionDigits: 2});
             document.getElementById('mRev').innerText = '$' + totalRev.toLocaleString(undefined, {minimumFractionDigits: 2});
             document.getElementById('mGive').innerText = '$' + totalGive.toLocaleString(undefined, {minimumFractionDigits: 2});
 
+            // --- REST OF RENDER FUNCTION (FILTERS & SORT) ---
             let filtered = clients.filter(c => {
                 if(search && !c.name.toLowerCase().includes(search.toLowerCase())) return false;
                 if (viewArchives) return c.archived === true;
