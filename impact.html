@@ -30,48 +30,53 @@
         }
 
         .glass {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
         }
     </style>
 </head>
 <body class="bg-animate min-h-screen text-gray-800">
 
     <header class="max-w-2xl mx-auto px-6 py-12 text-center">
-        <div class="relative inline-block">
-            <img src="icon.png" alt="Manny Serrano" class="w-24 h-24 rounded-full mx-auto mb-6 border-4 border-white shadow-xl object-cover">
-            <span class="absolute bottom-6 right-0 bg-green-500 w-5 h-5 border-4 border-white rounded-full" title="Available for Charity Events"></span>
-        </div>
+        <img src="icon.png" alt="Manny Serrano" class="w-24 h-24 rounded-full mx-auto mb-6 border-4 border-white shadow-xl object-cover">
         
-        <h1 class="text-4xl md:text-5xl font-black mb-2 tracking-tight text-gray-900">
-            More Than A Cut.
-        </h1>
+        <h1 class="text-4xl md:text-5xl font-black mb-2 tracking-tight text-gray-900">More Than A Cut.</h1>
         <p class="text-xl text-violet-700 font-medium mb-6 handwritten rotate-[-2deg] inline-block">
             Restoring Dignity & Spreading Joy
         </p>
         
-        <p class="text-gray-600 leading-relaxed mb-8 max-w-lg mx-auto">
-            I believe a fresh haircut does more than change your look—it changes how you feel. 
-            My mission is to serve the **Tampa Bay community** beyond the barbershop chair through grooming and laughter.
-        </p>
+        <div class="mb-10 italic text-gray-600 max-w-lg mx-auto border-l-4 border-violet-400 pl-4 py-2 text-left bg-white/30 rounded-r-xl">
+            "I've seen a simple fade give a man the confidence to walk into a job interview and change his life. That’s why I do this. It’s never just about the hair."
+            <span class="block mt-2 font-bold text-gray-800 not-italic text-sm">— Manny Serrano</span>
+        </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
-            <div class="glass rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+            <div class="glass rounded-2xl p-4 shadow-sm">
                 <i class="fa-solid fa-scissors text-violet-500 text-2xl mb-2"></i>
-                <div class="text-2xl font-black text-gray-800">50+</div>
-                <div class="text-xs text-gray-500 uppercase tracking-wide font-bold">Free Cuts</div>
+                <div class="text-2xl font-black text-gray-800">54</div>
+                <div class="text-xs text-gray-500 uppercase tracking-wide font-bold">Free Cuts Given</div>
             </div>
             <div class="glass rounded-2xl p-4 shadow-sm border-dashed border-2 border-violet-200">
                 <i class="fa-solid fa-microphone-lines text-pink-500 text-2xl mb-2"></i>
-                <div class="text-2xl font-black text-gray-400">0</div>
-                <div class="text-xs text-gray-500 uppercase tracking-wide font-bold">2026 Goal</div>
+                <div class="text-2xl font-black text-gray-800">0</div>
+                <div class="text-xs text-gray-500 uppercase tracking-wide font-bold">Benefit Shows</div>
             </div>
-            <div class="glass rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
-                <i class="fa-solid fa-heart text-red-500 text-2xl mb-2"></i>
-                <div class="text-2xl font-black text-gray-800">100%</div>
-                <div class="text-xs text-gray-500 uppercase tracking-wide font-bold">Commitment</div>
+            <div class="glass rounded-2xl p-4 shadow-sm">
+                <i class="fa-solid fa-location-dot text-red-500 text-2xl mb-2"></i>
+                <div class="text-2xl font-black text-gray-800">Tampa</div>
+                <div class="text-xs text-gray-500 uppercase tracking-wide font-bold">Primary Focus</div>
+            </div>
+        </div>
+
+        <div class="max-w-md mx-auto mb-12">
+            <div class="flex justify-between mb-2 text-[10px] font-black uppercase tracking-widest text-violet-600">
+                <span>2026 Goal: 100 Community Cuts</span>
+                <span>54% Complete</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden shadow-inner">
+                <div class="bg-gradient-to-right from-violet-500 to-pink-500 h-full rounded-full transition-all duration-1000" style="width: 54%; background: linear-gradient(to right, #7c3aed, #db2777);"></div>
             </div>
         </div>
     </header>
@@ -79,78 +84,71 @@
     <main class="max-w-xl mx-auto px-4 pb-16">
         <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 text-center">— Recent Missions —</h2>
 
-        <article class="bg-white rounded-2xl shadow-lg overflow-hidden mb-8 transform transition hover:scale-[1.02] duration-300">
-            <img src="https://placehold.co/600x300/2e1065/white?text=Shelter+Event" alt="Barbering at Tampa Hope Shelter" class="w-full h-48 object-cover">
-            <div class="p-6">
-                <div class="flex justify-between items-start mb-2">
-                    <h3 class="text-lg font-bold text-gray-800">Tampa Hope Shelter Day</h3>
-                    <span class="bg-violet-100 text-violet-800 text-xs font-bold px-2 py-1 rounded-md">Nov 2025</span>
+        <div class="space-y-8 mb-16">
+            <article class="bg-white rounded-2xl shadow-lg overflow-hidden transform transition hover:scale-[1.01]">
+                <img src="https://placehold.co/600x300/2e1065/white?text=Shelter+Event" alt="Tampa Hope" class="w-full h-48 object-cover">
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-bold text-gray-800">Tampa Hope Shelter Day</h3>
+                        <span class="bg-violet-100 text-violet-800 text-xs font-bold px-2 py-1 rounded-md text-[10px]">NOV 2025</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Providing grooming for residents preparing for job interviews.</p>
                 </div>
-                <p class="text-gray-600 text-sm mb-4">
-                    Spent the morning providing fresh cuts and hot towel shaves to residents getting ready for job interviews. 
-                    The confidence boost in the room was palpable.
-                </p>
-                <div class="flex gap-2">
-                    <span class="text-[10px] bg-gray-100 text-gray-500 px-2 py-1 rounded-full font-bold">#BARBERING</span>
-                    <span class="text-[10px] bg-gray-100 text-gray-500 px-2 py-1 rounded-full font-bold">#TAMPAHOPE</span>
+            </article>
+        </div>
+
+        <section class="mb-16">
+            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 text-center">— Impact Stories —</h2>
+            <div class="grid grid-cols-1 gap-4">
+                <div class="glass p-5 rounded-2xl italic text-sm text-gray-700 relative">
+                    <i class="fa-solid fa-quote-left absolute top-2 left-2 text-violet-200 text-2xl"></i>
+                    "Manny brought an energy to our facility that we haven't seen in a long time. The residents felt like kings."
+                    <span class="block mt-2 not-italic font-bold text-violet-600 text-xs uppercase">— Shelter Coordinator</span>
                 </div>
             </div>
-        </article>
+        </section>
 
-        <article class="bg-white rounded-2xl shadow-lg overflow-hidden mb-8 transform transition hover:scale-[1.02] duration-300">
-            <img src="https://placehold.co/600x300/4c1d95/white?text=Back+to+School" alt="Back to school haircut drive" class="w-full h-48 object-cover">
-            <div class="p-6">
-                <div class="flex justify-between items-start mb-2">
-                    <h3 class="text-lg font-bold text-gray-800">Back-to-School Drive</h3>
-                    <span class="bg-violet-100 text-violet-800 text-xs font-bold px-2 py-1 rounded-md">Aug 2025</span>
-                </div>
-                <p class="text-gray-600 text-sm mb-4">
-                    Partnered with local barbers to give 20 kids fresh fades before their first day of school. 
-                    Look good, feel good, learn good.
-                </p>
-                <div class="flex gap-2">
-                    <span class="text-[10px] bg-gray-100 text-gray-500 px-2 py-1 rounded-full font-bold">#YOUTH</span>
-                    <span class="text-[10px] bg-gray-100 text-gray-500 px-2 py-1 rounded-full font-bold">#EDUCATION</span>
-                </div>
-            </div>
-        </article>
-
-        <section class="relative bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-8 text-center text-white overflow-hidden shadow-2xl mb-12">
+        <section class="relative bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-8 text-center text-white overflow-hidden shadow-2xl mb-16">
             <div class="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
             <i class="fa-solid fa-masks-theater text-4xl mb-4 text-pink-500 animate-bounce"></i>
             <h3 class="text-2xl font-bold mb-2">Laughter is Medicine</h3>
-            <p class="text-gray-300 text-sm mb-6 max-w-xs mx-auto">
-                I'm bringing comedy shows to hospitals, shelters, and benefit nights. Because sometimes, a laugh is the best cure.
-            </p>
-            <span class="inline-block border border-pink-500/50 bg-pink-500/10 text-pink-300 text-xs font-bold px-4 py-2 rounded-full">
-                COMING SOON
-            </span>
+            <p class="text-gray-300 text-sm mb-6 max-w-xs mx-auto">Upcoming comedy benefit shows for local Tampa nonprofits.</p>
+            <span class="inline-block border border-pink-500/50 bg-pink-500/10 text-pink-300 text-xs font-bold px-4 py-2 rounded-full uppercase tracking-widest">Targeting Summer 2026</span>
         </section>
 
-        <section class="text-center mt-12 bg-white/40 p-8 rounded-3xl border border-white/50">
-            <h3 class="text-gray-800 font-bold text-xl mb-2">Know a Cause?</h3>
-            <p class="text-gray-500 text-sm mb-6 px-4">
-                If you know a shelter, school, or organization in Tampa that needs grooming services or a fundraising host, let's talk.
+        <section class="bg-white rounded-3xl p-8 shadow-xl border border-violet-100 mb-16">
+            <h3 class="text-gray-900 font-black text-xl mb-2 text-center">Nominate a Cause</h3>
+            <p class="text-gray-500 text-sm mb-6 text-center">Know a shelter, school, or nonprofit in Tampa Bay that needs our help?</p>
+            
+            <form action="https://formspree.io/f/your-form-id" method="POST" class="space-y-4">
+                <input type="text" name="org-name" placeholder="Organization Name" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:border-violet-500 outline-none transition-all">
+                <input type="email" name="email" placeholder="Your Email" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:border-violet-500 outline-none transition-all">
+                <textarea name="message" placeholder="Tell me about the need..." rows="3" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:border-violet-500 outline-none transition-all"></textarea>
+                <button type="submit" class="w-full bg-violet-600 hover:bg-violet-700 text-white font-bold py-4 rounded-xl shadow-lg transition-transform active:scale-[0.98]">
+                    Submit Nomination
+                </button>
+            </form>
+        </section>
+
+        <section class="text-center mb-16">
+            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">— Local Partners —</h3>
+            <p class="text-xs text-gray-500 mb-6 px-10 leading-relaxed">
+                I’m looking to partner with local Tampa coffee shops, supplies providers, and other barbers for future events.
             </p>
-            <a href="mailto:mannyserrano4@gmail.com?subject=Charity%20Opportunity" class="inline-flex items-center bg-violet-600 hover:bg-violet-700 active:scale-95 text-white font-bold py-3 px-10 rounded-full shadow-lg transition-all">
-                <i class="fa-solid fa-envelope mr-2"></i> Get in Touch
+            <a href="mailto:mannyserrano4@gmail.com?subject=Partnership%20Inquiry" class="text-violet-600 font-bold text-sm hover:underline decoration-2 underline-offset-4">
+                Let's collaborate <i class="fa-solid fa-arrow-right ml-1"></i>
             </a>
         </section>
+
     </main>
 
     <footer class="max-w-xl mx-auto px-4 text-center">
-        <div class="flex justify-center gap-6 border-t border-gray-200 pt-8">
-            <a href="index.html" aria-label="Home" class="text-gray-400 hover:text-violet-600 transition-colors">
-                <i class="fa-solid fa-house text-xl"></i>
-            </a>
-            <a href="portfolio.html" aria-label="Portfolio" class="text-gray-400 hover:text-violet-600 transition-colors">
-                <i class="fa-solid fa-camera text-xl"></i>
-            </a>
-            <a href="https://www.instagram.com/mas_barbery" target="_blank" aria-label="Instagram" class="text-gray-400 hover:text-pink-600 transition-colors">
-                <i class="fa-brands fa-instagram text-xl"></i>
-            </a>
+        <div class="flex justify-center gap-8 border-t border-gray-200 pt-8">
+            <a href="index.html" title="Home" class="text-gray-400 hover:text-violet-600 transition-colors"><i class="fa-solid fa-house text-xl"></i></a>
+            <a href="portfolio.html" title="Portfolio" class="text-gray-400 hover:text-violet-600 transition-colors"><i class="fa-solid fa-camera text-xl"></i></a>
+            <a href="https://www.instagram.com/mas_barbery" target="_blank" title="Instagram" class="text-gray-400 hover:text-pink-600 transition-colors"><i class="fa-brands fa-instagram text-xl"></i></a>
         </div>
-        <p class="text-[10px] text-gray-400 mt-8 pb-10 uppercase tracking-widest">&copy; 2026 Manny Serrano • Built with Heart in Tampa</p>
+        <p class="text-[10px] text-gray-400 mt-8 pb-10 uppercase tracking-widest font-bold">&copy; 2026 Manny Serrano • TAMPA BAY IMPACT</p>
     </footer>
 
 </body>
