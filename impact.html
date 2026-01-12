@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Community & Charity | Manny Serrano</title>
     
-    <meta property="og:title" content="Manny Serrano | Community Impact">
-    <meta property="og:description" content="Restoring dignity through haircuts and joy through laughter in Tampa & St. Pete.">
-    
     <link rel="icon" type="image/png" href="icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -21,81 +18,53 @@
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
         }
-        @keyframes gradientBG { 
-            0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } 
-        }
-        .glass {
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-        }
-        /* Offset for Sticky Nav */
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .glass { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.4); }
         section { scroll-margin-top: 100px; }
-        
-        /* Modal Animation */
-        #hero-modal { transition: all 0.3s ease-in-out; }
         .modal-open { overflow: hidden; }
-
-        /* Nav Highlight Color */
-        .nav-active { color: #7c3aed !important; font-weight: 900; }
+        .nav-active { color: #7c3aed !important; font-weight: 900; transform: scale(1.1); }
     </style>
 </head>
 <body class="bg-animate min-h-screen text-gray-800 pb-12">
 
-    <div id="hero-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-gray-900/40 backdrop-blur-sm opacity-0 pointer-events-none">
+    <div id="hero-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-gray-900/40 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
         <div class="glass max-w-sm w-full rounded-3xl p-8 shadow-2xl transform scale-95 transition-transform relative">
             <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-violet-600"><i class="fa-solid fa-xmark text-xl"></i></button>
             <div class="text-center">
                 <img id="modal-img" src="" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-white shadow-lg object-cover">
-                <h3 id="modal-name" class="text-xl font-black text-gray-900 uppercase tracking-tighter leading-none mb-1"></h3>
+                <h3 id="modal-name" class="text-xl font-black text-gray-900 uppercase tracking-tighter mb-1"></h3>
                 <p id="modal-role" class="text-[10px] font-bold text-violet-600 uppercase tracking-widest mb-4"></p>
                 <p id="modal-bio" class="text-sm text-gray-600 leading-relaxed mb-6"></p>
-                <div class="flex justify-center gap-4">
-                    <a id="modal-insta" href="#" target="_blank" class="bg-white p-3 rounded-full shadow-sm text-pink-500 hover:scale-110 transition-transform"><i class="fa-brands fa-instagram text-xl"></i></a>
-                </div>
+                <a id="modal-insta" href="#" target="_blank" class="inline-flex items-center gap-2 text-pink-500 font-bold text-sm bg-white px-6 py-2 rounded-full shadow-sm hover:scale-105 transition-transform"><i class="fa-brands fa-instagram"></i> Follow</a>
             </div>
-        </div>
-    </div>
-
-    <div id="toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50 translate-y-20 opacity-0 transition-all duration-500 ease-out">
-        <div class="glass border-violet-400 border-2 px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 text-sm font-bold uppercase tracking-tighter">
-            <div class="bg-violet-500 text-white rounded-full p-1"><i class="fa-solid fa-check text-xs"></i></div>
-            <span>Message Sent! Thanks, Manny.</span>
         </div>
     </div>
 
     <header class="max-w-2xl mx-auto px-6 py-12 text-center">
         <img src="icon.png" alt="Manny Serrano" class="w-24 h-24 rounded-full mx-auto mb-6 border-4 border-white shadow-xl object-cover">
         <h1 class="text-4xl md:text-5xl font-black mb-2 tracking-tight text-gray-900 uppercase">More Than A Cut.</h1>
-        <p class="text-xl text-violet-700 font-medium mb-4 handwritten rotate-[-2deg] inline-block">Serving Tampa & St. Pete</p>
+        <p class="text-xl text-violet-700 font-medium mb-4 handwritten rotate-[-2deg] inline-block text-white">Serving Tampa Bay & Beyond</p>
         
         <div class="mb-10 italic text-gray-600 max-w-lg mx-auto border-l-4 border-violet-400 pl-4 py-2 text-left bg-white/30 rounded-r-xl">
             "I've seen a simple fade give a person the confidence to walk into a job interview and change their life. It’s never just about the hair."
-            <span class="block mt-2 font-bold text-gray-800 not-italic text-sm">— Manny Serrano</span>
         </div>
 
         <div class="max-w-md mx-auto space-y-4 mb-8">
             <div class="flex justify-between mb-1 text-[9px] font-black uppercase tracking-widest text-violet-600">
-                <span id="cut-goal-text">Goal: 100 Cuts</span>
-                <span id="stat-cuts">0</span>
+                <span>Free Cuts: <span id="stat-cuts">0</span></span>
+                <span id="cut-goal-text">Goal: 100</span>
             </div>
             <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden shadow-inner">
                 <div id="cut-progress-bar" class="h-full bg-gradient-to-r from-violet-500 to-pink-500 transition-all duration-1000" style="width: 0%"></div>
             </div>
-            
             <div class="flex justify-between mb-1 text-[9px] font-black uppercase tracking-widest text-pink-600">
-                <span id="show-goal-text">Goal: 5 Benefit Shows</span>
-                <span id="stat-shows">0</span>
+                <span>Shows: <span id="stat-shows">0</span></span>
+                <span id="show-goal-text">Goal: 5</span>
             </div>
             <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden shadow-inner">
                 <div id="show-progress-bar" class="h-full bg-gradient-to-r from-pink-500 to-red-400 transition-all duration-1000" style="width: 0%"></div>
             </div>
         </div>
-
-        <a href="#" target="_blank" class="inline-flex items-center gap-2 text-[10px] font-black text-gray-400 hover:text-violet-600 transition-colors uppercase tracking-widest">
-            <i class="fa-solid fa-download"></i> Download Media Kit (Press)
-        </a>
     </header>
 
     <nav class="sticky top-4 z-40 max-w-fit mx-auto glass rounded-full px-6 py-2 mb-12 shadow-lg flex gap-4 md:gap-8 text-[10px] font-black uppercase tracking-widest">
@@ -105,81 +74,97 @@
         <a href="#nominate" class="nav-link">Connect</a>
     </nav>
 
-    <main class="max-w-4xl mx-auto px-4">
+    <main class="max-w-5xl mx-auto px-4">
         
         <section id="gallery" class="mb-24">
             <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-8 text-center">— Recent Impact —</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="gallery-grid">
                 <div class="gallery-card group relative overflow-hidden rounded-2xl aspect-square shadow-lg">
-                    <img src="https://placehold.co/600x600/2e1065/white?text=St.+Pete" class="object-cover w-full h-full transition-all duration-500 md:group-hover:scale-110">
-                    <div class="absolute inset-0 bg-gradient-to-t from-violet-900/95 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity p-6 flex flex-col justify-end">
-                        <p class="text-white font-bold text-sm uppercase">St. Pete Outreach</p>
-                        <p class="text-violet-200 text-[10px] uppercase mt-1">Feb 12, 2026</p>
+                    <img src="https://placehold.co/600x600/2e1065/white?text=St.+Pete" class="object-cover w-full h-full md:group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-violet-900/95 to-transparent flex flex-col justify-end p-6 text-white md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                        <p class="font-bold text-sm uppercase">St. Pete Outreach</p>
                     </div>
                 </div>
                 <div class="gallery-card group relative overflow-hidden rounded-2xl aspect-square shadow-lg">
-                    <img src="https://placehold.co/600x600/db2777/white?text=Comedy" class="object-cover w-full h-full transition-all duration-500 md:group-hover:scale-110">
-                    <div class="absolute inset-0 bg-gradient-to-t from-pink-900/95 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity p-6 flex flex-col justify-end text-white font-bold text-sm uppercase">Benefit Show #1</div>
+                    <img src="https://placehold.co/600x600/db2777/white?text=Tampa+Hope" class="object-cover w-full h-full">
+                    <div class="absolute inset-0 bg-gradient-to-t from-violet-900/95 to-transparent flex flex-col justify-end p-6 text-white md:opacity-0 md:group-hover:opacity-100 transition-opacity"><p class="font-bold text-sm uppercase">Tampa Hope Day</p></div>
                 </div>
                 <div class="gallery-card group relative overflow-hidden rounded-2xl aspect-square shadow-lg">
-                    <img src="https://placehold.co/600x600/4c1d95/white?text=Metro" class="object-cover w-full h-full">
-                    <div class="absolute inset-0 bg-gradient-to-t from-violet-900/95 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity p-6 flex flex-col justify-end text-white font-bold text-sm uppercase text-white uppercase">Metro Ministries</div>
+                    <img src="https://placehold.co/600x600/4c1d95/white?text=Benefit+Mic" class="object-cover w-full h-full">
+                    <div class="absolute inset-0 bg-gradient-to-t from-violet-900/95 to-transparent flex flex-col justify-end p-6 text-white md:opacity-0 md:group-hover:opacity-100 transition-opacity"><p class="font-bold text-sm uppercase">Comedy Night #1</p></div>
                 </div>
+                <div class="gallery-card group relative overflow-hidden rounded-2xl aspect-square shadow-lg"><img src="https://placehold.co/600x600/7c3aed/white?text=Photo+4" class="w-full h-full object-cover"></div>
+                <div class="gallery-card group relative overflow-hidden rounded-2xl aspect-square shadow-lg"><img src="https://placehold.co/600x600/ec4899/white?text=Photo+5" class="w-full h-full object-cover"></div>
+                <div class="gallery-card group relative overflow-hidden rounded-2xl aspect-square shadow-lg"><img src="https://placehold.co/600x600/3b82f6/white?text=Photo+6" class="w-full h-full object-cover"></div>
             </div>
-            <div class="text-center mt-8">
+            <div class="text-center mt-10">
                 <button id="galleryToggle" class="hidden inline-flex items-center gap-2 bg-white/40 hover:bg-white text-violet-700 text-[10px] font-black uppercase tracking-widest py-3 px-8 rounded-full border border-violet-100 transition-all">
-                    <span id="toggleText">View All Photos</span>
-                    <i class="fa-solid fa-chevron-down" id="toggleIcon"></i>
+                    <span id="galleryText">View All Photos</span>
+                    <i class="fa-solid fa-chevron-down" id="galleryIcon"></i>
                 </button>
             </div>
         </section>
 
         <section id="heroes" class="mb-24 text-center">
             <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-8">— The Coalition Wall —</h2>
-            <div class="flex flex-wrap justify-center gap-8">
+            <div class="flex flex-wrap justify-center gap-10" id="hero-grid">
                 
-                <div class="flex flex-col items-center group cursor-pointer" onclick="openModal('Alex R.', 'Barber', 'Volunteered 10+ hours in Tampa.', 'https://placehold.co/200x200/7c3aed/white?text=AR', '#')">
-                    <img src="https://placehold.co/100x100/7c3aed/white?text=AR" class="w-20 h-20 rounded-full border-4 border-white shadow-md group-hover:scale-110 transition-transform">
+                <div class="hero-card flex flex-col items-center group cursor-pointer" 
+                     onclick="openModal('Alex R.', 'Master Barber', 'Volunteered 20+ hours in Tampa. Specialty: High Fades.', 'https://placehold.co/200x200/7c3aed/white?text=AR', '#')">
+                    <div class="relative">
+                        <img src="https://placehold.co/100x100/7c3aed/white?text=AR" class="w-20 h-20 rounded-full border-4 border-white shadow-md group-hover:scale-105 transition-transform">
+                        <div class="absolute -bottom-1 -right-1 bg-violet-600 text-white w-6 h-6 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
+                            <i class="fa-solid fa-scissors text-[8px]"></i>
+                        </div>
+                    </div>
                     <p class="mt-3 text-[10px] font-black text-gray-800 uppercase leading-none">Alex R.</p>
+                    <p class="text-[8px] text-gray-400 font-bold uppercase mt-1">Master Barber</p>
                 </div>
 
-                <div class="flex flex-col items-center group cursor-pointer" onclick="openModal('Sarah L.', 'Designer', 'Handles all community flyers.', 'https://placehold.co/200x200/db2777/white?text=SL', '#')">
-                    <img src="https://placehold.co/100x100/db2777/white?text=SL" class="w-20 h-20 rounded-full border-4 border-white shadow-md group-hover:scale-110 transition-transform">
+                <div class="hero-card flex flex-col items-center group cursor-pointer" 
+                     onclick="openModal('Sarah L.', 'Visual Designer', 'Creates all of our community flyers and social assets.', 'https://placehold.co/200x200/db2777/white?text=SL', '#')">
+                    <div class="relative">
+                        <img src="https://placehold.co/100x100/db2777/white?text=SL" class="w-20 h-20 rounded-full border-4 border-white shadow-md group-hover:scale-105 transition-transform">
+                        <div class="absolute -bottom-1 -right-1 bg-pink-500 text-white w-6 h-6 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
+                            <i class="fa-solid fa-pen-nib text-[8px]"></i>
+                        </div>
+                    </div>
                     <p class="mt-3 text-[10px] font-black text-gray-800 uppercase leading-none">Sarah L.</p>
+                    <p class="text-[8px] text-gray-400 font-bold uppercase mt-1">Designer</p>
                 </div>
 
+            </div>
+            <div class="text-center mt-10">
+                <button id="heroToggle" class="hidden inline-flex items-center gap-2 bg-white/40 hover:bg-white text-violet-700 text-[10px] font-black uppercase tracking-widest py-3 px-8 rounded-full border border-violet-100 transition-all">
+                    <span id="heroText">View All Heroes</span>
+                    <i class="fa-solid fa-chevron-down" id="heroIcon"></i>
+                </button>
             </div>
         </section>
 
         <section id="partners" class="mb-24">
-            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-8 text-center">— Partners & Direct Giving —</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-                <div class="glass p-8 rounded-3xl flex flex-col justify-between">
+            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-8 text-center">— Partners —</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 max-w-2xl mx-auto">
+                <div class="glass p-8 rounded-3xl flex flex-col justify-between text-center">
                     <h3 class="text-lg font-black text-gray-900 mb-2 uppercase tracking-tighter">Tampa Hope</h3>
-                    <p class="text-gray-500 text-[11px] mb-6 leading-relaxed">Assisting residents as they transition into stable housing.</p>
-                    <a href="#" target="_blank" class="w-full bg-white hover:bg-gray-50 text-gray-800 text-[10px] font-black py-4 rounded-xl text-center uppercase border border-gray-100 transition-all flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-heart text-red-500"></i> Donate Directly
+                    <a href="#" target="_blank" class="bg-white hover:bg-gray-50 text-gray-800 text-[10px] font-black py-4 rounded-xl border border-gray-100 transition-all uppercase tracking-widest">
+                        <i class="fa-solid fa-heart text-red-500 mr-2"></i> Donate Directly
                     </a>
                 </div>
-                <div class="glass p-8 rounded-3xl flex flex-col justify-between">
-                    <h3 class="text-lg font-black text-gray-900 mb-2 uppercase tracking-tighter">Metro Ministries</h3>
-                    <p class="text-gray-500 text-[11px] mb-6 leading-relaxed">Providing food and housing for families across Tampa Bay.</p>
-                    <a href="#" target="_blank" class="w-full bg-white hover:bg-gray-50 text-gray-800 text-[10px] font-black py-4 rounded-xl text-center uppercase border border-gray-100 transition-all flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-heart text-red-500"></i> Donate Directly
+                <div class="glass p-8 rounded-3xl flex flex-col justify-between text-center">
+                    <h3 class="text-lg font-black text-gray-900 mb-2 uppercase tracking-tighter text-violet-800">Metro Ministries</h3>
+                    <a href="#" target="_blank" class="bg-white hover:bg-gray-50 text-gray-800 text-[10px] font-black py-4 rounded-xl border border-gray-100 transition-all uppercase tracking-widest">
+                        <i class="fa-solid fa-heart text-red-500 mr-2"></i> Donate Directly
                     </a>
                 </div>
             </div>
-            <div class="max-w-xl mx-auto text-center glass p-6 rounded-2xl border-violet-200 border">
-                <p class="text-[10px] text-gray-500 leading-relaxed italic">
-                    All donations go directly to official platforms. I do not handle any charitable funds.
-                </p>
-            </div>
+            <div class="text-center opacity-60"><p class="text-[10px] italic">100% Transparency: I do not handle any charitable funds. All donations go directly to official platforms.</p></div>
         </section>
 
         <section id="nominate" class="max-w-xl mx-auto bg-white rounded-3xl p-10 shadow-2xl border border-violet-100 mb-24">
             <h3 class="text-gray-900 font-black text-2xl mb-8 text-center uppercase tracking-tighter italic">Connect with Manny</h3>
             <form id="nominationForm" class="space-y-4">
-                <select name="role" required class="w-full px-4 py-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-violet-500 outline-none text-xs font-black uppercase text-gray-400">
+                <select name="role" required class="w-full px-4 py-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-violet-500 outline-none text-xs font-black uppercase text-gray-400 appearance-none">
                     <option value="" disabled selected>Reason for contact...</option>
                     <option value="Volunteer">I want to volunteer (Barber/Designer)</option>
                     <option value="Non-Profit">Needs services (Organization)</option>
@@ -191,79 +176,36 @@
                 <button type="submit" id="submitBtn" class="w-full bg-violet-600 hover:bg-violet-700 text-white font-black py-5 rounded-2xl shadow-lg transition-all active:scale-[0.98] uppercase tracking-widest">Send Message</button>
             </form>
         </section>
-
     </main>
 
     <footer class="max-w-4xl mx-auto px-6 border-t border-gray-200 pt-16 pb-12">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left">
             <div>
-                <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Direct Contact</h4>
-                <a href="mailto:mannyserrano4@gmail.com" class="block text-sm font-bold text-gray-800 hover:text-violet-600 transition-colors mb-2">mannyserrano4@gmail.com</a>
-                <p class="text-xs text-gray-500 italic">Available for Bay Area missions</p>
+                <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Direct</h4>
+                <a href="mailto:mannyserrano4@gmail.com" class="text-sm font-bold text-gray-800 hover:text-violet-600">mannyserrano4@gmail.com</a>
             </div>
             <div>
-                <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">The Coalition</h4>
-                <p class="text-xs text-gray-500 leading-relaxed mb-4">I bring internal power, professional lighting, and sanitation. Volunteers must provide their own cordless tools.</p>
-                <a href="#" class="text-[10px] font-black text-violet-600 uppercase border-b-2 border-violet-100 pb-1">Download Guide</a>
+                <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">The Crew</h4>
+                <p class="text-[10px] text-gray-500 leading-relaxed italic">I provide power & light. Volunteers provide cordless tools.</p>
             </div>
-            <div>
-                <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Social Impact</h4>
-                <div class="flex justify-center md:justify-start gap-6">
-                    <a href="https://instagram.com/mas_barbery" target="_blank" class="text-gray-400 hover:text-pink-500"><i class="fa-brands fa-instagram text-2xl"></i></a>
-                    <a href="#" class="text-gray-400 hover:text-blue-500"><i class="fa-brands fa-facebook text-2xl"></i></a>
-                    <a href="#" class="text-gray-400 hover:text-violet-600"><i class="fa-solid fa-envelope text-2xl"></i></a>
-                </div>
+            <div class="flex justify-center md:justify-start gap-6">
+                <a href="https://instagram.com/mas_barbery" target="_blank" class="text-gray-400 hover:text-pink-500 transition-colors"><i class="fa-brands fa-instagram text-2xl"></i></a>
+                <a href="mailto:mannyserrano4@gmail.com" class="text-gray-400 hover:text-violet-600 transition-colors"><i class="fa-solid fa-envelope text-2xl"></i></a>
             </div>
-        </div>
-        <div class="mt-16 text-center">
-            <p class="text-[9px] text-gray-400 uppercase tracking-[0.4em] font-black">&copy; 2026 Manny Serrano • More Than A Cut • Built with Heart</p>
         </div>
     </footer>
 
     <script>
-        /** 1. IMPACT METER LOGIC **/
+        /** 1. METER LOGIC **/
         const currentCuts = 54; const goalCuts = 100;
         const currentShows = 1; const goalShows = 5;
 
-        // Using simple math: percentage = (current / goal) * 100
-        const cPct = Math.min((currentCuts / goalCuts) * 100, 100);
-        const sPct = Math.min((currentShows / goalShows) * 100, 100);
-
-        document.getElementById('cut-progress-bar').style.width = cPct + "%";
+        document.getElementById('cut-progress-bar').style.width = Math.min((currentCuts/goalCuts)*100, 100) + "%";
         document.getElementById('stat-cuts').innerText = currentCuts;
-        document.getElementById('show-progress-bar').style.width = sPct + "%";
+        document.getElementById('show-progress-bar').style.width = Math.min((currentShows/goalShows)*100, 100) + "%";
         document.getElementById('stat-shows').innerText = currentShows;
 
-        /** 2. NAVIGATION HIGHLIGHTER (FIXED) **/
-        const navLinks = document.querySelectorAll(".nav-link");
-        const sections = document.querySelectorAll("section[id]");
-
-        window.addEventListener("scroll", () => {
-            let current = "";
-            
-            // Checks if at the bottom of the page
-            if ((window.innerHeight + window.pageYOffset) >= document.body.offsetHeight - 100) {
-                current = "nominate";
-            } else {
-                sections.forEach((section) => {
-                    const sectionTop = section.offsetTop;
-                    const sectionHeight = section.clientHeight;
-                    // If the user has scrolled into the section (with offset)
-                    if (pageYOffset >= sectionTop - 150) {
-                        current = section.getAttribute("id");
-                    }
-                });
-            }
-
-            navLinks.forEach((link) => {
-                link.classList.remove("nav-active");
-                if (link.getAttribute("href").includes(current)) {
-                    link.classList.add("nav-active");
-                }
-            });
-        });
-
-        /** 3. MODAL LOGIC **/
+        /** 2. MODAL LOGIC **/
         function openModal(name, role, bio, img, insta) {
             document.getElementById('modal-name').innerText = name;
             document.getElementById('modal-role').innerText = role;
@@ -273,32 +215,41 @@
             const m = document.getElementById('hero-modal');
             m.classList.remove('opacity-0', 'pointer-events-none');
             m.querySelector('div').classList.remove('scale-95');
-            document.body.style.overflow = 'hidden';
+            document.body.classList.add('modal-open');
         }
         function closeModal() {
             const m = document.getElementById('hero-modal');
             m.classList.add('opacity-0', 'pointer-events-none');
             m.querySelector('div').classList.add('scale-95');
-            document.body.style.overflow = 'auto';
+            document.body.classList.remove('modal-open');
         }
 
-        /** 4. FORM & GALLERY **/
-        const cards = document.querySelectorAll('.gallery-card');
-        const galleryToggle = document.getElementById('galleryToggle');
-        if (cards.length > 3) {
-            galleryToggle.classList.remove('hidden');
-            cards.forEach((c, i) => { if (i > 2) c.classList.add('hidden'); });
-        }
-        galleryToggle?.addEventListener('click', () => {
-            const open = galleryToggle.querySelector('span').innerText.includes("View");
-            if (open) {
-                cards.forEach(c => c.classList.remove('hidden'));
-                document.getElementById('toggleText').innerText = "Show Less";
-            } else {
-                cards.forEach((c, i) => { if (i > 2) c.classList.add('hidden'); });
-                document.getElementById('toggleText').innerText = "View All Photos";
-                document.getElementById('gallery').scrollIntoView({ behavior: 'smooth' });
+        /** 3. AUTOMATION LOGIC (Gallery & Heroes) **/
+        function setupToggle(cardClass, btnId, textId, iconId, initialCount) {
+            const cards = document.querySelectorAll(cardClass);
+            const btn = document.getElementById(btnId);
+            if (cards.length > initialCount) {
+                btn.classList.remove('hidden');
+                cards.forEach((c, i) => { if (i >= initialCount) c.classList.add('hidden'); });
             }
+            btn.addEventListener('click', () => {
+                const isHiding = btn.querySelector('span').innerText.includes("View");
+                cards.forEach((c, i) => { if (i >= initialCount) c.classList.toggle('hidden', !isHiding); });
+                btn.querySelector('span').innerText = isHiding ? "Show Less" : "View All";
+                document.getElementById(iconId).classList.toggle('rotate-180', isHiding);
+            });
+        }
+        setupToggle('.gallery-card', 'galleryToggle', 'galleryText', 'galleryIcon', 3);
+        setupToggle('.hero-card', 'heroToggle', 'heroText', 'heroIcon', 6);
+
+        /** 4. NAV HIGHLIGHTER **/
+        const navLinks = document.querySelectorAll(".nav-link");
+        const sections = document.querySelectorAll("section[id]");
+        window.addEventListener("scroll", () => {
+            let current = "";
+            if ((window.innerHeight + window.pageYOffset) >= document.body.offsetHeight - 50) current = "nominate";
+            else sections.forEach((s) => { if (pageYOffset >= s.offsetTop - 150) current = s.getAttribute("id"); });
+            navLinks.forEach((l) => { l.classList.toggle("nav-active", l.getAttribute("href").includes(current)); });
         });
     </script>
 </body>
