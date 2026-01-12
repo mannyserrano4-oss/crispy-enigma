@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Community Impact | Manny Serrano</title>
+    <title>Impact Showcase | Manny Serrano</title>
     
     <link rel="icon" type="image/png" href="icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,6 +14,7 @@
         body { font-family: 'Inter', sans-serif; }
         .handwritten { font-family: 'Caveat', cursive; }
         
+        /* Smooth Background Gradient Animation */
         .bg-animate {
             background: linear-gradient(-45deg, #f3e8ff, #fce7f3, #e0e7ff);
             background-size: 400% 400%;
@@ -23,6 +24,7 @@
             0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } 
         }
 
+        /* Glassmorphism Styles */
         .glass {
             background: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(12px);
@@ -30,41 +32,46 @@
             border: 1px solid rgba(255, 255, 255, 0.4);
         }
 
+        /* Nav & Section Logic */
         section { scroll-margin-top: 100px; }
         .nav-active { color: #7c3aed !important; font-weight: 900; }
+        
+        /* Custom Scrollbar for Modal */
+        .modal-scroll::-webkit-scrollbar { width: 4px; }
+        .modal-scroll::-webkit-scrollbar-thumb { background: #ddd; border-radius: 10px; }
     </style>
 </head>
 <body class="bg-animate min-h-screen text-gray-800">
 
     <div id="event-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300">
-    <div class="glass max-w-lg w-full rounded-3xl p-8 shadow-2xl transform scale-95 transition-transform relative max-h-[90vh] overflow-y-auto">
-        
-        <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-violet-600 p-2">
-            <i class="fa-solid fa-xmark text-2xl"></i>
-        </button>
-
-        <div id="modal-content" class="mt-4">
-            <h3 id="modal-title" class="text-2xl font-black text-gray-900 uppercase tracking-tighter mb-2"></h3>
-            <p id="modal-date" class="text-[10px] font-bold text-violet-600 uppercase tracking-widest mb-6"></p>
+        <div class="glass max-w-lg w-full rounded-3xl p-8 shadow-2xl transform scale-95 transition-transform relative max-h-[90vh] flex flex-col">
             
-            <div class="prose prose-sm text-gray-600 leading-relaxed mb-8">
-                <p id="modal-desc"></p>
-            </div>
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-violet-600 p-2 z-10">
+                <i class="fa-solid fa-xmark text-2xl"></i>
+            </button>
 
-            <div id="modal-org-link" class="mb-8">
+            <div id="modal-content" class="overflow-y-auto modal-scroll pr-2">
+                <h3 id="modal-title" class="text-2xl font-black text-gray-900 uppercase tracking-tighter mb-2"></h3>
+                <p id="modal-date" class="text-[10px] font-bold text-violet-600 uppercase tracking-widest mb-6"></p>
+                
+                <div class="prose prose-sm text-gray-600 leading-relaxed mb-8">
+                    <p id="modal-desc"></p>
                 </div>
 
-            <button onclick="closeModal()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-black py-4 rounded-2xl text-[10px] uppercase tracking-widest transition-all">
-                Close Details
-            </button>
+                <div id="modal-org-link" class="mb-8">
+                    </div>
+
+                <button onclick="closeModal()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-black py-4 rounded-2xl text-[10px] uppercase tracking-widest transition-all">
+                    Close Details
+                </button>
+            </div>
         </div>
     </div>
-</div>
 
     <header class="max-w-2xl mx-auto px-6 py-16 text-center">
         <img src="icon.png" alt="Manny Serrano" class="w-24 h-24 rounded-full mx-auto mb-6 border-4 border-white shadow-xl object-cover">
         <h1 class="text-4xl md:text-5xl font-black mb-2 tracking-tight text-gray-900 uppercase">More Than A Cut.</h1>
-        <p class="text-xl text-violet-700 font-medium mb-8 handwritten rotate-[-2deg] inline-block">Manny Serrano Impact Portfolio</p>
+        <p class="text-xl text-violet-700 font-medium mb-8 handwritten rotate-[-2deg] inline-block">Manny Serrano Impact Showcase</p>
         
         <div class="mb-10 italic text-gray-600 max-w-lg mx-auto border-l-4 border-violet-400 pl-4 py-2 text-left bg-white/30 rounded-r-xl">
             "I've seen a simple fade give a person the confidence to walk into a job interview and change their life. It’s never just about the hair."
@@ -73,52 +80,70 @@
 
     <nav class="sticky top-4 z-40 max-w-fit mx-auto glass rounded-full px-8 py-2 mb-12 shadow-lg flex gap-8 text-[10px] font-black uppercase tracking-widest">
         <a href="#gallery" class="nav-link">Showcase</a>
-        <a href="#collab" class="nav-link">Collab</a>
+        <a href="#collab" class="nav-link">Collaborate</a>
     </nav>
 
-    <main class="max-w-4xl mx-auto px-4 pb-24">
+    <main class="max-w-4xl mx-auto px-4">
         
         <section id="gallery" class="mb-24">
-            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-8 text-center">— Impact Showcase —</h2>
+            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-8 text-center">— Impact Portfolio —</h2>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="gallery-grid">
                 
                 <div class="gallery-card group relative overflow-hidden rounded-2xl aspect-square shadow-lg cursor-pointer"
-                     onclick="openModal('Tampa Hope Shelter Day', 'Nov 15, 2025', 'Spent the morning providing fresh cuts for residents preparing for job interviews. A haircut is the first step toward a new chapter.', 'https://catholiccharitieslp.org/tampahope')">
+                     onclick="openModal('Tampa Hope Shelter Day', 'Nov 15, 2025', 'Spent the morning providing fresh cuts for residents preparing for job interviews. Confidence is the first step toward a new chapter.', 'https://catholiccharitieslp.org/tampahope')">
                     <img src="https://placehold.co/600x600/2e1065/white?text=Tampa+Hope" class="object-cover w-full h-full md:group-hover:scale-110 transition-transform duration-500">
                     <div class="absolute inset-0 bg-gradient-to-t from-violet-900/95 to-transparent flex flex-col justify-end p-6 text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                        <p class="font-bold text-sm uppercase">Tampa Hope Day</p>
-                        <p class="text-violet-200 text-[10px]">11/15/25</p>
+                        <p class="font-bold text-sm uppercase leading-none">Tampa Hope Day</p>
+                        <p class="text-violet-200 text-[10px] mt-1">11/15/25</p>
                     </div>
                 </div>
 
                 <div class="gallery-card group relative overflow-hidden rounded-2xl aspect-square shadow-lg cursor-pointer"
-                     onclick="openModal('Back-to-School Drive', 'Aug 10, 2025', 'Partnered with local barbers to ensure 20+ kids started their school year with confidence. Look good, feel good, learn good.', 'https://www.metromin.org/')">
-                    <img src="https://placehold.co/600x600/db2777/white?text=School+Drive" class="object-cover w-full h-full">
+                     onclick="openModal('Back-to-School Drive', 'Aug 10, 2025', 'Ensuring kids start the year with confidence. Look good, feel good, learn good.', 'https://www.metromin.org/')">
+                    <img src="https://placehold.co/600x600/db2777/white?text=School+Drive" class="object-cover w-full h-full md:group-hover:scale-110 transition-transform duration-500">
                     <div class="absolute inset-0 bg-gradient-to-t from-violet-900/95 to-transparent flex flex-col justify-end p-6 text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                        <p class="font-bold text-sm uppercase">Back-to-School</p>
-                        <p class="text-violet-200 text-[10px]">08/10/25</p>
+                        <p class="font-bold text-sm uppercase leading-none">Back-to-School</p>
+                        <p class="text-violet-200 text-[10px] mt-1">08/10/25</p>
                     </div>
                 </div>
 
                 <div class="gallery-card group relative overflow-hidden rounded-2xl aspect-square shadow-lg cursor-pointer"
-                     onclick="openModal('Metro Ministries Outreach', 'Jan 21, 2026', 'A collaborative effort to bring professional grooming directly to those in need in the Tampa Bay area.', 'https://www.metromin.org/')">
-                    <img src="https://placehold.co/600x600/4c1d95/white?text=Metro" class="object-cover w-full h-full">
+                     onclick="openModal('Metro Ministries Outreach', 'Jan 21, 2026', 'Professional grooming brought directly to those in need in the Tampa area.', 'https://www.metromin.org/')">
+                    <img src="https://placehold.co/600x600/4c1d95/white?text=Metro" class="object-cover w-full h-full md:group-hover:scale-110 transition-transform duration-500">
                     <div class="absolute inset-0 bg-gradient-to-t from-violet-900/95 to-transparent flex flex-col justify-end p-6 text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                        <p class="font-bold text-sm uppercase">Metro Outreach</p>
-                        <p class="text-violet-200 text-[10px]">01/21/26</p>
+                        <p class="font-bold text-sm uppercase leading-none">Metro Outreach</p>
+                        <p class="text-violet-200 text-[10px] mt-1">01/21/26</p>
                     </div>
                 </div>
 
-                <div class="gallery-card hidden group relative overflow-hidden rounded-2xl aspect-square shadow-lg cursor-pointer" onclick="openModal('St. Pete Outreach', 'Feb 2026', 'Expansion into the St. Petersburg community.', '#')">
-                    <img src="https://placehold.co/600x600/7c3aed/white?text=Archive+1" class="w-full h-full object-cover">
+                <div class="gallery-card hidden group relative overflow-hidden rounded-2xl aspect-square shadow-lg cursor-pointer"
+                     onclick="openModal('St. Pete Outreach Day', 'Feb 02, 2026', 'Expansion of community impact into the St. Petersburg area.', '#')">
+                    <img src="https://placehold.co/600x600/7c3aed/white?text=St.+Pete" class="object-cover w-full h-full md:group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-violet-900/95 to-transparent flex flex-col justify-end p-6 text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                        <p class="font-bold text-sm uppercase leading-none">St. Pete Event</p>
+                        <p class="text-violet-200 text-[10px] mt-1">02/02/26</p>
+                    </div>
                 </div>
-                <div class="gallery-card hidden group relative overflow-hidden rounded-2xl aspect-square shadow-lg" onclick="openModal('Archive Event', '2025', 'Past mission details.', '#')">
-                    <img src="https://placehold.co/600x600/ec4899/white?text=Archive+2" class="w-full h-full object-cover">
+
+                <div class="gallery-card hidden group relative overflow-hidden rounded-2xl aspect-square shadow-lg cursor-pointer"
+                     onclick="openModal('Community Fade Event', '2025', 'General community support event details go here.', '#')">
+                    <img src="https://placehold.co/600x600/1e1b4b/white?text=Archive+2" class="object-cover w-full h-full md:group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-violet-900/95 to-transparent flex flex-col justify-end p-6 text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                        <p class="font-bold text-sm uppercase leading-none">Impact Event</p>
+                        <p class="text-violet-200 text-[10px] mt-1">2025</p>
+                    </div>
                 </div>
-                <div class="gallery-card hidden group relative overflow-hidden rounded-2xl aspect-square shadow-lg" onclick="openModal('Archive Event', '2024', 'Past mission details.', '#')">
-                    <img src="https://placehold.co/600x600/3b82f6/white?text=Archive+3" class="w-full h-full object-cover">
+
+                <div class="gallery-card hidden group relative overflow-hidden rounded-2xl aspect-square shadow-lg cursor-pointer"
+                     onclick="openModal('Historical Outreach', '2024', 'Where the mission originally began.', '#')">
+                    <img src="https://placehold.co/600x600/3b82f6/white?text=Archive+3" class="object-cover w-full h-full md:group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-violet-900/95 to-transparent flex flex-col justify-end p-6 text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                        <p class="font-bold text-sm uppercase leading-none">Historical Day</p>
+                        <p class="text-violet-200 text-[10px] mt-1">2024</p>
+                    </div>
                 </div>
+
             </div>
 
             <div class="text-center mt-12">
@@ -129,12 +154,12 @@
             </div>
         </section>
 
-        <section id="collab" class="max-w-xl mx-auto glass rounded-3xl p-10 text-center shadow-xl mb-24">
-            <h3 class="text-gray-900 font-black text-2xl mb-4 uppercase tracking-tighter italic">Collaborate With Manny</h3>
+        <section id="collab" class="max-w-xl mx-auto glass rounded-3xl p-10 text-center shadow-xl mb-32">
+            <h3 class="text-gray-900 font-black text-2xl mb-4 uppercase tracking-tighter italic leading-none">Collaborate With Manny</h3>
             <p class="text-gray-500 text-sm mb-8 leading-relaxed">
-                I am always looking to partner with local non-profits, shelters, and community centers in Tampa and St. Pete. If your organization has a need for professional grooming services, let's connect.
+                Looking to partner for a non-profit event or community outreach in Tampa or St. Pete? Reach out directly.
             </p>
-            <a href="mailto:mannyserrano4@gmail.com?subject=Outreach%20Collaboration" class="inline-block bg-violet-600 hover:bg-violet-700 text-white font-black py-4 px-10 rounded-2xl shadow-lg transition-transform active:scale-95 uppercase tracking-widest text-xs">
+            <a href="mailto:mannyserrano4@gmail.com?subject=Impact%20Collaboration" class="inline-block bg-violet-600 hover:bg-violet-700 text-white font-black py-4 px-10 rounded-2xl shadow-lg transition-transform active:scale-95 uppercase tracking-widest text-xs">
                 Email for Collaboration
             </a>
         </section>
@@ -143,16 +168,16 @@
 
     <footer class="max-w-4xl mx-auto px-6 border-t border-gray-200 pt-16 pb-12 text-center">
         <div class="flex justify-center gap-10 mb-10">
-            <a href="mailto:mannyserrano4@gmail.com" title="Email Manny" class="text-gray-400 hover:text-violet-600 transition-colors">
+            <a href="mailto:mannyserrano4@gmail.com" title="Email" class="text-gray-400 hover:text-violet-600 transition-all hover:scale-110">
                 <i class="fa-solid fa-envelope text-2xl"></i>
             </a>
-            <a href="https://instagram.com/mas_barbery" target="_blank" title="Instagram" class="text-gray-400 hover:text-pink-500 transition-colors">
+            <a href="https://instagram.com/mas_barbery" target="_blank" title="Instagram" class="text-gray-400 hover:text-pink-500 transition-all hover:scale-110">
                 <i class="fa-brands fa-instagram text-2xl"></i>
             </a>
-            <a href="#" target="_blank" title="Facebook" class="text-gray-400 hover:text-blue-600 transition-colors">
+            <a href="#" target="_blank" title="Facebook" class="text-gray-400 hover:text-blue-600 transition-all hover:scale-110">
                 <i class="fa-brands fa-facebook text-2xl"></i>
             </a>
-            <a href="#" target="_blank" title="Digital Business Card" class="text-gray-400 hover:text-gray-900 transition-colors">
+            <a href="#" target="_blank" title="Digital Business Card" class="text-gray-400 hover:text-gray-900 transition-all hover:scale-110">
                 <i class="fa-solid fa-address-card text-2xl"></i>
             </a>
         </div>
@@ -163,49 +188,45 @@
     </footer>
 
     <script>
-        /** 1. MODAL LOGIC **/
-            function openModal(title, date, desc, link) {
+        /** A. MODAL LOGIC (Mobile & Desktop) **/
+        function openModal(title, date, desc, link) {
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-date').innerText = date;
             document.getElementById('modal-desc').innerText = desc;
             
             const linkBox = document.getElementById('modal-org-link');
-            if(link !== '#') {
-                linkBox.innerHTML = `<a href="${link}" target="_blank" class="inline-block text-[10px] font-black text-violet-600 uppercase border-b-2 border-violet-100 pb-1 hover:text-violet-800 transition-all">Learn More About the Org →</a>`;
+            if(link !== '#' && link !== '') {
+                linkBox.innerHTML = `<a href="${link}" target="_blank" class="inline-block text-[10px] font-black text-violet-600 uppercase border-b-2 border-violet-100 pb-1 hover:text-violet-800 transition-all">Visit Organization Site →</a>`;
             } else {
                 linkBox.innerHTML = '';
             }
-        
+
             const modal = document.getElementById('event-modal');
             modal.classList.remove('opacity-0', 'pointer-events-none');
             modal.querySelector('div').classList.remove('scale-95');
             
-            // Prevent background scrolling while modal is open
+            // Prevent background scrolling
             document.body.style.overflow = 'hidden';
         }
-        
+
         function closeModal() {
             const modal = document.getElementById('event-modal');
             modal.classList.add('opacity-0', 'pointer-events-none');
             modal.querySelector('div').classList.add('scale-95');
-            
-            // Restore scrolling
             document.body.style.overflow = 'auto';
         }
-        
-        // Support for tapping the dark background to close on all devices
+
+        // Close on backdrop click
         document.getElementById('event-modal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
+            if (e.target === this) closeModal();
         });
-        
-        // Also support the "Escape" key for desktop users
+
+        // Close on Escape key
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeModal();
         });
 
-        /** 2. GALLERY TOGGLE LOGIC **/
+        /** B. GALLERY TOGGLE LOGIC **/
         const galleryToggle = document.getElementById('galleryToggle');
         const cards = document.querySelectorAll('.gallery-card');
         let expanded = false;
@@ -223,7 +244,7 @@
             }
         });
 
-        /** 3. NAVIGATION HIGHLIGHTER **/
+        /** C. NAVIGATION HIGHLIGHTER **/
         const navLinks = document.querySelectorAll(".nav-link");
         const sections = document.querySelectorAll("section[id]");
 
