@@ -14,7 +14,6 @@
         body { font-family: 'Inter', sans-serif; }
         .handwritten { font-family: 'Caveat', cursive; }
         
-        /* Smooth Background Gradient Animation */
         .bg-animate {
             background: linear-gradient(-45deg, #f3e8ff, #fce7f3, #e0e7ff);
             background-size: 400% 400%;
@@ -24,7 +23,6 @@
             0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } 
         }
 
-        /* Glassmorphism Styles */
         .glass {
             background: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(12px);
@@ -32,11 +30,9 @@
             border: 1px solid rgba(255, 255, 255, 0.4);
         }
 
-        /* Nav & Section Logic */
         section { scroll-margin-top: 100px; }
         .nav-active { color: #7c3aed !important; font-weight: 900; }
         
-        /* Custom Scrollbar for Modal */
         .modal-scroll::-webkit-scrollbar { width: 4px; }
         .modal-scroll::-webkit-scrollbar-thumb { background: #ddd; border-radius: 10px; }
     </style>
@@ -51,15 +47,14 @@
             </button>
 
             <div id="modal-content" class="overflow-y-auto modal-scroll pr-2">
-                <h3 id="modal-title" class="text-2xl font-black text-gray-900 uppercase tracking-tighter mb-2"></h3>
+                <h3 id="modal-title" class="text-2xl font-black text-gray-900 uppercase tracking-tighter mb-2 leading-none"></h3>
                 <p id="modal-date" class="text-[10px] font-bold text-violet-600 uppercase tracking-widest mb-6"></p>
                 
                 <div class="prose prose-sm text-gray-600 leading-relaxed mb-8">
                     <p id="modal-desc"></p>
                 </div>
 
-                <div id="modal-org-link" class="mb-8">
-                    </div>
+                <div id="modal-org-link" class="mb-8"></div>
 
                 <button onclick="closeModal()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-black py-4 rounded-2xl text-[10px] uppercase tracking-widest transition-all">
                     Close Details
@@ -83,7 +78,7 @@
         <a href="#collab" class="nav-link">Collaborate</a>
     </nav>
 
-    <main class="max-w-4xl mx-auto px-4">
+    <main class="max-w-5xl mx-auto px-4">
         
         <section id="gallery" class="mb-24">
             <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-8 text-center">— Impact Portfolio —</h2>
@@ -118,7 +113,7 @@
                 </div>
 
                 <div class="gallery-card hidden group relative overflow-hidden rounded-2xl aspect-square shadow-lg cursor-pointer"
-                     onclick="openModal('St. Pete Outreach Day', 'Feb 02, 2026', 'Expansion of community impact into the St. Petersburg area.', '#')">
+                     onclick="openModal('St. Pete Outreach Day', 'Feb 02, 2026', 'Expansion of community impact into the St. Petersburg area providing free mobile services.', '#')">
                     <img src="https://placehold.co/600x600/7c3aed/white?text=St.+Pete" class="object-cover w-full h-full md:group-hover:scale-110 transition-transform duration-500">
                     <div class="absolute inset-0 bg-gradient-to-t from-violet-900/95 to-transparent flex flex-col justify-end p-6 text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                         <p class="font-bold text-sm uppercase leading-none">St. Pete Event</p>
@@ -127,16 +122,16 @@
                 </div>
 
                 <div class="gallery-card hidden group relative overflow-hidden rounded-2xl aspect-square shadow-lg cursor-pointer"
-                     onclick="openModal('Community Fade Event', '2025', 'General community support event details go here.', '#')">
+                     onclick="openModal('Impact Night', 'Oct 2025', 'Benefit event held in downtown Tampa to raise awareness for local housing initiatives.', '#')">
                     <img src="https://placehold.co/600x600/1e1b4b/white?text=Archive+2" class="object-cover w-full h-full md:group-hover:scale-110 transition-transform duration-500">
                     <div class="absolute inset-0 bg-gradient-to-t from-violet-900/95 to-transparent flex flex-col justify-end p-6 text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                        <p class="font-bold text-sm uppercase leading-none">Impact Event</p>
-                        <p class="text-violet-200 text-[10px] mt-1">2025</p>
+                        <p class="font-bold text-sm uppercase leading-none">Impact Night</p>
+                        <p class="text-violet-200 text-[10px] mt-1">10/2025</p>
                     </div>
                 </div>
 
                 <div class="gallery-card hidden group relative overflow-hidden rounded-2xl aspect-square shadow-lg cursor-pointer"
-                     onclick="openModal('Historical Outreach', '2024', 'Where the mission originally began.', '#')">
+                     onclick="openModal('Historical Outreach', '2024', 'Where the mission originally began, providing haircuts in local community parks.', '#')">
                     <img src="https://placehold.co/600x600/3b82f6/white?text=Archive+3" class="object-cover w-full h-full md:group-hover:scale-110 transition-transform duration-500">
                     <div class="absolute inset-0 bg-gradient-to-t from-violet-900/95 to-transparent flex flex-col justify-end p-6 text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                         <p class="font-bold text-sm uppercase leading-none">Historical Day</p>
@@ -157,7 +152,7 @@
         <section id="collab" class="max-w-xl mx-auto glass rounded-3xl p-10 text-center shadow-xl mb-32">
             <h3 class="text-gray-900 font-black text-2xl mb-4 uppercase tracking-tighter italic leading-none">Collaborate With Manny</h3>
             <p class="text-gray-500 text-sm mb-8 leading-relaxed">
-                Looking to partner for a non-profit event or community outreach in Tampa or St. Pete? Reach out directly.
+                Looking to partner for a non-profit event or community outreach in Tampa or St. Pete? Let's connect.
             </p>
             <a href="mailto:mannyserrano4@gmail.com?subject=Impact%20Collaboration" class="inline-block bg-violet-600 hover:bg-violet-700 text-white font-black py-4 px-10 rounded-2xl shadow-lg transition-transform active:scale-95 uppercase tracking-widest text-xs">
                 Email for Collaboration
@@ -181,31 +176,23 @@
                 <i class="fa-solid fa-address-card text-2xl"></i>
             </a>
         </div>
-        
         <p class="text-[10px] text-gray-400 uppercase tracking-[0.4em] font-black">
             &copy; 2026 Manny Serrano • More Than A Cut • Built with Heart
         </p>
     </footer>
 
     <script>
-        /** A. MODAL LOGIC (Mobile & Desktop) **/
         function openModal(title, date, desc, link) {
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-date').innerText = date;
             document.getElementById('modal-desc').innerText = desc;
-            
             const linkBox = document.getElementById('modal-org-link');
             if(link !== '#' && link !== '') {
-                linkBox.innerHTML = `<a href="${link}" target="_blank" class="inline-block text-[10px] font-black text-violet-600 uppercase border-b-2 border-violet-100 pb-1 hover:text-violet-800 transition-all">Visit Organization Site →</a>`;
-            } else {
-                linkBox.innerHTML = '';
-            }
-
+                linkBox.innerHTML = `<a href="${link}" target="_blank" class="inline-block text-[10px] font-black text-violet-600 uppercase border-b-2 border-violet-100 pb-1 hover:text-violet-800 transition-all">Visit Organization →</a>`;
+            } else { linkBox.innerHTML = ''; }
             const modal = document.getElementById('event-modal');
             modal.classList.remove('opacity-0', 'pointer-events-none');
             modal.querySelector('div').classList.remove('scale-95');
-            
-            // Prevent background scrolling
             document.body.style.overflow = 'hidden';
         }
 
@@ -216,51 +203,29 @@
             document.body.style.overflow = 'auto';
         }
 
-        // Close on backdrop click
-        document.getElementById('event-modal').addEventListener('click', function(e) {
-            if (e.target === this) closeModal();
-        });
+        document.getElementById('event-modal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+        window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 
-        // Close on Escape key
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
-        });
-
-        /** B. GALLERY TOGGLE LOGIC **/
         const galleryToggle = document.getElementById('galleryToggle');
         const cards = document.querySelectorAll('.gallery-card');
         let expanded = false;
 
         galleryToggle.addEventListener('click', () => {
             expanded = !expanded;
-            cards.forEach((card, index) => {
-                if (index > 2) card.classList.toggle('hidden', !expanded);
-            });
+            cards.forEach((card, index) => { if (index > 2) card.classList.toggle('hidden', !expanded); });
             document.getElementById('toggleText').innerText = expanded ? "Show Recent Only" : "View All Impact Photos";
             document.getElementById('toggleIcon').classList.toggle('rotate-180', expanded);
-            
-            if (!expanded) {
-                document.getElementById('gallery').scrollIntoView({ behavior: 'smooth' });
-            }
+            if (!expanded) document.getElementById('gallery').scrollIntoView({ behavior: 'smooth' });
         });
 
-        /** C. NAVIGATION HIGHLIGHTER **/
         const navLinks = document.querySelectorAll(".nav-link");
         const sections = document.querySelectorAll("section[id]");
-
         window.addEventListener("scroll", () => {
             let current = "";
-            sections.forEach((section) => {
-                const sectionTop = section.offsetTop;
-                if (pageYOffset >= sectionTop - 150) {
-                    current = section.getAttribute("id");
-                }
-            });
+            sections.forEach((section) => { if (pageYOffset >= section.offsetTop - 150) current = section.getAttribute("id"); });
             navLinks.forEach((link) => {
                 link.classList.remove("nav-active");
-                if (link.getAttribute("href").includes(current)) {
-                    link.classList.add("nav-active");
-                }
+                if (link.getAttribute("href").includes(current)) link.classList.add("nav-active");
             });
         });
     </script>
