@@ -6,7 +6,7 @@
     <title>Community & Charity | Manny Serrano</title>
     
     <meta property="og:title" content="Manny Serrano | Community Impact">
-    <meta property="og:description" content="Restoring dignity through haircuts and joy through laughter in Tampa and St. Pete.">
+    <meta property="og:description" content="Restoring dignity through haircuts and joy through laughter in Tampa & St. Pete.">
     
     <link rel="icon" type="image/png" href="icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -36,9 +36,9 @@
 <body class="bg-animate min-h-screen text-gray-800 pb-12">
 
     <div id="toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50 translate-y-20 opacity-0 transition-all duration-500 ease-out">
-        <div class="glass border-violet-400 border-2 px-6 py-3 rounded-full shadow-2xl flex items-center gap-3">
+        <div class="glass border-violet-400 border-2 px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 text-sm font-bold uppercase tracking-tighter">
             <div class="bg-violet-500 text-white rounded-full p-1"><i class="fa-solid fa-check text-xs"></i></div>
-            <span class="text-sm font-bold text-gray-800 uppercase tracking-tighter">Message Sent! Thanks, Manny.</span>
+            <span>Message Sent! Thanks, Manny.</span>
         </div>
     </div>
 
@@ -47,25 +47,7 @@
         <h1 class="text-4xl md:text-5xl font-black mb-2 tracking-tight text-gray-900 uppercase">More Than A Cut.</h1>
         <p class="text-xl text-violet-700 font-medium mb-8 handwritten rotate-[-2deg] inline-block">Serving Tampa & St. Pete</p>
         
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-            <div class="glass rounded-2xl p-4 shadow-sm">
-                <i class="fa-solid fa-scissors text-violet-500 text-2xl mb-2"></i>
-                <div class="text-2xl font-black text-gray-800" id="stat-cuts">0</div>
-                <div class="text-[10px] text-gray-500 uppercase tracking-widest font-black">Free Cuts</div>
-            </div>
-            <div class="glass rounded-2xl p-4 shadow-sm">
-                <i class="fa-solid fa-microphone-lines text-pink-500 text-2xl mb-2"></i>
-                <div class="text-2xl font-black text-gray-800" id="stat-shows">0</div>
-                <div class="text-[10px] text-gray-500 uppercase tracking-widest font-black">Benefit Shows</div>
-            </div>
-            <div class="glass rounded-2xl p-4 shadow-sm">
-                <i class="fa-solid fa-location-dot text-red-500 text-2xl mb-2"></i>
-                <div class="text-2xl font-black text-gray-800 uppercase">Bay Area</div>
-                <div class="text-[10px] text-gray-500 uppercase tracking-widest font-black">Coverage</div>
-            </div>
-        </div>
-
-        <div class="max-w-md mx-auto space-y-6 mb-6">
+        <div class="max-w-md mx-auto space-y-6 mb-8">
             <div>
                 <div class="flex justify-between mb-2 text-[9px] font-black uppercase tracking-widest text-violet-600">
                     <span id="cut-goal-text">Goal: 100 Cuts</span>
@@ -77,7 +59,7 @@
             </div>
             <div>
                 <div class="flex justify-between mb-2 text-[9px] font-black uppercase tracking-widest text-pink-600">
-                    <span id="show-goal-text">Goal: 5 Shows</span>
+                    <span id="show-goal-text">Goal: 5 Benefit Shows</span>
                     <span id="show-percent-text">0%</span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden shadow-inner">
@@ -85,108 +67,121 @@
                 </div>
             </div>
         </div>
+
+        <a href="YOUR_GOOGLE_DRIVE_LINK" target="_blank" class="inline-flex items-center gap-2 text-[10px] font-black text-gray-400 hover:text-violet-600 transition-colors uppercase tracking-widest">
+            <i class="fa-solid fa-download"></i> Download Media Kit (Press)
+        </a>
     </header>
 
     <nav class="sticky top-4 z-40 max-w-fit mx-auto glass rounded-full px-6 py-2 mb-12 shadow-lg flex gap-4 md:gap-8 text-[10px] font-black uppercase tracking-widest">
-        <a href="#gallery" id="nav-gallery" class="nav-link transition-colors duration-300">Gallery</a>
-        <a href="#heroes" id="nav-heroes" class="nav-link transition-colors duration-300">Heroes</a>
-        <a href="#partners" id="nav-partners" class="nav-link transition-colors duration-300">Partners</a>
-        <a href="#nominate" id="nav-nominate" class="nav-link transition-colors duration-300">Connect</a>
+        <a href="#gallery" id="nav-gallery" class="nav-link">Gallery</a>
+        <a href="#missions" id="nav-missions" class="nav-link">Missions</a>
+        <a href="#coalition" id="nav-coalition" class="nav-link">Coalition</a>
+        <a href="#nominate" id="nav-nominate" class="nav-link">Connect</a>
     </nav>
 
     <main class="max-w-4xl mx-auto px-4">
         
         <section id="gallery" class="mb-24">
-            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-8 text-center">— Regional Impact —</h2>
+            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-8 text-center">— Recent Impact —</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="gallery-grid">
-                
                 <div class="gallery-card group relative overflow-hidden rounded-2xl aspect-square shadow-lg">
-                    <img src="https://placehold.co/600x600/2e1065/white?text=St.+Pete+Clinic" class="object-cover w-full h-full transition-transform duration-500 md:group-hover:scale-110">
-                    <div class="absolute inset-0 bg-gradient-to-t from-violet-900/95 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                        <p class="text-white font-bold text-sm leading-tight uppercase">St. Pete Outreach</p>
-                        <p class="text-violet-200 text-[10px] uppercase mt-1 tracking-widest">Feb 02, 2026</p>
+                    <img src="https://placehold.co/600x600/2e1065/white?text=St.+Pete+Event" class="object-cover w-full h-full transition-all duration-500 md:group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-violet-900/95 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity p-6 flex flex-col justify-end">
+                        <p class="text-white font-bold text-sm">St. Pete Clinic Day</p>
+                        <p class="text-violet-200 text-[10px] uppercase mt-1 tracking-widest">Jan 12, 2026</p>
                     </div>
                 </div>
-
-                <div class="gallery-card group relative overflow-hidden rounded-2xl aspect-square shadow-lg">
-                    <img src="https://placehold.co/600x600/4c1d95/white?text=Tampa+Hope" class="object-cover w-full h-full">
-                    <div class="absolute inset-0 bg-gradient-to-t from-violet-900/95 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                        <p class="text-white font-bold text-sm leading-tight uppercase">Tampa Hope Shelter</p>
-                        <p class="text-violet-200 text-[10px] uppercase mt-1 tracking-widest">Nov 15, 2025</p>
-                    </div>
-                </div>
-
-                <div class="gallery-card group relative overflow-hidden rounded-2xl aspect-square shadow-lg">
-                    <img src="https://placehold.co/600x600/7c3aed/white?text=Benefit+Mic" class="object-cover w-full h-full">
-                    <div class="absolute inset-0 bg-gradient-to-t from-pink-900/95 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                        <p class="text-white font-bold text-sm leading-tight uppercase">Comedy Benefit #1</p>
-                        <p class="text-pink-200 text-[10px] uppercase mt-1 tracking-widest">Oct 30, 2025</p>
-                    </div>
-                </div>
-
             </div>
             <div class="text-center mt-8">
-                <button id="galleryToggle" class="hidden inline-flex items-center gap-2 bg-white/50 hover:bg-white text-violet-700 text-[10px] font-black uppercase tracking-widest py-3 px-8 rounded-full border border-violet-100 shadow-sm transition-all">
+                <button id="galleryToggle" class="hidden inline-flex items-center gap-2 bg-white/50 hover:bg-white text-violet-700 text-[10px] font-black uppercase tracking-widest py-3 px-8 rounded-full border border-violet-100 transition-all shadow-sm">
                     <span id="toggleText">View All Photos</span>
                     <i class="fa-solid fa-chevron-down" id="toggleIcon"></i>
                 </button>
             </div>
         </section>
 
-        <section id="heroes" class="mb-24 text-center">
-            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-8">— The Coalition —</h2>
-            <div class="flex flex-wrap justify-center gap-8 mb-10">
-                <div class="flex flex-col items-center">
-                    <img src="https://placehold.co/100x100/7c3aed/white?text=M" alt="Manny" class="w-16 h-16 rounded-full border-2 border-white shadow-md">
-                    <p class="mt-3 text-[10px] font-black text-gray-800 uppercase tracking-tighter">Manny S.</p>
+        <section id="missions" class="mb-24 max-w-xl mx-auto">
+            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-8 text-center">— Upcoming Missions —</h2>
+            <div class="space-y-3">
+                <div class="glass p-4 rounded-2xl flex items-center justify-between border-l-4 border-violet-500">
+                    <div class="flex items-center gap-4">
+                        <div class="text-center bg-white px-3 py-1 rounded-xl shadow-sm">
+                            <span class="block text-xs font-black text-violet-600 leading-none">JAN</span>
+                            <span class="text-lg font-black text-gray-800">21</span>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-black text-gray-900 leading-tight">Metro Ministries</h4>
+                            <p class="text-[10px] text-gray-500 uppercase tracking-widest">Tampa Cut Day</p>
+                        </div>
+                    </div>
+                    <span class="text-[9px] font-black bg-violet-100 text-violet-700 px-3 py-1 rounded-full">10AM - 2PM</span>
                 </div>
             </div>
-            <a href="#nominate" class="inline-block bg-violet-600 text-white text-[10px] font-black px-8 py-4 rounded-2xl uppercase tracking-[0.2em] shadow-lg hover:bg-violet-700 transition-all">Join the Crew</a>
+        </section>
+
+        <section id="coalition" class="mb-24 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-3xl p-8 shadow-xl border border-violet-100 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-2xl font-black text-gray-900 mb-2 leading-none uppercase tracking-tighter">Join The Crew</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed mb-6">I’m building a coalition of Tampa Bay barbers to scale our impact. If you have the tools and the heart, let’s work.</p>
+                </div>
+                <div class="space-y-2">
+                    <a href="#nominate" class="w-full bg-violet-600 text-white text-center text-[11px] font-black py-4 rounded-xl block shadow-lg">Volunteer Sign-Up</a>
+                    <a href="YOUR_PDF_LINK" class="w-full border border-violet-100 text-violet-600 text-center text-[9px] font-black py-3 rounded-xl block uppercase">Download Mission Guide</a>
+                </div>
+            </div>
+
+            <div class="glass p-8 rounded-3xl">
+                <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4">— The Barber Bag —</h3>
+                <ul class="space-y-3 text-xs text-gray-600 font-medium">
+                    <li class="flex items-start gap-2"><i class="fa-solid fa-check text-violet-500 mt-1"></i> Cordless Clippers & Trimmers</li>
+                    <li class="flex items-start gap-2"><i class="fa-solid fa-check text-violet-500 mt-1"></i> Portable Ring Light</li>
+                    <li class="flex items-start gap-2"><i class="fa-solid fa-check text-violet-500 mt-1"></i> Clean Capes & Neck Strips</li>
+                    <li class="flex items-start gap-2"><i class="fa-solid fa-check text-violet-500 mt-1"></i> Hospital-Grade Sanitizer</li>
+                    <li class="flex items-start gap-2"><i class="fa-solid fa-heart text-red-500 mt-1"></i> No "Charity Cuts" — Precise Work Only</li>
+                </ul>
+            </div>
         </section>
 
         <section id="partners" class="mb-24">
-            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-8 text-center">— Bay Area Partners —</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                
+            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-8 text-center">— Partners & Logistics —</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 <div class="glass p-6 rounded-3xl flex flex-col justify-between">
-                    <h3 class="text-lg font-black text-gray-900 mb-2 uppercase tracking-tighter">Tampa Hope</h3>
-                    <p class="text-gray-600 text-[10px] leading-relaxed mb-4">Shelter and job-readiness focus in East Tampa.</p>
-                    <a href="https://catholiccharitieslp.org/tampahope" target="_blank" class="text-[9px] font-bold text-violet-600 uppercase">Direct Donate →</a>
+                    <div>
+                        <h3 class="text-lg font-black text-gray-900 mb-1 uppercase tracking-tighter leading-none">Tampa Hope</h3>
+                        <p class="text-gray-500 text-[11px] mb-4 leading-relaxed">Providing grooming for residents transitioning into stable housing and work.</p>
+                    </div>
+                    <a href="https://catholiccharitieslp.org/tampahope" target="_blank" class="text-[9px] font-black text-violet-600 uppercase border-t border-white/40 pt-4 flex items-center justify-between">
+                        Donate Directly to Them <i class="fa-solid fa-heart text-red-500"></i>
+                    </a>
                 </div>
-
-                <div class="glass p-6 rounded-3xl flex flex-col justify-between">
-                    <h3 class="text-lg font-black text-gray-900 mb-2 uppercase tracking-tighter">Metro Ministries</h3>
-                    <p class="text-gray-600 text-[10px] leading-relaxed mb-4">Feeding and housing families across the entire Bay area.</p>
-                    <a href="https://www.metromin.org/donate/" target="_blank" class="text-[9px] font-bold text-violet-600 uppercase">Direct Donate →</a>
+                <div class="glass p-6 rounded-3xl border-2 border-dashed border-violet-200">
+                    <h3 class="text-xs font-black text-gray-400 uppercase mb-4 tracking-widest">Organization Logistics</h3>
+                    <p class="text-[11px] text-gray-600 leading-relaxed italic">
+                        "I bring internal power, professional lighting, and sanitation. I require a 5x5ft space and zero set-up from your staff."
+                    </p>
                 </div>
-
-                <div class="glass p-6 rounded-3xl flex flex-col justify-between border-dashed border-2 border-violet-200">
-                    <h3 class="text-lg font-black text-gray-400 mb-2 uppercase tracking-tighter">St. Pete Partner</h3>
-                    <p class="text-gray-400 text-[10px] leading-relaxed mb-4">Seeking a steady partnership with a St. Petersburg nonprofit.</p>
-                    <a href="#nominate" class="text-[9px] font-bold text-gray-400 uppercase italic">Suggest a Cause →</a>
-                </div>
-
             </div>
         </section>
 
         <section id="nominate" class="max-w-xl mx-auto bg-white rounded-3xl p-10 shadow-2xl border border-violet-100">
-            <h3 class="text-gray-900 font-black text-2xl mb-2 text-center uppercase tracking-tighter">Connect with Manny</h3>
-            <p class="text-gray-500 text-sm mb-8 text-center px-4">Barber volunteers, venue owners, or non-profits—let's build something.</p>
+            <h3 class="text-gray-900 font-black text-2xl mb-2 text-center uppercase tracking-tighter italic">Connect with Manny</h3>
+            <p class="text-gray-500 text-sm mb-8 text-center">Nominate a cause, join the coalition, or host a comedy night.</p>
             
             <form id="nominationForm" class="space-y-4">
-                <select name="role" required class="w-full px-4 py-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-violet-500 outline-none transition-all text-xs font-black uppercase text-gray-400 appearance-none">
-                    <option value="" disabled selected>I am a...</option>
-                    <option value="Volunteer">Barber (Wants to volunteer)</option>
-                    <option value="Venue">Venue (Wants to host comedy)</option>
-                    <option value="Non-Profit">Non-Profit (Needs services)</option>
+                <select name="role" required class="w-full px-4 py-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-violet-500 outline-none text-xs font-black uppercase text-gray-400 appearance-none">
+                    <option value="" disabled selected>Select Your Reason...</option>
+                    <option value="Volunteer">I want to join the Coalition (Barber)</option>
+                    <option value="Non-Profit">I need services (Organization)</option>
+                    <option value="Comedy">I have a venue (Comedy Night)</option>
                 </select>
-                <input type="text" name="name" placeholder="Full Name" required class="w-full px-4 py-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-violet-500 outline-none transition-all text-sm">
-                <input type="email" name="email" placeholder="Email Address" required class="w-full px-4 py-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-violet-500 outline-none transition-all text-sm">
-                <textarea name="message" placeholder="How can we work together?" rows="4" required class="w-full px-4 py-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-violet-500 outline-none transition-all text-sm"></textarea>
+                <input type="text" name="name" placeholder="Full Name" required class="w-full px-4 py-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-violet-500 outline-none text-sm">
+                <input type="email" name="email" placeholder="Email" required class="w-full px-4 py-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-violet-500 outline-none text-sm">
+                <textarea name="message" placeholder="How can we build together?" rows="4" required class="w-full px-4 py-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-violet-500 outline-none text-sm"></textarea>
                 <button type="submit" id="submitBtn" class="w-full bg-violet-600 hover:bg-violet-700 text-white font-black py-5 rounded-2xl shadow-lg transition-all active:scale-[0.98] uppercase tracking-widest">Send Message</button>
             </form>
         </section>
-
     </main>
 
     <footer class="mt-24 text-center">
@@ -195,37 +190,29 @@
 
     <script>
         /** 1. THE DUAL METER LOGIC **/
-        // Update these for Cuts
-        const currentCuts = 54; 
-        const goalCuts = 100;
-        // Update these for Shows
-        const currentShows = 1; 
-        const goalShows = 5;
+        const currentCuts = 54; const goalCuts = 100;
+        const currentShows = 1; const goalShows = 5;
 
-        // Math for Cuts
         const cutPct = Math.min(Math.floor((currentCuts / goalCuts) * 100), 100);
         document.getElementById('cut-progress-bar').style.width = cutPct + "%";
         document.getElementById('cut-percent-text').innerText = cutPct + "%";
         document.getElementById('cut-goal-text').innerText = `Goal: ${goalCuts} Cuts`;
         document.getElementById('stat-cuts').innerText = currentCuts;
 
-        // Math for Shows
         const showPct = Math.min(Math.floor((currentShows / goalShows) * 100), 100);
         document.getElementById('show-progress-bar').style.width = showPct + "%";
         document.getElementById('show-percent-text').innerText = showPct + "%";
-        document.getElementById('show-goal-text').innerText = `Goal: ${goalShows} Shows`;
-        document.getElementById('stat-shows').innerText = currentShows;
+        document.getElementById('show-goal-text').innerText = `Goal: ${goalShows} Benefit Shows`;
 
         /** 2. GALLERY AUTOMATION **/
         const cards = document.querySelectorAll('.gallery-card');
         const toggle = document.getElementById('galleryToggle');
-        let open = false;
         if (cards.length > 3) {
             toggle.classList.remove('hidden');
             cards.forEach((c, i) => { if (i > 2) c.classList.add('hidden'); });
         }
         toggle.addEventListener('click', () => {
-            open = !open;
+            const open = toggle.querySelector('span').innerText.includes("View");
             if (open) {
                 cards.forEach(c => c.classList.remove('hidden'));
                 document.getElementById('toggleText').innerText = "Show Recent Only";
