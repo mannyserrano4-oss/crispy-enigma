@@ -36,20 +36,30 @@
 </head>
 <body class="bg-animate min-h-screen text-gray-800">
 
-    <div id="event-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-gray-900/40 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
-        <div class="glass max-w-lg w-full rounded-3xl p-8 shadow-2xl transform scale-95 transition-transform relative">
-            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-violet-600"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <div id="modal-content">
-                <h3 id="modal-title" class="text-2xl font-black text-gray-900 uppercase tracking-tighter mb-2"></h3>
-                <p id="modal-date" class="text-[10px] font-bold text-violet-600 uppercase tracking-widest mb-6"></p>
-                <div class="prose prose-sm text-gray-600 leading-relaxed mb-6">
-                    <p id="modal-desc"></p>
-                </div>
-                <div id="modal-org-link" class="pt-4 border-t border-gray-200">
-                    </div>
+    <div id="event-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300">
+    <div class="glass max-w-lg w-full rounded-3xl p-8 shadow-2xl transform scale-95 transition-transform relative max-h-[90vh] overflow-y-auto">
+        
+        <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-violet-600 p-2">
+            <i class="fa-solid fa-xmark text-2xl"></i>
+        </button>
+
+        <div id="modal-content" class="mt-4">
+            <h3 id="modal-title" class="text-2xl font-black text-gray-900 uppercase tracking-tighter mb-2"></h3>
+            <p id="modal-date" class="text-[10px] font-bold text-violet-600 uppercase tracking-widest mb-6"></p>
+            
+            <div class="prose prose-sm text-gray-600 leading-relaxed mb-8">
+                <p id="modal-desc"></p>
             </div>
+
+            <div id="modal-org-link" class="mb-8">
+                </div>
+
+            <button onclick="closeModal()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-black py-4 rounded-2xl text-[10px] uppercase tracking-widest transition-all">
+                Close Details
+            </button>
         </div>
     </div>
+</div>
 
     <header class="max-w-2xl mx-auto px-6 py-16 text-center">
         <img src="icon.png" alt="Manny Serrano" class="w-24 h-24 rounded-full mx-auto mb-6 border-4 border-white shadow-xl object-cover">
@@ -153,34 +163,47 @@
     </footer>
 
     <script>
-        /** 1. MODAL LOGIC (Click for Info) **/
-        function openModal(title, date, desc, link) {
+        /** 1. MODAL LOGIC **/
+            function openModal(title, date, desc, link) {
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-date').innerText = date;
             document.getElementById('modal-desc').innerText = desc;
             
             const linkBox = document.getElementById('modal-org-link');
             if(link !== '#') {
-                linkBox.innerHTML = `<a href="${link}" target="_blank" class="text-[10px] font-black text-violet-600 uppercase hover:underline">Learn More About the Org →</a>`;
+                linkBox.innerHTML = `<a href="${link}" target="_blank" class="inline-block text-[10px] font-black text-violet-600 uppercase border-b-2 border-violet-100 pb-1 hover:text-violet-800 transition-all">Learn More About the Org →</a>`;
             } else {
                 linkBox.innerHTML = '';
             }
-
+        
             const modal = document.getElementById('event-modal');
             modal.classList.remove('opacity-0', 'pointer-events-none');
             modal.querySelector('div').classList.remove('scale-95');
+            
+            // Prevent background scrolling while modal is open
             document.body.style.overflow = 'hidden';
         }
-
+        
         function closeModal() {
             const modal = document.getElementById('event-modal');
             modal.classList.add('opacity-0', 'pointer-events-none');
             modal.querySelector('div').classList.add('scale-95');
+            
+            // Restore scrolling
             document.body.style.overflow = 'auto';
         }
-
-        // Close on outside click
-        window.onclick = function(e) { if(e.target == document.getElementById('event-modal')) closeModal(); }
+        
+        // Support for tapping the dark background to close on all devices
+        document.getElementById('event-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+        
+        // Also support the "Escape" key for desktop users
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
 
         /** 2. GALLERY TOGGLE LOGIC **/
         const galleryToggle = document.getElementById('galleryToggle');
