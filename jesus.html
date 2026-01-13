@@ -631,7 +631,18 @@ let selectedDisc = 'none';
 
 const VIBE_TAGS = ['Silent', 'Talkative', 'Tipper', 'Sensitive Skin', 'Sports', 'Chill', 'Late', 'Cash Only', 'Politics', 'Family'];
 
-// --- CORE FUNCTIONS ---
+// --- CRASH PROTECTION ---
+window.onerror = function(msg, url, line) {
+    const m = document.getElementById('crashModal');
+    const msgBox = document.getElementById('crashMsg');
+    if(m && msgBox) {
+        msgBox.innerText = msg + " (Line " + line + ")";
+        m.style.display = 'flex';
+    }
+    return false;
+};
+
+// --- CORE DATA PERSISTENCE ---
 function saveAll() {
     localStorage.setItem('bbClients', JSON.stringify(clients));
     localStorage.setItem('bbHistory', JSON.stringify(history));
@@ -639,39 +650,60 @@ function saveAll() {
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
 }
 
-// Initial Load
-try {
-    const cRaw = localStorage.getItem('bbClients');
-    const hRaw = localStorage.getItem('bbHistory');
-    const sRaw = localStorage.getItem('bbSettings');
-    if(cRaw) clients = JSON.parse(cRaw);
-    if(hRaw) history = JSON.parse(hRaw);
-    if(sRaw) settings = JSON.parse(sRaw);
-} catch (e) {
-    console.error("Data Corruption", e);
+function loadData() {
+    try {
+        const cRaw = localStorage.getItem('bbClients');
+        const hRaw = localStorage.getItem('bbHistory');
+        const sRaw = localStorage.getItem('bbSettings');
+        if(cRaw) clients = JSON.parse(cRaw);
+        if(hRaw) history = JSON.parse(hRaw);
+        if(sRaw) settings = JSON.parse(sRaw);
+    } catch (e) {
+        console.error("Data Load Error", e);
+    }
 }
 
 window.onload = () => {
-    if(localStorage.getItem('theme') === 'dark') toggleTheme();
+    loadData();
+    if(localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+        isDark = true;
+    }
     document.getElementById('setLoc').value = settings.location || '';
     render();
 };
 
-// --- RENDER SYSTEM ---
+// --- MODAL ENGINE ---
+function openModal(id) { 
+    const el = document.getElementById(id);
+    if(el) {
+        el.style.display = 'flex'; 
+        document.body.style.overflow = 'hidden'; 
+    }
+}
+
+function closeModal(id) { 
+    const el = document.getElementById(id);
+    if(el) el.style.display = 'none'; 
+    const anyOpen = Array.from(document.querySelectorAll('.overlay')).some(m => m.style.display === 'flex');
+    if (!anyOpen) document.body.style.overflow = ''; 
+}
+
+// --- RENDER & REVENUE CALCULATIONS ---
 function render(search = '') {
     const list = document.getElementById('list');
     if(!list) return;
     list.innerHTML = '';
 
-    // Update Metrics
+    // Optimized Revenue Logic
     const totalRev = history.reduce((s, h) => s + (Number(h.amount) || 0), 0);
     const totalGive = clients.reduce((s, c) => s + (Number(c.giveback) || 0), 0);
     const todayStr = new Date().toLocaleDateString('en-CA');
     const todayRev = history.filter(h => h.date === todayStr).reduce((s, h) => s + (Number(h.amount) || 0), 0);
 
-    document.getElementById('mToday').innerText = '$' + todayRev.toFixed(2);
-    document.getElementById('mRev').innerText = '$' + totalRev.toFixed(2);
-    document.getElementById('mGive').innerText = '$' + totalGive.toFixed(2);
+    document.getElementById('mToday').innerText = '$' + todayRev.toLocaleString(undefined, {minimumFractionDigits: 2});
+    document.getElementById('mRev').innerText = '$' + totalRev.toLocaleString(undefined, {minimumFractionDigits: 2});
+    document.getElementById('mGive').innerText = '$' + totalGive.toLocaleString(undefined, {minimumFractionDigits: 2});
 
     let filtered = clients.filter(c => {
         if(search && !c.name.toLowerCase().includes(search.toLowerCase())) return false;
@@ -682,15 +714,26 @@ function render(search = '') {
         return true;
     });
 
-    filtered.sort((a,b) => (activeFilter === 'all') ? (a.name || "").localeCompare(b.name || "") : new Date(a.last || a.first) - new Date(b.last || b.first));
+    // Sorting
+    if (activeFilter === 'all') {
+        filtered.sort((a,b) => (a.name || "").localeCompare(b.name || ""));
+    } else {
+        filtered.sort((a,b) => new Date(a.last || a.first) - new Date(b.last || b.first));
+    }
 
     filtered.forEach(c => {
+        const stat = getStatus(c);
+        let badges = '';
+        if(c.dob && isMonth(c.dob)) badges += `🎂`;
+        if(c.first && isAnniversary(c.first)) badges += `🏅`;
+        if((c.spent || 0) >= 250) badges += `<span style="color:var(--p-gold); margin-left:5px;"><i class="fas fa-crown"></i></span>`;
+        
         const div = document.createElement('div');
-        div.className = `client-card ${getStatus(c)}`;
+        div.className = `client-card ${stat}`;
         div.onclick = () => showClient(c.id);
         div.innerHTML = `
             <div class="cc-top">
-                <div class="cc-name">${c.name} ${c.strikes > 0 ? '🚩'.repeat(c.strikes) : ''}</div>
+                <div class="cc-name">${c.name} ${badges}${c.strikes > 0 ? '🚩'.repeat(c.strikes) : ''}</div>
                 <div class="cc-due">${getDueStr(c)}</div>
             </div>
             <div class="cc-info">Last: ${formatPretty(c.last)}</div>
@@ -700,57 +743,44 @@ function render(search = '') {
     });
 }
 
-// --- TAB & THEME ---
-function setTab(t, btn) {
-    activeFilter = t;
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    render();
-}
-
-function toggleTheme() {
-    document.body.classList.toggle('dark-mode');
-    isDark = document.body.classList.contains('dark-mode');
-    saveAll();
-}
-
-// --- MODALS ---
-function openModal(id) { 
-    document.getElementById(id).style.display = 'flex'; 
-    document.body.style.overflow = 'hidden'; 
-}
-
-function closeModal(id) { 
-    document.getElementById(id).style.display = 'none'; 
-    document.body.style.overflow = ''; 
-}
-
-function openSettings() { openModal('settingsModal'); }
-function openWalkIn() { openModal('walkInModal'); }
-
+// --- CLIENT ACTIONS ---
 function showClient(id) {
     activeId = id;
     const c = clients.find(x => x.id == id);
     if(!c) return;
-    document.getElementById('vName').innerText = c.name;
+
+    document.getElementById('vName').innerText = c.name + (c.strikes > 0 ? ` (${c.strikes} Strike${c.strikes>1?'s':''})` : '');
     document.getElementById('vSub').innerText = c.phone || 'No Phone';
     document.getElementById('vFormula').innerText = c.formula || "No cut formula saved.";
     document.getElementById('vLoyalty').innerText = getLoyaltyVisual(c.loyalty);
     document.getElementById('vCredit').innerText = `$${(c.credit||0).toFixed(2)}`;
+    document.getElementById('vTotalCuts').innerText = c.cuts||0;
     document.getElementById('vLTV').innerText = `$${(c.spent||0).toFixed(2)}`;
-    document.getElementById('btnCall').href = `tel:${c.phone}`;
     
+    // UI Visibility logic
+    document.getElementById('btnCall').href = `tel:${c.phone}`;
+    document.getElementById('btnInsta').style.display = c.insta ? 'block' : 'none';
+    document.getElementById('btnRemStrike').style.display = (c.strikes > 0) ? 'flex' : 'none';
+    
+    const iceBox = document.getElementById('vIcebreaker');
+    if(c.icebreaker) {
+        document.getElementById('vIceText').innerText = "Ask about: " + c.icebreaker;
+        iceBox.style.display = 'flex';
+    } else { iceBox.style.display = 'none'; }
+
+    const tagDiv = document.getElementById('vTags');
+    tagDiv.innerHTML = '';
+    (c.tags || []).forEach(t => tagDiv.innerHTML += `<span class="tag-badge">${t}</span>`);
+
     const navBtn = document.getElementById('btnNav');
     if(c.address) {
         navBtn.style.display = 'flex';
         navBtn.href = `maps://?q=${encodeURIComponent(c.address)}`;
-    } else {
-        navBtn.style.display = 'none';
-    }
+    } else { navBtn.style.display = 'none'; }
+
     openModal('viewModal');
 }
 
-// --- ADD/EDIT CLIENT ---
 function openAddModal() {
     activeId = null;
     document.getElementById('eTitle').innerText = 'New Client';
@@ -758,6 +788,8 @@ function openAddModal() {
     document.getElementById('eName').value = '';
     document.getElementById('ePhone').value = '';
     document.getElementById('ePrice').value = 35;
+    document.getElementById('eFreq').value = 4;
+    document.getElementById('eFirst').value = new Date().toLocaleDateString('en-CA');
     
     const tagBox = document.getElementById('eTags');
     tagBox.innerHTML = '';
@@ -771,11 +803,24 @@ function openAddModal() {
     openModal('editModal');
 }
 
-function saveClient() {
+async function saveClient() {
     const id = document.getElementById('eId').value || Date.now().toString();
     const isNew = !document.getElementById('eId').value;
-    const tags = Array.from(document.querySelectorAll('#eTags .tag-pill.active')).map(p => p.innerText);
+    const refName = document.getElementById('eRef').value;
     
+    const tags = Array.from(document.querySelectorAll('#eTags .tag-pill.active')).map(p => p.innerText);
+    const existing = isNew ? null : clients.find(x => x.id == id);
+
+    let creditAdd = 0;
+    if(isNew && refName) {
+        const referee = clients.find(x => x.name.toLowerCase() === refName.toLowerCase());
+        if(referee) {
+            referee.credit = (referee.credit || 0) + 5;
+            creditAdd = 5;
+            await customConfirm(`Linked to ${referee.name}! $5 added to both.`);
+        }
+    }
+
     const data = {
         id,
         name: document.getElementById('eName').value,
@@ -783,70 +828,92 @@ function saveClient() {
         insta: document.getElementById('eInsta').value,
         email: document.getElementById('eEmail').value,
         address: document.getElementById('eAddr').value,
-        price: parseFloat(document.getElementById('ePrice').value) || 35,
+        price: parseFloat(document.getElementById('ePrice').value) || 0,
         freq: parseInt(document.getElementById('eFreq').value) || 4,
         first: document.getElementById('eFirst').value,
         dob: document.getElementById('eDob').value,
-        formula: document.getElementById('eFormula').value,
-        icebreaker: document.getElementById('eIcebreaker').value,
+        refBy: refName,
         notes: document.getElementById('eNotes').value,
+        icebreaker: document.getElementById('eIcebreaker').value,
+        formula: document.getElementById('eFormula').value,
         tags: tags,
-        strikes: isNew ? 0 : (clients.find(x => x.id == id).strikes || 0),
-        loyalty: isNew ? 0 : (clients.find(x => x.id == id).loyalty || 0),
-        spent: isNew ? 0 : (clients.find(x => x.id == id).spent || 0)
+        credit: isNew ? creditAdd : existing.credit,
+        banked: isNew ? 0 : existing.banked,
+        loyalty: isNew ? 0 : existing.loyalty,
+        spent: isNew ? 0 : existing.spent,
+        giveback: isNew ? 0 : existing.giveback,
+        cuts: isNew ? 0 : existing.cuts,
+        strikes: isNew ? 0 : (existing.strikes || 0),
+        archived: isNew ? false : (existing.archived || false),
+        last: isNew ? null : existing.last
     };
 
     if(isNew) clients.push(data);
     else clients[clients.findIndex(x => x.id == id)] = data;
-    
+
     saveAll();
     closeModal('editModal');
     render();
 }
 
-// --- ACTIONS ---
-function addStrike() {
-    const c = clients.find(x => x.id == activeId);
-    c.strikes = (c.strikes || 0) + 1;
-    saveAll();
-    closeModal('viewModal');
-    render();
-}
-
-function openSmsMenu() { openModal('smsModal'); }
-
-function sendSms(type) {
-    const c = clients.find(x => x.id == activeId);
-    if(!c.phone) return alert("No phone number!");
-    let msg = "";
-    if(type === 'late') msg = "Hey! Running 15 mins late.";
-    if(type === 'confirm') msg = "Yo, confirming our cut today. Still good?";
-    window.location.href = `sms:${c.phone}&body=${encodeURIComponent(msg)}`;
-    closeModal('smsModal');
-}
-
-// --- CHECKOUT ---
+// --- REVENUE & CHECKOUT ---
 function openCheckout() {
     const c = clients.find(x => x.id == activeId);
     document.getElementById('payPrice').value = c.price || 35;
     document.getElementById('payTip').value = 0;
+    document.getElementById('payDate').value = new Date().toLocaleDateString('en-CA');
+    
+    const nextDate = new Date();
+    nextDate.setDate(nextDate.getDate() + ((c.freq || 4) * 7));
+    document.getElementById('sbDate').innerText = nextDate.toLocaleDateString(undefined, {month:'short', day:'numeric'});
+
+    const opts = document.getElementById('discountList');
+    opts.innerHTML = '';
+    addOpt(opts, 'none', 'No Discount', true);
+    if((c.banked || 0) > 0) addOpt(opts, 'free', `Redeem 1 Free Cut (Banked: ${c.banked})`);
+    if((c.credit || 0) > 0) addOpt(opts, 'credit', `Redeem $5 Credit (Bal: $${c.credit})`);
+    
     openModal('checkoutModal');
     calcTotal();
+}
+
+function addOpt(parent, val, label, selected = false) {
+    const div = document.createElement('div');
+    div.className = `discount-opt ${selected ? 'selected' : ''}`;
+    div.innerText = label;
+    div.onclick = () => {
+        document.querySelectorAll('.discount-opt').forEach(d => d.classList.remove('selected'));
+        div.classList.add('selected');
+        selectedDisc = val;
+        document.getElementById('customDiscBox').style.display = val === 'custom' ? 'block' : 'none';
+        calcTotal();
+    };
+    parent.appendChild(div);
 }
 
 function calcTotal() {
     const base = parseFloat(document.getElementById('payPrice').value) || 0;
     const tip = parseFloat(document.getElementById('payTip').value) || 0;
-    checkoutTotal = base + tip;
+    let discount = 0;
+    if(selectedDisc === 'free') discount = base;
+    if(selectedDisc === 'half') discount = base * 0.5;
+    if(selectedDisc === 'credit') discount = Math.min(base, 5);
+    
+    checkoutGiveback = discount;
+    checkoutTotal = (base - discount) + tip;
     document.getElementById('payTotal').innerText = `$${checkoutTotal.toFixed(2)}`;
+    document.getElementById('givebackDisplay').innerText = `Giveback: $${checkoutGiveback.toFixed(2)}`;
 }
 
-function finalizeCut() {
+async function finalizeCut() {
     const c = clients.find(x => x.id == activeId);
-    c.spent = (c.spent || 0) + checkoutTotal;
-    c.cuts = (c.cuts || 0) + 1;
-    c.last = new Date().toLocaleDateString('en-CA');
-    c.loyalty = ((c.loyalty || 0) + 1) % 5;
+    if(selectedDisc === 'free') c.banked = Math.max(0, (c.banked || 0) - 1);
+    if(selectedDisc === 'credit') c.credit = Math.max(0, (c.credit || 0) - 5);
+
+    c.spent = (Number(c.spent) || 0) + checkoutTotal;
+    c.giveback = (Number(c.giveback) || 0) + checkoutGiveback;
+    c.cuts = (Number(c.cuts) || 0) + 1;
+    c.last = document.getElementById('payDate').value;
 
     history.push({
         clientId: c.id,
@@ -855,16 +922,57 @@ function finalizeCut() {
         amount: checkoutTotal
     });
 
+    if(selectedDisc !== 'free') {
+        c.loyalty = ((c.loyalty || 0) + 1);
+        if(c.loyalty >= 5) {
+            c.banked = (c.banked || 0) + 1;
+            c.loyalty = 0;
+            await customConfirm("🎉 5th Cut! Free Cut Banked.");
+        }
+    }
+
     saveAll();
     closeModal('checkoutModal');
     closeModal('viewModal');
     render();
 }
 
-// --- HELPERS ---
+// --- EXPORTS & TOOLS ---
+function exportSimpleCSV() {
+    let csv = "Name,Phone,Email,Status,LTV\n";
+    clients.forEach(c => {
+        csv += `${c.name},${c.phone || ''},${c.email || ''},${getStatus(c)},${c.spent || 0}\n`;
+    });
+    const blob = new Blob([csv], {type:'text/csv'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'Clients.csv'; a.click();
+}
+
+function exportHistoryCSV() {
+    let csv = "Date,Client,Amount\n";
+    history.forEach(h => { csv += `${h.date},${h.clientName},${h.amount}\n`; });
+    const blob = new Blob([csv], {type:'text/csv'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'Transactions.csv'; a.click();
+}
+
+// --- UI HELPERS ---
+function setTab(t, btn) {
+    activeFilter = t;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    render();
+}
+
+function toggleTheme() {
+    document.body.classList.toggle('dark-mode');
+    isDark = document.body.classList.contains('dark-mode');
+    saveAll();
+}
+
 function getStatus(c) {
-    const last = new Date(c.last || c.first || Date.now());
-    const diff = (new Date() - last) / (1000 * 60 * 60 * 24);
+    const ref = c.last || c.first || Date.now();
+    const diff = (new Date() - new Date(ref)) / (1000 * 60 * 60 * 24);
     if(diff >= 56) return 'overdue';
     if(diff >= (c.freq || 4) * 7) return 'due';
     return 'good';
@@ -883,15 +991,19 @@ function getLoyaltyVisual(n) {
 }
 
 function formatPretty(d) { return d ? new Date(d).toLocaleDateString() : 'Never'; }
+function isMonth(d) { return d && new Date(d).getMonth() === new Date().getMonth(); }
+function isAnniversary(d) { if(!d) return false; const dt = new Date(d); return dt.getMonth() === new Date().getMonth() && dt.getFullYear() !== new Date().getFullYear(); }
 
-function saveSettings() {
-    settings.location = document.getElementById('setLoc').value;
-    saveAll();
-    closeModal('settingsModal');
-}
-
+function openSettings() { openModal('settingsModal'); }
+function openWalkIn() { openModal('walkInModal'); }
+function openHistory() { closeModal('settingsModal'); openModal('historyModal'); }
+function openStats() { closeModal('settingsModal'); openModal('statsModal'); }
+function toggleArchiveMode() { viewArchives = !viewArchives; closeModal('settingsModal'); render(); }
+function customConfirm(msg) { return new Promise((resolve) => { document.getElementById('cMsg').innerText = msg; document.getElementById('confirmModal').style.display = 'flex'; document.getElementById('cYes').onclick = () => { closeModal('confirmModal'); resolve(true); }; document.getElementById('cNo').onclick = () => { closeModal('confirmModal'); resolve(false); }; }); }
 function factoryReset() { if(confirm("Clear ALL data?")) { localStorage.clear(); location.reload(); } }
 function emergencyCopy() { navigator.clipboard.writeText(JSON.stringify({clients, history})); alert("Data Copied!"); }
+
+// --- END OF SCRIPT ---
     </script>
 </body>
 </html>
