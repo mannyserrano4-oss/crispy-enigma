@@ -96,6 +96,7 @@
         .metric-pill {
             background: var(--bg-card); border: 2px solid var(--border); border-radius: 12px;
             padding: 8px 15px; min-width: 100px; display: flex; flex-direction: column; box-shadow: var(--shadow);
+            border-bottom: 4px solid var(--p-blue); /* Adds a "status bar" look to the bottom of the pill */
         }
         .m-lbl { font-size: 0.7rem; text-transform: uppercase; color: var(--text-sub); font-weight: 700; }
         .m-val { font-size: 1.1rem; font-weight: 800; color: var(--p-blue-dark); }
@@ -286,6 +287,9 @@
             <div class="contact-grid">
                 <a id="btnCall" href="#" class="c-btn"><i class="fas fa-phone"></i> Call</a>
                 <div class="c-btn" onclick="openSmsMenu()"><i class="fas fa-comment"></i> Text</div>
+                <a id="btnNav" href="#" target="_blank" class="c-btn" style="grid-column: span 2; display: none; background: var(--p-green); border-color: var(--p-green-dark); color: black;">
+                    <i class="fas fa-map-marker-alt"></i> Get Directions
+                </a>
             </div>
 
             <div class="v-grid">
@@ -598,6 +602,14 @@
             if(c.first && isAnniversary(c.first)) b += `<span style="background:var(--p-purple); color:black; padding:5px 10px; border-radius:10px; font-size:0.8rem; font-weight:bold;">🏅 Anniversary Month</span>`;
             document.getElementById('vBadges').innerHTML = b;
 
+            // Shows the Navigate button only if the client has an address saved
+                const navBtn = document.getElementById('btnNav');
+                if (navBtn) {
+                    navBtn.style.display = c.address ? 'flex' : 'none';
+                    // This format tells iOS to open the Apple Maps app directly
+                    navBtn.href = `maps://?q=${encodeURIComponent(c.address)}`;
+                }
+
             document.getElementById('vLoyalty').innerText = getLoyaltyVisual(c.loyalty);
             document.getElementById('vCredit').innerText = `$${(c.credit||0).toFixed(2)}`;
             document.getElementById('vTotalCuts').innerText = c.cuts||0;
@@ -633,6 +645,10 @@
                 amount: checkoutTotal
             });
             localStorage.setItem('bbHistory', JSON.stringify(history));
+
+            if (history.length % 10 === 0 && history.length !== 0) {
+                alert("Nice work! You've recorded " + history.length + " total cuts. Remember to download a Backup (.json) in Settings soon!");
+            }
 
             if(selectedDisc !== 'free') {
                 c.loyalty = (c.loyalty || 0) + 1;
