@@ -618,559 +618,376 @@
 
     <script>
         // --- DATA STATE ---
-        let clients = [];
-        let history = [];
-        let settings = { location: '' };
-        let activeId = null;
-        let activeFilter = 'all';
-        let isDark = false;
-        let viewArchives = false;
+let clients = [];
+let history = [];
+let settings = { location: '' };
+let activeId = null;
+let activeFilter = 'all';
+let isDark = false;
+let viewArchives = false;
+
+const VIBE_TAGS = ['Silent', 'Talkative', 'Tipper', 'Sensitive Skin', 'Sports', 'Chill', 'Late', 'Cash Only', 'Politics', 'Family'];
+
+// CRASH PROTECTION: Catch errors and show the crash screen
+window.onerror = function(msg, url, line) {
+    showCrashScreen(msg + " (Line " + line + ")");
+    return false;
+};
+
+// --- CORE FUNCTIONS ---
+function saveAll() {
+    localStorage.setItem('bbClients', JSON.stringify(clients));
+    localStorage.setItem('bbHistory', JSON.stringify(history));
+    localStorage.setItem('bbSettings', JSON.stringify(settings));
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+}
+
+// LOAD DATA
+try {
+    const cRaw = localStorage.getItem('bbClients');
+    const hRaw = localStorage.getItem('bbHistory');
+    const sRaw = localStorage.getItem('bbSettings');
+    if(cRaw) clients = JSON.parse(cRaw);
+    if(hRaw) history = JSON.parse(hRaw);
+    if(sRaw) settings = JSON.parse(sRaw);
+} catch (e) {
+    console.error("Data Load Error", e);
+}
+
+window.onload = () => {
+    // Initial check for theme
+    if(localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+        isDark = true;
+    }
+    
+    // Set settings field
+    const setLocInput = document.getElementById('setLoc');
+    if(setLocInput) setLocInput.value = settings.location || '';
+    
+    render();
+};
+
+// --- MODAL HELPERS ---
+function openModal(id) { 
+    const el = document.getElementById(id);
+    if(el) {
+        el.style.display = 'flex'; 
+        document.body.style.overflow = 'hidden'; 
+    }
+}
+
+function closeModal(id) { 
+    const el = document.getElementById(id);
+    if(el) el.style.display = 'none'; 
+    
+    // Check if any other modals are still open
+    const anyOpen = Array.from(document.querySelectorAll('.overlay'))
+                         .some(m => m.style.display === 'flex');
+    if (!anyOpen) {
+        document.body.style.overflow = ''; 
+    }
+}
+
+function render(search = '') {
+    const list = document.getElementById('list');
+    if(!list) return;
+    list.innerHTML = '';
+
+    // Calculate Stats Safely
+    const totalRev = history.reduce((s, h) => s + (Number(h.amount) || 0), 0);
+    const totalGive = clients.reduce((s, c) => s + (Number(c.giveback) || 0), 0);
+    const todayStr = new Date().toLocaleDateString('en-CA');
+    const todayRev = history.filter(h => h.date === todayStr)
+                            .reduce((s, h) => s + (Number(h.amount) || 0), 0);
+
+    // Update Header UI safely
+    const mToday = document.getElementById('mToday');
+    const mRev = document.getElementById('mRev');
+    const mGive = document.getElementById('mGive');
+    
+    if (mToday) mToday.innerText = '$' + todayRev.toFixed(2);
+    if (mRev) mRev.innerText = '$' + totalRev.toFixed(2);
+    if (mGive) mGive.innerText = '$' + totalGive.toFixed(2);
+
+    // Filter Logic
+    let filtered = clients.filter(c => {
+        const nameMatch = c.name && c.name.toLowerCase().includes(search.toLowerCase());
+        if(search && !nameMatch) return false;
         
-        const VIBE_TAGS = ['Silent', 'Talkative', 'Tipper', 'Sensitive Skin', 'Sports', 'Chill', 'Late', 'Cash Only', 'Politics', 'Family'];
+        if (viewArchives) return c.archived === true;
+        if (c.archived === true) return false;
 
-        window.onerror = function(msg, url, line) {
-            showCrashScreen(msg + " (Line " + line + ")");
-            return false;
-        };
+        if(!search && activeFilter === 'due') return getStatus(c) === 'due';
+        if(!search && activeFilter === 'overdue') return getStatus(c) === 'overdue';
+        return true;
+    });
 
-        // --- CORE FUNCTIONS ---
-        function saveAll() {
-            localStorage.setItem('bbClients', JSON.stringify(clients));
-            localStorage.setItem('bbHistory', JSON.stringify(history));
-            localStorage.setItem('bbSettings', JSON.stringify(settings));
+    // Sort Logic
+    filtered.sort((a, b) => {
+        if (activeFilter === 'all') {
+            return (a.name || "").localeCompare(b.name || "");
+        } else {
+            const dateA = new Date(a.last || a.first || '2000-01-01');
+            const dateB = new Date(b.last || b.first || '2000-01-01');
+            return dateA - dateB; 
         }
-        try {
-            const cRaw = localStorage.getItem('bbClients');
-            const hRaw = localStorage.getItem('bbHistory');
-            const sRaw = localStorage.getItem('bbSettings');
-            if(cRaw) clients = JSON.parse(cRaw);
-            if(hRaw) history = JSON.parse(hRaw);
-            if(sRaw) settings = JSON.parse(sRaw);
-        } catch (e) {
-            showCrashScreen("Data Corruption: " + e.message);
-        }
+    });
 
-        window.onload = () => {
-            render();
-            document.getElementById('setLoc').value = settings.location || '';
-            if(localStorage.getItem('theme') === 'dark') toggleTheme();
-        };
-
-        // --- UPDATED MODAL HELPERS WITH SCROLL LOCK ---
-        function openModal(id) { 
-            document.getElementById(id).style.display = 'flex'; 
-            document.body.style.overflow = 'hidden'; // LOCK SCROLL
-        }
-        function closeModal(id) { 
-            document.getElementById(id).style.display = 'none'; 
-            // Only unlock if no other overlays are visible
-            const openModals = document.querySelectorAll('.overlay[style*="display: flex"]');
-            if (openModals.length === 0) {
-                document.body.style.overflow = ''; // UNLOCK SCROLL
-            }
-        }
-
-        function render(search = '') {
-            const list = document.getElementById('list');
-            list.innerHTML = '';
-
-            // --- OPTIMIZED REVENUE LOGIC ---
-            // We only update the header metrics if the user isn't actively searching.
-            // This prevents the UI from lagging while typing.
-            if (!search) {
-                const totalRev = history.reduce((s, h) => s + (h.amount || 0), 0);
-                const totalGive = clients.reduce((s, c) => s + (c.giveback || 0), 0);
-                
-                const todayStr = new Date().toLocaleDateString('en-CA');
-                const todayRev = history.filter(h => h.date === todayStr).reduce((s, h) => s + h.amount, 0);
-
-                // Update Header UI
-                document.getElementById('mToday').innerText = '$' + todayRev.toLocaleString(undefined, {minimumFractionDigits: 2});
-                document.getElementById('mRev').innerText = '$' + totalRev.toLocaleString(undefined, {minimumFractionDigits: 2});
-                document.getElementById('mGive').innerText = '$' + totalGive.toLocaleString(undefined, {minimumFractionDigits: 2});
-            }
-
-            // --- REST OF RENDER FUNCTION (FILTERS & SORT) ---
-            let filtered = clients.filter(c => {
-                if(search && !c.name.toLowerCase().includes(search.toLowerCase())) return false;
-                if (viewArchives) return c.archived === true;
-                else if (c.archived === true) return false;
-
-                if(!search && activeFilter === 'due') return getStatus(c) === 'due';
-                if(!search && activeFilter === 'overdue') return getStatus(c) === 'overdue';
-                return true;
-            });
-
-            if (activeFilter === 'all') {
-                filtered.sort((a,b) => a.name.localeCompare(b.name));
-            } else {
-                filtered.sort((a,b) => {
-                    const dateA = new Date(a.last || a.first || '2000-01-01');
-                    const dateB = new Date(b.last || b.first || '2000-01-01');
-                    return dateA - dateB; 
-                });
-            }
-
-            filtered.forEach(c => {
-                const stat = getStatus(c);
-                let badges = '';
-                if(c.dob && isMonth(c.dob)) badges += `<span class="badge" style="color:var(--p-pink-dark)"><i class="fas fa-birthday-cake"></i></span>`;
-                if(c.first && isAnniversary(c.first)) badges += `<span class="badge" style="color:var(--p-purple)"><i class="fas fa-medal"></i></span>`;
-                // VIP CROWN (New)
-                if (c.spent >= 250) badges += `<span style="color:var(--p-gold); margin-left:5px;"><i class="fas fa-crown"></i></span>`;
-                let flags = '';
-                if(c.strikes > 0) flags = ' ' + '🚩'.repeat(Math.min(c.strikes, 3));
-
-                const div = document.createElement('div');
-                div.className = `client-card ${stat}`;
-                div.onclick = () => showClient(c.id);
-                div.innerHTML = `
-                    <div class="cc-top">
-                        <div class="cc-name">${c.name} ${badges}${flags}</div>
-                        <div class="cc-due">${getDueStr(c)}</div>
-                    </div>
-                    <div class="cc-info">Last: ${formatPretty(c.last)}</div>
-                    <div class="loyalty-visual">${getLoyaltyVisual(c.loyalty)}</div>
-                `;
-                list.appendChild(div);
-            });
-        }
-
-        function showClient(id) {
-            activeId = id;
-            const c = getClient(id);
-            let nameDisplay = c.name;
-            if(c.strikes > 0) nameDisplay += ` (${c.strikes} Strike${c.strikes>1?'s':''})`;
-            document.getElementById('vName').innerText = nameDisplay;
-            document.getElementById('vSub').innerText = c.phone || 'No Phone';
-            document.getElementById('vFormula').innerText = c.formula || "No cut formula saved.";
-            
-            let b = '';
-            if(c.dob && isMonth(c.dob)) b += `<span style="background:var(--p-pink); color:black; padding:5px 10px; border-radius:10px; font-size:0.8rem; font-weight:bold;">🎂 Birthday Month</span>`;
-            if(c.first && isAnniversary(c.first)) b += `<span style="background:var(--p-purple); color:black; padding:5px 10px; border-radius:10px; font-size:0.8rem; font-weight:bold;">🏅 Anniversary Month</span>`;
-            document.getElementById('vBadges').innerHTML = b;
-
-            const iceBox = document.getElementById('vIcebreaker');
-            if(c.icebreaker && c.icebreaker.trim() !== '') {
-                document.getElementById('vIceText').innerText = "Ask about: " + c.icebreaker;
-                iceBox.style.display = 'flex';
-            } else { iceBox.style.display = 'none'; }
-
-            const tagDiv = document.getElementById('vTags');
-            tagDiv.innerHTML = '';
-            if(c.tags && c.tags.length > 0) {
-                c.tags.forEach(t => { tagDiv.innerHTML += `<span class="tag-badge">${t}</span>`; });
-            }
-
-            document.getElementById('vLoyalty').innerText = getLoyaltyVisual(c.loyalty);
-            document.getElementById('vCredit').innerText = `$${(c.credit||0).toFixed(2)}`;
-            document.getElementById('vTotalCuts').innerText = c.cuts||0;
-            document.getElementById('vLTV').innerText = `$${(c.spent||0).toFixed(2)}`;
-            
-            document.getElementById('btnCall').href = `tel:${c.phone}`;
-            document.getElementById('btnInsta').style.display = c.insta ? 'block' : 'none';
-            document.getElementById('btnRemStrike').style.display = (c.strikes > 0) ? 'flex' : 'none';
-
-            const emBtn = document.getElementById('btnEmail');
-            if(c.email) { emBtn.style.display = 'flex'; emBtn.href = `mailto:${c.email}`; } else { emBtn.style.display = 'none'; }
-
-           // --- AUTO-GRAB DIRECTIONS LOGIC ---
-            const navBtn = document.getElementById('btnNav');
-            if (navBtn) {
-                if (c.address && c.address.trim() !== '') {
-                    navBtn.style.display = 'flex';
-                    // This opens the address directly in the Apple Maps App
-                    navBtn.href = `maps://?q=${encodeURIComponent(c.address)}`;
-                } else {
-                    navBtn.style.display = 'none';
-                }
-            }
-            
-            const arcBtn = document.getElementById('btnArchive');
-            arcBtn.innerHTML = c.archived ? '<i class="fas fa-box-open"></i> Restore Client' : '<i class="fas fa-archive"></i> Archive Client (Hide)';
-
-            openModal('viewModal');
-        }
-
-        // --- CHECKOUT & REVENUE ---
-        async function finalizeCut() {
-            const c = getClient(activeId);
-            if(selectedDisc === 'free') c.banked = (c.banked || 0) - 1;
-            if(selectedDisc === 'credit') c.credit = Math.max(0, (c.credit || 0) - 5);
-
-            c.spent = (c.spent || 0) + checkoutTotal;
-            c.giveback = (c.giveback || 0) + checkoutGiveback;
-            c.cuts = (c.cuts || 0) + 1;
-            c.last = document.getElementById('payDate').value;
-
-            history.push({
-                clientId: c.id,
-                clientName: c.name,
-                date: c.last,
-                amount: checkoutTotal
-            });
-
-            if(selectedDisc !== 'free') {
-                c.loyalty = (c.loyalty || 0) + 1;
-                if(c.loyalty >= 5) {
-                    c.banked = (c.banked || 0) + 1;
-                    c.loyalty = 0;
-                    await customConfirm("🎉 High Five! Client reached 5 cuts. Free Cut banked.");
-                }
-            }
-            
-            saveAll();
-            closeModal('checkoutModal');
-            closeModal('viewModal');
-            render();
-        }
-
-        async function smartBook() {
-            await finalizeCut(); 
-            const c = getClient(activeId);
-            const nextDate = new Date();
-            nextDate.setDate(nextDate.getDate() + ((c.freq || 4) * 7));
-            const iso = nextDate.toISOString().slice(0, 10) + "T10:00";
-            document.getElementById('schedDate').value = iso;
-            openModal('schedModal');
-        }
-
-        function openWalkIn() {
-            document.getElementById('wPrice').value = 35;
-            document.getElementById('wTip').value = 0;
-            openModal('walkInModal');
-        }
-
-        function saveWalkIn() {
-            const price = parseFloat(document.getElementById('wPrice').value) || 0;
-            const tip = parseFloat(document.getElementById('wTip').value) || 0;
-            const total = price + tip;
-
-            if (total <= 0) return alert("Enter an amount.");
-
-            history.push({
-                clientId: 'walkin',
-                clientName: '🚶 Walk-In Client',
-                date: new Date().toLocaleDateString('en-CA'),
-                amount: total
-            });
-
-            saveAll();
-            closeModal('walkInModal');
-            render();
-            alert(`Walk-In Recorded: $${total.toFixed(2)}`);
-        }
-
-        async function deleteTransaction(idx) {
-            const h = history[idx];
-            if(await customConfirm(`Delete $${h.amount.toFixed(2)} entry for ${h.clientName}?\n\nThis will also reverse their cut stats.`)) {
-                const c = getClient(h.clientId);
-                if(c) {
-                    c.spent = Math.max(0, (c.spent || 0) - h.amount);
-                    c.cuts = Math.max(0, (c.cuts || 0) - 1);
-                    
-                    // Logic to reverse loyalty and banked cuts
-                    if (c.loyalty === 0 && (c.banked || 0) > 0) {
-                        c.loyalty = 4; 
-                        c.banked -= 1;
-                    } else {
-                        c.loyalty = Math.max(0, (c.loyalty || 0) - 1);
-                    }
-                }
-                history.splice(idx, 1);
-                saveAll();
-                render();
-                openHistory();
-            }
-        }
-
-        function openStats() {
-            closeModal('settingsModal');
-            const div = document.getElementById('statsContent');
-            div.innerHTML = '';
-            const years = {};
-            history.forEach(h => {
-                const y = h.date.split('-')[0];
-                if(!years[y]) years[y] = 0;
-                years[y] += h.amount;
-            });
-            let html = '<div class="v-grid">';
-            Object.keys(years).sort().reverse().forEach(y => {
-                html += `<div class="v-box"><span class="v-big" style="color:var(--p-green-dark)">$${years[y].toFixed(2)}</span><span style="font-size:0.7rem;">${y} Revenue</span></div>`;
-            });
-            html += '</div>';
-            div.innerHTML = html;
-            openModal('statsModal');
-        }
-
-        async function toggleArchive() {
-            const c = getClient(activeId);
-            const action = c.archived ? "Restore" : "Archive";
-            if(await customConfirm(`${action} this client?`)) {
-                c.archived = !c.archived;
-                saveAll(); 
-                closeModal('viewModal'); 
-                render();
-            }
-        }
-        function toggleArchiveMode() {
-            viewArchives = !viewArchives;
-            document.getElementById('archiveLabel').innerText = viewArchives ? "Back to Active Clients" : "View Archived Clients";
-            closeModal('settingsModal'); render();
-        }
-
-        function exportHistoryCSV() {
-            let csv = "Date,Client,Amount\n";
-            history.forEach(h => { csv += `${h.date},${h.clientName.replace(/,/g," ")},${h.amount}\n`; });
-            downloadCSV(csv, 'BlackBook_Transactions.csv');
-        }
-        function exportSimpleCSV() {
-            let csv = "Name,Phone,Email,Status,Strikes,Total_Spent,Last_Cut\n";
-            clients.forEach(c => {
-                const safePhone = `\t${c.phone}`;
-                csv += `${c.name.replace(/,/g," ")},${safePhone},${c.email || ''},${getStatus(c)},${c.strikes||0},${c.spent},${c.last}\n`;
-            });
-            downloadCSV(csv, 'BlackBook_Clients.csv');
-        }
-        function downloadCSV(content, name) {
-            const blob = new Blob([content], {type: 'text/csv;charset=utf-8'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = name; a.click();
-        }
+    // Build Cards
+    filtered.forEach(c => {
+        const stat = getStatus(c);
+        let badges = '';
+        if(c.dob && isMonth(c.dob)) badges += `🎂`;
+        if(c.first && isAnniversary(c.first)) badges += `🏅`;
+        if ((c.spent || 0) >= 250) badges += `👑`;
         
-        function formatPretty(dateStr) {
-            if(!dateStr) return 'Never';
-            const [y, m, d] = dateStr.split('-'); 
-            const date = new Date(y, m-1, d); 
-            const mon = date.toLocaleString('default', { month: 'short' });
-            const day = parseInt(d);
-            let suff = 'th';
-            if(day === 1 || day === 21 || day === 31) suff = 'st';
-            if(day === 2 || day === 22) suff = 'nd';
-            if(day === 3 || day === 23) suff = 'rd';
-            return `${mon} ${day}${suff}, ${y}`;
-        }
+        let flags = c.strikes > 0 ? ' ' + '🚩'.repeat(Math.min(c.strikes, 3)) : '';
 
-        function insertDate() {
-            const txt = document.getElementById('eNotes');
-            const now = new Date();
-            txt.value += `\n[${now.getMonth()+1}/${now.getDate()}]: `;
-            txt.focus();
-        }
-        
-        function getClient(id) { return clients.find(x => x.id === id); }
-        function setTab(t, btn) { activeFilter = t; document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); render(); }
-        function isMonth(d) { return new Date(d).getMonth() === new Date().getMonth(); }
-        function isAnniversary(d) { const dt = new Date(d); const now = new Date(); return dt.getMonth() === now.getMonth() && dt.getFullYear() !== now.getFullYear(); }
-        function openInsta() { const c = getClient(activeId); if(c.insta) window.open(`https://instagram.com/${c.insta.replace('@','')}`); }
-        function customConfirm(msg) { return new Promise((resolve) => { document.getElementById('cMsg').innerText = msg; document.getElementById('confirmModal').style.display = 'flex'; document.getElementById('cYes').onclick = () => { document.getElementById('confirmModal').style.display = 'none'; resolve(true); }; document.getElementById('cNo').onclick = () => { document.getElementById('confirmModal').style.display = 'none'; resolve(false); }; }); }
-        function searchRef(val) { const div = document.getElementById('refResults'); if(!val) { div.style.display='none'; return; } const matches = clients.filter(c => c.name.toLowerCase().includes(val.toLowerCase())); div.innerHTML = ''; if(matches.length){ div.style.display='block'; matches.forEach(m => { const d = document.createElement('div'); d.innerText = m.name; d.style.padding='8px'; d.style.borderBottom='1px solid #444'; d.onclick = () => { document.getElementById('eRef').value = m.name; div.style.display='none'; }; div.appendChild(d); }); } else div.style.display='none'; }
-        function openSchedule() { openModal('schedModal'); }
-        function openSettings() { openModal('settingsModal'); }
-        
-        function openHistory() { 
-            closeModal('settingsModal'); 
-            const div = document.getElementById('historyList'); 
-            div.innerHTML = ''; 
-            const revHist = [...history].reverse(); 
-            if(revHist.length === 0) div.innerHTML = "No transactions yet."; 
-            revHist.forEach((h, i) => { 
-                const originalIndex = (history.length - 1) - i;
-                const row = document.createElement('div'); 
-                row.className = 'hist-item'; 
-                row.innerHTML = `
-                    <div style="display:flex; flex-direction:column;">
-                        <span style="font-weight:700;">${h.clientName}</span>
-                        <span style="font-size:0.7rem; color:var(--text-sub);">${formatPretty(h.date)}</span>
-                    </div>
-                    <div style="display:flex; align-items:center; gap:15px;">
-                        <b>$${h.amount.toFixed(2)}</b>
-                        <i class="fas fa-trash-alt" style="color:#ff6b6b; cursor:pointer;" onclick="deleteTransaction(${originalIndex})"></i>
-                    </div>
-                `; 
-                div.appendChild(row); 
-            }); 
-            openModal('historyModal'); 
-        }
+        const div = document.createElement('div');
+        div.className = `client-card ${stat}`;
+        div.onclick = () => showClient(c.id);
+        div.innerHTML = `
+            <div class="cc-top">
+                <div class="cc-name">${c.name} ${badges}${flags}</div>
+                <div class="cc-due">${getDueStr(c)}</div>
+            </div>
+            <div class="cc-info">Last: ${formatPretty(c.last)}</div>
+            <div class="loyalty-visual">${getLoyaltyVisual(c.loyalty)}</div>
+        `;
+        list.appendChild(div);
+    });
+}
 
-        function addToCalendar() { const c = getClient(activeId); const d = new Date(document.getElementById('schedDate').value); const loc = document.getElementById('schedLoc').value === 'shop' ? settings.location : c.address; const end = new Date(d.getTime() + 7200000); const fmt = (x) => x.toISOString().replace(/-|:|\.\d\d\d/g,""); const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART:${fmt(d)}\nDTEND:${fmt(end)}\nSUMMARY:Cut - ${c.name}\nLOCATION:${loc}\nEND:VEVENT\nEND:VCALENDAR`; const blob = new Blob([ics], {type:'text/calendar;charset=utf-8'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'appt.ics'; a.click(); closeModal('schedModal'); }
-        function saveSettings() { settings.location = document.getElementById('setLoc').value; saveAll(); closeModal('settingsModal'); }
-        function exportData() { const s = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({clients, settings, history})); const a = document.createElement('a'); a.href = s; a.download = 'backup.json'; a.click(); }
-        function toggleTheme() { document.body.classList.toggle('dark-mode'); isDark = document.body.classList.contains('dark-mode'); localStorage.setItem('theme', isDark ? 'dark' : 'light'); }
-        function getStatus(c) { const refDate = c.last || c.first; if(!refDate) return 'good'; const last = new Date(refDate); const today = new Date(); const days = (today - last)/(1000*60*60*24); const freqDays = (c.freq || 4) * 7; if(days >= 56) return 'overdue'; if(days >= freqDays) return 'due'; return 'good'; }
-        function getDueStr(c) { const refDate = c.last || c.first; if(!refDate) return 'Today'; const last = new Date(refDate); last.setDate(last.getDate() + ((c.freq||4)*7)); return last.toLocaleDateString(undefined, {month:'short', day:'numeric'}); }
-        function getLoyaltyVisual(n) { n = n || 0; let s = ''; for(let i=0; i<5; i++) { s += (i < n) ? '✂️' : '⚪'; } return s; }
-        
-        function exportRobustExcel() {
-            let html = '<html><head><style>body{font-family:sans-serif; padding:20px;} table{width:100%; border-collapse:collapse; margin-bottom:40px;} th{background:#4472C4; color:white; padding:10px; text-align:left;} td{border:1px solid #ddd; padding:8px;} .due{color:#e67e22;} .overdue{color:#e74c3c;}</style></head><body>';
-            html += '<h1>Black Book Report</h1><p>Generated: ' + new Date().toLocaleDateString() + '</p>';
-            html += '<h2>Active Clients</h2><table><tr><th>Name</th><th>Phone</th><th>Status</th><th>Strikes</th><th>LTV</th><th>Last Cut</th></tr>';
-            clients.forEach(c => { 
-                if(c.archived) return; 
-                const stat = getStatus(c); 
-                html += `<tr><td><b>${c.name}</b></td><td>${c.phone || ''}</td><td>${stat.toUpperCase()}</td><td>${c.strikes || 0}</td><td>$${(c.spent||0).toFixed(2)}</td><td>${formatPretty(c.last)||''}</td></tr>`; 
-            });
-            html += '</table><h2>Transaction History</h2><table><tr><th>Date</th><th>Client</th><th>Amount</th></tr>';
-            history.forEach(h => { html += `<tr><td>${formatPretty(h.date)}</td><td>${h.clientName}</td><td>$${h.amount.toFixed(2)}</td></tr>`; });
-            html += '</table></body></html>';
-            const blob = new Blob([html], {type: 'text/html'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'BlackBook_Report.html'; a.click();
-        }
+// --- UTILITY FUNCTIONS ---
+function getClient(id) { return clients.find(x => x.id == id); }
 
-        function showCrashScreen(msg) { const m = document.getElementById('crashModal'); document.getElementById('crashMsg').innerText = msg; m.style.display = 'flex'; }
-        function emergencyCopy() { const raw = localStorage.getItem('bbClients'); if(navigator.clipboard) { navigator.clipboard.writeText(raw).then(() => alert("Copied!")); } else { prompt("Copy:", raw); } }
-        function factoryReset() { if(confirm("This deletes everything. Sure?")) { localStorage.clear(); location.reload(); } }
-        
-        let checkoutTotal = 0; let checkoutGiveback = 0; let selectedDisc = 'none';
-        function openCheckout() { 
-            const c = getClient(activeId); 
-            document.getElementById('payPrice').value = c.price || 35; 
-            document.getElementById('payTip').value = 0; 
-            document.getElementById('payDate').value = new Date().toLocaleDateString('en-CA'); 
-            document.getElementById('customDiscBox').style.display = 'none'; 
-            selectedDisc = 'none'; 
-            const nextDate = new Date();
-            nextDate.setDate(nextDate.getDate() + ((c.freq || 4) * 7));
-            document.getElementById('sbDate').innerText = nextDate.toLocaleDateString(undefined, {month:'short', day:'numeric'});
-            const opts = document.getElementById('discountList'); 
-            opts.innerHTML = ''; 
-            addOpt(opts, 'none', 'No Discount', true); 
-            if((c.banked || 0) > 0) addOpt(opts, 'free', `Redeem 1 Free Cut (Banked: ${c.banked})`); 
-            if((c.credit || 0) > 0) addOpt(opts, 'credit', `Redeem $5 Credit (Bal: $${c.credit})`); 
-            if( (c.dob && isMonth(c.dob)) || (c.first && isAnniversary(c.first)) ) { addOpt(opts, 'half', `Redeem 50% Off (Special Month)`); } 
-            addOpt(opts, 'custom', 'Custom % Discount'); 
-            openModal('checkoutModal'); calcTotal(); 
-        }
+function setTab(t, btn) { 
+    activeFilter = t; 
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
+    btn.classList.add('active'); 
+    render(); 
+}
 
-        function addOpt(parent, val, label, selected = false) { const div = document.createElement('div'); div.className = `discount-opt ${selected ? 'selected' : ''}`; div.innerText = label; div.onclick = () => { document.querySelectorAll('.discount-opt').forEach(d => d.classList.remove('selected')); div.classList.add('selected'); selectedDisc = val; document.getElementById('customDiscBox').style.display = val === 'custom' ? 'block' : 'none'; calcTotal(); }; parent.appendChild(div); }
-        function calcTotal() { const base = parseFloat(document.getElementById('payPrice').value) || 0; const tip = parseFloat(document.getElementById('payTip').value) || 0; let discount = 0; if(selectedDisc === 'free') discount = base; if(selectedDisc === 'half') discount = base * 0.5; if(selectedDisc === 'credit') discount = Math.min(base, 5); if(selectedDisc === 'custom') { const pct = parseFloat(document.getElementById('payCustomPct').value) || 0; discount = base * (pct / 100); } checkoutGiveback = discount; checkoutTotal = (base - discount) + tip; document.getElementById('payTotal').innerText = `$${checkoutTotal.toFixed(2)}`; document.getElementById('givebackDisplay').innerText = `Giveback: $${checkoutGiveback.toFixed(2)}`; }
-        
-        function openAddModal() { 
-            document.getElementById('eTitle').innerText = 'New Client'; document.getElementById('eId').value = ''; document.getElementById('eName').value = ''; document.getElementById('ePhone').value = ''; document.getElementById('eInsta').value = ''; document.getElementById('eEmail').value = ''; document.getElementById('eAddr').value = ''; document.getElementById('eRef').value = ''; document.getElementById('eNotes').value = ''; document.getElementById('eIcebreaker').value = ''; document.getElementById('eFormula').value = ''; document.getElementById('ePrice').value = 35; document.getElementById('eFreq').value = 4; document.getElementById('eDob').value = ''; document.getElementById('eFirst').value = new Date().toLocaleDateString('en-CA'); 
-            const tagBox = document.getElementById('eTags'); tagBox.innerHTML = ''; VIBE_TAGS.forEach(t => { const pill = document.createElement('div'); pill.className = 'tag-pill'; pill.innerText = t; pill.onclick = () => pill.classList.toggle('active'); tagBox.appendChild(pill); });
-            openModal('editModal'); 
-        }
-        
-        function editClient() { 
-            closeModal('viewModal'); 
-            const c = getClient(activeId); 
-            document.getElementById('eTitle').innerText = 'Edit Client'; 
-            document.getElementById('eId').value = c.id; 
-            document.getElementById('eName').value = c.name; 
-            document.getElementById('ePhone').value = c.phone; 
-            document.getElementById('eInsta').value = c.insta; 
-            document.getElementById('eEmail').value = c.email || ''; 
-            document.getElementById('ePrice').value = c.price; 
-            document.getElementById('eAddr').value = c.address; 
-            document.getElementById('eFreq').value = c.freq; 
-            document.getElementById('eFirst').value = c.first; 
-            document.getElementById('eDob').value = c.dob; 
-            document.getElementById('eRef').value = c.refBy || ''; 
-            document.getElementById('eNotes').value = c.notes; 
-            document.getElementById('eIcebreaker').value = c.icebreaker || '';
-            document.getElementById('eFormula').value = c.formula || ''; 
-            const tagBox = document.getElementById('eTags');
-            tagBox.innerHTML = '';
-            const myTags = c.tags || [];
-            VIBE_TAGS.forEach(t => {
-                const pill = document.createElement('div');
-                pill.className = `tag-pill ${myTags.includes(t) ? 'active' : ''}`;
-                pill.innerText = t;
-                pill.onclick = () => pill.classList.toggle('active');
-                tagBox.appendChild(pill);
-            });
-            openModal('editModal'); 
-        }
+function getStatus(c) { 
+    const refDate = c.last || c.first; 
+    if(!refDate) return 'good'; 
+    const last = new Date(refDate); 
+    const today = new Date(); 
+    const diff = (today - last)/(1000*60*60*24); 
+    const freqDays = (c.freq || 4) * 7; 
+    if(diff >= 56) return 'overdue'; 
+    if(diff >= freqDays) return 'due'; 
+    return 'good'; 
+}
 
-        async function saveClient() { 
-            const id = document.getElementById('eId').value || Date.now().toString(); 
-            const isNew = !document.getElementById('eId').value; 
-            const refName = document.getElementById('eRef').value; 
-            let creditAdd = 0; 
-        
-            // Find existing data if editing
-            const existing = isNew ? null : getClient(id);
-        
-            if(isNew && refName) { 
-                const referee = clients.find(x => x.name.toLowerCase() === refName.toLowerCase()); 
-                if(referee) { 
-                    referee.credit = (referee.credit || 0) + 5; 
-                    creditAdd = 5; 
-                    await customConfirm(`Linked to ${referee.name}! $5 added to both.`); 
-                } 
-            } 
-        
-            const selectedTags = Array.from(document.querySelectorAll('#eTags .tag-pill.active')).map(x => x.innerText);
-            const formFirst = document.getElementById('eFirst').value; 
-            
-            const data = { 
-                id: id, 
-                name: document.getElementById('eName').value, 
-                phone: document.getElementById('ePhone').value, 
-                insta: document.getElementById('eInsta').value, 
-                email: document.getElementById('eEmail').value, 
-                address: document.getElementById('eAddr').value, 
-                price: parseFloat(document.getElementById('ePrice').value) || 0, 
-                freq: parseInt(document.getElementById('eFreq').value) || 4, 
-                first: formFirst, 
-                dob: document.getElementById('eDob').value, 
-                refBy: refName, 
-                notes: document.getElementById('eNotes').value, 
-                icebreaker: document.getElementById('eIcebreaker').value,
-                formula: document.getElementById('eFormula').value, 
-                tags: selectedTags,
-                credit: isNew ? creditAdd : existing.credit, 
-                banked: isNew ? 0 : existing.banked, 
-                loyalty: isNew ? 0 : existing.loyalty, 
-                spent: isNew ? 0 : existing.spent, 
-                giveback: isNew ? 0 : existing.giveback, 
-                cuts: isNew ? 0 : existing.cuts, 
-                // Logic fix: ensures scheduling works even if first cut date is adjusted later
-                last: (isNew || !existing.last || existing.last === existing.first) ? formFirst : existing.last,
-                strikes: isNew ? 0 : (existing.strikes || 0), 
-                archived: isNew ? false : (existing.archived || false) 
-            }; 
-        
-            if(isNew) clients.push(data); 
-            else { const idx = clients.findIndex(x => x.id === id); clients[idx] = data; } 
-            saveAll(); 
-            closeModal('editModal'); 
-            render(); 
-        }
-        
-        async function deleteClient() { if(await customConfirm("Permanently delete this client?")) { clients = clients.filter(c => c.id !== document.getElementById('eId').value); saveAll(); closeModal('editModal'); render(); } }
-        async function addStrike() { const c = getClient(activeId); if(await customConfirm(`Mark ${c.name} as a No-Show? \n\nAdds a Strike 🚩.`)) { c.strikes = (c.strikes || 0) + 1; saveAll(); closeModal('viewModal'); render(); } }
-        async function removeStrike() { const c = getClient(activeId); if(await customConfirm("Remove one Strike 🚩?")) { c.strikes = Math.max(0, (c.strikes || 0) - 1); saveAll(); closeModal('viewModal'); render(); } }
-        function openSmsMenu() { openModal('smsModal'); }
+function getDueStr(c) { 
+    const refDate = c.last || c.first; 
+    if(!refDate) return 'Today'; 
+    const next = new Date(refDate); 
+    next.setDate(next.setDate(next.getDate() + ((c.freq||4)*7))); 
+    return next.toLocaleDateString(undefined, {month:'short', day:'numeric'}); 
+}
 
-        // --- UPDATED CROSS-PLATFORM SMS LOGIC ---
-        function sendSms(type) { 
-            const c = getClient(activeId); if(!c || !c.phone) return alert('No phone saved.'); 
-            const first = c.name.split(' ')[0]; let msg = ''; 
-            if(type === 'late') msg = `Hey ${first}, running about 15 mins late. So sorry!`; 
-            if(type === 'confirm') msg = `Yo ${first}, just confirming our cut. You still good?`; 
-            if(type === 'longtime') msg = `Hey ${first}, been a while! Time to clean up that cut?`; 
-            if(type === 'followup') msg = `Appreciate you coming through ${first}! How's the cut treating you?`; 
-            if(type === 'review') msg = `Yo ${first}, appreciate the cut! If you have a sec, rate it here:\n\nhttps://mannyserrano4-oss.github.io/crispy-enigma/reviews`; 
-            if(type === 'custom') msg = `Hey ${first}, `;
-            
-            // Detect iOS for proper separator (? vs &)
-            const ua = navigator.userAgent.toLowerCase();
-            const isApple = ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1;
-            const sep = isApple ? '&' : '?';
-            
-            window.location.href = `sms:${c.phone}${sep}body=${encodeURIComponent(msg)}`; 
-            closeModal('smsModal'); 
-        }
+function getLoyaltyVisual(n) { 
+    n = n || 0; 
+    let s = ''; 
+    for(let i=0; i<5; i++) { s += (i < n) ? '✂️' : '⚪'; } 
+    return s; 
+}
 
-        function restoreData(input) {
-            const r = new FileReader();
-            r.onload = (e) => {
-                try {
-                    const d = JSON.parse(e.target.result);
-                    if(d.clients) { clients = d.clients; settings = d.settings || settings; history = d.history || []; saveAll(); render(); alert('Database Restored Successfully!'); closeModal('settingsModal'); }
-                } catch(err) { alert("Error loading file: " + err); }
-            };
-            r.readAsText(input.files[0]);
+function formatPretty(dateStr) {
+    if(!dateStr) return 'Never';
+    try {
+        const [y, m, d] = dateStr.split('-'); 
+        const date = new Date(y, m-1, d); 
+        return date.toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'});
+    } catch(e) { return dateStr; }
+}
+
+// --- MODAL ACTIONS ---
+function showClient(id) {
+    activeId = id;
+    const c = getClient(id);
+    if(!c) return;
+
+    document.getElementById('vName').innerText = c.name + (c.strikes > 0 ? ` (${c.strikes}🚩)` : '');
+    document.getElementById('vSub').innerText = c.phone || 'No Phone';
+    document.getElementById('vFormula').innerText = c.formula || "No cut formula saved.";
+    
+    const iceBox = document.getElementById('vIcebreaker');
+    if(c.icebreaker) {
+        document.getElementById('vIceText').innerText = "Ask about: " + c.icebreaker;
+        iceBox.style.display = 'flex';
+    } else { iceBox.style.display = 'none'; }
+
+    document.getElementById('vLoyalty').innerText = getLoyaltyVisual(c.loyalty);
+    document.getElementById('vCredit').innerText = `$${(c.credit||0).toFixed(2)}`;
+    document.getElementById('vTotalCuts').innerText = c.cuts||0;
+    document.getElementById('vLTV').innerText = `$${(c.spent||0).toFixed(2)}`;
+    
+    document.getElementById('btnCall').href = `tel:${c.phone}`;
+    document.getElementById('btnInsta').style.display = c.insta ? 'block' : 'none';
+    
+    // Address/Navigation
+    const navBtn = document.getElementById('btnNav');
+    if(c.address) {
+        navBtn.style.display = 'flex';
+        navBtn.href = `maps://?q=${encodeURIComponent(c.address)}`;
+    } else { navBtn.style.display = 'none'; }
+
+    openModal('viewModal');
+}
+
+function openAddModal() {
+    activeId = null;
+    document.getElementById('eTitle').innerText = 'New Client';
+    document.getElementById('eId').value = '';
+    document.getElementById('eName').value = '';
+    document.getElementById('ePhone').value = '';
+    document.getElementById('ePrice').value = 35;
+    document.getElementById('eFreq').value = 4;
+    document.getElementById('eFirst').value = new Date().toLocaleDateString('en-CA');
+    
+    // Clear Tags
+    const tagBox = document.getElementById('eTags');
+    tagBox.innerHTML = '';
+    VIBE_TAGS.forEach(t => {
+        const pill = document.createElement('div');
+        pill.className = 'tag-pill';
+        pill.innerText = t;
+        pill.onclick = () => pill.classList.toggle('active');
+        tagBox.appendChild(pill);
+    });
+    
+    openModal('editModal');
+}
+
+async function saveClient() {
+    const id = document.getElementById('eId').value || Date.now().toString();
+    const isNew = !document.getElementById('eId').value;
+    
+    const selectedTags = Array.from(document.querySelectorAll('#eTags .tag-pill.active')).map(x => x.innerText);
+    
+    const newClient = {
+        id: id,
+        name: document.getElementById('eName').value,
+        phone: document.getElementById('ePhone').value,
+        insta: document.getElementById('eInsta').value,
+        email: document.getElementById('eEmail').value,
+        address: document.getElementById('eAddr').value,
+        price: parseFloat(document.getElementById('ePrice').value) || 0,
+        freq: parseInt(document.getElementById('eFreq').value) || 4,
+        first: document.getElementById('eFirst').value,
+        dob: document.getElementById('eDob').value,
+        notes: document.getElementById('eNotes').value,
+        icebreaker: document.getElementById('eIcebreaker').value,
+        formula: document.getElementById('eFormula').value,
+        tags: selectedTags,
+        archived: false,
+        strikes: 0,
+        loyalty: 0,
+        spent: 0,
+        cuts: 0
+    };
+
+    if(isNew) {
+        clients.push(newClient);
+    } else {
+        const idx = clients.findIndex(c => c.id == id);
+        // Merge with existing stats
+        clients[idx] = {...clients[idx], ...newClient};
+    }
+
+    saveAll();
+    closeModal('editModal');
+    render();
+}
+
+// THEME TOGGLE
+function toggleTheme() {
+    isDark = !isDark;
+    document.body.classList.toggle('dark-mode');
+    saveAll();
+}
+
+// DISCOUNTS & CHECKOUT
+let checkoutTotal = 0;
+let checkoutGiveback = 0;
+let selectedDisc = 'none';
+
+function openCheckout() {
+    const c = getClient(activeId);
+    document.getElementById('payPrice').value = c.price || 35;
+    document.getElementById('payTip').value = 0;
+    document.getElementById('payDate').value = new Date().toLocaleDateString('en-CA');
+    
+    // Simple logic for discount options (you can expand this)
+    const opts = document.getElementById('discountList');
+    opts.innerHTML = '<div class="discount-opt selected" onclick="selectDiscount(this, \'none\')">No Discount</div>';
+    opts.innerHTML += '<div class="discount-opt" onclick="selectDiscount(this, \'custom\')">Custom %</div>';
+    
+    openModal('checkoutModal');
+    calcTotal();
+}
+
+function selectDiscount(el, val) {
+    document.querySelectorAll('.discount-opt').forEach(d => d.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedDisc = val;
+    document.getElementById('customDiscBox').style.display = val === 'custom' ? 'block' : 'none';
+    calcTotal();
+}
+
+function calcTotal() {
+    const base = parseFloat(document.getElementById('payPrice').value) || 0;
+    const tip = parseFloat(document.getElementById('payTip').value) || 0;
+    let discount = 0;
+    
+    if(selectedDisc === 'custom') {
+        const pct = parseFloat(document.getElementById('payCustomPct').value) || 0;
+        discount = base * (pct / 100);
+    }
+    
+    checkoutGiveback = discount;
+    checkoutTotal = (base - discount) + tip;
+    
+    document.getElementById('payTotal').innerText = `$${checkoutTotal.toFixed(2)}`;
+    document.getElementById('givebackDisplay').innerText = `Giveback: $${checkoutGiveback.toFixed(2)}`;
+}
+
+function finalizeCut() {
+    const c = getClient(activeId);
+    c.spent = (Number(c.spent) || 0) + checkoutTotal;
+    c.cuts = (Number(c.cuts) || 0) + 1;
+    c.last = document.getElementById('payDate').value;
+    c.loyalty = ((Number(c.loyalty) || 0) + 1) % 5;
+
+    history.push({
+        clientId: c.id,
+        clientName: c.name,
+        date: c.last,
+        amount: checkoutTotal
+    });
+
+    saveAll();
+    closeModal('checkoutModal');
+    closeModal('viewModal');
+    render();
+}
+
+// CRASH HANDLERS
+function showCrashScreen(msg) { 
+    const m = document.getElementById('crashModal'); 
+    document.getElementById('crashMsg').innerText = msg; 
+    m.style.display = 'flex'; 
+}
+function factoryReset() { 
+    if(confirm("Delete all data permanently?")) { 
+        localStorage.clear(); 
+        location.reload(); 
+    } 
+}
         }
     </script>
 </body>
