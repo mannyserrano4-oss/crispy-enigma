@@ -514,7 +514,7 @@
                 </div>
                 <button class="btn btn-primary">Save Client</button>
                 <button type="button" class="btn btn-red" onclick="deleteClient()">Delete</button>
-                <button type="button" class="btn btn-ghost" onclick="closeModal('editModal')">Cancel</button>
+                <button type="button" class="btn btn-ghost" onclick="cancelEdit()">Cancel</button>
             </form>
         </div>
     </div>
@@ -606,8 +606,9 @@
         let activeFilter = 'all';
         let isDark = false;
         let viewArchives = false;
-        let selectedDisc = 'none'; // Global for current checkout session only
-        
+        let selectedDisc = 'none'; 
+        let editInitialState = ""; // Tracks if data has changed for "Cancel" alert
+
         const VIBE_TAGS = ['Silent', 'Talkative', 'Tipper', 'Sensitive Skin', 'Sports', 'Chill', 'Late', 'Cash Only', 'Politics', 'Family'];
 
         // --- HELPERS ---
@@ -1023,7 +1024,13 @@
         }
 
         function addToCalendar() { const c = getClient(activeId); const d = new Date(document.getElementById('schedDate').value); const loc = document.getElementById('schedLoc').value === 'shop' ? settings.location : c.address; const end = new Date(d.getTime() + 7200000); const fmt = (x) => x.toISOString().replace(/-|:|\.\d\d\d/g,""); const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART:${fmt(d)}\nDTEND:${fmt(end)}\nSUMMARY:Cut - ${c.name}\nLOCATION:${loc}\nEND:VEVENT\nEND:VCALENDAR`; const blob = new Blob([ics], {type:'text/calendar;charset=utf-8'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'appt.ics'; a.click(); closeModal('schedModal'); }
-        function saveSettings() { settings.location = document.getElementById('setLoc').value; saveAll(); closeModal('settingsModal'); }
+        
+        function saveSettings() { 
+            settings.location = document.getElementById('setLoc').value; 
+            saveAll(); 
+            closeModal('settingsModal'); 
+        }
+        
         function exportData() { const s = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({clients, settings, history})); const a = document.createElement('a'); a.href = s; a.download = 'backup.json'; a.click(); }
         function toggleTheme() { document.body.classList.toggle('dark-mode'); isDark = document.body.classList.contains('dark-mode'); localStorage.setItem('theme', isDark ? 'dark' : 'light'); }
         function getStatus(c) { const refDate = c.last || c.first; if(!refDate) return 'good'; const last = new Date(refDate); const today = new Date(); const days = (today - last)/(1000*60*60*24); const freqDays = (c.freq || 4) * 7; if(days >= 56) return 'overdue'; if(days >= freqDays) return 'due'; return 'good'; }
@@ -1063,6 +1070,26 @@
             parent.appendChild(div); 
         }
         
+        function captureEditState() {
+            const fields = ['eName', 'ePhone', 'eInsta', 'eEmail', 'eAddr', 'ePrice', 'eFreq', 'eFirst', 'eDob', 'eRef', 'eNotes', 'eIcebreaker', 'eFormula'];
+            let state = "";
+            fields.forEach(f => {
+                const el = document.getElementById(f);
+                if (el) state += el.value;
+            });
+            // Also include active tags
+            state += Array.from(document.querySelectorAll('#eTags .tag-pill.active')).map(x => x.innerText).join("");
+            return state;
+        }
+
+        async function cancelEdit() {
+            const currentState = captureEditState();
+            if (currentState !== editInitialState) {
+                if (!await customConfirm("Discard unsaved changes?")) return;
+            }
+            closeModal('editModal');
+        }
+
         function openAddModal() { 
             document.getElementById('eTitle').innerText = 'New Client'; 
             document.getElementById('eId').value = ''; 
@@ -1087,6 +1114,7 @@
                 pill.onclick = () => pill.classList.toggle('active'); 
                 tagBox.appendChild(pill); 
             });
+            editInitialState = captureEditState();
             openModal('editModal'); 
         }
         
@@ -1118,6 +1146,7 @@
                 pill.onclick = () => pill.classList.toggle('active');
                 tagBox.appendChild(pill);
             });
+            editInitialState = captureEditState();
             openModal('editModal'); 
         }
 
