@@ -860,7 +860,29 @@
             render();
             alert(`Walk-In Recorded: $${total.toFixed(2)}`);
         }
-      }
+
+        async function deleteTransaction(idx) {
+            const h = history[idx];
+            if(await customConfirm(`Delete $${h.amount.toFixed(2)} entry for ${h.clientName}?\n\nThis will also reverse their cut stats.`)) {
+                const c = getClient(h.clientId);
+                if(c) {
+                    c.spent = Math.max(0, (c.spent || 0) - h.amount);
+                    c.cuts = Math.max(0, (c.cuts || 0) - 1);
+                    
+                    // Logic to reverse loyalty and banked cuts
+                    if (c.loyalty === 0 && (c.banked || 0) > 0) {
+                        c.loyalty = 4; 
+                        c.banked -= 1;
+                    } else {
+                        c.loyalty = Math.max(0, (c.loyalty || 0) - 1);
+                    }
+                }
+                history.splice(idx, 1);
+                saveAll();
+                render();
+                openHistory();
+            }
+        }
         async function deleteTransaction(idx) {
           const h = history[idx];
           if(await customConfirm(`Delete $${h.amount.toFixed(2)} entry for ${h.clientName}?\n\nThis will also reverse their cut stats.`)) {
