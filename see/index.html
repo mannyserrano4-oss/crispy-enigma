@@ -275,6 +275,20 @@
             font-weight: bold; margin-top: 15px; font-size: 1rem; cursor: pointer;
         }
         .fa-crown { color: var(--p-gold); filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.4)); }
+        
+                /* --- FIX FOR ICEBREAKER VISIBILITY --- */
+        #eIcebreaker {
+            color: #212121 !important; /* Force dark text to contrast with yellow bg */
+            -webkit-text-fill-color: #212121 !important; /* Ensures iOS renders it dark */
+        }
+        
+        /* Optional: Make the yellow background slightly darker in dark mode so it hurts eyes less */
+        body.dark-mode #eIcebreaker {
+            background: #fbc02d !important;
+            border-color: #f57f17 !important;
+        }
+
+        
     </style>
 </head>
 <body>
