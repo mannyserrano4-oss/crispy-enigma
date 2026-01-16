@@ -50,29 +50,33 @@
 
     <script>
     function downloadVCard() {
-        // 1. LOGO DATA
-        const logoBase64 = "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"; 
+        // We create the notes string separately to ensure the line breaks work perfectly
+        const notesLine = [
+            "📅 Book: https://mannyserrano4-oss.github.io/crispy-enigma/book/",
+            "🎁 Referral: Both get $5 OFF when they mention you!",
+            "🔥 Loyalty: Every 6th cut is FREE! ✂️",
+            "🔔 VIP Deals: https://mannyserrano.substack.com/",
+            "📍 Mobile in Tampa & St Pete.",
+            "🎭 Sharp fades, mid jokes."
+        ].join("\\n"); // This ensures the iPhone sees the breaks
 
-        // 2. VCARD CONTENT (Corrected formatting)
         const vcard = `BEGIN:VCARD
 VERSION:3.0
 N:Serrano;Manny;;;
 FN:Manny Serrano
 ORG:MAS Barbery
 TITLE:Barber & Comedian
-PHOTO;ENCODING=b;TYPE=PNG:${logoBase64}
-TEL;TYPE=CELL;TYPE=VOICE;TYPE=PREF:9014437347
+PHOTO;VALUE=URI:https://mannyserrano4-oss.github.io/crispy-enigma/gitpp.png
+TEL;TYPE=CELL;TYPE=VOICE;TYPE=PREF:9014437338
 EMAIL:mannyserrano4@gmail.com
 URL:https://mannyserrano4-oss.github.io/crispy-enigma/
-// ADR;TYPE=WORK:;;123 Shop St;Tampa;FL;33602;USA
 item1.URL:https://instagram.com/mas_barbery
 item1.X-ABLabel:Barbering IG
 item2.URL:https://instagram.com/monotonebaritone
 item2.X-ABLabel:Comedy IG
-NOTE:📅 Book: https://mannyserrano4-oss.github.io/crispy-enigma/book/\\n🎁 Referral: Both get $5 OFF when they mention you!\\n🔥 Loyalty: Every 6th cut is FREE! ✂️\\n🔔 VIP Deals: https://mannyserrano.substack.com/\\n📍 Mobile in Tampa & St Pete.\\n🎭 Sharp fades, mid jokes.
+NOTE:${notesLine}
 END:VCARD`;
         
-        // 3. GENERATE BLOB
         const blob = new Blob([vcard], { type: "text/vcard" });
         const url = URL.createObjectURL(blob);
         const newLink = document.createElement('a');
@@ -82,7 +86,6 @@ END:VCARD`;
         URL.revokeObjectURL(url);
     }
 
-    // Auto-trigger the download after 1.5 seconds
     window.onload = () => {
         setTimeout(downloadVCard, 1500);
     };
