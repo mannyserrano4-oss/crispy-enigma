@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saving Contact... | Manny Serrano</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(-45deg, #e9d5ff, #f5d0fe, #c4b5fd, #a78bfa);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .loader {
+            border-top-color: #7c3aed;
+            animation: spinner 1.5s linear infinite;
+        }
+
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
+
+    <div class="glass-card w-full max-w-sm rounded-3xl p-8 text-center shadow-2xl">
+        <div class="mb-6">
+            <img src="gitpp.png" alt="Manny Serrano" class="w-20 h-20 rounded-full mx-auto border-2 border-white shadow-md object-cover">
+        </div>
+
+        <h1 class="text-2xl font-black text-violet-900 mb-2">Manny Serrano</h1>
+        <p class="text-violet-700 font-medium mb-8">MAS Barbery & Comedy</p>
+
+        <div class="flex flex-col items-center justify-center space-y-4">
+            <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
+            <p class="text-sm font-bold text-violet-800 animate-pulse">Saving to contacts...</p>
+        </div>
+
+        <div class="mt-10 pt-6 border-t border-white/30">
+            <p class="text-xs text-gray-600 mb-3">If the download didn't start automatically:</p>
+            <button onclick="downloadVCard()" class="bg-violet-600 hover:bg-violet-700 text-white text-sm font-bold py-3 px-6 rounded-xl transition-all active:scale-95 shadow-lg">
+                <i class="fa-solid fa-user-plus mr-2"></i> Download Contact
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function downloadVCard() {
+            const vcard = `BEGIN:VCARD
+VERSION:3.0
+N:Serrano;Manny;;;
+FN:Manny Serrano
+ORG:MAS Barbery
+TITLE:Barber & Comedian
+TEL;TYPE=CELL;TYPE=VOICE;TYPE=PREF:9014437338
+EMAIL:mannyserrano4@gmail.com
+URL:https://mannyserrano4-oss.github.io/crispy-enigma/
+ADR;TYPE=WORK:;;Tampa;FL;;;
+X-SOCIALPROFILE;TYPE=instagram:https://instagram.com/mas_barbery
+X-SOCIALPROFILE;TYPE=instagram:https://instagram.com/monotonebaritone
+NOTE:✂️ Sharp tapers & questionable humor.
+END:VCARD`;
+
+            const blob = new Blob([vcard], { type: "text/vcard" });
+            const url = URL.createObjectURL(blob);
+            const newLink = document.createElement('a');
+            newLink.download = "Manny_Serrano.vcf";
+            newLink.href = url;
+            newLink.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Auto-trigger the download after a 1.5 second "loading" delay
+        window.onload = () => {
+            setTimeout(downloadVCard, 1500);
+        };
+    </script>
+</body>
+</html>
