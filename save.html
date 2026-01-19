@@ -49,42 +49,87 @@
     </div>
 
     <script>
-    function downloadVCard() {
-        // We create the notes string separately to ensure the line breaks work perfectly
-        const notesLine = [
-            "📅 Book: https://mannyserrano4-oss.github.io/crispy-enigma/book/",
-            "🎁 Referral: Both get $5 OFF when they mention you!",
-            "🔥 Loyalty: Every 6th cut is FREE! ✂️",
-            "🔔 VIP Deals: https://mannyserrano.substack.com/",
-            "📍 Mobile in Tampa & St Pete.",
-            "🎭 Sharp fades, mid jokes."
-        ].join("\\n"); // This ensures the iPhone sees the breaks
-
-        const vcard = `BEGIN:VCARD
-VERSION:3.0
-N:Serrano;Manny;;;
-FN:Manny Serrano
-ORG:MAS Barbery
-TITLE:Barber & Comedian
-PHOTO;VALUE=URI:https://mannyserrano4-oss.github.io/crispy-enigma/gitpp.png
-TEL;TYPE=CELL;TYPE=VOICE;TYPE=PREF:9014437338
-EMAIL:mannyserrano4@gmail.com
-URL:https://mannyserrano4-oss.github.io/crispy-enigma/
-item1.URL:https://instagram.com/mas_barbery
-item1.X-ABLabel:Barbering IG
-item2.URL:https://instagram.com/monotonebaritone
-item2.X-ABLabel:Comedy IG
-NOTE:${notesLine}
-END:VCARD`;
+    // 3. SAVE CONTACT FUNCTION (Master Version)
+        function downloadVCard() {
+            const contact = {
+                firstName: "Manny",
+                lastName: "Serrano",
+                org: "MAS Barbery",
+                // SEARCH SEO: Including "Barber", "Fades", and "Tampa" here 
+                // makes you show up when clients search those terms in their contacts.
+                title: "Barber / Fades / Comedian / Tampa", 
+                phone: "9014437338",
+                email: "mannyserrano4@gmail.com",
+                website: "https://mannyserrano4-oss.github.io/crispy-enigma/",
+                photoUrl: "https://mannyserrano4-oss.github.io/crispy-enigma/gitpp.png",
+                barberIG: "mas_barbery",
+                comedyIG: "monotonebaritone",
+                cashApp: "YOUR_CASHAPP_TAG" // Replace with your actual tag (no $)
+            };
         
-        const blob = new Blob([vcard], { type: "text/vcard" });
-        const url = URL.createObjectURL(blob);
-        const newLink = document.createElement('a');
-        newLink.download = "Manny_Serrano.vcf";
-        newLink.href = url;
-        newLink.click();
-        URL.revokeObjectURL(url);
-    }
+            // --- FUTURE SHOP SETUP ---
+            // When you get a shop, fill these out, uncomment them, and uncomment the 📍 and 🗺️ lines in the notes below.
+            //const shopName = "Fade Masters"; 
+            //const shopAddress = "1234 Barber Ln";
+            //const suiteChair = "Suite 10, Chair 3"; // Added Suite and Chair
+            //const shopCityState = "Tampa, FL 33602";
+            //const googleMapsLink = "https://maps.google.com/your-shop-link";
+        
+            const notesLine = [
+                // "📍 Shop: " + shopName + " (" + suiteChair + ")", // UNCOMMENT LATER
+                // "🏢 Address: " + shopAddress + ", " + shopCityState, // UNCOMMENT LATER
+                // "🗺️ Directions: " + googleMapsLink, // UNCOMMENT LATER
+                "📅 Book: https://mannyserrano4-oss.github.io/crispy-enigma/book/",
+                `💸 CashApp: https://cash.app/$${contact.cashApp}`,
+                `🏦 Zelle: ${contact.phone}`,
+                "🎁 Referral: Both get $5 OFF when they mention you!",
+                "🔥 Loyalty: Every 6th cut is FREE! ✂️",
+                "🔔 VIP Deals: https://mannyserrano.substack.com/",
+                "📍 Mobile in Tampa & St Pete.",
+                "🎭 Sharp fades, mid jokes."
+            ].join("\\n");
+        
+            const vcard = [
+                "BEGIN:VCARD",
+                "VERSION:3.0",
+                `N:${contact.lastName};${contact.firstName};;;`,
+                `FN:${contact.firstName} ${contact.lastName}`,
+                `ORG:${contact.org}`,
+                `TITLE:${contact.title}`,
+                `PHOTO;VALUE=URI:${contact.photoUrl}`,
+                `TEL;TYPE=CELL;TYPE=VOICE;TYPE=PREF:${contact.phone}`,
+                `EMAIL:${contact.email}`,
+                `URL:${contact.website}`,
+                
+                // MOBILE SEO: Categorizes you as a Tampa service while you are mobile.
+                `ADR;TYPE=WORK:;;;Tampa;FL;;USA`, 
+        
+                /* 🏠 FUTURE SHOP ADDRESS: 
+                   When you get a shop, delete the ADR line above and use this one instead:
+                   `ADR;TYPE=WORK:;${suiteChair};${shopAddress};Tampa;FL;33602;USA`,
+                */
+        
+                // Instagram App Launchers (X-SOCIALPROFILE triggers the IG icon on iOS)
+                `X-SOCIALPROFILE;type=instagram:https://instagram.com/${contact.barberIG}`,
+                `X-SOCIALPROFILE;type=instagram:https://instagram.com/${contact.comedyIG}`,
+                `item1.URL:https://instagram.com/${contact.barberIG}`,
+                "item1.X-ABLabel:Barbering IG",
+                `item2.URL:https://instagram.com/${contact.comedyIG}`,
+                "item2.X-ABLabel:Comedy IG",
+                
+                `NOTE:${notesLine}`,
+                "END:VCARD"
+            ].join("\n");
+        
+            // Download Logic
+            const blob = new Blob([vcard], { type: "text/vcard" });
+            const url = URL.createObjectURL(blob);
+            const newLink = document.createElement('a');
+            newLink.download = "Manny_Serrano_Barber.vcf"; 
+            newLink.href = url;
+            newLink.click();
+            URL.revokeObjectURL(url);
+        }
 
     window.onload = () => {
         setTimeout(downloadVCard, 1500);
