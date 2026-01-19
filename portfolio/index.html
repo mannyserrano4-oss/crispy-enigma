@@ -160,25 +160,67 @@
 
     </div>
 
-    <div class="text-center mt-12 mb-6">
-        <p class="text-xs text-violet-900 font-bold opacity-80 mb-1">
-            &copy; <span id="year">2025</span> Manny Serrano.
-        </p>
-        <script>
-            document.getElementById("year").textContent = new Date().getFullYear();
-        </script>
-        <p class="text-[10px] text-violet-800 opacity-60 italic">
-            I want to thank my clients for their trust and permission for providing these photos.
-        </p>
+    <footer class="max-w-4xl mx-auto px-6 border-t border-gray-200 pt-16 pb-12 text-center mt-20">
+
+    <div class="flex justify-center gap-10 mb-10">
+
+        <a href="mailto:mannyserrano4@gmail.com" title="Email Manny" class="text-gray-400 hover:text-violet-600 transition-all hover:scale-110">
+
+            <i class="fa-solid fa-envelope text-2xl"></i>
+
+        </a>
+
+
+
+        <a href="https://instagram.com/mas_barbery" target="_blank" title="Instagram" class="text-gray-400 hover:text-pink-500 transition-all hover:scale-110">
+
+            <i class="fa-brands fa-instagram text-2xl"></i>
+
+        </a>
+
+
+
+        <a href="https://www.facebook.com/share/1ChXo1WokK/?mibextid=wwXIfr" target="_blank" title="Facebook" class="text-gray-400 hover:text-blue-600 transition-all hover:scale-110">
+
+            <i class="fa-brands fa-facebook text-2xl"></i>
+
+        </a>
+
+
+
+        <a href="https://mannyserrano4-oss.github.io/crispy-enigma/" target="_blank" title="Main Menu" class="text-gray-400 hover:text-gray-900 transition-all hover:scale-110">
+
+            <i class="fa-solid fa-address-card text-2xl"></i>
+
+        </a>
+
     </div>
 
-    <div id="lightbox" class="hidden fixed inset-0 z-50 bg-black/95 backdrop-blur-sm flex items-center justify-center p-4" onclick="closeLightbox()">
-        <div class="relative max-w-2xl w-full">
-            <button class="absolute -top-12 right-0 text-white/80 hover:text-white text-4xl font-bold p-2">&times;</button>
-            <img id="lightbox-img" src="" class="w-full h-auto max-h-[80vh] object-contain rounded-lg shadow-2xl border border-white/20">
-            <p class="text-white/60 text-center text-xs mt-4">Tap anywhere to close</p>
-        </div>
-    </div>
+
+
+    <p class="text-[10px] text-gray-400 uppercase tracking-[0.4em] font-black mb-2">
+
+        &copy; <span id="footer-year"></span> Manny Serrano • More Than A Cut
+
+    </p>
+
+    
+
+    <p class="text-[10px] text-violet-800 opacity-60 italic">
+
+        I bring the shop to your house, and the jokes to your face.
+
+    </p>
+
+
+
+    <script>
+
+        document.getElementById("footer-year").textContent = new Date().getFullYear();
+
+    </script>
+
+</footer>
 
     <script>
         const lightbox = document.getElementById('lightbox');
