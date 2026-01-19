@@ -185,11 +185,11 @@
             <p class="text-xs font-bold text-violet-800 uppercase tracking-widest text-center mb-2 mt-6">Follow Me</p>
             
             <div class="grid grid-cols-2 gap-3">
-                <a href="https://www.instagram.com/mas_barbery" target="_blank" class="ios-btn flex flex-col items-center justify-center p-3 rounded-2xl">
+                <a href="https://www.instagram.com/_u/mas_barbery" target="_blank" class="ios-btn flex flex-col items-center justify-center p-3 rounded-2xl">
                     <i class="fa-brands fa-instagram text-2xl text-pink-600 mb-1"></i>
                     <span class="text-xs font-bold text-violet-900">Barbering</span>
                 </a>
-                <a href="https://www.instagram.com/monotonebaritone" target="_blank" class="ios-btn flex flex-col items-center justify-center p-3 rounded-2xl">
+                <a href="https://www.instagram.com/_u/monotonebaritone" target="_blank" class="ios-btn flex flex-col items-center justify-center p-3 rounded-2xl">
                     <i class="fa-brands fa-instagram text-2xl text-purple-600 mb-1"></i>
                     <span class="text-xs font-bold text-violet-900">Comedy</span>
                 </a>
@@ -316,14 +316,24 @@
                 firstName: "Manny",
                 lastName: "Serrano",
                 org: "MAS Barbery",
-                title: "Barber",
-                phone: "9014437338", // <--- Put the actual number here in quotes
+                title: "Barber & Comedian",
+                phone: "9014437338",
                 email: "mannyserrano4@gmail.com",
                 website: "https://mannyserrano4-oss.github.io/crispy-enigma/",
-                instagram: "mas_barbery",
-                city: "Tampa, FL"
+                photoUrl: "https://mannyserrano4-oss.github.io/crispy-enigma/gitpp.png",
+                barberIG: "mas_barbery",
+                comedyIG: "monotonebaritone"
             };
-
+        
+            const notesLine = [
+                "📅 Book: https://mannyserrano4-oss.github.io/crispy-enigma/book/",
+                "🎁 Referral: Both get $5 OFF when they mention you!",
+                "🔥 Loyalty: Every 6th cut is FREE! ✂️",
+                "🔔 VIP Deals: https://mannyserrano.substack.com/",
+                "📍 Mobile in Tampa & St Pete.",
+                "🎭 Sharp fades, mid jokes."
+            ].join("\\n");
+        
             const vcard = [
                 "BEGIN:VCARD",
                 "VERSION:3.0",
@@ -331,19 +341,31 @@
                 `FN:${contact.firstName} ${contact.lastName}`,
                 `ORG:${contact.org}`,
                 `TITLE:${contact.title}`,
-                `TEL;TYPE=CELL:${contact.phone}`,
+                `PHOTO;VALUE=URI:${contact.photoUrl}`,
+                `TEL;TYPE=CELL;TYPE=VOICE;TYPE=PREF:${contact.phone}`,
                 `EMAIL:${contact.email}`,
                 `URL:${contact.website}`,
-                `ADR;TYPE=WORK:;;${contact.city};;;;`,
-                `X-SOCIALPROFILE;type=instagram:https://www.instagram.com/${contact.instagram}`,
-                `NOTE:✂️ Join my VIP List for last-minute openings & discounts: https://mannyserrano.substack.com/`,
+                
+                // SOCIAL PROFILES (Helps iOS open the app directly from the contact card)
+                `X-SOCIALPROFILE;type=instagram:https://instagram.com/${contact.barberIG}`,
+                `X-SOCIALPROFILE;type=instagram:https://instagram.com/${contact.comedyIG}`,
+        
+                // CUSTOM LABELS (Shows up as clickable links in the "URL" section)
+                `item1.URL:https://instagram.com/${contact.barberIG}`,
+                "item1.X-ABLabel:Barbering IG",
+                `item2.URL:https://instagram.com/${contact.comedyIG}`,
+                "item2.X-ABLabel:Comedy IG",
+                
+                // ADR;TYPE=WORK:;;123 Shop St;Tampa;FL;33602;USA
+                
+                `NOTE:${notesLine}`,
                 "END:VCARD"
             ].join("\n");
-
+        
             const blob = new Blob([vcard], { type: "text/vcard" });
             const url = URL.createObjectURL(blob);
             const newLink = document.createElement('a');
-            newLink.download = "Manny_Barber.vcf";
+            newLink.download = "Manny_Serrano.vcf";
             newLink.href = url;
             newLink.click();
             URL.revokeObjectURL(url);
