@@ -535,12 +535,12 @@
                             <input type="number" id="eBanked" value="0" min="0" inputmode="numeric" pattern="[0-9]*">
                         </div>
                         <div>
-                            <label style="font-size:0.7rem;">Points (0-4 ✂️)</label>
+                            <label style="font-size:0.7rem;">Points (0-4 ✂️)</label>   <!-- 0-9 here -->
                             <input type="number" id="eLoyalty" value="0" min="0" max="4" inputmode="numeric" pattern="[0-9]*">
                         </div>
                     </div>
                     <p style="font-size: 0.65rem; color: var(--text-sub); margin: 0; font-style: italic;">
-                        *Use this to manually fix mistakes. 5 points automatically = 1 Banked Cut.
+                        *Use this to manually fix mistakes. 5 points automatically = 1 Banked Cut.  <!-- 10 points -->
                     </p>
                 </div>
 
@@ -892,10 +892,10 @@
 
             if(selectedDisc !== 'free') {
                 c.loyalty = (c.loyalty || 0) + 1;
-                if(c.loyalty >= 5) {
+                if(c.loyalty >= 5) {        //change this number to 10 if you want to increase the required amount
                     c.banked = (c.banked || 0) + 1;
                     c.loyalty = 0;
-                    await customConfirm("🎉 High Five! Client reached 5 cuts. Free Cut banked.");
+                    await customConfirm("🎉 High Five! Client reached 5 cuts. Free Cut banked."); // this too
                 }
             }
             
@@ -962,7 +962,7 @@
                         // Reverse loyalty point
                         if (c.loyalty === 0 && (c.banked || 0) > 0) {
                             c.banked--;
-                            c.loyalty = 4;
+                            c.loyalty = 4; // change 4 to 9
                         } else {
                             c.loyalty = Math.max(0, (c.loyalty || 0) - 1);
                         }
@@ -1114,7 +1114,7 @@
         function toggleTheme() { document.body.classList.toggle('dark-mode'); isDark = document.body.classList.contains('dark-mode'); localStorage.setItem('theme', isDark ? 'dark' : 'light'); }
         function getStatus(c) { const refDate = c.last || c.first; if(!refDate) return 'good'; const last = new Date(refDate); const today = new Date(); const days = (today - last)/(1000*60*60*24); const freqDays = (c.freq || 4) * 7; if(days >= 56) return 'overdue'; if(days >= freqDays) return 'due'; return 'good'; }
         function getDueStr(c) { const refDate = c.last || c.first; if(!refDate) return 'Today'; const last = new Date(refDate); last.setDate(last.getDate() + ((c.freq||4)*7)); return last.toLocaleDateString(undefined, {month:'short', day:'numeric'}); }
-        function getLoyaltyVisual(n) { n = n || 0; let s = ''; for(let i=0; i<5; i++) { s += (i < n) ? '✂️' : '⚪'; } return s; }
+        function getLoyaltyVisual(n) { n = n || 0; let s = ''; for(let i=0; i<5; i++) { s += (i < n) ? '✂️' : '⚪'; } return s; } // 5 to 10 here
         
         function exportRobustExcel() {
             let html = '<html><head><style>body{font-family:sans-serif; padding:20px;} table{width:100%; border-collapse:collapse; margin-bottom:40px;} th{background:#4472C4; color:white; padding:10px; text-align:left;} td{border:1px solid #ddd; padding:8px;} .due{color:#e67e22;} .overdue{color:#e74c3c;}</style></head><body>';
