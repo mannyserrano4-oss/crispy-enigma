@@ -27,7 +27,9 @@
             --p-pink: #FFC8DD;
             --p-pink-dark: #FF8FAB;
             --p-purple: #CDB4DB;
+            --p-purple-dark: #9D4EDD;
             --p-yellow: #FDE2E4;
+            --p-gold: #FFD700;
             
             --status-due: #FFD6A5;
             --status-overdue: #FFA69E;
@@ -53,6 +55,8 @@
             --p-pink: #FF758F;
             --p-pink-dark: #FF4D6D;
             --p-purple: #9D4EDD;
+            --p-purple-dark: #C77DFF;
+            --p-gold: #FFD700;
             
             --status-due: #FF9E00;
             --status-overdue: #FF0054;
@@ -69,7 +73,7 @@
             color: var(--text-main);
             margin: 0; padding: 0; padding-bottom: 140px;
             transition: background-color 0.3s ease;
-            -webkit-tap-highlight-color: transparent; user-select: none;
+            -webkit-tap-highlight-color: transparent; 
         }
 
         /* --- HEADER --- */
@@ -91,18 +95,52 @@
         }
         body.dark-mode .toggle-dot { transform: translateX(24px); background: var(--p-pink); }
 
-        /* Metrics */
-        .metrics-scroll { display: flex; gap: 10px; overflow-x: auto; padding: 0 20px 10px 20px; scrollbar-width: none; }
+        .metrics-scroll { display: flex; gap: 12px; overflow-x: auto; padding: 0 20px 10px 20px; scrollbar-width: none; }
+        
         .metric-pill {
-            background: var(--bg-card); border: 2px solid var(--border); border-radius: 12px;
-            padding: 8px 15px; min-width: 100px; display: flex; flex-direction: column; box-shadow: var(--shadow);
-            border-bottom: 4px solid var(--p-blue); /* Adds a "status bar" look to the bottom of the pill */
+            background: var(--bg-card); 
+            border: 1px solid var(--border); 
+            border-radius: 16px;
+            padding: 14px 18px; 
+            min-width: 120px; 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.1s ease;
         }
-        .m-lbl { font-size: 0.7rem; text-transform: uppercase; color: var(--text-sub); font-weight: 700; }
-        .m-val { font-size: 1.1rem; font-weight: 800; color: var(--p-blue-dark); }
+
+        .metric-pill::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 100%; height: 5px;
+            background: var(--p-blue-dark);
+            opacity: 0.8;
+        }
+
+        .metric-pill:first-child::after { background: var(--p-green-dark); }
+        .metric-pill:last-child::after { background: var(--p-pink-dark); }
+        .metric-pill:active { transform: scale(0.96); }
+
+        .m-lbl { 
+            font-size: 0.65rem; 
+            text-transform: uppercase; 
+            color: var(--text-sub); 
+            font-weight: 800; 
+            letter-spacing: 0.5px;
+            margin-bottom: 6px; 
+        }
+
+        .m-val { 
+            font-size: 1.3rem; 
+            font-weight: 900; 
+            color: var(--text-main); 
+        }
+
         .m-val.today { color: var(--p-green-dark); }
 
-        /* Tabs */
         .tabs { display: flex; gap: 10px; padding: 10px 20px; }
         .tab-btn {
             flex: 1; padding: 10px; border: none; background: var(--input-bg); border-radius: 10px;
@@ -110,7 +148,6 @@
         }
         .tab-btn.active { background: var(--p-blue); color: #000; box-shadow: 0 2px 10px rgba(162, 210, 255, 0.4); }
 
-        /* List */
         .client-list { padding: 15px 20px; }
         .client-card {
             background: var(--bg-card); border-radius: 18px; padding: 18px; margin-bottom: 15px;
@@ -124,7 +161,6 @@
         .cc-info { color: var(--text-sub); font-size: 0.9rem; margin-top: 5px; }
         .loyalty-visual { color: var(--p-blue-dark); font-size: 0.8rem; letter-spacing: 2px; margin-top: 5px;}
 
-        /* Footer */
         .footer-bar {
             position: fixed; bottom: 0; left: 0; width: 100%;
             background: var(--bg-card); border-top: 1px solid var(--border);
@@ -144,7 +180,6 @@
             box-shadow: 0 4px 15px var(--p-pink); flex-shrink: 0; cursor: pointer;
         }
 
-        /* Modals */
         .overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); z-index: 500; backdrop-filter: blur(4px); align-items: flex-end;
@@ -173,6 +208,9 @@
         .btn-green { background: var(--p-green); color: #000; box-shadow: 0 4px 12px rgba(183, 228, 199, 0.4); }
         .btn-red { background: var(--p-pink); color: #000; }
         .btn-ghost { background: transparent; border: 2px solid var(--border); color: var(--text-sub); }
+        .btn-teal { background: #2dd4bf; color: #000; box-shadow: 0 4px 12px rgba(45, 212, 191, 0.4); }
+        .btn-orange { background: #fb923c; color: #000; box-shadow: 0 4px 12px rgba(251, 146, 60, 0.4); }
+        .btn-indigo { background: #818cf8; color: white; box-shadow: 0 4px 12px rgba(129, 140, 248, 0.4); }
 
         .v-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
         .v-box { background: var(--input-bg); padding: 15px; border-radius: 14px; text-align: center; border: 1px solid var(--border); }
@@ -182,7 +220,7 @@
             background: var(--input-bg); border: 2px dashed var(--p-blue); padding: 15px; border-radius: 12px;
             text-align: center; font-style: italic; color: var(--p-blue-dark); font-weight: 600; margin-bottom: 20px;
         }
-        .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
         .c-btn {
             padding: 15px; border-radius: 14px; background: var(--input-bg); border: 2px solid var(--p-blue);
             color: var(--p-blue-dark); font-weight: 700; text-align: center; display: flex; align-items: center;
@@ -199,7 +237,27 @@
         }
         .discount-opt.selected { border-color: var(--p-green-dark); background: rgba(183, 228, 199, 0.2); }
         
-        .hist-item { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+        .tag-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+        .tag-pill {
+            padding: 6px 12px; border-radius: 20px; background: var(--input-bg); border: 1px solid var(--border);
+            font-size: 0.8rem; cursor: pointer; transition: all 0.2s; user-select: none;
+        }
+        .tag-pill.active { background: var(--p-blue); color: black; border-color: var(--p-blue-dark); font-weight: bold; }
+        .tag-badge {
+            padding: 4px 10px; border-radius: 6px; background: var(--input-bg); font-size: 0.75rem; 
+            color: var(--text-sub); border: 1px solid var(--border); font-weight: 600;
+        }
+
+        .icebreaker-box {
+            background: linear-gradient(135deg, #fff9c4 0%, #fff176 100%);
+            border: 2px solid var(--p-gold); color: #5d4037; padding: 15px; border-radius: 14px;
+            margin-bottom: 20px; font-weight: 600; display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.2); animation: popIn 0.3s ease-out;
+        }
+        body.dark-mode .icebreaker-box { background: linear-gradient(135deg, #fbc02d 0%, #f9a825 100%); color: #212121; }
+        @keyframes popIn { from{transform:scale(0.95); opacity:0;} to{transform:scale(1); opacity:1;} }
+
+        .hist-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 12px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
         .confirm-box {
             background: var(--bg-card); padding: 30px; border-radius: 20px; text-align: center; width: 80%;
             max-width: 350px; box-shadow: 0 10px 40px rgba(0,0,0,0.3);
@@ -216,9 +274,24 @@
             background: #ff6b6b; color: black; padding: 15px; width: 100%; border: none; border-radius: 10px;
             font-weight: bold; margin-top: 15px; font-size: 1rem; cursor: pointer;
         }
+        .fa-crown { color: var(--p-gold); filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.4)); }
+        
+                /* --- FIX FOR ICEBREAKER VISIBILITY --- */
+        #eIcebreaker {
+            color: #212121 !important; /* Force dark text to contrast with yellow bg */
+            -webkit-text-fill-color: #212121 !important; /* Ensures iOS renders it dark */
+        }
+        
+        /* Optional: Make the yellow background slightly darker in dark mode so it hurts eyes less */
+        body.dark-mode #eIcebreaker {
+            background: #fbc02d !important;
+            border-color: #f57f17 !important;
+        }
+
+        
     </style>
 </head>
-<body class="">
+<body>
 
     <div id="crashModal">
         <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px;"></i>
@@ -266,7 +339,10 @@
     <div class="footer-bar">
         <div class="search-wrap">
             <i class="fas fa-search search-icon"></i>
-            <input type="text" class="search-input" placeholder="Search..." oninput="render(this.value)">
+            <input type="text" class="search-input" placeholder="Search..." oninput="handleSearch(this.value)">
+        </div>
+        <div class="fab" style="background:var(--p-blue); margin-right:10px;" onclick="openWalkIn()">
+            <i class="fas fa-bolt"></i>
         </div>
         <div class="fab" onclick="openAddModal()">
             <i class="fas fa-plus"></i>
@@ -281,16 +357,25 @@
             </div>
             <p id="vSub" style="color:var(--text-sub); margin-top:-10px;">Phone</p>
             <div id="vBadges" style="margin-bottom:15px; display:flex; gap:5px;"></div>
+            
+            <div id="vIcebreaker" class="icebreaker-box" style="display:none;">
+                <i class="fas fa-lightbulb"></i> <span id="vIceText"></span>
+            </div>
+
+            <div id="vTags" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:15px;"></div>
 
             <div class="formula-box" id="vFormula">"No cut formula saved."</div>
 
             <div class="contact-grid">
                 <a id="btnCall" href="#" class="c-btn"><i class="fas fa-phone"></i> Call</a>
                 <div class="c-btn" onclick="openSmsMenu()"><i class="fas fa-comment"></i> Text</div>
-                <a id="btnNav" href="#" target="_blank" class="c-btn" style="grid-column: span 2; display: none; background: var(--p-green); border-color: var(--p-green-dark); color: black;">
+                <a id="btnNav" href="#" target="_blank" class="c-btn" style="grid-column: span 2; display: none; background: #34c759; border-color: #248a3d; color: white;">
                     <i class="fas fa-map-marker-alt"></i> Get Directions
                 </a>
             </div>
+            <a id="btnEmail" href="#" class="c-btn" style="width:100%; box-sizing:border-box; margin-bottom:20px; display:none;">
+                <i class="fas fa-envelope"></i> Send Email
+            </a>
 
             <div class="v-grid">
                 <div class="v-box">
@@ -341,7 +426,7 @@
         </div>
     </div>
 
-    <div id="checkoutModal" class="overlay" style="z-index:600;">
+    <div id="checkoutModal" class="overlay" style="z-index:800;">
         <div class="sheet">
             <h3>Checkout</h3>
             
@@ -368,7 +453,28 @@
             </div>
 
             <button class="btn btn-green" onclick="finalizeCut()">Confirm & Save</button>
+            
+            <button class="btn btn-ghost" id="btnSmartBook" onclick="smartBook()" style="margin-top:10px; border-color:var(--p-purple-dark); color:var(--p-purple-dark);">
+                <i class="fas fa-calendar-plus"></i> Book Next: <span id="sbDate">...</span>
+            </button>
+
             <button class="btn btn-red" onclick="closeModal('checkoutModal')">Cancel</button>
+        </div>
+    </div>
+
+    <div id="walkInModal" class="overlay" style="z-index:900;">
+        <div class="sheet">
+            <h3>Quick Walk-In</h3>
+            <p style="color:var(--text-sub); margin-top:-10px; font-size:0.8rem;">Fast revenue entry (No profile needed).</p>
+            
+            <label>Service Price ($)</label>
+            <input type="number" id="wPrice" value="35" inputmode="decimal">
+
+            <label>Tip ($)</label>
+            <input type="number" id="wTip" value="0" inputmode="decimal">
+
+            <button class="btn btn-green" onclick="saveWalkIn()">Record Walk-In</button>
+            <button class="btn btn-ghost" onclick="closeModal('walkInModal')">Cancel</button>
         </div>
     </div>
 
@@ -384,8 +490,10 @@
                         <input type="tel" id="ePhone" placeholder="Phone">
                         <input type="text" id="eInsta" placeholder="Insta @">
                     </div>
+                    <input type="email" id="eEmail" placeholder="Email Address">
                     <input type="text" id="eAddr" placeholder="Address">
                 </div>
+
                 <div style="border:2px solid var(--p-green); padding:15px; border-radius:15px; margin-bottom:15px; background:rgba(183,228,199,0.1);">
                     <label style="color:var(--p-green-dark)">Service</label>
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
@@ -399,29 +507,51 @@
                     <label style="margin-top:10px;">The Formula</label>
                     <input type="text" id="eFormula" placeholder="e.g. Mid fade, #1.5 into #3">
                 </div>
+
                 <div style="border:2px solid var(--p-purple); padding:15px; border-radius:15px; margin-bottom:15px; background:rgba(205,180,219,0.1);">
-                    <label style="color:var(--p-purple)">Connection</label>
+                    <label style="color:var(--p-purple)">Connection & Vibe</label>
+                    
+                    <label style="color:var(--p-purple-dark); margin-bottom:5px;">💡 Icebreaker (Ask next time)</label>
+                    <input type="text" id="eIcebreaker" placeholder="e.g. Ask how the Mexico trip was" style="border-color:var(--p-gold); background:#fffde7;">
+                    
                     <input type="text" id="eRef" placeholder="Referred By..." oninput="searchRef(this.value)">
                     <div id="refResults" style="background:var(--bg-card); display:none; border:1px solid var(--border); padding:10px;"></div>
-                    <textarea id="eNotes" rows="3" placeholder="Notes..."></textarea>
+                    
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <label>Permanent Notes</label>
+                        <span onclick="insertDate()" style="font-size:0.7rem; color:var(--p-blue-dark); cursor:pointer; font-weight:bold;">+ Insert Date</span>
+                    </div>
+                    <textarea id="eNotes" rows="3" placeholder="Permanent info (Wife, Job, etc)"></textarea>
+                    
+                    <label style="margin-top:10px;">Vibe Tags</label>
+                    <div class="tag-grid" id="eTags"></div>
                 </div>
+
+                <div style="border:2px solid #FFD700; padding:15px; border-radius:15px; margin-bottom:15px; background:rgba(255, 215, 0, 0.05);">
+                    <label style="color:#b8860b;">Admin: Loyalty & Rewards</label>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:8px;">
+                        <div>
+                            <label style="font-size:0.7rem;">Banked Free Cuts</label>
+                            <input type="number" id="eBanked" value="0" min="0" inputmode="numeric" pattern="[0-9]*">
+                        </div>
+                        <div>
+                            <label style="font-size:0.7rem;">Points (0-4 ✂️)</label>
+                            <input type="number" id="eLoyalty" value="0" min="0" max="4" inputmode="numeric" pattern="[0-9]*">
+                        </div>
+                    </div>
+                    <p style="font-size: 0.65rem; color: var(--text-sub); margin: 0; font-style: italic;">
+                        *Use this to manually fix mistakes. 5 points automatically = 1 Banked Cut.
+                    </p>
+                </div>
+
                 <button class="btn btn-primary">Save Client</button>
                 <button type="button" class="btn btn-red" onclick="deleteClient()">Delete</button>
-                <button type="button" class="btn btn-ghost" onclick="closeModal('editModal')">Cancel</button>
+                <button type="button" class="btn btn-ghost" onclick="cancelEdit()">Cancel</button>
             </form>
         </div>
     </div>
 
-    <div id="confirmModal" class="overlay" style="align-items:center; justify-content:center; z-index:999;">
-        <div class="confirm-box">
-            <div class="confirm-title" id="cMsg">Are you sure?</div>
-            <div class="confirm-btns">
-                <button class="btn btn-ghost" id="cNo">No</button>
-                <button class="btn btn-primary" id="cYes">Yes</button>
-            </div>
-        </div>
-    </div>
-    <div id="smsModal" class="overlay" style="z-index: 600;">
+    <div id="smsModal" class="overlay" style="z-index: 800;">
         <div class="sheet">
             <h3>Send Text</h3>
             <div class="sms-opt" onclick="sendSms('late')">🏃 Running Late (15m) <i class="fas fa-chevron-right"></i></div>
@@ -431,6 +561,16 @@
             <div class="sms-opt" onclick="sendSms('review')">⭐ Request Review <i class="fas fa-chevron-right"></i></div>
             <div class="sms-opt" onclick="sendSms('custom')">💬 Custom Message <i class="fas fa-chevron-right"></i></div>
             <button class="btn btn-red" onclick="closeModal('smsModal')">Cancel</button>
+        </div>
+    </div>
+
+    <div id="confirmModal" class="overlay" style="align-items:center; justify-content:center; z-index:1000;">
+        <div class="confirm-box">
+            <div class="confirm-title" id="cMsg">Are you sure?</div>
+            <div class="confirm-btns">
+                <button class="btn btn-ghost" id="cNo">No</button>
+                <button class="btn btn-primary" id="cYes">Yes</button>
+            </div>
         </div>
     </div>
     
@@ -475,22 +615,22 @@
             <button class="btn btn-ghost" onclick="exportHistoryCSV()">
                 <i class="fas fa-table"></i> Download Transaction CSV (Tax)
             </button>
-            <button class="btn btn-ghost" onclick="exportSimpleCSV()">
+            <button class="btn btn-teal" onclick="exportSimpleCSV()">
                 <i class="fas fa-user-tag"></i> Download Client List CSV
             </button>
-            <button class="btn btn-ghost" style="border: 2px solid var(--p-green-dark); color:var(--p-green-dark);" onclick="exportData()">
+            <button class="btn btn-indigo" style="border: 2px solid var(--p-green-dark); color:var(--p-green-dark);" onclick="exportData()">
                 <i class="fas fa-save"></i> Save Full Backup (.json)
             </button>
             
             <hr style="border-color:var(--border); margin:20px 0;">
             <input type="file" id="restoreFile" hidden onchange="restoreData(this)">
-            <button class="btn btn-ghost" onclick="document.getElementById('restoreFile').click()">Restore From Backup</button>
+            <button class="btn btn-orange" onclick="document.getElementById('restoreFile').click()">Restore From Backup</button>
             <button class="btn btn-red" onclick="closeModal('settingsModal')">Close</button>
         </div>
     </div>
 
     <script>
-        // --- SAFE LOADING ---
+        // --- DATA STATE ---
         let clients = [];
         let history = [];
         let settings = { location: '' };
@@ -498,11 +638,28 @@
         let activeFilter = 'all';
         let isDark = false;
         let viewArchives = false;
+        let selectedDisc = 'none'; 
+        let editInitialState = ""; 
+
+        const VIBE_TAGS = ['Silent', 'Talkative', 'Tipper', 'Sensitive Skin', 'Sports', 'Chill', 'Late', 'Cash Only', 'Politics', 'Family'];
+
+        // --- HELPERS ---
+        const getTodayIso = () => {
+            const d = new Date();
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        };
 
         window.onerror = function(msg, url, line) {
             showCrashScreen(msg + " (Line " + line + ")");
             return false;
         };
+
+        // --- CORE FUNCTIONS ---
+        function saveAll() {
+            localStorage.setItem('bbClients', JSON.stringify(clients));
+            localStorage.setItem('bbHistory', JSON.stringify(history));
+            localStorage.setItem('bbSettings', JSON.stringify(settings));
+        }
 
         try {
             const cRaw = localStorage.getItem('bbClients');
@@ -515,45 +672,65 @@
             showCrashScreen("Data Corruption: " + e.message);
         }
 
-        // --- CORE FUNCTIONS ---
         window.onload = () => {
             render();
-            document.getElementById('setLoc').value = settings.location;
+            document.getElementById('setLoc').value = settings.location || '';
             if(localStorage.getItem('theme') === 'dark') toggleTheme();
         };
 
-        function render(search = '') {
-            const list = document.getElementById('list');
-            list.innerHTML = '';
+        function openModal(id) { 
+            document.getElementById(id).style.display = 'flex'; 
+            document.body.style.overflow = 'hidden';
+        }
 
-            // Metrics
-            const totalRev = clients.reduce((s,c) => s + (c.spent || 0), 0);
-            const totalGive = clients.reduce((s,c) => s + (c.giveback || 0), 0);
-            const todayStr = new Date().toLocaleDateString('en-CA');
-            const todayRev = history.filter(h => h.date === todayStr).reduce((s,h) => s + h.amount, 0);
+        function closeModal(id) { 
+            document.getElementById(id).style.display = 'none'; 
+            const openModals = document.querySelectorAll('.overlay[style*="display: flex"]');
+            if (openModals.length === 0) {
+                document.body.style.overflow = '';
+            }
+        }
+
+        // --- PERFORMANCE FIX: Decouple Math from Rendering ---
+        function render(search = '') {
+            // Only recalculate metrics if NOT searching
+            if (!search) {
+                updateMetrics();
+            }
+            renderList(search);
+        }
+
+        function handleSearch(val) {
+            // Skips updateMetrics() for lightning speed
+            renderList(val);
+        }
+
+        function updateMetrics() {
+            const totalRev = history.reduce((s, h) => s + (h.amount || 0), 0);
+            const totalGive = clients.reduce((s, c) => s + (c.giveback || 0), 0);
+            const todayStr = getTodayIso();
+            const todayRev = history.filter(h => h.date === todayStr).reduce((s, h) => s + h.amount, 0);
 
             document.getElementById('mToday').innerText = '$' + todayRev.toLocaleString(undefined, {minimumFractionDigits: 2});
             document.getElementById('mRev').innerText = '$' + totalRev.toLocaleString(undefined, {minimumFractionDigits: 2});
             document.getElementById('mGive').innerText = '$' + totalGive.toLocaleString(undefined, {minimumFractionDigits: 2});
+        }
 
-            // Filter
+        function renderList(search = '') {
+            const list = document.getElementById('list');
+            list.innerHTML = '';
+
             let filtered = clients.filter(c => {
                 if(search && !c.name.toLowerCase().includes(search.toLowerCase())) return false;
-                
-                // ARCHIVE LOGIC
-                if (viewArchives) {
-                    return c.archived === true; // Only show archived
-                } else {
-                    if (c.archived === true) return false; // Hide archived
-                }
+                if (viewArchives) return c.archived === true;
+                else if (c.archived === true) return false;
 
                 if(!search && activeFilter === 'due') return getStatus(c) === 'due';
                 if(!search && activeFilter === 'overdue') return getStatus(c) === 'overdue';
                 return true;
             });
 
-            // Sort
-            if (activeFilter === 'all') {
+            if (activeFilter === 'all' || search) {
                 filtered.sort((a,b) => a.name.localeCompare(b.name));
             } else {
                 filtered.sort((a,b) => {
@@ -563,13 +740,12 @@
                 });
             }
 
-            // Build List
             filtered.forEach(c => {
                 const stat = getStatus(c);
                 let badges = '';
                 if(c.dob && isMonth(c.dob)) badges += `<span class="badge" style="color:var(--p-pink-dark)"><i class="fas fa-birthday-cake"></i></span>`;
                 if(c.first && isAnniversary(c.first)) badges += `<span class="badge" style="color:var(--p-purple)"><i class="fas fa-medal"></i></span>`;
-
+                if (c.spent >= 250) badges += `<span style="color:var(--p-gold); margin-left:5px;"><i class="fas fa-crown"></i></span>`;
                 let flags = '';
                 if(c.strikes > 0) flags = ' ' + '🚩'.repeat(Math.min(c.strikes, 3));
 
@@ -602,13 +778,17 @@
             if(c.first && isAnniversary(c.first)) b += `<span style="background:var(--p-purple); color:black; padding:5px 10px; border-radius:10px; font-size:0.8rem; font-weight:bold;">🏅 Anniversary Month</span>`;
             document.getElementById('vBadges').innerHTML = b;
 
-            // Shows the Navigate button only if the client has an address saved
-                const navBtn = document.getElementById('btnNav');
-                if (navBtn) {
-                    navBtn.style.display = c.address ? 'flex' : 'none';
-                    // This format tells iOS to open the Apple Maps app directly
-                    navBtn.href = `maps://?q=${encodeURIComponent(c.address)}`;
-                }
+            const iceBox = document.getElementById('vIcebreaker');
+            if(c.icebreaker && c.icebreaker.trim() !== '') {
+                document.getElementById('vIceText').innerText = "Ask about: " + c.icebreaker;
+                iceBox.style.display = 'flex';
+            } else { iceBox.style.display = 'none'; }
+
+            const tagDiv = document.getElementById('vTags');
+            tagDiv.innerHTML = '';
+            if(c.tags && c.tags.length > 0) {
+                c.tags.forEach(t => { tagDiv.innerHTML += `<span class="tag-badge">${t}</span>`; });
+            }
 
             document.getElementById('vLoyalty').innerText = getLoyaltyVisual(c.loyalty);
             document.getElementById('vCredit').innerText = `$${(c.credit||0).toFixed(2)}`;
@@ -619,7 +799,17 @@
             document.getElementById('btnInsta').style.display = c.insta ? 'block' : 'none';
             document.getElementById('btnRemStrike').style.display = (c.strikes > 0) ? 'flex' : 'none';
 
-            // Update Archive Button Text
+            const emBtn = document.getElementById('btnEmail');
+            if(c.email) { emBtn.style.display = 'flex'; emBtn.href = `mailto:${c.email}`; } else { emBtn.style.display = 'none'; }
+
+            const navBtn = document.getElementById('btnNav');
+            if (navBtn) {
+                if (c.address && c.address.trim() !== '') {
+                    navBtn.style.display = 'flex';
+                    navBtn.href = `maps://?q=${encodeURIComponent(c.address)}`;
+                } else { navBtn.style.display = 'none'; }
+            }
+            
             const arcBtn = document.getElementById('btnArchive');
             arcBtn.innerHTML = c.archived ? '<i class="fas fa-box-open"></i> Restore Client' : '<i class="fas fa-archive"></i> Archive Client (Hide)';
 
@@ -627,28 +817,78 @@
         }
 
         // --- CHECKOUT & REVENUE ---
+        function openCheckout() { 
+            const c = getClient(activeId); 
+            document.getElementById('payPrice').value = c.price || 35; 
+            document.getElementById('payTip').value = 0; 
+            document.getElementById('payDate').value = getTodayIso(); 
+            document.getElementById('customDiscBox').style.display = 'none'; 
+            selectedDisc = 'none'; 
+            
+            const nextDate = new Date();
+            nextDate.setDate(nextDate.getDate() + ((c.freq || 4) * 7));
+            document.getElementById('sbDate').innerText = nextDate.toLocaleDateString(undefined, {month:'short', day:'numeric'});
+            
+            const opts = document.getElementById('discountList'); 
+            opts.innerHTML = ''; 
+            addOpt(opts, 'none', 'No Discount', true); 
+            if((c.banked || 0) > 0) addOpt(opts, 'free', `Redeem 1 Free Cut (Banked: ${c.banked})`); 
+            if((c.credit || 0) > 0) addOpt(opts, 'credit', `Redeem $5 Credit (Bal: $${c.credit})`); 
+            if( (c.dob && isMonth(c.dob)) || (c.first && isAnniversary(c.first)) ) { addOpt(opts, 'half', `Redeem 50% Off (Special Month)`); } 
+            addOpt(opts, 'custom', 'Custom % Discount'); 
+            openModal('checkoutModal'); 
+            calcTotal(); 
+        }
+
+        function calcTotal() { 
+            const base = parseFloat(document.getElementById('payPrice').value) || 0; 
+            const tip = parseFloat(document.getElementById('payTip').value) || 0; 
+            let discount = 0; 
+            if(selectedDisc === 'free') discount = base; 
+            if(selectedDisc === 'half') discount = base * 0.5; 
+            if(selectedDisc === 'credit') discount = Math.min(base, 5); 
+            if(selectedDisc === 'custom') { 
+                const pct = parseFloat(document.getElementById('payCustomPct').value) || 0; 
+                discount = base * (pct / 100); 
+            } 
+            const giveback = discount; 
+            const total = (base - discount) + tip; 
+            document.getElementById('payTotal').innerText = `$${total.toFixed(2)}`; 
+            document.getElementById('givebackDisplay').innerText = `Giveback: $${giveback.toFixed(2)}`; 
+            return { total, giveback };
+        }
+
         async function finalizeCut() {
             const c = getClient(activeId);
-            if(selectedDisc === 'free') c.banked = (c.banked || 0) - 1;
-            if(selectedDisc === 'credit') c.credit = Math.max(0, (c.credit || 0) - 5);
+            const totals = calcTotal(); 
 
-            c.spent = (c.spent || 0) + checkoutTotal;
-            c.giveback = (c.giveback || 0) + checkoutGiveback;
+            let wasFreeFlag = false;
+            let wasCreditFlag = false;
+
+            if(selectedDisc === 'free') {
+                c.banked = (c.banked || 0) - 1;
+                wasFreeFlag = true;
+            }
+            if(selectedDisc === 'credit') {
+                c.credit = Math.max(0, (c.credit || 0) - 5);
+                wasCreditFlag = true;
+            }
+
+            c.spent = (c.spent || 0) + totals.total;
+            c.giveback = (c.giveback || 0) + totals.giveback;
             c.cuts = (c.cuts || 0) + 1;
             c.last = document.getElementById('payDate').value;
 
-            // SAVE HISTORY
+            // --- SMART UNDO TRACKING ---
             history.push({
                 clientId: c.id,
                 clientName: c.name,
                 date: c.last,
-                amount: checkoutTotal
+                amount: totals.total,
+                wasFree: wasFreeFlag,
+                wasCredit: wasCreditFlag,
+                givebackAmt: totals.giveback
             });
-            localStorage.setItem('bbHistory', JSON.stringify(history));
-
-            if (history.length % 10 === 0 && history.length !== 0) {
-                alert("Nice work! You've recorded " + history.length + " total cuts. Remember to download a Backup (.json) in Settings soon!");
-            }
 
             if(selectedDisc !== 'free') {
                 c.loyalty = (c.loyalty || 0) + 1;
@@ -658,42 +898,110 @@
                     await customConfirm("🎉 High Five! Client reached 5 cuts. Free Cut banked.");
                 }
             }
-            saveData();
+            
+            saveAll();
             closeModal('checkoutModal');
             closeModal('viewModal');
             render();
+        }
+
+        async function smartBook() {
+            await finalizeCut(); 
+            const c = getClient(activeId);
+            const nextDate = new Date();
+            nextDate.setDate(nextDate.getDate() + ((c.freq || 4) * 7));
+            const iso = nextDate.toISOString().slice(0, 10) + "T10:00";
+            document.getElementById('schedDate').value = iso;
+            openModal('schedModal');
+        }
+
+        function openWalkIn() {
+            document.getElementById('wPrice').value = 35;
+            document.getElementById('wTip').value = 0;
+            openModal('walkInModal');
+        }
+
+        function saveWalkIn() {
+            const price = parseFloat(document.getElementById('wPrice').value) || 0;
+            const tip = parseFloat(document.getElementById('wTip').value) || 0;
+            const total = price + tip;
+
+            if (total <= 0) return alert("Please enter an amount.");
+
+            history.push({
+                clientId: 'walkin',
+                clientName: '🚶 Walk-In Client',
+                date: getTodayIso(),
+                amount: total,
+                wasFree: false,
+                wasCredit: false,
+                givebackAmt: 0
+            });
+
+            saveAll();
+            closeModal('walkInModal');
+            render();
+            alert(`Walk-In Recorded: $${total.toFixed(2)}`);
+        }
+
+        // --- SMART UNDO FEATURE ---
+        async function deleteTransaction(idx) {
+            const h = history[idx];
+            if(await customConfirm(`Delete $${h.amount.toFixed(2)} entry for ${h.clientName}?\n\nThis will reverse their stats and loyalty.`)) {
+                const c = getClient(h.clientId);
+                if(c) {
+                    c.spent = Math.max(0, (c.spent || 0) - h.amount);
+                    c.cuts = Math.max(0, (c.cuts || 0) - 1);
+                    c.giveback = Math.max(0, (c.giveback || 0) - (h.givebackAmt || 0));
+                    
+                    if (h.wasFree) {
+                        c.banked = (c.banked || 0) + 1;
+                    } else if (h.wasCredit) {
+                        c.credit = (c.credit || 0) + 5;
+                    } else {
+                        // Reverse loyalty point
+                        if (c.loyalty === 0 && (c.banked || 0) > 0) {
+                            c.banked--;
+                            c.loyalty = 4;
+                        } else {
+                            c.loyalty = Math.max(0, (c.loyalty || 0) - 1);
+                        }
+                    }
+                }
+                history.splice(idx, 1);
+                saveAll();
+                render();
+                openHistory();
+            }
         }
 
         function openStats() {
             closeModal('settingsModal');
             const div = document.getElementById('statsContent');
             div.innerHTML = '';
-            
-            // Calculate by Year
             const years = {};
             history.forEach(h => {
                 const y = h.date.split('-')[0];
                 if(!years[y]) years[y] = 0;
                 years[y] += h.amount;
             });
-            
             let html = '<div class="v-grid">';
             Object.keys(years).sort().reverse().forEach(y => {
                 html += `<div class="v-box"><span class="v-big" style="color:var(--p-green-dark)">$${years[y].toFixed(2)}</span><span style="font-size:0.7rem;">${y} Revenue</span></div>`;
             });
             html += '</div>';
-            
             div.innerHTML = html;
             openModal('statsModal');
         }
 
-        // --- ARCHIVE & UTILS ---
         async function toggleArchive() {
             const c = getClient(activeId);
             const action = c.archived ? "Restore" : "Archive";
             if(await customConfirm(`${action} this client?`)) {
                 c.archived = !c.archived;
-                saveData(); closeModal('viewModal'); render();
+                saveAll(); 
+                closeModal('viewModal'); 
+                render();
             }
         }
         function toggleArchiveMode() {
@@ -702,20 +1010,16 @@
             closeModal('settingsModal'); render();
         }
 
-        // --- EXPORTS ---
         function exportHistoryCSV() {
             let csv = "Date,Client,Amount\n";
-            history.forEach(h => {
-                csv += `${h.date},${h.clientName.replace(/,/g," ")},${h.amount}\n`;
-            });
+            history.forEach(h => { csv += `${h.date},${h.clientName.replace(/,/g," ")},${h.amount}\n`; });
             downloadCSV(csv, 'BlackBook_Transactions.csv');
         }
         function exportSimpleCSV() {
-            let csv = "Name,Phone,Status,Strikes,Total_Spent,Last_Cut\n";
+            let csv = "Name,Phone,Email,Status,Strikes,Total_Spent,Last_Cut\n";
             clients.forEach(c => {
-                // We add a quote and tab to force Excel to read phone as Text, not Math
                 const safePhone = `\t${c.phone}`;
-                csv += `${c.name.replace(/,/g," ")},${safePhone},${getStatus(c)},${c.strikes||0},${c.spent},${c.last}\n`;
+                csv += `${c.name.replace(/,/g," ")},${safePhone},${c.email || ''},${getStatus(c)},${c.strikes||0},${c.spent},${c.last}\n`;
             });
             downloadCSV(csv, 'BlackBook_Clients.csv');
         }
@@ -725,7 +1029,6 @@
             const a = document.createElement('a'); a.href = url; a.download = name; a.click();
         }
         
-        // --- HELPERS (Dates, etc) ---
         function formatPretty(dateStr) {
             if(!dateStr) return 'Never';
             const [y, m, d] = dateStr.split('-'); 
@@ -738,156 +1041,270 @@
             if(day === 3 || day === 23) suff = 'rd';
             return `${mon} ${day}${suff}, ${y}`;
         }
+
+        function insertDate() {
+            const txt = document.getElementById('eNotes');
+            const now = new Date();
+            txt.value += `\n[${now.getMonth()+1}/${now.getDate()}]: `;
+            txt.focus();
+        }
         
-        // --- BOILERPLATE (Modal, Theme, Save) ---
         function getClient(id) { return clients.find(x => x.id === id); }
-        function saveData() { localStorage.setItem('bbClients', JSON.stringify(clients)); }
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
         function setTab(t, btn) { activeFilter = t; document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); render(); }
         function isMonth(d) { return new Date(d).getMonth() === new Date().getMonth(); }
         function isAnniversary(d) { const dt = new Date(d); const now = new Date(); return dt.getMonth() === now.getMonth() && dt.getFullYear() !== now.getFullYear(); }
         function openInsta() { const c = getClient(activeId); if(c.insta) window.open(`https://instagram.com/${c.insta.replace('@','')}`); }
         function customConfirm(msg) { return new Promise((resolve) => { document.getElementById('cMsg').innerText = msg; document.getElementById('confirmModal').style.display = 'flex'; document.getElementById('cYes').onclick = () => { document.getElementById('confirmModal').style.display = 'none'; resolve(true); }; document.getElementById('cNo').onclick = () => { document.getElementById('confirmModal').style.display = 'none'; resolve(false); }; }); }
-        function searchRef(val) { const div = document.getElementById('refResults'); if(!val) { div.style.display='none'; return; } const matches = clients.filter(c => c.name.toLowerCase().includes(val.toLowerCase())); div.innerHTML = ''; if(matches.length){ div.style.display='block'; matches.forEach(m => { const d = document.createElement('div'); d.innerText = m.name; d.style.padding='8px'; d.style.borderBottom='1px solid #444'; d.onclick = () => { document.getElementById('eRef').value = m.name; div.style.display='none'; }; div.appendChild(d); }); } else div.style.display='none'; }
+        
+        function searchRef(val) { 
+            const div = document.getElementById('refResults'); 
+            if(!val) { div.style.display='none'; return; } 
+            const matches = clients.filter(c => c.name.toLowerCase().includes(val.toLowerCase())); 
+            div.innerHTML = ''; 
+            if(matches.length){ 
+                div.style.display='block'; 
+                matches.forEach(m => { 
+                    const d = document.createElement('div'); 
+                    d.innerText = m.name; 
+                    d.style.padding='8px'; 
+                    d.style.borderBottom='1px solid #444'; 
+                    d.onclick = () => { document.getElementById('eRef').value = m.name; div.style.display='none'; }; 
+                    div.appendChild(d); 
+                }); 
+            } else div.style.display='none'; 
+        }
+
         function openSchedule() { openModal('schedModal'); }
         function openSettings() { openModal('settingsModal'); }
-        function openHistory() { closeModal('settingsModal'); const div = document.getElementById('historyList'); div.innerHTML = ''; const revHist = [...history].reverse(); if(revHist.length === 0) div.innerHTML = "No transactions yet."; revHist.forEach(h => { const row = document.createElement('div'); row.className = 'hist-item'; row.innerHTML = `<span>${formatPretty(h.date)} - ${h.clientName}</span> <b>$${h.amount.toFixed(2)}</b>`; div.appendChild(row); }); openModal('historyModal'); }
+        
+        function openHistory() { 
+            closeModal('settingsModal'); 
+            const div = document.getElementById('historyList'); 
+            div.innerHTML = ''; 
+            const revHist = [...history].reverse(); 
+            if(revHist.length === 0) div.innerHTML = "No transactions yet."; 
+            revHist.forEach((h, i) => { 
+                const originalIndex = (history.length - 1) - i;
+                const row = document.createElement('div'); 
+                row.className = 'hist-item'; 
+                row.innerHTML = `
+                    <div style="display:flex; flex-direction:column;">
+                        <span style="font-weight:700;">${h.clientName}</span>
+                        <span style="font-size:0.7rem; color:var(--text-sub);">${formatPretty(h.date)}</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <b>$${h.amount.toFixed(2)}</b>
+                        <i class="fas fa-trash-alt" style="color:#ff6b6b; cursor:pointer;" onclick="deleteTransaction(${originalIndex})"></i>
+                    </div>
+                `; 
+                div.appendChild(row); 
+            }); 
+            openModal('historyModal'); 
+        }
+
         function addToCalendar() { const c = getClient(activeId); const d = new Date(document.getElementById('schedDate').value); const loc = document.getElementById('schedLoc').value === 'shop' ? settings.location : c.address; const end = new Date(d.getTime() + 7200000); const fmt = (x) => x.toISOString().replace(/-|:|\.\d\d\d/g,""); const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART:${fmt(d)}\nDTEND:${fmt(end)}\nSUMMARY:Cut - ${c.name}\nLOCATION:${loc}\nEND:VEVENT\nEND:VCALENDAR`; const blob = new Blob([ics], {type:'text/calendar;charset=utf-8'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'appt.ics'; a.click(); closeModal('schedModal'); }
-        function saveSettings() { settings.location = document.getElementById('setLoc').value; localStorage.setItem('bbSettings', JSON.stringify(settings)); closeModal('settingsModal'); }
+        
+        function saveSettings() { 
+            settings.location = document.getElementById('setLoc').value; 
+            saveAll(); 
+            closeModal('settingsModal'); 
+        }
+        
         function exportData() { const s = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({clients, settings, history})); const a = document.createElement('a'); a.href = s; a.download = 'backup.json'; a.click(); }
-        function toggleTheme() { document.body.classList.toggle('dark-mode'); isDark = !isDark; localStorage.setItem('theme', isDark ? 'dark' : 'light'); }
+        function toggleTheme() { document.body.classList.toggle('dark-mode'); isDark = document.body.classList.contains('dark-mode'); localStorage.setItem('theme', isDark ? 'dark' : 'light'); }
         function getStatus(c) { const refDate = c.last || c.first; if(!refDate) return 'good'; const last = new Date(refDate); const today = new Date(); const days = (today - last)/(1000*60*60*24); const freqDays = (c.freq || 4) * 7; if(days >= 56) return 'overdue'; if(days >= freqDays) return 'due'; return 'good'; }
         function getDueStr(c) { const refDate = c.last || c.first; if(!refDate) return 'Today'; const last = new Date(refDate); last.setDate(last.getDate() + ((c.freq||4)*7)); return last.toLocaleDateString(undefined, {month:'short', day:'numeric'}); }
         function getLoyaltyVisual(n) { n = n || 0; let s = ''; for(let i=0; i<5; i++) { s += (i < n) ? '✂️' : '⚪'; } return s; }
         
-        // Export Robust Excel
-    function exportRobustExcel() {
-            let html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:sans-serif; padding:20px;} table{width:100%; border-collapse:collapse; margin-bottom:40px;} th{background:#4472C4; color:white; padding:10px; text-align:left;} td{border:1px solid #ddd; padding:8px;} tr:nth-child(even){background:#f2f2f2;} .due{color:#e67e22; font-weight:bold;} .overdue{color:#e74c3c; font-weight:bold;} .archived-row{color:#999; font-style:italic;}</style></head><body>';
-            
+        function exportRobustExcel() {
+            let html = '<html><head><style>body{font-family:sans-serif; padding:20px;} table{width:100%; border-collapse:collapse; margin-bottom:40px;} th{background:#4472C4; color:white; padding:10px; text-align:left;} td{border:1px solid #ddd; padding:8px;} .due{color:#e67e22;} .overdue{color:#e74c3c;}</style></head><body>';
             html += '<h1>Black Book Report</h1><p>Generated: ' + new Date().toLocaleDateString() + '</p>';
-            
-            // --- TABLE 1: ACTIVE CLIENTS ---
-            html += '<h2>Active Client Database</h2><table><tr><th>Name</th><th>Phone</th><th>Status</th><th>Strikes</th><th>LTV</th><th>Last Cut</th><th>The Formula</th></tr>';
-            
-            let hasActive = false;
+            html += '<h2>Active Clients</h2><table><tr><th>Name</th><th>Phone</th><th>Status</th><th>Strikes</th><th>LTV</th><th>Last Cut</th></tr>';
             clients.forEach(c => { 
-                if(c.archived) return; // Skip archived people here
-                hasActive = true;
-                
+                if(c.archived) return; 
                 const stat = getStatus(c); 
-                let statClass = ''; 
-                if(stat === 'due') statClass = 'due'; 
-                if(stat === 'overdue') statClass = 'overdue'; 
-                
-                html += `<tr><td><b>${c.name}</b></td><td>${c.phone || ''}</td><td class="${statClass}">${stat.toUpperCase()}</td><td>${'🚩'.repeat(c.strikes || 0)}</td><td>$${(c.spent||0).toFixed(2)}</td><td>${formatPretty(c.last)||''}</td><td>${c.formula||''}</td></tr>`; 
+                html += `<tr><td><b>${c.name}</b></td><td>${c.phone || ''}</td><td>${stat.toUpperCase()}</td><td>${c.strikes || 0}</td><td>$${(c.spent||0).toFixed(2)}</td><td>${formatPretty(c.last)||''}</td></tr>`; 
             });
-            if(!hasActive) html += '<tr><td colspan="7" style="text-align:center; padding:20px;">No active clients found.</td></tr>';
-            html += '</table>';
-
-            // --- TABLE 2: ARCHIVED CLIENTS (THE NEW SECTION) ---
-            // We verify if there are any archived clients first to avoid an empty table
-            const archivedList = clients.filter(c => c.archived);
-            
-            if(archivedList.length > 0) {
-                html += '<h2 style="color:#666;">Archived / Inactive Clients</h2><table style="border:1px solid #ccc;">';
-                html += '<tr style="background:#999;"><th>Name</th><th>Phone</th><th>LTV (Final)</th><th>Last Cut</th></tr>';
-                
-                archivedList.forEach(c => {
-                    html += `<tr class="archived-row">
-                        <td>${c.name}</td>
-                        <td>${c.phone || ''}</td>
-                        <td>$${(c.spent||0).toFixed(2)}</td>
-                        <td>${formatPretty(c.last)||''}</td>
-                    </tr>`;
-                });
-                html += '</table>';
-            }
-
-            // --- TABLE 3: TRANSACTION HISTORY ---
-            html += '<h2>Transaction History</h2><table><tr><th>Date</th><th>Client Name</th><th>Amount</th></tr>';
-            history.forEach(h => { 
-                html += `<tr><td>${formatPretty(h.date)}</td><td>${h.clientName || 'Unknown'}</td><td><b>$${h.amount.toFixed(2)}</b></td></tr>`; 
-            });
+            html += '</table><h2>Transaction History</h2><table><tr><th>Date</th><th>Client</th><th>Amount</th></tr>';
+            history.forEach(h => { html += `<tr><td>${formatPretty(h.date)}</td><td>${h.clientName}</td><td>$${h.amount.toFixed(2)}</td></tr>`; });
             html += '</table></body></html>';
-
-            const blob = new Blob([html], {type: 'text/html'}); 
-            const url = URL.createObjectURL(blob); 
-            const a = document.createElement('a'); 
-            a.href = url; 
-            a.download = 'BlackBook_Report.html'; 
-            a.click();
+            const blob = new Blob([html], {type: 'text/html'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'BlackBook_Report.html'; a.click();
         }
 
-        // Crash Guard Logic
         function showCrashScreen(msg) { const m = document.getElementById('crashModal'); document.getElementById('crashMsg').innerText = msg; m.style.display = 'flex'; }
         function emergencyCopy() { const raw = localStorage.getItem('bbClients'); if(navigator.clipboard) { navigator.clipboard.writeText(raw).then(() => alert("Copied!")); } else { prompt("Copy:", raw); } }
         function factoryReset() { if(confirm("This deletes everything. Sure?")) { localStorage.clear(); location.reload(); } }
         
-        // Checkout Math
-        let checkoutTotal = 0; let checkoutGiveback = 0; let selectedDisc = 'none';
-        function openCheckout() { const c = getClient(activeId); document.getElementById('payPrice').value = c.price || 35; document.getElementById('payTip').value = 0; document.getElementById('payDate').value = new Date().toLocaleDateString('en-CA'); document.getElementById('customDiscBox').style.display = 'none'; selectedDisc = 'none'; const opts = document.getElementById('discountList'); opts.innerHTML = ''; addOpt(opts, 'none', 'No Discount', true); if((c.banked || 0) > 0) addOpt(opts, 'free', `Redeem 1 Free Cut (Banked: ${c.banked})`); if((c.credit || 0) > 0) addOpt(opts, 'credit', `Redeem $5 Credit (Bal: $${c.credit})`); if( (c.dob && isMonth(c.dob)) || (c.first && isAnniversary(c.first)) ) { addOpt(opts, 'half', `Redeem 50% Off (Special Month)`); } addOpt(opts, 'custom', 'Custom % Discount'); openModal('checkoutModal'); calcTotal(); }
-        function addOpt(parent, val, label, selected = false) { const div = document.createElement('div'); div.className = `discount-opt ${selected ? 'selected' : ''}`; div.innerText = label; div.onclick = () => { document.querySelectorAll('.discount-opt').forEach(d => d.classList.remove('selected')); div.classList.add('selected'); selectedDisc = val; document.getElementById('customDiscBox').style.display = val === 'custom' ? 'block' : 'none'; calcTotal(); }; parent.appendChild(div); }
-        function calcTotal() { const base = parseFloat(document.getElementById('payPrice').value) || 0; const tip = parseFloat(document.getElementById('payTip').value) || 0; let discount = 0; if(selectedDisc === 'free') discount = base; if(selectedDisc === 'half') discount = base * 0.5; if(selectedDisc === 'credit') discount = Math.min(base, 5); if(selectedDisc === 'custom') { const pct = parseFloat(document.getElementById('payCustomPct').value) || 0; discount = base * (pct / 100); } checkoutGiveback = discount; checkoutTotal = (base - discount) + tip; document.getElementById('payTotal').innerText = `$${checkoutTotal.toFixed(2)}`; document.getElementById('givebackDisplay').innerText = `Giveback: $${checkoutGiveback.toFixed(2)}`; }
+        function addOpt(parent, val, label, selected = false) { 
+            const div = document.createElement('div'); 
+            div.className = `discount-opt ${selected ? 'selected' : ''}`; 
+            div.innerText = label; 
+            div.onclick = () => { 
+                document.querySelectorAll('.discount-opt').forEach(d => d.classList.remove('selected')); 
+                div.classList.add('selected'); 
+                selectedDisc = val; 
+                document.getElementById('customDiscBox').style.display = val === 'custom' ? 'block' : 'none'; 
+                calcTotal(); 
+            }; 
+            parent.appendChild(div); 
+        }
         
-        // Edit Logic
-        function openAddModal() { document.getElementById('eTitle').innerText = 'New Client'; document.getElementById('eId').value = ''; document.getElementById('eName').value = ''; document.getElementById('ePhone').value = ''; document.getElementById('eInsta').value = ''; document.getElementById('eAddr').value = ''; document.getElementById('eRef').value = ''; document.getElementById('eNotes').value = ''; document.getElementById('eFormula').value = ''; document.getElementById('ePrice').value = 35; document.getElementById('eFreq').value = 4; document.getElementById('eDob').value = ''; document.getElementById('eFirst').value = new Date().toLocaleDateString('en-CA'); openModal('editModal'); }
-        function editClient() { closeModal('viewModal'); const c = getClient(activeId); document.getElementById('eTitle').innerText = 'Edit Client'; document.getElementById('eId').value = c.id; document.getElementById('eName').value = c.name; document.getElementById('ePhone').value = c.phone; document.getElementById('eInsta').value = c.insta; document.getElementById('ePrice').value = c.price; document.getElementById('eAddr').value = c.address; document.getElementById('eFreq').value = c.freq; document.getElementById('eFirst').value = c.first; document.getElementById('eDob').value = c.dob; document.getElementById('eRef').value = c.refBy || ''; document.getElementById('eNotes').value = c.notes; document.getElementById('eFormula').value = c.formula || ''; openModal('editModal'); }
-        async function saveClient() { const id = document.getElementById('eId').value || Date.now().toString(); const isNew = !document.getElementById('eId').value; const refName = document.getElementById('eRef').value; let creditAdd = 0; if(isNew && refName) { const referee = clients.find(x => x.name.toLowerCase() === refName.toLowerCase()); if(referee) { referee.credit = (referee.credit || 0) + 5; creditAdd = 5; await customConfirm(`Linked to ${referee.name}! $5 added to both.`); } } const formFirst = document.getElementById('eFirst').value; const data = { id: id, name: document.getElementById('eName').value, phone: document.getElementById('ePhone').value, insta: document.getElementById('eInsta').value, address: document.getElementById('eAddr').value, price: parseFloat(document.getElementById('ePrice').value), freq: parseInt(document.getElementById('eFreq').value), first: formFirst, dob: document.getElementById('eDob').value, refBy: refName, notes: document.getElementById('eNotes').value, formula: document.getElementById('eFormula').value, credit: isNew ? creditAdd : getClient(id).credit, banked: isNew ? 0 : getClient(id).banked, loyalty: isNew ? 0 : getClient(id).loyalty, spent: isNew ? 0 : getClient(id).spent, giveback: isNew ? 0 : getClient(id).giveback, cuts: isNew ? 0 : getClient(id).cuts, last: isNew ? formFirst : getClient(id).last, strikes: isNew ? 0 : (getClient(id).strikes || 0), archived: isNew ? false : (getClient(id).archived || false) }; if(isNew) clients.push(data); else { const idx = clients.findIndex(x => x.id === id); clients[idx] = data; } saveData(); closeModal('editModal'); render(); }
-        async function deleteClient() { if(await customConfirm("Permanently delete this client?")) { clients = clients.filter(c => c.id !== document.getElementById('eId').value); saveData(); closeModal('editModal'); render(); } }
-        async function addStrike() { const c = getClient(activeId); if(await customConfirm(`Mark ${c.name} as a No-Show? \n\nAdds a Strike 🚩.`)) { c.strikes = (c.strikes || 0) + 1; saveData(); closeModal('viewModal'); render(); } }
-        async function removeStrike() { const c = getClient(activeId); if(await customConfirm("Remove one Strike 🚩?")) { c.strikes = Math.max(0, (c.strikes || 0) - 1); saveData(); closeModal('viewModal'); render(); } }
-        function openSmsMenu() { openModal('smsModal'); }
-        function sendSms(type) { 
+        function captureEditState() {
+            const fields = ['eName', 'ePhone', 'eInsta', 'eEmail', 'eAddr', 'ePrice', 'eFreq', 'eFirst', 'eDob', 'eRef', 'eNotes', 'eIcebreaker', 'eFormula', 'eBanked', 'eLoyalty'];
+            let state = "";
+            fields.forEach(f => {
+                const el = document.getElementById(f);
+                if (el) state += el.value;
+            });
+            state += Array.from(document.querySelectorAll('#eTags .tag-pill.active')).map(x => x.innerText).join("");
+            return state;
+        }
+
+        async function cancelEdit() {
+            const currentState = captureEditState();
+            if (currentState !== editInitialState) {
+                if (!await customConfirm("Discard unsaved changes?")) return;
+            }
+            closeModal('editModal');
+        }
+
+        function openAddModal() { 
+            document.getElementById('eTitle').innerText = 'New Client'; 
+            document.getElementById('eId').value = ''; 
+            document.getElementById('eName').value = ''; 
+            document.getElementById('ePhone').value = ''; 
+            document.getElementById('eInsta').value = ''; 
+            document.getElementById('eEmail').value = ''; 
+            document.getElementById('eAddr').value = ''; 
+            document.getElementById('eRef').value = ''; 
+            document.getElementById('eNotes').value = ''; 
+            document.getElementById('eIcebreaker').value = ''; 
+            document.getElementById('eFormula').value = ''; 
+            document.getElementById('ePrice').value = 35; 
+            document.getElementById('eFreq').value = 4; 
+            document.getElementById('eDob').value = ''; 
+            document.getElementById('eBanked').value = 0;
+            document.getElementById('eLoyalty').value = 0;
+            document.getElementById('eFirst').value = getTodayIso(); 
+            const tagBox = document.getElementById('eTags'); tagBox.innerHTML = ''; 
+            VIBE_TAGS.forEach(t => { 
+                const pill = document.createElement('div'); 
+                pill.className = 'tag-pill'; 
+                pill.innerText = t; 
+                pill.onclick = () => pill.classList.toggle('active'); 
+                tagBox.appendChild(pill); 
+            });
+            editInitialState = captureEditState();
+            openModal('editModal'); 
+        }
+        
+        function editClient() { 
+            closeModal('viewModal'); 
             const c = getClient(activeId); 
-            if(!c || !c.phone) return alert('No phone saved.'); 
-            const first = c.name.split(' ')[0]; 
-            let msg = ''; 
+            document.getElementById('eTitle').innerText = 'Edit Client'; 
+            document.getElementById('eId').value = c.id; 
+            document.getElementById('eName').value = c.name; 
+            document.getElementById('ePhone').value = c.phone; 
+            document.getElementById('eInsta').value = c.insta; 
+            document.getElementById('eEmail').value = c.email || ''; 
+            document.getElementById('ePrice').value = c.price; 
+            document.getElementById('eAddr').value = c.address; 
+            document.getElementById('eFreq').value = c.freq; 
+            document.getElementById('eFirst').value = c.first; 
+            document.getElementById('eDob').value = c.dob; 
+            document.getElementById('eRef').value = c.refBy || ''; 
+            document.getElementById('eNotes').value = c.notes; 
+            document.getElementById('eIcebreaker').value = c.icebreaker || '';
+            document.getElementById('eFormula').value = c.formula || ''; 
+            document.getElementById('eBanked').value = c.banked || 0;
+            document.getElementById('eLoyalty').value = c.loyalty || 0;
+            const tagBox = document.getElementById('eTags');
+            tagBox.innerHTML = '';
+            const myTags = c.tags || [];
+            VIBE_TAGS.forEach(t => {
+                const pill = document.createElement('div');
+                pill.className = `tag-pill ${myTags.includes(t) ? 'active' : ''}`;
+                pill.innerText = t;
+                pill.onclick = () => pill.classList.toggle('active');
+                tagBox.appendChild(pill);
+            });
+            editInitialState = captureEditState();
+            openModal('editModal'); 
+        }
+
+        async function saveClient() { 
+            const id = document.getElementById('eId').value || Date.now().toString(); 
+            const isNew = !document.getElementById('eId').value; 
+            const refName = document.getElementById('eRef').value.trim(); 
+            let creditAdd = 0; 
+
+            if(isNew && refName) { 
+                const referee = clients.find(x => x.name.toLowerCase() === refName.toLowerCase()); 
+                if(referee) { 
+                    referee.credit = (referee.credit || 0) + 5; 
+                    creditAdd = 5; 
+                    await customConfirm(`Linked to ${referee.name}! $5 added to both.`); 
+                } else {
+                    alert(`Note: No client found named "${refName}". No referral credit applied.`);
+                }
+            } 
+            const selectedTags = Array.from(document.querySelectorAll('#eTags .tag-pill.active')).map(x => x.innerText);
+            const formFirst = document.getElementById('eFirst').value; 
+            const data = { 
+                id: id, name: document.getElementById('eName').value, phone: document.getElementById('ePhone').value, 
+                insta: document.getElementById('eInsta').value, email: document.getElementById('eEmail').value, 
+                address: document.getElementById('eAddr').value, price: parseFloat(document.getElementById('ePrice').value), 
+                freq: parseInt(document.getElementById('eFreq').value), first: formFirst, dob: document.getElementById('eDob').value, 
+                refBy: refName, notes: document.getElementById('eNotes').value, icebreaker: document.getElementById('eIcebreaker').value,
+                formula: document.getElementById('eFormula').value, tags: selectedTags,
+                credit: isNew ? creditAdd : getClient(id).credit, 
+                banked: parseInt(document.getElementById('eBanked').value) || 0, 
+                loyalty: parseInt(document.getElementById('eLoyalty').value) || 0, 
+                spent: isNew ? 0 : getClient(id).spent, 
+                giveback: isNew ? 0 : getClient(id).giveback, cuts: isNew ? 0 : getClient(id).cuts, 
+                // --- LAST CUT SYNC FIX ---
+                last: isNew ? formFirst : getClient(id).last, 
+                strikes: isNew ? 0 : (getClient(id).strikes || 0), 
+                archived: isNew ? false : (getClient(id).archived || false) 
+            }; 
+            if(isNew) clients.push(data); 
+            else { const idx = clients.findIndex(x => x.id === id); clients[idx] = data; } 
+            saveAll(); closeModal('editModal'); render(); 
+        }
         
+        async function deleteClient() { if(await customConfirm("Permanently delete this client?")) { clients = clients.filter(c => c.id !== document.getElementById('eId').value); saveAll(); closeModal('editModal'); render(); } }
+        async function addStrike() { const c = getClient(activeId); if(await customConfirm(`Mark ${c.name} as a No-Show? \n\nAdds a Strike 🚩.`)) { c.strikes = (c.strikes || 0) + 1; saveAll(); closeModal('viewModal'); render(); } }
+        async function removeStrike() { const c = getClient(activeId); if(await customConfirm("Remove one Strike 🚩?")) { c.strikes = Math.max(0, (c.strikes || 0) - 1); saveAll(); closeModal('viewModal'); render(); } }
+        function openSmsMenu() { openModal('smsModal'); }
+
+        function sendSms(type) { 
+            const c = getClient(activeId); if(!c || !c.phone) return alert('No phone saved.'); 
+            const first = c.name.split(' ')[0]; let msg = ''; 
             if(type === 'late') msg = `Hey ${first}, running about 15 mins late. So sorry!`; 
             if(type === 'confirm') msg = `Yo ${first}, just confirming our cut. You still good?`; 
             if(type === 'longtime') msg = `Hey ${first}, been a while! Time to clean up that cut?`; 
             if(type === 'followup') msg = `Appreciate you coming through ${first}! How's the cut treating you?`; 
-            
-            // NEW REVIEW LOGIC
             if(type === 'review') msg = `Yo ${first}, appreciate the cut! If you have a sec, rate it here:\n\nhttps://mannyserrano4-oss.github.io/crispy-enigma/reviews`; 
-        
-            window.location.href = `sms:${c.phone}&body=${encodeURIComponent(msg)}`; 
+            if(type === 'custom') msg = `Hey ${first}, `;
+            
+            const ua = navigator.userAgent.toLowerCase();
+            const isApple = ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1;
+            const sep = isApple ? '&' : '?';
+            
+            window.location.href = `sms:${c.phone}${sep}body=${encodeURIComponent(msg)}`; 
             closeModal('smsModal'); 
         }
-        /* function sendSms(type) { const c = getClient(activeId); if(!c || !c.phone) return alert('No phone saved.'); const first = c.name.split(' ')[0]; let msg = ''; if(type === 'late') msg = `Hey ${first}, running about 15 mins late. So sorry!`; if(type === 'confirm') msg = `Yo ${first}, just confirming our cut. You still good?`; if(type === 'longtime') msg = `Hey ${first}, been a while! Time to clean up that cut?`; if(type === 'followup') msg = `Appreciate you coming through ${first}! How's the cut treating you?`; window.location.href = `sms:${c.phone}&body=${encodeURIComponent(msg)}`; closeModal('smsModal'); } */
 
-        // --- RESTORE FUNCTION (Missing Fix) ---
         function restoreData(input) {
             const r = new FileReader();
             r.onload = (e) => {
                 try {
                     const d = JSON.parse(e.target.result);
-                    // Check if file is valid
-                    if(d.clients) { 
-                        clients = d.clients; 
-                        settings = d.settings || settings; 
-                        history = d.history || [];
-                        
-                        // Save to phone storage
-                        saveData(); 
-                        localStorage.setItem('bbHistory', JSON.stringify(history));
-                        localStorage.setItem('bbSettings', JSON.stringify(settings));
-                        
-                        // Refresh screen
-                        render(); 
-                        alert('Database Restored Successfully!'); 
-                        closeModal('settingsModal'); 
-                    } else {
-                        alert("Error: This doesn't look like a valid backup file.");
-                    }
-                } catch(err) {
-                    alert("Error loading file: " + err);
-                }
+                    if(d.clients) { clients = d.clients; settings = d.settings || settings; history = d.history || []; saveAll(); render(); alert('Database Restored Successfully!'); closeModal('settingsModal'); }
+                } catch(err) { alert("Error loading file: " + err); }
             };
             r.readAsText(input.files[0]);
         }
-        
     </script>
 </body>
 </html>

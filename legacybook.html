@@ -99,7 +99,7 @@
                             <option value="Beard Trim" data-price="15">Beard Trim ($15)</option>
                             <option value="Full Service" data-price="35">Full Service ($35)</option>
                             <option value="Line Up" data-price="15">Line Up Only ($15)</option>
-                            <option value="House Call" data-price="50+">House Call ($50 + Travel Fee)</option>
+                            <option value="House Call" data-price="50+">House Call (Starts at $50)</option>
                             <option value="General Inquiry" data-price="0">General Inquiry</option>
                         </select>
                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-violet-600"><i class="fa-solid fa-chevron-down text-xs"></i></div>
@@ -213,24 +213,9 @@
 
             <div>
                 <label class="block text-xs font-bold text-violet-700 uppercase tracking-wider mb-1">Details / Specifics</label>
-                <textarea id="cNotes" rows="2" placeholder="House Calls: Please provide your address. Shop Cuts: Any specific hair goals?" class="form-input resize-none"></textarea>
+                <textarea id="cNotes" rows="2" placeholder="e.g. Leave the top long..." class="form-input resize-none"></textarea>
             </div>
 
-           <div id="houseCallWaiver" class="hidden mt-2 bg-red-50 border border-red-200 rounded-lg p-4 shadow-sm transition-all">
-                <h4 class="text-xs font-bold text-red-700 uppercase tracking-wider mb-2 flex items-center">
-                    <i class="fa-solid fa-house-chimney-medical mr-2"></i> House Call Requirements
-                </h4>
-                <div class="text-[11px] text-gray-700 space-y-2 mb-4 pl-1 leading-relaxed">
-                    <p><strong>1. Setup:</strong> I'll provide a rigid chair, power outlet, and lighting. I'm responsible for the final floor cleanup.</p>
-                    <p><strong>2. Travel & Parking:</strong> I agree to a Travel Fee ($1/mile from Zephyrhills or a flat fee discussed via text). I will provide a parking spot or reimburse garage fees.</p>
-                    <p><strong>3. Safety:</strong> Pets secured. No intoxication. The Barber can leave if the environment feels unsafe.</p>
-                    <p><strong>4. Liability:</strong> I assume risk of nicks/accidents caused by my home setup.</p>
-                </div>
-                <label class="flex items-start gap-3 cursor-pointer p-3 bg-white rounded-lg border border-red-200 hover:border-red-400 transition-colors">
-                    <input type="checkbox" id="cHouseSafety" class="mt-1 w-5 h-5 text-red-600 rounded border-gray-300 focus:ring-red-500 cursor-pointer">
-                    <span class="text-xs font-bold text-red-900">I agree to the House Call Requirements & Liability Waiver.</span>
-                </label>
-            </div>
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center gap-3">
                 <i class="fa-solid fa-camera text-blue-500 text-lg ml-1"></i>
                 <div class="text-xs text-blue-800 leading-tight">
@@ -348,14 +333,9 @@
                     </details>
                 </div>
             </div>
-
-            
         </div>
-    </div>
 
-       <div class="text-center mt-12 mb-6">
-    
-    <footer class="max-w-4xl mx-auto px-6 border-t border-gray-200 pt-16 pb-12 text-center mt-20">
+            <footer class="max-w-4xl mx-auto px-6 border-t border-gray-200 pt-16 pb-12 text-center mt-20">
         <div class="flex justify-center gap-10 mb-10">
             <a href="mailto:mannyserrano4@gmail.com" title="Email Manny" class="text-gray-400 hover:text-violet-600 transition-all hover:scale-110">
                 <i class="fa-solid fa-envelope text-2xl"></i>
@@ -402,16 +382,6 @@
             let total = parseFloat(select.options[select.selectedIndex].getAttribute('data-price')) || 0;
             const isHouseCall = select.value === "House Call";
 
-            // 🚨 TOGGLE THE WAIVER VISIBILITY
-            const waiverDiv = document.getElementById('houseCallWaiver');
-            if (isHouseCall) {
-                waiverDiv.classList.remove('hidden');
-            } else {
-                waiverDiv.classList.add('hidden');
-                // Uncheck it if they switch away so they have to check it again if they come back
-                document.getElementById('cHouseSafety').checked = false;
-            }
-
             // B. Add Checkboxes (Eyebrows, etc)
             // We look for any checkbox with class 'addon-checkbox' that is checked
             document.querySelectorAll('.addon-checkbox:checked').forEach(box => {
@@ -452,21 +422,10 @@
             const dateVal = document.getElementById('cDate').value;
             const notes = document.getElementById('cNotes').value.trim();
             const policy = document.getElementById('cPolicy').checked;
-            
-            // 🚨 CHECK HOUSE CALL WAIVER
-            const isHouseCall = service === 'House Call';
-            const houseSafety = document.getElementById('cHouseSafety').checked;
 
             // Safety Checks (Validation)
             if(!name) { showToast("Please enter your name."); return; }
             if(!dateVal && service !== 'General Inquiry') { showToast("Please select a date and time."); return; }
-            
-            // 🚨 NEW RULE: If House Call, MUST check safety box
-            if(isHouseCall && !houseSafety) {
-                 showToast("Please accept the House Call Safety Rules."); 
-                 return; 
-            }
-
             if(!policy) { showToast("Please accept the cancellation policy."); return; }
 
             // Format the Date nicely (e.g., "Mon, Jan 12 at 4:00 PM")
@@ -508,12 +467,6 @@
             }
 
             if (notes) { message += `\n\nNotes: ${notes}`; }
-            
-            // Add Safety note to text if House Call
-            if (isHouseCall) {
-                message += `\n\n(I have accepted the House Call Safety Waiver)`;
-            }
-
             message += `\n\n(I've read the policy & am waiting for confirmation)`;
 
             // --- SEND IT ---
