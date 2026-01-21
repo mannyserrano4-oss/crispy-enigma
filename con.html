@@ -3,69 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAS Design Engine | Stable</title>
+    <title>MAS Design Engine | Decay Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/imagetracerjs@1.2.6/imagetracer_v1.2.6.min.js"></script>
     <style>
-        :root { --bg: #121212; --card: #1e1e1e; --text: #ffffff; --accent: #007aff; --border: #333; }
+        :root { --bg: #121212; --card: #1e1e1e; --text: #ffffff; --accent: #007aff; --border: #333; --decay: #556b2f; }
         body { background-color: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         header { text-align: center; margin-bottom: 20px; }
         .dashboard-container { display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 1100px; }
         @media (min-width: 768px) { .dashboard-container { flex-direction: row; } .editor-panel { flex: 2; } .color-panel { flex: 1; } }
         .editor-panel, .color-panel { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; position: relative; }
         
-        /* Drag and Drop Zone */
-        .upload-zone { border: 2px dashed var(--accent); padding: 20px; text-align: center; border-radius: 12px; cursor: pointer; background: rgba(0, 122, 255, 0.05); margin-bottom: 20px; transition: 0.3s; }
+        .upload-zone { border: 2px dashed var(--accent); padding: 20px; text-align: center; border-radius: 12px; cursor: pointer; background: rgba(0, 122, 255, 0.05); margin-bottom: 20px; }
         .upload-zone.dragover { background: rgba(0, 122, 255, 0.2); border-style: solid; }
         
-        .controls { margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px; font-size: 0.8rem; }
+        .controls { margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; font-size: 0.8rem; }
         input[type="range"] { width: 100%; accent-color: var(--accent); }
+        
         .comparison-viewer { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         canvas, #svg-preview { width: 100%; aspect-ratio: 1 / 1; background: #000; border-radius: 8px; border: 1px solid var(--border); overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; }
         svg { width: 100%; height: 100%; }
 
-        /* Loading Indicator */
-        #loading-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); color: white; border-radius: 16px; z-index: 10; align-items: center; justify-content: center; font-weight: bold; }
+        #loading-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); color: white; border-radius: 16px; z-index: 10; align-items: center; justify-content: center; font-weight: bold; }
 
         .swatch-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
         .swatch-container { display: flex; flex-direction: column; align-items: center; font-size: 9px; color: #888; }
         .swatch { width: 38px; height: 38px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
+        
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s; }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-decay { background: var(--decay); color: white; display: none; border: 1px solid #7c9e3c; }
+        .btn-decay:hover { background: #6a8239; }
+
         .preset-section { padding-top: 15px; border-top: 1px solid var(--border); margin-top: 15px; }
         h3 { font-size: 0.8rem; margin: 0 0 10px 0; color: var(--accent); text-transform: uppercase; }
-        #download-btn { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 8px; margin-top: 15px; font-weight: bold; cursor: pointer; display: none; }
     </style>
 </head>
 <body>
 
     <header>
         <h1>MAS Design Engine</h1>
-        <p>Pro Vectorizer • Stable Build</p>
+        <p>Pro Vectorizer • Decay Mode Active</p>
     </header>
 
     <main class="dashboard-container">
         <section class="editor-panel">
-            <div id="loading-overlay">TRACING PATHS...</div>
+            <div id="loading-overlay">PROCESSING...</div>
             
             <div class="upload-zone" id="drop-zone">
-                <span>Drag & Drop or Tap to Upload</span>
+                <span>Drag & Drop or Tap Logo</span>
                 <input type="file" id="file-input" accept="image/*" hidden>
             </div>
 
             <div class="controls">
                 <label>Simplify Detail: <span id="thresh-val">128</span></label>
                 <input type="range" id="threshold" min="0" max="255" value="128">
+                <button id="decay-btn" class="btn btn-decay">ACTIVATE DECAY MODE</button>
             </div>
             
             <div class="comparison-viewer">
                 <div class="view-box"><h3>Original</h3><canvas id="canvas"></canvas></div>
                 <div class="view-box"><h3>Vector</h3><div id="svg-preview"></div></div>
             </div>
-            <button id="download-btn">Download SVG</button>
+            <button id="download-btn" class="btn btn-primary" style="display:none;">Download SVG</button>
         </section>
 
         <section class="color-panel">
             <div class="preset-section"><h3>Skin Presets</h3><div class="swatch-grid" id="skin-presets"></div></div>
-            <div class="preset-section"><h3>Decay Presets</h3><div class="swatch-grid" id="decay-presets"></div></div>
-            <div class="preset-section"><h3>Detected</h3><div id="image-colors" class="swatch-grid"></div></div>
+            <div class="preset-section"><h3>Decay Themes</h3><div class="swatch-grid" id="decay-presets"></div></div>
+            <div class="preset-section"><h3>Detected Colors</h3><div id="image-colors" class="swatch-grid"></div></div>
         </section>
     </main>
 
@@ -79,20 +84,17 @@
         const svgPreview = document.getElementById('svg-preview');
         const loading = document.getElementById('loading-overlay');
         const downloadBtn = document.getElementById('download-btn');
+        const decayBtn = document.getElementById('decay-btn');
         let currentImg = null;
+        let detectedSkinColor = null;
 
-        // Prevent browser from opening dropped files
+        // Prevent browser default file behavior
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => {
             window.addEventListener(e, (evt) => evt.preventDefault());
         });
 
         dropZone.onclick = () => fileInput.click();
-        dropZone.ondragover = () => dropZone.classList.add('dragover');
-        dropZone.ondragleave = () => dropZone.classList.remove('dragover');
-        dropZone.ondrop = (e) => {
-            dropZone.classList.remove('dragover');
-            handleFile(e.dataTransfer.files[0]);
-        };
+        dropZone.ondrop = (e) => handleFile(e.dataTransfer.files[0]);
         fileInput.onchange = (e) => handleFile(e.target.files[0]);
 
         function handleFile(file) {
@@ -101,65 +103,69 @@
             reader.onload = (event) => {
                 currentImg = new Image();
                 currentImg.onload = () => {
-                    // Limit resolution for performance
-                    const maxDim = 800;
+                    const maxDim = 800; // Keep performance stable
                     let w = currentImg.width, h = currentImg.height;
-                    if (w > maxDim || h > maxDim) {
-                        const ratio = Math.min(maxDim / w, maxDim / h);
-                        w *= ratio; h *= ratio;
-                    }
-                    canvas.width = w; canvas.height = h;
-                    ctx.drawImage(currentImg, 0, 0, w, h);
+                    const ratio = Math.min(maxDim / w, maxDim / h);
+                    canvas.width = w * ratio; canvas.height = h * ratio;
+                    ctx.drawImage(currentImg, 0, 0, canvas.width, canvas.height);
                     extractColors();
                     startVectorize();
+                    decayBtn.style.display = 'block';
                 };
                 currentImg.src = event.target.result;
             };
             reader.readAsDataURL(file);
         }
 
+        // --- THE DECAY LOGIC ---
+        decayBtn.onclick = () => {
+            if (!detectedSkinColor) return;
+            loading.style.display = 'flex';
+            
+            setTimeout(() => {
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imageData.data;
+                const target = hexToRgb(detectedSkinColor);
+                const replacement = { r: 85, g: 107, b: 47 }; // Zombie Green (#556b2f)
+
+                for (let i = 0; i < data.length; i += 4) {
+                    // Check if pixel color is close to the detected skin color
+                    const d = Math.sqrt(
+                        Math.pow(data[i] - target.r, 2) +
+                        Math.pow(data[i+1] - target.g, 2) +
+                        Math.pow(data[i+2] - target.b, 2)
+                    );
+                    
+                    if (d < 60) { // Fuzziness threshold
+                        data[i] = replacement.r;
+                        data[i+1] = replacement.g;
+                        data[i+2] = replacement.b;
+                    }
+                }
+                ctx.putImageData(imageData, 0, 0);
+                startVectorize();
+            }, 100);
+        };
+
         function startVectorize() {
             loading.style.display = 'flex';
             downloadBtn.style.display = 'none';
-            // Use setTimeout to allow the "Loading" UI to show up before freezing the thread
             setTimeout(vectorize, 50);
         }
 
         function vectorize() {
             try {
-                const options = { 
-                    ltres: 1.5, // Slightly higher = faster/smoother
-                    qtres: 1.5, 
-                    pathomit: 15, // Ignores tiny specks/noise
-                    numberofcolors: 12, // Lower colors = faster
-                    treshold: parseInt(thresholdInput.value)
-                };
+                const options = { ltres: 1.5, qtres: 1.5, pathomit: 12, numberofcolors: 12, treshold: parseInt(thresholdInput.value) };
                 const svgString = ImageTracer.imagedataToSVG(ctx.getImageData(0,0,canvas.width,canvas.height), options);
                 svgPreview.innerHTML = svgString;
                 downloadBtn.style.display = 'block';
-            } catch (err) {
-                console.error(err);
-                alert("Image too complex! Try increasing the 'Simplify' slider.");
-            } finally {
-                loading.style.display = 'none';
-            }
+            } finally { loading.style.display = 'none'; }
         }
 
         thresholdInput.oninput = () => {
             threshVal.innerText = thresholdInput.value;
             if(currentImg) startVectorize();
         };
-
-        // Color Logic
-        const skinTones = [{n:'Light',c:'#f9d5b0'},{n:'Med',c:'#d2b48c'},{n:'Deep',c:'#5d4037'}];
-        const decayTones = [{n:'Zombie',c:'#556b2f'},{n:'Rot',c:'#4b5320'},{n:'Grey',c:'#708090'}];
-
-        function init() {
-            const skinRow = document.getElementById('skin-presets');
-            const decayRow = document.getElementById('decay-presets');
-            skinTones.forEach(t => skinRow.appendChild(createSwatch(t.c, t.n)));
-            decayTones.forEach(t => decayRow.appendChild(createSwatch(t.c, t.n)));
-        }
 
         function extractColors() {
             const data = ctx.getImageData(0,0,canvas.width,canvas.height).data;
@@ -168,10 +174,11 @@
                 const hex = "#"+[data[i],data[i+1],data[i+2]].map(x=>x.toString(16).padStart(2,'0')).join('');
                 counts[hex] = (counts[hex]||0)+1;
             }
-            const sorted = Object.keys(counts).sort((a,b)=>counts[b]-counts[a]).slice(0,5);
+            const sorted = Object.keys(counts).sort((a,b)=>counts[b]-counts[a]).filter(h => h !== '#ffffff' && h !== '#000000');
+            detectedSkinColor = sorted[0]; // Assume most common non-BW color is skin
             const grid = document.getElementById('image-colors');
             grid.innerHTML = '';
-            sorted.forEach(h => grid.appendChild(createSwatch(h,h)));
+            sorted.slice(0,5).forEach(h => grid.appendChild(createSwatch(h,h)));
         }
 
         function createSwatch(hex, label) {
@@ -181,15 +188,24 @@
             return d;
         }
 
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : null;
+        }
+
         downloadBtn.onclick = () => {
             const blob = new Blob([svgPreview.innerHTML], {type:'image/svg+xml'});
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = 'MAS-Design.svg';
+            a.download = 'MAS-Design-Vector.svg';
             a.click();
         };
 
-        init();
+        // Init Presets
+        const skinTones = [{n:'Light',c:'#f9d5b0'},{n:'Med',c:'#d2b48c'},{n:'Deep',c:'#5d4037'}];
+        const decayTones = [{n:'Zombie',c:'#556b2f'},{n:'Rot',c:'#4b5320'},{n:'Grey',c:'#708090'}];
+        skinTones.forEach(t => document.getElementById('skin-presets').appendChild(createSwatch(t.c, t.n)));
+        decayTones.forEach(t => document.getElementById('decay-presets').appendChild(createSwatch(t.c, t.n)));
     </script>
 </body>
 </html>
