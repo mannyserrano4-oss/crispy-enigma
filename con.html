@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MAS Design Engine | High-Res Scale</title>
+    <title>MAS Design Engine | Final Stable</title>
     <script src="https://cdn.jsdelivr.net/npm/imagetracerjs@1.2.6/imagetracer_v1.2.6.min.js"></script>
     <style>
         :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --accent: #38bdf8; --border: #334155; }
@@ -20,14 +20,15 @@
         svg { width: 100% !important; height: 100% !important; display: block; overflow: visible !important; }
         canvas, img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .status-bar { display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; color: #888; margin-bottom: 8px; }
-        #loading { color: var(--accent); font-weight: bold; display: none; }
+        #loading { color: #ff4757; font-weight: bold; display: none; }
+        .print-info { background: rgba(56, 189, 248, 0.1); padding: 10px; border-radius: 8px; font-size: 0.75rem; margin-top: 15px; text-align: center; color: var(--accent); }
     </style>
 </head>
 <body>
     <div class="container">
         <h2 style="text-align:center; margin: 0 0 10px 0;">MAS Design Engine</h2>
         <div class="drop-zone" onclick="document.getElementById('file-input').click()">
-            <span>Tap to Upload Logo</span>
+            <span>Tap to Upload</span>
             <input type="file" id="file-input" accept="image/*" hidden>
         </div>
         <div class="controls">
@@ -36,34 +37,35 @@
                 <select id="format"><option value="image/svg+xml">SVG (Vector)</option><option value="image/png">PNG (Raster)</option></select>
             </div>
             <div class="control-group">
-                <label>Print Scale (High-Res)</label>
-                <select id="upscale"><option value="1">1x (Standard)</option><option value="2">2x (Large)</option><option value="4">4x (Ultra-Res)</option></select>
+                <label>Print Scale</label>
+                <select id="upscale"><option value="1">1x</option><option value="2" selected>2x (Recommended)</option><option value="4">4x (Max Detail)</option></select>
             </div>
             <div class="control-group">
                 <label>Zoom: <span id="zoom-val">1x</span></label>
                 <input type="range" id="zoom-slider" min="1" max="100" value="1">
             </div>
             <div class="control-group">
-                <label>Color Sensitivity: <span id="color-val">12</span></label>
-                <input type="range" id="color-slider" min="2" max="32" value="12">
+                <label>Red Sensitivity</label>
+                <input type="range" id="color-slider" min="4" max="32" value="16">
             </div>
         </div>
         <div class="status-bar">
-            <span id="loading">PROCESSING HIGH-RES...</span>
+            <span id="loading">OPTIMIZING FOR PRINT...</span>
             <button onclick="resetView()" style="padding: 2px 8px; font-size: 0.6rem;">RESET VIEW</button>
         </div>
         <div class="preview-window" id="viewport">
             <div id="pan-container"><div id="zoom-content"></div></div>
         </div>
+        <div id="print-calc" class="print-info">Upload a design to see print size.</div>
         <button id="download-btn" style="width:100%; margin-top: 15px; display:none; padding: 12px;">Download for Printing</button>
     </div>
     <script>
-        const fileInput = document.getElementById('file-input'), zoomSlider = document.getElementById('zoom-slider'), colorSlider = document.getElementById('color-slider'), upscaleSelect = document.getElementById('upscale'), zoomVal = document.getElementById('zoom-val'), colorVal = document.getElementById('color-val'), panContainer = document.getElementById('pan-container'), zoomContent = document.getElementById('zoom-content'), formatSelect = document.getElementById('format'), downloadBtn = document.getElementById('download-btn'), loading = document.getElementById('loading');
+        const fileInput = document.getElementById('file-input'), zoomSlider = document.getElementById('zoom-slider'), colorSlider = document.getElementById('color-slider'), upscaleSelect = document.getElementById('upscale'), zoomVal = document.getElementById('zoom-val'), panContainer = document.getElementById('pan-container'), zoomContent = document.getElementById('zoom-content'), formatSelect = document.getElementById('format'), downloadBtn = document.getElementById('download-btn'), loading = document.getElementById('loading'), printCalc = document.getElementById('print-calc');
         let originalImg = null, scale = 1, pointX = 0, pointY = 0, start = { x: 0, y: 0 }, isDragging = false;
         function updateTransform() { panContainer.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`; }
         function resetView() { scale = 1; pointX = 0; pointY = 0; zoomSlider.value = 1; zoomVal.innerText = '1x'; updateTransform(); }
         zoomSlider.oninput = () => { scale = parseFloat(zoomSlider.value); zoomVal.innerText = `${scale}x`; updateTransform(); };
-        colorSlider.oninput = () => { colorVal.innerText = colorSlider.value; if(originalImg) processFile(); };
+        colorSlider.oninput = () => { if(originalImg) processFile(); };
         const viewport = document.getElementById('viewport');
         viewport.addEventListener('mousedown', (e) => { isDragging = true; start = { x: e.clientX - pointX, y: e.clientY - pointY }; });
         viewport.addEventListener('touchstart', (e) => { isDragging = true; start = { x: e.touches[0].clientX - pointX, y: e.touches[0].clientY - pointY }; });
@@ -77,14 +79,24 @@
         };
         async function processFile() {
             loading.style.display = 'inline';
-            const canvas = document.createElement('canvas'), ctx = canvas.getContext('2d'), multiplier = parseInt(upscaleSelect.value); 
-            canvas.width = originalImg.width * multiplier; canvas.height = originalImg.height * multiplier;
+            const canvas = document.createElement('canvas'), ctx = canvas.getContext('2d'), mult = parseInt(upscaleSelect.value); 
+            // Memory Safeguard: Cap the width/height to prevent crashing at 4x
+            let w = originalImg.width * mult, h = originalImg.height * mult;
+            const maxSafe = 4000;
+            if (w > maxSafe || h > maxSafe) { const r = Math.min(maxSafe/w, maxSafe/h); w *= r; h *= r; }
+            canvas.width = w; canvas.height = h;
             ctx.imageSmoothingQuality = 'high';
             ctx.drawImage(originalImg, 0, 0, canvas.width, canvas.height);
+            
+            // Print Size Calculation
+            const inchesW = (canvas.width / 300).toFixed(1);
+            const inchesH = (canvas.height / 300).toFixed(1);
+            printCalc.innerHTML = `<strong>Max Sharp Print (300 DPI):</strong> ${inchesW}" x ${inchesH}" at ${mult}x scale.`;
+
             setTimeout(() => {
                 const target = formatSelect.value; zoomContent.innerHTML = '';
                 if (target === "image/svg+xml") {
-                    const options = { ltres: 0.2, qtres: 0.2, pathomit: 0, numberofcolors: parseInt(colorSlider.value), mincolorratio: 0, viewbox: true };
+                    const options = { ltres: 0.1, qtres: 0.1, pathomit: 0, numberofcolors: parseInt(colorSlider.value), mincolorratio: 0, viewbox: true };
                     zoomContent.innerHTML = ImageTracer.imagedataToSVG(ctx.getImageData(0,0,canvas.width,canvas.height), options);
                 } else {
                     const img = document.createElement('img'); img.src = canvas.toDataURL(target, 1.0); zoomContent.appendChild(img);
@@ -96,8 +108,8 @@
         downloadBtn.onclick = () => {
             const target = formatSelect.value, a = document.createElement('a');
             if (target === "image/svg+xml") {
-                const blob = new Blob([zoomContent.innerHTML], {type: 'image/svg+xml'}); a.href = URL.createObjectURL(blob); a.download = 'MAS-HighRes.svg';
-            } else { a.href = zoomContent.querySelector('img').src; a.download = `MAS-HighRes.png`; }
+                const blob = new Blob([zoomContent.innerHTML], {type: 'image/svg+xml'}); a.href = URL.createObjectURL(blob); a.download = 'MAS-PrintReady.svg';
+            } else { a.href = zoomContent.querySelector('img').src; a.download = `MAS-PrintReady.png`; }
             a.click();
         };
     </script>
