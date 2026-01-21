@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MAS Color Lab</title>
+    <style>
+        :root { --bg: #121212; --card: #1e1e1e; --text: #f8fafc; --accent: #38bdf8; --border: #334155; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        header { padding: 10px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .main-layout { display: flex; flex: 1; overflow: hidden; }
+
+        /* Left Panel: Sidebar Controls */
+        .sidebar { width: 350px; border-right: 1px solid var(--border); padding: 20px; overflow-y: auto; background: var(--card); }
+        .drop-zone { border: 2px dashed var(--accent); border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; margin-bottom: 20px; }
+        
+        .harmony-select { width: 100%; padding: 10px; margin-bottom: 20px; background: #000; color: #fff; border: 1px solid var(--border); border-radius: 4px; }
+        .swatch-group { display: flex; gap: 5px; margin-bottom: 20px; }
+        .swatch { flex: 1; aspect-ratio: 1/1; border-radius: 4px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); position: relative; }
+        .swatch.active { border: 2px solid var(--accent); }
+        .swatch span { position: absolute; bottom: -18px; left: 0; font-size: 9px; color: #888; }
+
+        .definition-box { font-size: 0.8rem; line-height: 1.4; background: rgba(56, 189, 248, 0.05); padding: 15px; border-radius: 8px; border: 1px solid rgba(56, 189, 248, 0.2); margin-top: 10px; }
+        .definition-box b { color: var(--accent); }
+
+        /* Center Canvas: Zoom & Pan */
+        .viewport { flex: 1; background: #000; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: crosshair; }
+        #canvas-container { transform-origin: center; transition: transform 0.1s linear; position: absolute; }
+        canvas { max-width: 90vw; max-height: 80vh; image-rendering: pixelated; }
+
+        /* Bottom Controls */
+        .toolbar { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); padding: 10px 20px; border-radius: 30px; display: flex; gap: 20px; align-items: center; border: 1px solid var(--border); backdrop-filter: blur(10px); }
+        input[type="range"] { accent-color: var(--accent); width: 150px; }
+        .btn { background: var(--accent); color: #000; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h2 style="margin:0; font-size: 1.2rem;">MAS COLOR LAB</h2>
+        <div id="hex-display" style="font-family: monospace; color: var(--accent);">#UPLOAD IMAGE</div>
+    </header>
+
+    <main class="main-layout">
+        <section class="sidebar">
+            <div class="drop-zone" onclick="document.getElementById('file-input').click()">
+                <span>DRAG IMAGE OR TAP</span>
+                <input type="file" id="file-input" accept="image/*" hidden>
+            </div>
+
+            <label>Color Harmony Mode</label>
+            <select id="harmony-mode" class="harmony-select">
+                <option value="none">Manual Pick (Standard)</option>
+                <option value="complementary">Complementary</option>
+                <option value="analogous">Analogous</option>
+                <option value="monochromatic">Monochromatic</option>
+                <option value="triad">Triad</option>
+            </select>
+
+            <div class="swatch-group" id="palette">
+                <div class="swatch active" style="background:#38bdf8"><span>#38BDF8</span></div>
+                <div class="swatch" style="background:#ffffff"><span>#FFFFFF</span></div>
+                <div class="swatch" style="background:#000000"><span>#000000</span></div>
+            </div>
+
+            <div id="definition" class="definition-box">
+                <b>Manual Pick:</b> Click a pixel in the image to select it, then use the bottom wheel to change it.
+            </div>
+
+            <div style="margin-top:20px;">
+                <label>Manual Hex Code</label>
+                <input type="text" id="manual-hex" style="width:100%; padding:8px; background:#000; color:#fff; border:1px solid var(--border); margin-top:5px;" placeholder="#FFFFFF">
+            </div>
+        </section>
+
+        <section class="viewport" id="viewport">
+            <div id="canvas-container">
+                <canvas id="main-canvas"></canvas>
+            </div>
+        </section>
+    </main>
+
+    <div class="toolbar">
+        <div style="display:flex; flex-direction:column; align-items:center;">
+            <label style="font-size:10px; margin-bottom:2px;">ZOOM: <span id="zoom-val">1</span>x</label>
+            <input type="range" id="zoom-slider" min="1" max="10" step="0.1" value="1">
+        </div>
+        <input type="color" id="color-wheel" style="width:40px; height:40px; border:none; background:none; cursor:pointer;">
+        <button class="btn" id="download-btn">DOWNLOAD</button>
+        <button class="btn" style="background:#666;" onclick="resetView()">RESET VIEW</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('main-canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const viewport = document.getElementById('viewport');
+        const container = document.getElementById('canvas-container');
+        const zoomSlider = document.getElementById('zoom-slider');
+        const zoomVal = document.getElementById('zoom-val');
+        const colorWheel = document.getElementById('color-wheel');
+        const harmonyMode = document.getElementById('harmony-mode');
+        const definition = document.getElementById('definition');
+        const manualHex = document.getElementById('manual-hex');
+        
+        let imgData = null;
+        let originalImgData = null;
+        let scale = 1, pointX = 0, pointY = 0, start = { x: 0, y: 0 }, isDragging = false;
+        let selectedColor = { r: 0, g: 0, b: 0 };
+
+        // 1. Color Definitions
+        const definitions = {
+            none: "<b>Manual Pick:</b> Direct control. Good for <b>branding</b> where specific colors are required.",
+            complementary: "<b>Complementary:</b> Colors opposite each other. Good for <b>high contrast</b> and making elements pop.",
+            analogous: "<b>Analogous:</b> Colors next to each other. Good for <b>serene, comfortable</b> designs found in nature.",
+            monochromatic: "<b>Monochromatic:</b> Variations in lightness/saturation. Good for <b>clean, professional</b> looks.",
+            triad: "<b>Triad:</b> Three colors evenly spaced. Good for <b>vibrant, balanced</b> illustrations."
+        };
+
+        // 2. File Handling
+        document.getElementById('file-input').onchange = (e) => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    originalImgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    resetView();
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        // 3. Zoom & Pan (Center Zoom)
+        zoomSlider.oninput = () => {
+            scale = parseFloat(zoomSlider.value);
+            zoomVal.innerText = scale;
+            container.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+        };
+
+        function resetView() {
+            scale = 1; pointX = 0; pointY = 0;
+            zoomSlider.value = 1; zoomVal.innerText = '1';
+            container.style.transform = `translate(0,0) scale(1)`;
+        }
+
+        viewport.onmousedown = (e) => { isDragging = true; start = { x: e.clientX - pointX, y: e.clientY - pointY }; };
+        window.onmousemove = (e) => { if (isDragging) { pointX = e.clientX - start.x; pointY = e.clientY - start.y; container.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`; }};
+        window.onmouseup = () => isDragging = false;
+
+        // 4. Color Swapping Logic
+        canvas.onclick = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.floor((e.clientX - rect.left) / (rect.width / canvas.width));
+            const y = Math.floor((e.clientY - rect.top) / (rect.height / canvas.height));
+            const pixel = ctx.getImageData(x, y, 1, 1).data;
+            selectedColor = { r: pixel[0], g: pixel[1], b: pixel[2] };
+            document.getElementById('hex-display').innerText = rgbToHex(pixel[0], pixel[1], pixel[2]);
+        };
+
+        colorWheel.oninput = () => {
+            const newColor = hexToRgb(colorWheel.value);
+            manualHex.value = colorWheel.value.toUpperCase();
+            recolor(selectedColor, newColor);
+            selectedColor = newColor;
+        };
+
+        function recolor(target, replacement) {
+            const data = imgData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                if (data[i] === target.r && data[i+1] === target.g && data[i+2] === target.b) {
+                    data[i] = replacement.r;
+                    data[i+1] = replacement.g;
+                    data[i+2] = replacement.b;
+                }
+            }
+            ctx.putImageData(imgData, 0, 0);
+        }
+
+        // 5. Utilities
+        function rgbToHex(r, g, b) {
+            return "#" + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase();
+        }
+
+        function hexToRgb(hex) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return { r, g, b };
+        }
+
+        harmonyMode.onchange = () => {
+            definition.innerHTML = definitions[harmonyMode.value];
+        };
+
+        document.getElementById('download-btn').onclick = () => {
+            const link = document.createElement('a');
+            link.download = 'MAS-Color-Edit.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        };
+    </script>
+</body>
+</html>
