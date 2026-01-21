@@ -3,34 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MAS Design Engine | Full View</title>
+    <title>MAS Design Engine | Clean Build</title>
     <script src="https://cdn.jsdelivr.net/npm/imagetracerjs@1.2.6/imagetracer_v1.2.6.min.js"></script>
     <style>
         :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --accent: #38bdf8; --border: #334155; }
         body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
-        .container { width: 100%; max-width: 800px; background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        .drop-zone { border: 2px dashed var(--accent); border-radius: 12px; padding: 25px; text-align: center; cursor: pointer; background: rgba(56, 189, 248, 0.05); margin-bottom: 20px; }
-        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .control-group { display: flex; flex-direction: column; gap: 5px; font-size: 0.8rem; font-weight: bold; color: var(--accent); }
-        select, button, input[type="range"] { padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: #0f172a; color: white; font-size: 1rem; }
+        .container { width: 100%; max-width: 850px; background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .drop-zone { border: 2px dashed var(--accent); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; background: rgba(56, 189, 248, 0.05); margin-bottom: 15px; }
+        
+        /* Fixed Controls Layout */
+        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .control-group { display: flex; flex-direction: column; gap: 4px; font-size: 0.75rem; font-weight: bold; color: var(--accent); }
+        select, button, input[type="range"] { padding: 8px; border-radius: 6px; border: 1px solid var(--border); background: #0f172a; color: white; font-size: 0.9rem; }
         button { background: var(--accent); color: #0f172a; border: none; font-weight: bold; cursor: pointer; }
+
         .preview-window { width: 100%; aspect-ratio: 1/1; background: #000; border: 2px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; touch-action: none; cursor: grab; display: flex; align-items: center; justify-content: center; }
+        
         #pan-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transform-origin: center; transition: transform 0.05s linear; }
-        #zoom-content { display: flex; align-items: center; justify-content: center; pointer-events: none; width: 100%; height: 100%; }
-        /* SVG Fix: Ensure the vector scales to fit the container */
-        svg { width: 100%; height: 100%; object-fit: contain; display: block; }
-        canvas, img { max-width: 100%; max-height: 100%; display: block; pointer-events: none; }
-        .status-bar { display: flex; justify-content: space-between; font-size: 0.7rem; color: #888; margin-bottom: 10px; }
+        #zoom-content { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        
+        /* Critical SVG Scaling Fix */
+        svg { width: 100% !important; height: 100% !important; max-width: 100%; max-height: 100%; display: block; overflow: visible !important; }
+        canvas, img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+        .status-bar { display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; color: #888; margin-bottom: 8px; }
         #loading { color: var(--accent); font-weight: bold; display: none; }
+        .hint { font-size: 0.65rem; color: #64748b; margin-bottom: 10px; text-align: center; line-height: 1.2; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <h2 style="text-align:center; margin: 0 0 10px 0;">MAS Design Engine</h2>
+        <div class="hint">FIX: Lower "Color Count" to 5-8 to remove gray spots. Zoom from center active.</div>
         
         <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
-            <span>Tap to Upload Tattoo Design</span>
+            <span>Tap to Upload</span>
             <input type="file" id="file-input" accept="image/*" hidden>
         </div>
 
@@ -38,19 +46,26 @@
             <div class="control-group">
                 <label>Format</label>
                 <select id="format">
-                    <option value="image/svg+xml">SVG (Full Detail)</option>
+                    <option value="image/svg+xml">SVG (Vector)</option>
                     <option value="image/png">PNG</option>
-                    <option value="image/jpeg">JPEG</option>
                 </select>
             </div>
             <div class="control-group">
                 <label>Zoom: <span id="zoom-val">1x</span></label>
                 <input type="range" id="zoom-slider" min="1" max="100" step="1" value="1">
             </div>
+            <div class="control-group">
+                <label>Color Count: <span id="color-val">8</span></label>
+                <input type="range" id="color-slider" min="2" max="32" value="8">
+            </div>
+            <div class="control-group">
+                <label>Simplify Detail</label>
+                <input type="range" id="detail-slider" min="0" max="2" step="0.1" value="0.5">
+            </div>
         </div>
 
         <div class="status-bar">
-            <span id="loading">TRACING EVERYTHING...</span>
+            <span id="loading">CLEANING PATHS...</span>
             <button onclick="resetView()" style="padding: 2px 8px; font-size: 0.6rem;">RESET VIEW</button>
         </div>
 
@@ -60,14 +75,16 @@
             </div>
         </div>
 
-        <button id="download-btn" style="width:100%; margin-top: 20px; display:none;">Download Final File</button>
+        <button id="download-btn" style="width:100%; margin-top: 15px; display:none; padding: 12px;">Download Final File</button>
     </div>
 
     <script>
         const fileInput = document.getElementById('file-input');
         const zoomSlider = document.getElementById('zoom-slider');
+        const colorSlider = document.getElementById('color-slider');
+        const detailSlider = document.getElementById('detail-slider');
         const zoomVal = document.getElementById('zoom-val');
-        const viewport = document.getElementById('viewport');
+        const colorVal = document.getElementById('color-val');
         const panContainer = document.getElementById('pan-container');
         const zoomContent = document.getElementById('zoom-content');
         const formatSelect = document.getElementById('format');
@@ -81,14 +98,16 @@
         function resetView() { scale = 1; pointX = 0; pointY = 0; zoomSlider.value = 1; zoomVal.innerText = '1x'; updateTransform(); }
 
         zoomSlider.oninput = () => { scale = parseFloat(zoomSlider.value); zoomVal.innerText = `${scale}x`; updateTransform(); };
+        colorSlider.oninput = () => { colorVal.innerText = colorSlider.value; if(originalImg) processFile(); };
+        detailSlider.oninput = () => { if(originalImg) processFile(); };
 
+        // Pan Logic
         const startDrag = (e) => {
             isDragging = true;
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
             start = { x: clientX - pointX, y: clientY - pointY };
         };
-
         const duringDrag = (e) => {
             if (!isDragging) return;
             e.preventDefault();
@@ -97,7 +116,7 @@
             pointX = clientX - start.x; pointY = clientY - start.y;
             updateTransform();
         };
-
+        const viewport = document.getElementById('viewport');
         viewport.addEventListener('mousedown', startDrag);
         viewport.addEventListener('touchstart', startDrag);
         window.addEventListener('mousemove', duringDrag);
@@ -119,11 +138,9 @@
 
         async function processFile() {
             loading.style.display = 'inline';
-            resetView();
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            
-            const max = 2000; 
+            const max = 1500; 
             let w = originalImg.width, h = originalImg.height;
             const r = Math.min(max/w, max/h);
             canvas.width = w * r; canvas.height = h * r;
@@ -133,9 +150,14 @@
                 const target = formatSelect.value;
                 zoomContent.innerHTML = '';
                 if (target === "image/svg+xml") {
-                    const options = { ltres: 0.5, qtres: 0.5, pathomit: 0, numberofcolors: 32, mincolorratio: 0.0001 };
-                    let svgString = ImageTracer.imagedataToSVG(ctx.getImageData(0,0,canvas.width,canvas.height), options);
-                    zoomContent.innerHTML = svgString;
+                    const options = { 
+                        ltres: parseFloat(detailSlider.value), 
+                        qtres: parseFloat(detailSlider.value), 
+                        pathomit: 0.1, 
+                        numberofcolors: parseInt(colorSlider.value), 
+                        viewbox: true // CRITICAL: Ensures SVG scales correctly
+                    };
+                    zoomContent.innerHTML = ImageTracer.imagedataToSVG(ctx.getImageData(0,0,canvas.width,canvas.height), options);
                 } else {
                     const img = document.createElement('img');
                     img.src = canvas.toDataURL(target, 1.0);
@@ -143,19 +165,20 @@
                 }
                 loading.style.display = 'none';
                 downloadBtn.style.display = 'block';
-            }, 100);
+            }, 50);
         }
 
+        formatSelect.onchange = () => { if(originalImg) processFile(); };
         downloadBtn.onclick = () => {
             const target = formatSelect.value;
             const a = document.createElement('a');
             if (target === "image/svg+xml") {
                 const blob = new Blob([zoomContent.innerHTML], {type: 'image/svg+xml'});
                 a.href = URL.createObjectURL(blob);
-                a.download = 'MAS-FullView.svg';
+                a.download = 'MAS-CleanDesign.svg';
             } else {
                 a.href = zoomContent.querySelector('img').src;
-                a.download = `MAS-FullView.${target.split('/')[1]}`;
+                a.download = `MAS-CleanDesign.png`;
             }
             a.click();
         };
