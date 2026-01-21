@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MAS Design Engine | Ultra Detail</title>
+    <title>MAS Design Engine | Full View</title>
     <script src="https://cdn.jsdelivr.net/npm/imagetracerjs@1.2.6/imagetracer_v1.2.6.min.js"></script>
     <style>
         :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --accent: #38bdf8; --border: #334155; }
@@ -16,8 +16,10 @@
         button { background: var(--accent); color: #0f172a; border: none; font-weight: bold; cursor: pointer; }
         .preview-window { width: 100%; aspect-ratio: 1/1; background: #000; border: 2px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; touch-action: none; cursor: grab; display: flex; align-items: center; justify-content: center; }
         #pan-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transform-origin: center; transition: transform 0.05s linear; }
-        #zoom-content { display: flex; align-items: center; justify-content: center; pointer-events: none; }
-        svg, canvas, img { max-width: 100%; max-height: 100%; display: block; pointer-events: none; }
+        #zoom-content { display: flex; align-items: center; justify-content: center; pointer-events: none; width: 100%; height: 100%; }
+        /* SVG Fix: Ensure the vector scales to fit the container */
+        svg { width: 100%; height: 100%; object-fit: contain; display: block; }
+        canvas, img { max-width: 100%; max-height: 100%; display: block; pointer-events: none; }
         .status-bar { display: flex; justify-content: space-between; font-size: 0.7rem; color: #888; margin-bottom: 10px; }
         #loading { color: var(--accent); font-weight: bold; display: none; }
     </style>
@@ -28,7 +30,7 @@
         <h2 style="text-align:center; margin: 0 0 10px 0;">MAS Design Engine</h2>
         
         <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
-            <span>Tap to Upload Design</span>
+            <span>Tap to Upload Tattoo Design</span>
             <input type="file" id="file-input" accept="image/*" hidden>
         </div>
 
@@ -36,9 +38,9 @@
             <div class="control-group">
                 <label>Format</label>
                 <select id="format">
-                    <option value="image/svg+xml">SVG (Ultra Detail)</option>
-                    <option value="image/png">PNG (Lossless)</option>
-                    <option value="image/jpeg">JPEG (High Quality)</option>
+                    <option value="image/svg+xml">SVG (Full Detail)</option>
+                    <option value="image/png">PNG</option>
+                    <option value="image/jpeg">JPEG</option>
                 </select>
             </div>
             <div class="control-group">
@@ -48,7 +50,7 @@
         </div>
 
         <div class="status-bar">
-            <span id="loading">CONVERTING FINE DETAILS...</span>
+            <span id="loading">TRACING EVERYTHING...</span>
             <button onclick="resetView()" style="padding: 2px 8px; font-size: 0.6rem;">RESET VIEW</button>
         </div>
 
@@ -121,7 +123,6 @@
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             
-            // INCREASED RESOLUTION for fine details
             const max = 2000; 
             let w = originalImg.width, h = originalImg.height;
             const r = Math.min(max/w, max/h);
@@ -132,18 +133,12 @@
                 const target = formatSelect.value;
                 zoomContent.innerHTML = '';
                 if (target === "image/svg+xml") {
-                    // ULTRA-DETAIL OPTIONS
-                    const options = { 
-                        ltres: 0.5, // Much tighter line tracing
-                        qtres: 0.5, 
-                        pathomit: 1, // DO NOT OMIT FINE LINES (like the tattoo)
-                        numberofcolors: 32, // Preserves color contrast for small details
-                        mincolorratio: 0.001 
-                    };
-                    zoomContent.innerHTML = ImageTracer.imagedataToSVG(ctx.getImageData(0,0,canvas.width,canvas.height), options);
+                    const options = { ltres: 0.5, qtres: 0.5, pathomit: 0, numberofcolors: 32, mincolorratio: 0.0001 };
+                    let svgString = ImageTracer.imagedataToSVG(ctx.getImageData(0,0,canvas.width,canvas.height), options);
+                    zoomContent.innerHTML = svgString;
                 } else {
                     const img = document.createElement('img');
-                    img.src = canvas.toDataURL(target, 1.0); // 1.0 = Max quality
+                    img.src = canvas.toDataURL(target, 1.0);
                     zoomContent.appendChild(img);
                 }
                 loading.style.display = 'none';
@@ -157,10 +152,10 @@
             if (target === "image/svg+xml") {
                 const blob = new Blob([zoomContent.innerHTML], {type: 'image/svg+xml'});
                 a.href = URL.createObjectURL(blob);
-                a.download = 'MAS-UltraDetail.svg';
+                a.download = 'MAS-FullView.svg';
             } else {
                 a.href = zoomContent.querySelector('img').src;
-                a.download = `MAS-UltraDetail.${target.split('/')[1]}`;
+                a.download = `MAS-FullView.${target.split('/')[1]}`;
             }
             a.click();
         };
