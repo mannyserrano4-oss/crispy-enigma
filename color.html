@@ -3,203 +3,259 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MAS Color Lab | Pro</title>
+    <title>MAS Color Lab | Auto-Detect</title>
     <style>
         :root { --bg: #0a0a0c; --card: #16161a; --text: #ececed; --accent: #38bdf8; --border: #2d2d33; }
         body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
+
+        /* --- SIDEBAR --- */
+        .sidebar { width: 340px; min-width: 340px; border-right: 1px solid var(--border); padding: 20px; overflow-y: auto; background: var(--card); display: flex; flex-direction: column; gap: 15px; }
+        .section-header { font-size: 0.7rem; font-weight: 700; color: #71717a; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
         
-        .sidebar { width: 380px; border-right: 1px solid var(--border); padding: 24px; overflow-y: auto; background: var(--card); display: flex; flex-direction: column; gap: 15px; z-index: 10; }
-        .drop-zone { border: 2px dashed var(--accent); border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; background: rgba(56, 189, 248, 0.03); }
+        .drop-zone { border: 2px dashed var(--accent); border-radius: 10px; padding: 15px; text-align: center; cursor: pointer; background: rgba(56, 189, 248, 0.05); }
+        .btn { background: var(--accent); color: #000; border: none; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; font-size: 0.9rem; }
+        select.btn { background: #000; color: #fff; border: 1px solid var(--border); text-align: left; }
+
+        /* Palettes Grid */
+        .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+        .swatch-container { display: flex; flex-direction: column; align-items: center; cursor: pointer; position: relative; }
+        .swatch { width: 100%; aspect-ratio: 1/1; border-radius: 6px; border: 2px solid var(--border); transition: 0.2s; }
+        .swatch-hex { font-size: 0.6rem; color: #71717a; margin-top: 3px; font-family: monospace; }
+        /* Active states for targeting and replacing */
+        .swatch-container.target .swatch { border-color: var(--accent); box-shadow: 0 0 10px var(--accent); transform: scale(1.05); z-index: 2; }
+        .swatch-container.mapped .swatch::after { content: '→'; position: absolute; top: -5px; right: -5px; background: var(--accent); color: black; border-radius: 50%; width: 15px; height: 15px; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+
+        /* Color Wheel */
+        .wheel-wrap { position: relative; width: 200px; height: 200px; margin: 10px auto; }
+        #c-wheel { width: 100%; height: 100%; border-radius: 50%; cursor: crosshair; border: 3px solid var(--border); }
+        .wheel-marker { position: absolute; width: 14px; height: 14px; border: 2px solid white; border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; box-shadow: 0 0 5px black; }
+        #main-marker { border-color: var(--accent); z-index: 10; }
+
+        /* --- MAIN VIEW --- */
+        .main-view { flex: 1; display: flex; flex-direction: column; background: #000; }
+        .canvas-split { flex: 1; display: flex; border-bottom: 1px solid var(--border); position: relative; }
+        .viewport { flex: 1; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+        .vp-label { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); padding: 5px 10px; border-radius: 4px; font-size: 0.7rem; color: #aaa; z-index: 10; pointer-events: none; }
         
-        .wheel-container { position: relative; width: 220px; height: 220px; margin: 10px auto; }
-        #color-wheel { width: 100%; height: 100%; border-radius: 50%; cursor: crosshair; border: 3px solid var(--border); }
-        #wheel-cursor { position: absolute; width: 12px; height: 12px; border: 2px solid white; border-radius: 50%; pointer-events: none; transform: translate(-50%, -50%); box-shadow: 0 0 4px black; }
+        .canvas-holder { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+        .pan-layer { position: absolute; top: 50%; left: 50%; transform-origin: center; display: flex; align-items: center; justify-content: center; transition: transform 0.05s linear; }
+        canvas { max-width: 90%; max-height: 90%; image-rendering: pixelated; box-shadow: 0 5px 20px rgba(0,0,0,0.5); pointer-events: none; }
 
-        .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 10px; }
-        .swatch { aspect-ratio: 1/1; border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; display: flex; align-items: flex-end; justify-content: center; font-size: 8px; padding-bottom: 2px; text-shadow: 0 0 2px black; }
-        .swatch.active { border-color: var(--accent); transform: scale(1.1); }
-
-        .definition-card { font-size: 0.8rem; line-height: 1.5; background: rgba(56, 189, 248, 0.05); padding: 12px; border-radius: 10px; border: 1px solid rgba(56, 189, 248, 0.15); }
-
-        .main-stage { flex: 1; background: #000; position: relative; overflow: hidden; }
-        #canvas-holder { transform-origin: center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-        canvas#editor-canvas { max-width: 90vw; max-height: 85vh; image-rendering: pixelated; cursor: crosshair; }
-
-        /* Magnifier Glass */
-        #magnifier { position: fixed; width: 100px; height: 100px; border: 3px solid var(--accent); border-radius: 50%; pointer-events: none; display: none; overflow: hidden; z-index: 100; background: #000; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
-        #mag-canvas { width: 200%; height: 200%; image-rendering: pixelated; }
-
-        .zoom-bar { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(22,22,26,0.9); padding: 10px 20px; border-radius: 50px; display: flex; gap: 20px; align-items: center; border: 1px solid var(--border); backdrop-filter: blur(10px); }
-        .action-btn { background: var(--accent); color: #000; border: none; padding: 10px 15px; border-radius: 30px; font-weight: 700; cursor: pointer; }
+        .toolbar { height: 50px; background: var(--card); display: flex; align-items: center; padding: 0 20px; gap: 20px; border-top: 1px solid var(--border); }
+        input[type=range] { accent-color: var(--accent); }
     </style>
 </head>
 <body>
 
-    <aside class="sidebar">
-        <div class="drop-zone" onclick="document.getElementById('file-input').click()">
-            <div style="font-weight: 800; color: var(--accent);">IMPORT QR OR DESIGN</div>
-            <input type="file" id="file-input" accept="image/*" hidden>
-        </div>
+<aside class="sidebar">
+    <div class="drop-zone" onclick="document.getElementById('f-in').click()">
+        <div>UPLOAD IMAGE</div>
+        <input type="file" id="f-in" accept="image/*" hidden>
+    </div>
 
-        <select id="harmony-mode" class="action-btn" style="background:#000; color:#fff; border:1px solid var(--border); width:100%;">
-            <option value="analogous">Analogous</option>
-            <option value="monochromatic">Monochromatic</option>
-            <option value="complementary">Complementary</option>
-            <option value="triad">Triad</option>
+    <div>
+        <div class="section-header">1. Detected Colors (Click to Target)</div>
+        <div class="palette-grid" id="detected-pal"></div>
+    </div>
+
+    <div style="border-top: 1px solid var(--border); padding-top: 15px;">
+        <div class="section-header">2. Harmony Rules</div>
+        <select id="harmony" class="btn select.btn">
+            <option value="complementary">Complementary (Contrast)</option>
+            <option value="analogous">Analogous (Smooth)</option>
+            <option value="triad">Triad (Vibrant)</option>
+            <option value="monochromatic">Monochromatic (Subtle)</option>
         </select>
+    </div>
 
-        <div class="wheel-container">
-            <canvas id="color-wheel"></canvas>
-            <div id="wheel-cursor"></div>
+    <div class="wheel-wrap">
+        <canvas id="c-wheel"></canvas>
+        <div id="main-marker" class="wheel-marker" style="display:none"></div>
+    </div>
+
+    <div>
+        <div class="section-header">3. Suggested Replacements (Click to Apply)</div>
+        <div class="palette-grid" id="suggested-pal"></div>
+    </div>
+
+    <button class="btn" id="dl-btn" style="margin-top: auto;">DOWNLOAD NEW IMAGE</button>
+</aside>
+
+<main class="main-view">
+    <div class="canvas-split">
+        <div class="viewport" style="border-right: 1px solid var(--border);">
+            <div class="vp-label">ORIGINAL</div>
+            <div class="canvas-holder" id="orig-holder">
+                <div class="pan-layer" id="orig-pan"><canvas id="c-orig"></canvas></div>
+            </div>
         </div>
-
-        <div id="theory-definition" class="definition-card"><b>Analogous:</b> Colors next to each other. Best for smooth, nature-inspired blends.</div>
-
-        <div style="font-size:0.75rem; color:var(--accent); font-weight:bold; margin-top:10px;">SUGGESTED PALETTE</div>
-        <div class="palette-grid" id="palette-display"></div>
-
-        <button class="action-btn" id="download-btn" style="margin-top:auto">EXPORT DESIGN</button>
-    </aside>
-
-    <main class="main-stage" id="stage">
-        <div id="canvas-holder">
-            <canvas id="editor-canvas"></canvas>
+        <div class="viewport">
+            <div class="vp-label">PREVIEW (RECOLORED)</div>
+            <div class="canvas-holder" id="prev-holder">
+                <div class="pan-layer" id="prev-pan"><canvas id="c-prev"></canvas></div>
+            </div>
         </div>
-        <div id="magnifier"><canvas id="mag-canvas"></canvas></div>
-        
-        <div class="zoom-bar">
-            <span style="font-size: 0.7rem;">ZOOM: <span id="z-val">1</span>x</span>
-            <input type="range" id="z-slider" min="1" max="10" step="0.1" value="1">
-            <div id="active-hex" style="font-family:monospace; color:var(--accent);">#PICK COLOR</div>
-        </div>
-    </main>
+    </div>
+    <div class="toolbar">
+        <label style="font-size: 0.8rem;">ZOOM: <span id="z-val">1</span>x</label>
+        <input type="range" id="z-slider" min="1" max="10" step="0.1" value="1">
+        <button class="btn" style="width: auto; padding: 5px 15px; font-size: 0.7rem; background: #333; color: white;" onclick="resetChanges()">RESET COLORS</button>
+    </div>
+</main>
 
-    <script>
-        const editor = document.getElementById('editor-canvas'), eCtx = editor.getContext('2d', {willReadFrequently: true});
-        const wheel = document.getElementById('color-wheel'), wCtx = wheel.getContext('2d');
-        const mag = document.getElementById('magnifier'), magCanvas = document.getElementById('mag-canvas'), mCtx = magCanvas.getContext('2d');
-        const paletteDisplay = document.getElementById('palette-display'), zSlider = document.getElementById('z-slider'), holder = document.getElementById('canvas-holder');
-        const theoryBox = document.getElementById('theory-definition'), activeHexDisplay = document.getElementById('active-hex');
+<script>
+    const cOrig = document.getElementById('c-orig'), ctxOrig = cOrig.getContext('2d', {willReadFrequently:true});
+    const cPrev = document.getElementById('c-prev'), ctxPrev = cPrev.getContext('2d');
+    const wheel = document.getElementById('c-wheel'), wCtx = wheel.getContext('2d');
+    const detectedPal = document.getElementById('detected-pal'), suggestedPal = document.getElementById('suggested-pal');
+    const zSlider = document.getElementById('z-slider'), zVal = document.getElementById('z-val');
+    const origPan = document.getElementById('orig-pan'), prevPan = document.getElementById('prev-pan');
+    const mainMarker = document.getElementById('main-marker');
 
-        let imgData = null, originalData = null, scale = 1, pX = 0, pY = 0, start = {x:0, y:0}, isDrag = false;
-        let selectedSourceRGB = null, baseHSL = {h: 200, s: 100, l: 50};
+    let originalData = null;
+    let detectedColors = []; // Array of hex strings
+    let colorMap = {}; // Object mapping oldHex -> newHex
+    let activeTargetHex = null; // The color currently selected to be changed
+    let scale = 1;
 
-        const theories = {
-            analogous: "<b>Analogous:</b> Adjacent colors. <b>Great for</b> serene, comfortable vibes like nature.",
-            monochromatic: "<b>Monochromatic:</b> Shades of one hue. <b>Great for</b> clean, professional barber branding.",
-            complementary: "<b>Complementary:</b> Opposites. <b>Great for</b> high-contrast QR codes that must pop.",
-            triad: "<b>Triad:</b> Three equal spaces. <b>Great for</b> vibrant, balanced streetwear designs."
-        };
-
-        // 1. Setup Wheel
-        wheel.width = wheel.height = 400;
-        function drawWheel() {
-            const r = 200;
-            for(let i=0; i<360; i++) {
-                wCtx.beginPath(); wCtx.moveTo(r,r); wCtx.arc(r,r,r, (i-1)*Math.PI/180, (i+1)*Math.PI/180);
-                wCtx.fillStyle = `hsl(${i}, 100%, 50%)`; wCtx.fill();
-            }
+    // --- 1. INITIALIZE COLOR WHEEL (Corrected Orientation) ---
+    wheel.width = wheel.height = 200;
+    function drawWheel() {
+        const r = 100, cx = 100, cy = 100;
+        for(let i=0; i<360; i++) {
+            wCtx.beginPath();
+            wCtx.moveTo(cx, cy);
+            // -90 degrees offsets so 0 is at the top (Red)
+            wCtx.arc(cx, cy, r, (i-91)*Math.PI/180, (i-89)*Math.PI/180);
+            wCtx.fillStyle = `hsl(${i}, 100%, 50%)`;
+            wCtx.fill();
         }
-        drawWheel();
+    }
+    drawWheel();
 
-        // 2. File Handling
-        document.getElementById('file-input').onchange = (e) => {
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                const img = new Image();
-                img.onload = () => {
-                    editor.width = img.width; editor.height = img.height;
-                    eCtx.drawImage(img, 0, 0);
-                    imgData = eCtx.getImageData(0,0,img.width,img.height);
-                    originalData = eCtx.getImageData(0,0,img.width,img.height);
-                };
-                img.src = ev.target.result;
+    // --- 2. FILE LOAD & AUTO-DETECT ---
+    document.getElementById('f-in').onchange = (e) => {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            const img = new Image();
+            img.onload = () => {
+                cOrig.width = cPrev.width = img.width;
+                cOrig.height = cPrev.height = img.height;
+                ctxOrig.drawImage(img,0,0);
+                originalData = ctxOrig.getImageData(0,0,img.width,img.height);
+                extractColors(); // Auto-detect function
+                updatePreview();
             };
-            reader.readAsDataURL(e.target.files[0]);
+            img.src = ev.target.result;
         };
+        reader.readAsDataURL(e.target.files[0]);
+    };
 
-        // 3. Eyedropper & Magnifier
-        editor.onmousemove = (e) => {
-            if(!imgData) return;
-            mag.style.display = 'block';
-            mag.style.left = (e.clientX + 20) + 'px'; mag.style.top = (e.clientY + 20) + 'px';
-            
-            const rect = editor.getBoundingClientRect();
-            const x = Math.floor((e.clientX - rect.left) / (rect.width / editor.width));
-            const y = Math.floor((e.clientY - rect.top) / (rect.height / editor.height));
-            
-            // Draw into magnifier canvas
-            mCtx.clearRect(0,0,magCanvas.width,magCanvas.height);
-            mCtx.drawImage(editor, x-5, y-5, 10, 10, 0, 0, magCanvas.width, magCanvas.height);
-        };
-        editor.onmouseleave = () => mag.style.display = 'none';
-
-        editor.onclick = (e) => {
-            const rect = editor.getBoundingClientRect();
-            const x = Math.floor((e.clientX - rect.left) / (rect.width / editor.width));
-            const y = Math.floor((e.clientY - rect.top) / (rect.height / editor.height));
-            const pixel = eCtx.getImageData(x, y, 1, 1).data;
-            selectedSourceRGB = {r: pixel[0], g: pixel[1], b: pixel[2]};
-            activeHexDisplay.innerText = rgbToHex(pixel[0], pixel[1], pixel[2]);
-        };
-
-        // 4. Harmony & Palette
-        wheel.onclick = (e) => {
-            const rect = wheel.getBoundingClientRect();
-            const x = e.clientX - rect.left - 110, y = e.clientY - rect.top - 110;
-            baseHSL.h = (Math.atan2(y, x) * 180 / Math.PI + 450) % 360;
-            updatePalette();
-        };
-
-        function updatePalette() {
-            const mode = document.getElementById('harmony-mode').value;
-            theoryBox.innerHTML = theories[mode];
-            paletteDisplay.innerHTML = '';
-            
-            const offsets = {analogous:[-30,0,30], complementary:[0,180], triad:[0,120,240], monochromatic:[0]}[mode];
-            const lightness = mode === 'monochromatic' ? [30,50,70,80,90] : [50,50,50];
-
-            offsets.forEach((off, i) => {
-                (mode === 'monochromatic' ? lightness : [50]).forEach(l => {
-                    const hex = hslToHex((baseHSL.h + off) % 360, 100, l);
-                    const s = document.createElement('div');
-                    s.className = 'swatch'; s.style.background = hex; s.innerText = hex;
-                    s.onclick = () => { if(selectedSourceRGB) applyRecolor(selectedSourceRGB, hexToRgb(hex)); };
-                    paletteDisplay.appendChild(s);
-                });
-            });
+    function extractColors() {
+        const data = originalData.data;
+        const counts = {};
+        for(let i=0; i<data.length; i+=16) { // Sample every 4th pixel for speed
+            const hex = rgbToHex(data[i], data[i+1], data[i+2]);
+            counts[hex] = (counts[hex] || 0) + 1;
         }
+        // Sort by frequency and take top 15 unique colors
+        detectedColors = Object.keys(counts).sort((a,b)=>counts[b]-counts[a]).slice(0, 15);
+        renderDetectedPalette();
+    }
 
-        function applyRecolor(target, replacement) {
-            const data = imgData.data;
-            for(let i=0; i<data.length; i+=4) {
-                if(data[i] === target.r && data[i+1] === target.g && data[i+2] === target.b) {
-                    data[i]=replacement.r; data[i+1]=replacement.g; data[i+2]=replacement.b;
-                }
+    function renderDetectedPalette() {
+        detectedPal.innerHTML = '';
+        detectedColors.forEach(hex => {
+            const wrap = document.createElement('div'); wrap.className = `swatch-container ${hex === activeTargetHex ? 'target' : ''} ${colorMap[hex] ? 'mapped' : ''}`;
+            // If mapped, show new color, otherwise show original
+            const displayHex = colorMap[hex] || hex;
+            wrap.innerHTML = `<div class="swatch" style="background:${displayHex}"></div><div class="swatch-hex">${hex}</div>`;
+            wrap.onclick = () => { activeTargetHex = hex; renderDetectedPalette(); updateSuggestions(); };
+            detectedPal.appendChild(wrap);
+        });
+    }
+
+    // --- 3. HARMONY & SUGGESTIONS ---
+    function updateSuggestions() {
+        if(!activeTargetHex) return;
+        const rgb = hexToRgb(activeTargetHex);
+        const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+        const mode = document.getElementById('harmony').value;
+        
+        // Update marker on wheel
+        mainMarker.style.display = 'block';
+        // Adjust angle for top-oriented wheel
+        const angleRad = (hsl.h - 90) * (Math.PI / 180);
+        const r = 90; // radius where marker sits
+        mainMarker.style.left = (100 + r * Math.cos(angleRad)) + 'px';
+        mainMarker.style.top = (100 + r * Math.sin(angleRad)) + 'px';
+
+        suggestedPal.innerHTML = '';
+        const offsets = { complementary:[180], analogous:[-30,30], triad:[120,240], monochromatic:[0] }[mode];
+        
+        offsets.forEach(off => {
+            // For monochromatic, vary lightness, else vary hue
+            const h = mode === 'monochromatic' ? hsl.h : (hsl.h + off + 360) % 360;
+            const l = mode === 'monochromatic' ? Math.max(20, Math.min(80, hsl.l + (off===0 ? -20 : 20))) : hsl.l;
+            const newHex = hslToHex(h, hsl.s, l);
+            
+            const wrap = document.createElement('div'); wrap.className = 'swatch-container';
+            wrap.innerHTML = `<div class="swatch" style="background:${newHex}"></div><div class="swatch-hex">${newHex}</div>`;
+            wrap.onclick = () => applyColorChange(newHex);
+            suggestedPal.appendChild(wrap);
+        });
+    }
+
+    // --- 4. RECOLOR ENGINE ---
+    function applyColorChange(newHex) {
+        if(!activeTargetHex) return;
+        colorMap[activeTargetHex] = newHex; // Map old color to new color
+        renderDetectedPalette(); // Update UI to show mapping
+        updatePreview(); // Redraw preview image
+    }
+
+    function updatePreview() {
+        if(!originalData) return;
+        const newData = ctxPrev.createImageData(originalData);
+        const sData = originalData.data;
+        const dData = newData.data;
+
+        for(let i=0; i<sData.length; i+=4) {
+            const currentHex = rgbToHex(sData[i], sData[i+1], sData[i+2]);
+            // Check if this pixel's color is in our map
+            if(colorMap[currentHex]) {
+                const newRgb = hexToRgb(colorMap[currentHex]);
+                dData[i] = newRgb.r; dData[i+1] = newRgb.g; dData[i+2] = newRgb.b; dData[i+3] = sData[i+3];
+            } else {
+                // Copy original pixel
+                dData[i] = sData[i]; dData[i+1] = sData[i+1]; dData[i+2] = sData[i+2]; dData[i+3] = sData[i+3];
             }
-            eCtx.putImageData(imgData, 0, 0);
-            selectedSourceRGB = replacement;
-            activeHexDisplay.innerText = rgbToHex(replacement.r, replacement.g, replacement.b);
         }
+        ctxPrev.putImageData(newData, 0, 0);
+    }
 
-        // 5. Utils & Zoom
-        zSlider.oninput = () => {
-            scale = zSlider.value; document.getElementById('z-val').innerText = scale;
-            holder.style.transform = `translate(-50%, -50%) scale(${scale})`;
-        };
+    function resetChanges() {
+        colorMap = {}; activeTargetHex = null; mainMarker.style.display = 'none';
+        renderDetectedPalette(); suggestedPal.innerHTML = ''; updatePreview();
+    }
 
-        function rgbToHex(r,g,b) { return "#"+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('').toUpperCase(); }
-        function hexToRgb(hex) { return {r:parseInt(hex.slice(1,3),16), g:parseInt(hex.slice(3,5),16), b:parseInt(hex.slice(5,7),16)}; }
-        function hslToHex(h,s,l) {
-            l/=100; const a=s*Math.min(l,1-l)/100;
-            const f=n=>{const k=(n+h/30)%12; return Math.round(255*(l-a*Math.max(Math.min(k-3,9-k,1),-1))).toString(16).padStart(2,'0');};
-            return `#${f(0)}${f(8)}${f(4)}`.toUpperCase();
-        }
+    // --- 5. ZOOM & UTILS ---
+    zSlider.oninput = () => {
+        scale = zSlider.value; zVal.innerText = scale;
+        const transform = `translate(-50%, -50%) scale(${scale})`;
+        origPan.style.transform = prevPan.style.transform = transform;
+    };
 
-        document.getElementById('download-btn').onclick = () => {
-            const a = document.createElement('a'); a.download = 'MAS-Recolor.png'; a.href = editor.toDataURL(); a.click();
-        };
-        document.getElementById('harmony-mode').onchange = updatePalette;
-    </script>
+    document.getElementById('dl-btn').onclick = () => {
+        const a = document.createElement('a'); a.download = 'MAS-Recolor.png'; a.href = cPrev.toDataURL(); a.click();
+    };
+
+    // Color Conversion Helpers
+    function rgbToHex(r,g,b) { return "#"+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('').toUpperCase(); }
+    function hexToRgb(hex) { return {r:parseInt(hex.slice(1,3),16), g:parseInt(hex.slice(3,5),16), b:parseInt(hex.slice(5,7),16)}; }
+    function rgbToHsl(r,g,b){r/=255,g/=255,b/=255;let max=Math.max(r,g,b),min=Math.min(r,g,b);let h,s,l=(max+min)/2;if(max===min){h=s=0}else{let d=max-min;s=l>0.5?d/(2-max-min):d/(max+min);switch(max){case r:h=(g-b)/d+(g<b?6:0);break;case g:h=(b-r)/d+2;break;case b:h=(r-g)/d+4;break;}h*=60}return{h:Math.round(h),s:Math.round(s*100),l:Math.round(l*100)}}
+    function hslToHex(h,s,l){l/=100;const a=s*Math.min(l,1-l)/100;const f=n=>{const k=(n+h/30)%12;return Math.round(255*(l-a*Math.max(Math.min(k-3,9-k,1),-1))).toString(16).padStart(2,'0')};return`#${f(0)}${f(8)}${f(4)}`.toUpperCase()}
+    document.getElementById('harmony').onchange = updateSuggestions;
+</script>
 </body>
 </html>
