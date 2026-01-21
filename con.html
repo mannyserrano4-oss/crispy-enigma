@@ -3,353 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAS Design Engine</title>
+    <title>MAS Design Engine | Stable</title>
     <script src="https://cdn.jsdelivr.net/npm/imagetracerjs@1.2.6/imagetracer_v1.2.6.min.js"></script>
     <style>
-        :root {
-            --bg: #121212;
-            --card: #1e1e1e;
-            --text: #ffffff;
-            --accent: #007aff;
-            --border: #333;
-            --decay: #556b2f;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            margin: 0;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
+        :root { --bg: #121212; --card: #1e1e1e; --text: #ffffff; --accent: #007aff; --border: #333; }
+        body { background-color: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         header { text-align: center; margin-bottom: 20px; }
-        h1 { margin: 0; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; }
-        p { color: #888; font-size: 0.8rem; margin-top: 5px; }
-
-        .dashboard-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            width: 100%;
-            max-width: 1100px;
-        }
-
-        @media (min-width: 768px) {
-            .dashboard-container { flex-direction: row; }
-            .editor-panel { flex: 2; }
-            .color-panel { flex: 1; }
-        }
-
-        .editor-panel, .color-panel {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 20px;
-        }
-
-        .upload-zone {
-            border: 2px dashed var(--accent);
-            padding: 20px;
-            text-align: center;
-            border-radius: 12px;
-            cursor: pointer;
-            background: rgba(0, 122, 255, 0.05);
-            margin-bottom: 20px;
-            transition: 0.3s;
-        }
-
-        .upload-zone:hover { background: rgba(0, 122, 255, 0.1); }
-
-        .controls {
-            margin-bottom: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            font-size: 0.8rem;
-        }
-
+        .dashboard-container { display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 1100px; }
+        @media (min-width: 768px) { .dashboard-container { flex-direction: row; } .editor-panel { flex: 2; } .color-panel { flex: 1; } }
+        .editor-panel, .color-panel { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; position: relative; }
+        
+        /* Drag and Drop Zone */
+        .upload-zone { border: 2px dashed var(--accent); padding: 20px; text-align: center; border-radius: 12px; cursor: pointer; background: rgba(0, 122, 255, 0.05); margin-bottom: 20px; transition: 0.3s; }
+        .upload-zone.dragover { background: rgba(0, 122, 255, 0.2); border-style: solid; }
+        
+        .controls { margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px; font-size: 0.8rem; }
         input[type="range"] { width: 100%; accent-color: var(--accent); }
-
-        .comparison-viewer {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        canvas, #svg-preview {
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            background: #000;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            overflow: hidden;
-        }
-
+        .comparison-viewer { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        canvas, #svg-preview { width: 100%; aspect-ratio: 1 / 1; background: #000; border-radius: 8px; border: 1px solid var(--border); overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; }
         svg { width: 100%; height: 100%; }
 
-        h3 { font-size: 0.8rem; margin: 0 0 10px 0; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
+        /* Loading Indicator */
+        #loading-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); color: white; border-radius: 16px; z-index: 10; align-items: center; justify-content: center; font-weight: bold; }
 
-        /* Color & Preset UI */
-        .swatch-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-
-        .swatch-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 9px;
-            color: #888;
-        }
-
-        .swatch {
-            width: 38px;
-            height: 38px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.1);
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .swatch:hover { transform: scale(1.1); border-color: var(--accent); }
-
-        .preset-section {
-            padding-top: 15px;
-            border-top: 1px solid var(--border);
-            margin-top: 15px;
-        }
-
-        #download-btn {
-            width: 100%;
-            padding: 12px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            margin-top: 15px;
-            font-weight: bold;
-            cursor: pointer;
-            display: none;
-        }
+        .swatch-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+        .swatch-container { display: flex; flex-direction: column; align-items: center; font-size: 9px; color: #888; }
+        .swatch { width: 38px; height: 38px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
+        .preset-section { padding-top: 15px; border-top: 1px solid var(--border); margin-top: 15px; }
+        h3 { font-size: 0.8rem; margin: 0 0 10px 0; color: var(--accent); text-transform: uppercase; }
+        #download-btn { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 8px; margin-top: 15px; font-weight: bold; cursor: pointer; display: none; }
     </style>
 </head>
 <body>
 
     <header>
         <h1>MAS Design Engine</h1>
-        <p>Pro Vectorizer • Skin Tone Matcher • Decay Mode</p>
+        <p>Pro Vectorizer • Stable Build</p>
     </header>
 
     <main class="dashboard-container">
         <section class="editor-panel">
-            <div class="upload-zone" onclick="document.getElementById('file-input').click()">
-                <span>Tap to Upload Logo or Hand</span>
+            <div id="loading-overlay">TRACING PATHS...</div>
+            
+            <div class="upload-zone" id="drop-zone">
+                <span>Drag & Drop or Tap to Upload</span>
                 <input type="file" id="file-input" accept="image/*" hidden>
             </div>
 
             <div class="controls">
-                <label>Tracing Detail (Threshold): <span id="thresh-val">128</span></label>
+                <label>Simplify Detail: <span id="thresh-val">128</span></label>
                 <input type="range" id="threshold" min="0" max="255" value="128">
             </div>
             
             <div class="comparison-viewer">
-                <div class="view-box">
-                    <h3>Original</h3>
-                    <canvas id="canvas"></canvas>
-                </div>
-                <div class="view-box">
-                    <h3>Vector Output</h3>
-                    <div id="svg-preview"></div>
-                </div>
+                <div class="view-box"><h3>Original</h3><canvas id="canvas"></canvas></div>
+                <div class="view-box"><h3>Vector</h3><div id="svg-preview"></div></div>
             </div>
-            <button id="download-btn">Download SVG for Printing</button>
+            <button id="download-btn">Download SVG</button>
         </section>
 
         <section class="color-panel">
-            <div class="preset-section">
-                <h3>Skin Tone Presets</h3>
-                <div class="swatch-grid" id="skin-presets">
-                    </div>
-            </div>
-
-            <div class="preset-section">
-                <h3>Decay & Undead</h3>
-                <div class="swatch-grid" id="decay-presets">
-                    </div>
-            </div>
-
-            <div class="preset-section">
-                <h3>Image Colors (Detected)</h3>
-                <div id="image-colors" class="swatch-grid"></div>
-            </div>
-
-            <div id="harmonies" class="preset-section" style="display:none;">
-                <h3>Color Harmonies</h3>
-                <div id="comp-swatches" class="swatch-grid"></div>
-            </div>
+            <div class="preset-section"><h3>Skin Presets</h3><div class="swatch-grid" id="skin-presets"></div></div>
+            <div class="preset-section"><h3>Decay Presets</h3><div class="swatch-grid" id="decay-presets"></div></div>
+            <div class="preset-section"><h3>Detected</h3><div id="image-colors" class="swatch-grid"></div></div>
         </section>
     </main>
 
     <script>
         const fileInput = document.getElementById('file-input');
+        const dropZone = document.getElementById('drop-zone');
         const thresholdInput = document.getElementById('threshold');
         const threshVal = document.getElementById('thresh-val');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const svgPreview = document.getElementById('svg-preview');
-        const colorGrid = document.getElementById('image-colors');
+        const loading = document.getElementById('loading-overlay');
         const downloadBtn = document.getElementById('download-btn');
         let currentImg = null;
 
-        // Configuration for Skin Tones
-        const skinTones = [
-            { name: 'Light', hex: '#f9d5b0' },
-            { name: 'Medium', hex: '#d2b48c' },
-            { name: 'Warm', hex: '#ac8e68' },
-            { name: 'Deep', hex: '#5d4037' },
-            { name: 'Rich', hex: '#3e2723' }
-        ];
-
-        const decayTones = [
-            { name: 'Zombie', hex: '#556b2f' },
-            { name: 'Rot', hex: '#4b5320' },
-            { name: 'Grey', hex: '#708090' },
-            { name: 'Vein', hex: '#2f4f4f' },
-            { name: 'Bone', hex: '#e3dac9' }
-        ];
-
-        // Initialize Presets
-        function initPresets() {
-            const skinRow = document.getElementById('skin-presets');
-            const decayRow = document.getElementById('decay-presets');
-            
-            skinTones.forEach(t => skinRow.appendChild(createSwatch(t.hex, t.name)));
-            decayTones.forEach(t => decayRow.appendChild(createSwatch(t.hex, t.name)));
-        }
-
-        fileInput.addEventListener('change', handleUpload);
-        thresholdInput.addEventListener('input', () => { 
-            threshVal.innerText = thresholdInput.value;
-            if(currentImg) vectorize(); 
+        // Prevent browser from opening dropped files
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => {
+            window.addEventListener(e, (evt) => evt.preventDefault());
         });
 
-        function handleUpload(e) {
-            const file = e.target.files[0];
-            if (!file) return;
+        dropZone.onclick = () => fileInput.click();
+        dropZone.ondragover = () => dropZone.classList.add('dragover');
+        dropZone.ondragleave = () => dropZone.classList.remove('dragover');
+        dropZone.ondrop = (e) => {
+            dropZone.classList.remove('dragover');
+            handleFile(e.dataTransfer.files[0]);
+        };
+        fileInput.onchange = (e) => handleFile(e.target.files[0]);
 
+        function handleFile(file) {
+            if (!file || !file.type.startsWith('image/')) return;
             const reader = new FileReader();
             reader.onload = (event) => {
                 currentImg = new Image();
                 currentImg.onload = () => {
-                    canvas.width = currentImg.width;
-                    canvas.height = currentImg.height;
-                    ctx.drawImage(currentImg, 0, 0);
+                    // Limit resolution for performance
+                    const maxDim = 800;
+                    let w = currentImg.width, h = currentImg.height;
+                    if (w > maxDim || h > maxDim) {
+                        const ratio = Math.min(maxDim / w, maxDim / h);
+                        w *= ratio; h *= ratio;
+                    }
+                    canvas.width = w; canvas.height = h;
+                    ctx.drawImage(currentImg, 0, 0, w, h);
                     extractColors();
-                    vectorize();
-                    downloadBtn.style.display = 'block';
+                    startVectorize();
                 };
                 currentImg.src = event.target.result;
             };
             reader.readAsDataURL(file);
         }
 
-        function vectorize() {
-            const options = { 
-                ltres: 1, 
-                qtres: 1, 
-                pathomit: 8, 
-                numberofcolors: 16,
-                treshold: parseInt(thresholdInput.value)
-            };
-            const svgString = ImageTracer.imagedataToSVG(ctx.getImageData(0,0,canvas.width,canvas.height), options);
-            svgPreview.innerHTML = svgString;
+        function startVectorize() {
+            loading.style.display = 'flex';
+            downloadBtn.style.display = 'none';
+            // Use setTimeout to allow the "Loading" UI to show up before freezing the thread
+            setTimeout(vectorize, 50);
         }
 
-        downloadBtn.onclick = () => {
-            const blob = new Blob([svgPreview.innerHTML], {type: 'image/svg+xml'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'MAS-Vector.svg';
-            a.click();
+        function vectorize() {
+            try {
+                const options = { 
+                    ltres: 1.5, // Slightly higher = faster/smoother
+                    qtres: 1.5, 
+                    pathomit: 15, // Ignores tiny specks/noise
+                    numberofcolors: 12, // Lower colors = faster
+                    treshold: parseInt(thresholdInput.value)
+                };
+                const svgString = ImageTracer.imagedataToSVG(ctx.getImageData(0,0,canvas.width,canvas.height), options);
+                svgPreview.innerHTML = svgString;
+                downloadBtn.style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                alert("Image too complex! Try increasing the 'Simplify' slider.");
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        thresholdInput.oninput = () => {
+            threshVal.innerText = thresholdInput.value;
+            if(currentImg) startVectorize();
         };
 
+        // Color Logic
+        const skinTones = [{n:'Light',c:'#f9d5b0'},{n:'Med',c:'#d2b48c'},{n:'Deep',c:'#5d4037'}];
+        const decayTones = [{n:'Zombie',c:'#556b2f'},{n:'Rot',c:'#4b5320'},{n:'Grey',c:'#708090'}];
+
+        function init() {
+            const skinRow = document.getElementById('skin-presets');
+            const decayRow = document.getElementById('decay-presets');
+            skinTones.forEach(t => skinRow.appendChild(createSwatch(t.c, t.n)));
+            decayTones.forEach(t => decayRow.appendChild(createSwatch(t.c, t.n)));
+        }
+
         function extractColors() {
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-            const colorCounts = {};
-            for (let i = 0; i < imageData.length; i += 400) {
-                const hex = rgbToHex(imageData[i], imageData[i+1], imageData[i+2]);
-                colorCounts[hex] = (colorCounts[hex] || 0) + 1;
+            const data = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+            const counts = {};
+            for(let i=0; i<data.length; i+=800) {
+                const hex = "#"+[data[i],data[i+1],data[i+2]].map(x=>x.toString(16).padStart(2,'0')).join('');
+                counts[hex] = (counts[hex]||0)+1;
             }
-            const sortedColors = Object.keys(colorCounts).sort((a, b) => colorCounts[b] - colorCounts[a]).slice(0, 6);
-            colorGrid.innerHTML = '';
-            sortedColors.forEach(hex => {
-                const s = createSwatch(hex, hex);
-                s.onclick = () => generateHarmonies(hex);
-                colorGrid.appendChild(s);
-            });
+            const sorted = Object.keys(counts).sort((a,b)=>counts[b]-counts[a]).slice(0,5);
+            const grid = document.getElementById('image-colors');
+            grid.innerHTML = '';
+            sorted.forEach(h => grid.appendChild(createSwatch(h,h)));
         }
 
         function createSwatch(hex, label) {
-            const div = document.createElement('div');
-            div.className = 'swatch-container';
-            div.innerHTML = `<div class="swatch" style="background:${hex}"></div><span>${label}</span>`;
-            // For now, clicking a preset just generates harmonies to help you find the perfect color
-            div.onclick = () => generateHarmonies(hex);
-            return div;
+            const d = document.createElement('div');
+            d.className = 'swatch-container';
+            d.innerHTML = `<div class="swatch" style="background:${hex}"></div><span>${label}</span>`;
+            return d;
         }
 
-        function rgbToHex(r, g, b) {
-            return "#" + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
-        }
+        downloadBtn.onclick = () => {
+            const blob = new Blob([svgPreview.innerHTML], {type:'image/svg+xml'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'MAS-Design.svg';
+            a.click();
+        };
 
-        function generateHarmonies(hex) {
-            document.getElementById('harmonies').style.display = 'block';
-            const h = hexToHSL(hex);
-            const comp = hslToHex((h.h + 180) % 360, h.s, h.l);
-            const row = document.getElementById('comp-swatches');
-            row.innerHTML = '';
-            row.appendChild(createSwatch(hex, 'Selected'));
-            row.appendChild(createSwatch(comp, 'Contrast'));
-        }
-
-        function hexToHSL(hex) {
-            let r = parseInt(hex.slice(1, 3), 16) / 255, g = parseInt(hex.slice(3, 5), 16) / 255, b = parseInt(hex.slice(5, 7), 16) / 255;
-            let max = Math.max(r, g, b), min = Math.min(r, g, b);
-            let h, s, l = (max + min) / 2;
-            if (max == min) h = s = 0;
-            else {
-                let d = max - min;
-                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-                switch (max) {
-                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-                    case g: h = (b - r) / d + 2; break;
-                    case b: h = (r - g) / d + 4; break;
-                }
-                h /= 6;
-            }
-            return { h: h * 360, s: s * 100, l: l * 100 };
-        }
-
-        function hslToHex(h, s, l) {
-            l /= 100;
-            const a = s * Math.min(l, 1 - l) / 100;
-            const f = n => {
-                const k = (n + h / 30) % 12;
-                const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-                return Math.round(255 * color).toString(16).padStart(2, '0');
-            };
-            return `#${f(0)}${f(8)}${f(4)}`;
-        }
-
-        initPresets();
+        init();
     </script>
 </body>
 </html>
