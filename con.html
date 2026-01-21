@@ -2,25 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAS Design Engine | Zoom Preview</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MAS Design Engine | 100x Zoom</title>
     <script src="https://cdn.jsdelivr.net/npm/imagetracerjs@1.2.6/imagetracer_v1.2.6.min.js"></script>
     <style>
         :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --accent: #38bdf8; --border: #334155; }
-        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
         .container { width: 100%; max-width: 800px; background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
         
-        /* Upload Area */
-        .drop-zone { border: 2px dashed var(--accent); border-radius: 12px; padding: 30px; text-align: center; cursor: pointer; background: rgba(56, 189, 248, 0.05); margin-bottom: 20px; }
+        .drop-zone { border: 2px dashed var(--accent); border-radius: 12px; padding: 25px; text-align: center; cursor: pointer; background: rgba(56, 189, 248, 0.05); margin-bottom: 20px; }
         
-        /* Preview Controls */
         .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
         .control-group { display: flex; flex-direction: column; gap: 5px; font-size: 0.8rem; font-weight: bold; color: var(--accent); }
         select, button, input[type="range"] { padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: #0f172a; color: white; font-size: 1rem; }
         button { background: var(--accent); color: #0f172a; border: none; font-weight: bold; cursor: pointer; }
 
-        /* Zoom Preview Window */
-        .preview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        /* Advanced Pan & Zoom Window */
         .preview-window { 
             width: 100%; 
             aspect-ratio: 1/1; 
@@ -28,36 +25,42 @@
             border: 2px solid var(--border); 
             border-radius: 12px; 
             position: relative; 
-            overflow: hidden; /* This hides the parts of the image that go outside the box when zooming */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: move;
+            overflow: hidden; 
+            touch-action: none; /* Required for custom touch dragging */
+            cursor: grab;
         }
+        .preview-window:active { cursor: grabbing; }
 
-        #zoom-container {
-            transition: transform 0.1s ease-out;
-            transform-origin: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        #pan-container {
             width: 100%;
             height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            transform-origin: 0 0; /* Changed for easier math */
         }
 
-        svg, canvas { max-width: 100%; max-height: 100%; display: block; }
+        #zoom-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none; /* Let the container handle dragging */
+        }
+
+        svg, canvas, img { max-width: 100%; max-height: 100%; display: block; pointer-events: none; }
         
-        .status { font-size: 0.8rem; color: #94a3b8; text-align: center; margin-top: 15px; }
-        #loading { display: none; color: var(--accent); font-weight: bold; }
+        .status-bar { display: flex; justify-content: space-between; font-size: 0.7rem; color: #888; margin-bottom: 10px; }
+        #loading { color: var(--accent); font-weight: bold; display: none; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2 style="text-align:center; margin: 0 0 15px 0;">MAS Design Engine</h2>
+        <h2 style="text-align:center; margin: 0 0 10px 0;">MAS Design Engine</h2>
         
         <div class="drop-zone" id="drop-zone">
-            <span>Tap to Upload Logo or Design</span>
+            <span>Tap to Upload Logo</span>
             <input type="file" id="file-input" accept="image/*" hidden>
         </div>
 
@@ -71,46 +74,82 @@
                 </select>
             </div>
             <div class="control-group">
-                <label>Magnify (Zoom): <span id="zoom-val">1x</span></label>
-                <input type="range" id="zoom-slider" min="1" max="10" step="0.1" value="1">
+                <label>Zoom: <span id="zoom-val">1x</span></label>
+                <input type="range" id="zoom-slider" min="1" max="100" step="1" value="1">
             </div>
         </div>
 
-        <div class="preview-header">
-            <span id="loading">CONVERTING...</span>
-            <span style="font-size: 0.7rem; color: #888;">Inspect edges below before download</span>
+        <div class="status-bar">
+            <span id="loading">PROCESSING...</span>
+            <span>Drag to Pan • Scale to 100x</span>
         </div>
 
-        <div class="preview-window" id="window">
-            <div id="zoom-container">
-                </div>
+        <div class="preview-window" id="viewport">
+            <div id="pan-container">
+                <div id="zoom-content">
+                    </div>
+            </div>
         </div>
 
         <button id="download-btn" style="width:100%; margin-top: 20px; display:none;">Download Final File</button>
-        <div class="status" id="status">Waiting for image...</div>
     </div>
 
     <script>
         const fileInput = document.getElementById('file-input');
         const dropZone = document.getElementById('drop-zone');
-        const formatSelect = document.getElementById('format');
         const zoomSlider = document.getElementById('zoom-slider');
         const zoomVal = document.getElementById('zoom-val');
-        const zoomContainer = document.getElementById('zoom-container');
+        const viewport = document.getElementById('viewport');
+        const panContainer = document.getElementById('pan-container');
+        const zoomContent = document.getElementById('zoom-content');
+        const formatSelect = document.getElementById('format');
         const downloadBtn = document.getElementById('download-btn');
-        const status = document.getElementById('status');
         const loading = document.getElementById('loading');
-        
-        let originalImg = null;
-        let hiddenCanvas = document.createElement('canvas');
-        let hCtx = hiddenCanvas.getContext('2d');
 
-        // 1. Zoom Logic
+        let originalImg = null;
+        let scale = 1;
+        let pointX = 0;
+        let pointY = 0;
+        let start = { x: 0, y: 0 };
+        let isDragging = false;
+
+        // 1. Zoom & Pan Logic
+        function updateTransform() {
+            panContainer.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+        }
+
         zoomSlider.oninput = () => {
-            const scale = zoomSlider.value;
+            scale = parseFloat(zoomSlider.value);
             zoomVal.innerText = `${scale}x`;
-            zoomContainer.style.transform = `scale(${scale})`;
+            updateTransform();
         };
+
+        // Mouse & Touch Events
+        const startDrag = (e) => {
+            isDragging = true;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            start = { x: clientX - pointX, y: clientY - pointY };
+        };
+
+        const duringDrag = (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            pointX = clientX - start.x;
+            pointY = clientY - start.y;
+            updateTransform();
+        };
+
+        const stopDrag = () => isDragging = false;
+
+        viewport.addEventListener('mousedown', startDrag);
+        viewport.addEventListener('touchstart', startDrag);
+        window.addEventListener('mousemove', duringDrag);
+        window.addEventListener('touchmove', duringDrag, { passive: false });
+        window.addEventListener('mouseup', stopDrag);
+        window.addEventListener('touchend', stopDrag);
 
         // 2. File Handling
         dropZone.onclick = () => fileInput.click();
@@ -118,7 +157,6 @@
 
         function handleFile(file) {
             if (!file) return;
-            status.innerText = `File: ${file.name}`;
             const reader = new FileReader();
             reader.onload = (e) => {
                 originalImg = new Image();
@@ -128,39 +166,34 @@
             reader.readAsDataURL(file);
         }
 
-        // 3. Conversion Engine
         async function processFile() {
             loading.style.display = 'inline';
-            downloadBtn.style.display = 'none';
-            zoomSlider.value = 1;
-            zoomVal.innerText = '1x';
-            zoomContainer.style.transform = 'scale(1)';
-            
-            // Limit internal resolution for stability on iPhone
+            // Reset position
+            scale = 1; pointX = 0; pointY = 0;
+            zoomSlider.value = 1; zoomVal.innerText = '1x';
+            updateTransform();
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
             const max = 1000;
             let w = originalImg.width, h = originalImg.height;
-            if (w > max || h > max) {
-                const r = Math.min(max/w, max/h);
-                w *= r; h *= r;
-            }
-            hiddenCanvas.width = w; hiddenCanvas.height = h;
-            hCtx.drawImage(originalImg, 0, 0, w, h);
+            const r = Math.min(max/w, max/h);
+            canvas.width = w * r; canvas.height = h * r;
+            ctx.drawImage(originalImg, 0, 0, canvas.width, canvas.height);
 
             setTimeout(() => {
                 const target = formatSelect.value;
-                zoomContainer.innerHTML = '';
+                zoomContent.innerHTML = '';
 
                 if (target === "image/svg+xml") {
                     const options = { ltres: 1, qtres: 1, pathomit: 10, numberofcolors: 16 };
-                    const svgString = ImageTracer.imagedataToSVG(hCtx.getImageData(0,0,w,h), options);
-                    zoomContainer.innerHTML = svgString;
+                    const svgString = ImageTracer.imagedataToSVG(ctx.getImageData(0,0,canvas.width,canvas.height), options);
+                    zoomContent.innerHTML = svgString;
                 } else {
                     const img = document.createElement('img');
-                    img.src = hiddenCanvas.toDataURL(target, 0.9);
-                    img.style.width = '100%';
-                    zoomContainer.appendChild(img);
+                    img.src = canvas.toDataURL(target, 0.9);
+                    zoomContent.appendChild(img);
                 }
-
                 loading.style.display = 'none';
                 downloadBtn.style.display = 'block';
             }, 100);
@@ -168,18 +201,17 @@
 
         formatSelect.onchange = () => { if(originalImg) processFile(); };
 
-        // 4. Download Logic
         downloadBtn.onclick = () => {
             const target = formatSelect.value;
             const a = document.createElement('a');
-            
             if (target === "image/svg+xml") {
-                const blob = new Blob([zoomContainer.innerHTML], {type: 'image/svg+xml'});
+                const blob = new Blob([zoomContent.innerHTML], {type: 'image/svg+xml'});
                 a.href = URL.createObjectURL(blob);
-                a.download = 'MAS-Converted.svg';
+                a.download = 'MAS-Design.svg';
             } else {
-                a.href = hiddenCanvas.toDataURL(target, 0.9);
-                a.download = `MAS-Converted.${target.split('/')[1]}`;
+                const img = zoomContent.querySelector('img');
+                a.href = img.src;
+                a.download = `MAS-Design.${target.split('/')[1]}`;
             }
             a.click();
         };
