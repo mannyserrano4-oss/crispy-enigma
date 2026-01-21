@@ -12,6 +12,7 @@
             --text: #ffffff;
             --accent: #007aff;
             --border: #333;
+            --decay: #556b2f;
         }
 
         body {
@@ -26,8 +27,8 @@
         }
 
         header { text-align: center; margin-bottom: 20px; }
-        h1 { margin: 0; font-size: 1.5rem; }
-        p { color: #888; font-size: 0.9rem; }
+        h1 { margin: 0; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; }
+        p { color: #888; font-size: 0.8rem; margin-top: 5px; }
 
         .dashboard-container {
             display: flex;
@@ -58,18 +59,20 @@
             cursor: pointer;
             background: rgba(0, 122, 255, 0.05);
             margin-bottom: 20px;
+            transition: 0.3s;
         }
 
-        /* Vector Controls */
+        .upload-zone:hover { background: rgba(0, 122, 255, 0.1); }
+
         .controls {
             margin-bottom: 15px;
             display: flex;
-            align-items: center;
-            gap: 10px;
+            flex-direction: column;
+            gap: 5px;
             font-size: 0.8rem;
         }
 
-        input[type="range"] { flex: 1; accent-color: var(--accent); }
+        input[type="range"] { width: 100%; accent-color: var(--accent); }
 
         .comparison-viewer {
             display: grid;
@@ -88,44 +91,51 @@
 
         svg { width: 100%; height: 100%; }
 
-        /* Color Engine UI */
-        .color-grid, .swatch-row {
+        h3 { font-size: 0.8rem; margin: 0 0 10px 0; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Color & Preset UI */
+        .swatch-grid {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin: 10px 0 20px 0;
+            margin-bottom: 20px;
         }
 
         .swatch-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-size: 10px;
+            font-size: 9px;
             color: #888;
         }
 
         .swatch {
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
             cursor: pointer;
             transition: 0.2s;
         }
 
-        .swatch:hover { transform: scale(1.1); }
-        h3 { font-size: 0.9rem; margin-top: 0; color: var(--accent); text-transform: uppercase; }
-        .harmony-section { margin-bottom: 20px; border-top: 1px solid var(--border); padding-top: 15px; }
-        
+        .swatch:hover { transform: scale(1.1); border-color: var(--accent); }
+
+        .preset-section {
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+            margin-top: 15px;
+        }
+
         #download-btn {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             background: var(--accent);
             color: white;
             border: none;
             border-radius: 8px;
             margin-top: 15px;
             font-weight: bold;
+            cursor: pointer;
             display: none;
         }
     </style>
@@ -134,18 +144,18 @@
 
     <header>
         <h1>MAS Design Engine</h1>
-        <p>Vectorize & Color Match for Clothing</p>
+        <p>Pro Vectorizer • Skin Tone Matcher • Decay Mode</p>
     </header>
 
     <main class="dashboard-container">
         <section class="editor-panel">
             <div class="upload-zone" onclick="document.getElementById('file-input').click()">
-                <span>Tap to Upload Design</span>
+                <span>Tap to Upload Logo or Hand</span>
                 <input type="file" id="file-input" accept="image/*" hidden>
             </div>
 
             <div class="controls">
-                <label>Threshold (Detail):</label>
+                <label>Tracing Detail (Threshold): <span id="thresh-val">128</span></label>
                 <input type="range" id="threshold" min="0" max="255" value="128">
             </div>
             
@@ -163,24 +173,26 @@
         </section>
 
         <section class="color-panel">
-            <div class="palette-extractor">
-                <h3>Image Colors</h3>
-                <div id="image-colors" class="color-grid"></div>
+            <div class="preset-section">
+                <h3>Skin Tone Presets</h3>
+                <div class="swatch-grid" id="skin-presets">
+                    </div>
             </div>
 
-            <div id="harmonies" style="display:none;">
-                <div class="harmony-section">
-                    <h3>Complementary</h3>
-                    <div id="comp-swatches" class="swatch-row"></div>
-                </div>
-                <div class="harmony-section">
-                    <h3>Analogous</h3>
-                    <div id="anal-swatches" class="swatch-row"></div>
-                </div>
-                <div class="harmony-section">
-                    <h3>Monochromatic</h3>
-                    <div id="mono-swatches" class="swatch-row"></div>
-                </div>
+            <div class="preset-section">
+                <h3>Decay & Undead</h3>
+                <div class="swatch-grid" id="decay-presets">
+                    </div>
+            </div>
+
+            <div class="preset-section">
+                <h3>Image Colors (Detected)</h3>
+                <div id="image-colors" class="swatch-grid"></div>
+            </div>
+
+            <div id="harmonies" class="preset-section" style="display:none;">
+                <h3>Color Harmonies</h3>
+                <div id="comp-swatches" class="swatch-grid"></div>
             </div>
         </section>
     </main>
@@ -188,6 +200,7 @@
     <script>
         const fileInput = document.getElementById('file-input');
         const thresholdInput = document.getElementById('threshold');
+        const threshVal = document.getElementById('thresh-val');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const svgPreview = document.getElementById('svg-preview');
@@ -195,8 +208,37 @@
         const downloadBtn = document.getElementById('download-btn');
         let currentImg = null;
 
+        // Configuration for Skin Tones
+        const skinTones = [
+            { name: 'Light', hex: '#f9d5b0' },
+            { name: 'Medium', hex: '#d2b48c' },
+            { name: 'Warm', hex: '#ac8e68' },
+            { name: 'Deep', hex: '#5d4037' },
+            { name: 'Rich', hex: '#3e2723' }
+        ];
+
+        const decayTones = [
+            { name: 'Zombie', hex: '#556b2f' },
+            { name: 'Rot', hex: '#4b5320' },
+            { name: 'Grey', hex: '#708090' },
+            { name: 'Vein', hex: '#2f4f4f' },
+            { name: 'Bone', hex: '#e3dac9' }
+        ];
+
+        // Initialize Presets
+        function initPresets() {
+            const skinRow = document.getElementById('skin-presets');
+            const decayRow = document.getElementById('decay-presets');
+            
+            skinTones.forEach(t => skinRow.appendChild(createSwatch(t.hex, t.name)));
+            decayTones.forEach(t => decayRow.appendChild(createSwatch(t.hex, t.name)));
+        }
+
         fileInput.addEventListener('change', handleUpload);
-        thresholdInput.addEventListener('input', () => { if(currentImg) vectorize(); });
+        thresholdInput.addEventListener('input', () => { 
+            threshVal.innerText = thresholdInput.value;
+            if(currentImg) vectorize(); 
+        });
 
         function handleUpload(e) {
             const file = e.target.files[0];
@@ -219,18 +261,13 @@
         }
 
         function vectorize() {
-            // Using ImageTracer library
-            // Options tailored for screen printing (cleaner paths)
             const options = { 
                 ltres: 1, 
                 qtres: 1, 
                 pathomit: 8, 
-                colorsampling: 1, 
                 numberofcolors: 16,
-                mincolorratio: 0.02,
                 treshold: parseInt(thresholdInput.value)
             };
-            
             const svgString = ImageTracer.imagedataToSVG(ctx.getImageData(0,0,canvas.width,canvas.height), options);
             svgPreview.innerHTML = svgString;
         }
@@ -240,32 +277,32 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'MAS-Design.svg';
+            a.download = 'MAS-Vector.svg';
             a.click();
         };
 
-        // --- Color Logic ---
         function extractColors() {
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
             const colorCounts = {};
-            for (let i = 0; i < imageData.length; i += 200) {
-                const r = imageData[i], g = imageData[i+1], b = imageData[i+2];
-                const hex = rgbToHex(r, g, b);
+            for (let i = 0; i < imageData.length; i += 400) {
+                const hex = rgbToHex(imageData[i], imageData[i+1], imageData[i+2]);
                 colorCounts[hex] = (colorCounts[hex] || 0) + 1;
             }
-            const sortedColors = Object.keys(colorCounts).sort((a, b) => colorCounts[b] - colorCounts[a]).slice(0, 8);
+            const sortedColors = Object.keys(colorCounts).sort((a, b) => colorCounts[b] - colorCounts[a]).slice(0, 6);
             colorGrid.innerHTML = '';
             sortedColors.forEach(hex => {
-                const container = createSwatch(hex);
-                container.onclick = () => generateHarmonies(hex);
-                colorGrid.appendChild(container);
+                const s = createSwatch(hex, hex);
+                s.onclick = () => generateHarmonies(hex);
+                colorGrid.appendChild(s);
             });
         }
 
-        function createSwatch(hex) {
+        function createSwatch(hex, label) {
             const div = document.createElement('div');
             div.className = 'swatch-container';
-            div.innerHTML = `<div class="swatch" style="background:${hex}"></div><span>${hex}</span>`;
+            div.innerHTML = `<div class="swatch" style="background:${hex}"></div><span>${label}</span>`;
+            // For now, clicking a preset just generates harmonies to help you find the perfect color
+            div.onclick = () => generateHarmonies(hex);
             return div;
         }
 
@@ -275,16 +312,12 @@
 
         function generateHarmonies(hex) {
             document.getElementById('harmonies').style.display = 'block';
-            const hsv = hexToHSL(hex);
-            updateRow('comp-swatches', [hex, hslToHex((hsv.h + 180) % 360, hsv.s, hsv.l)]);
-            updateRow('anal-swatches', [hslToHex((hsv.h + 30) % 360, hsv.s, hsv.l), hex, hslToHex((hsv.h - 30 + 360) % 360, hsv.s, hsv.l)]);
-            updateRow('mono-swatches', [hslToHex(hsv.h, hsv.s, Math.max(0, hsv.l - 20)), hex, hslToHex(hsv.h, hsv.s, Math.min(100, hsv.l + 20))]);
-        }
-
-        function updateRow(id, hexList) {
-            const row = document.getElementById(id);
+            const h = hexToHSL(hex);
+            const comp = hslToHex((h.h + 180) % 360, h.s, h.l);
+            const row = document.getElementById('comp-swatches');
             row.innerHTML = '';
-            hexList.forEach(h => row.appendChild(createSwatch(h)));
+            row.appendChild(createSwatch(hex, 'Selected'));
+            row.appendChild(createSwatch(comp, 'Contrast'));
         }
 
         function hexToHSL(hex) {
@@ -315,6 +348,8 @@
             };
             return `#${f(0)}${f(8)}${f(4)}`;
         }
+
+        initPresets();
     </script>
 </body>
 </html>
