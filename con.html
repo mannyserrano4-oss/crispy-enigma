@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAS Design Engine</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>MAS Design Engine</h1>
+        <p>Vectorize & Color Match for Clothing</p>
+    </header>
+
+    <main class="dashboard-container">
+        <section class="editor-panel">
+            <div class="upload-zone" id="drop-zone">
+                <span>Tap to Upload Logo/Hand Design</span>
+                <input type="file" id="file-input" accept="image/*" hidden>
+            </div>
+            
+            <div class="comparison-viewer">
+                <div class="view-box">
+                    <h3>Original</h3>
+                    <canvas id="original-canvas"></canvas>
+                </div>
+                <div class="view-box">
+                    <h3>Vector/Modified</h3>
+                    <div id="svg-preview"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="color-panel">
+            <div class="palette-extractor">
+                <h3>Extracted Colors</h3>
+                <div id="image-colors" class="color-grid">
+                    </div>
+            </div>
+
+            <div class="harmony-engine">
+                <h3>Harmony Wheel</h3>
+                <div id="harmony-results">
+                    <div class="harmony-type">
+                        <span>Complementary</span>
+                        <div class="swatch-row" id="comp-swatches"></div>
+                    </div>
+                    <div class="harmony-type">
+                        <span>Analogous</span>
+                        <div class="swatch-row" id="anal-swatches"></div>
+                    </div>
+                    </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
