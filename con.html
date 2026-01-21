@@ -3,122 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAS File Converter</title>
+    <title>MAS Design Engine | Zoom Preview</title>
     <script src="https://cdn.jsdelivr.net/npm/imagetracerjs@1.2.6/imagetracer_v1.2.6.min.js"></script>
     <style>
         :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --accent: #38bdf8; --border: #334155; }
-        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 600px; background: var(--card); padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5); }
-        h1 { margin: 0 0 10px 0; font-size: 1.5rem; text-align: center; }
-        .drop-zone { border: 2px dashed var(--accent); border-radius: 8px; padding: 40px; text-align: center; cursor: pointer; background: rgba(56, 189, 248, 0.05); transition: 0.3s; margin-bottom: 20px; }
-        .drop-zone:hover { background: rgba(56, 189, 248, 0.1); }
-        .controls { display: flex; flex-direction: column; gap: 15px; }
-        select, button { padding: 12px; border-radius: 6px; border: 1px solid var(--border); font-size: 1rem; }
-        select { background: #0f172a; color: white; }
-        button { background: var(--accent); color: #0f172a; font-weight: bold; cursor: pointer; border: none; }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
-        #preview { width: 100%; margin-top: 20px; border-radius: 6px; display: none; background: #000; }
-        .status { font-size: 0.8rem; color: #94a3b8; text-align: center; margin-top: 10px; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 800px; background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        
+        /* Upload Area */
+        .drop-zone { border: 2px dashed var(--accent); border-radius: 12px; padding: 30px; text-align: center; cursor: pointer; background: rgba(56, 189, 248, 0.05); margin-bottom: 20px; }
+        
+        /* Preview Controls */
+        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .control-group { display: flex; flex-direction: column; gap: 5px; font-size: 0.8rem; font-weight: bold; color: var(--accent); }
+        select, button, input[type="range"] { padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: #0f172a; color: white; font-size: 1rem; }
+        button { background: var(--accent); color: #0f172a; border: none; font-weight: bold; cursor: pointer; }
+
+        /* Zoom Preview Window */
+        .preview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .preview-window { 
+            width: 100%; 
+            aspect-ratio: 1/1; 
+            background: #000; 
+            border: 2px solid var(--border); 
+            border-radius: 12px; 
+            position: relative; 
+            overflow: hidden; /* This hides the parts of the image that go outside the box when zooming */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: move;
+        }
+
+        #zoom-container {
+            transition: transform 0.1s ease-out;
+            transform-origin: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        svg, canvas { max-width: 100%; max-height: 100%; display: block; }
+        
+        .status { font-size: 0.8rem; color: #94a3b8; text-align: center; margin-top: 15px; }
+        #loading { display: none; color: var(--accent); font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>MAS Converter</h1>
+        <h2 style="text-align:center; margin: 0 0 15px 0;">MAS Design Engine</h2>
+        
         <div class="drop-zone" id="drop-zone">
-            <span>Tap or Drag Image Here</span>
+            <span>Tap to Upload Logo or Design</span>
             <input type="file" id="file-input" accept="image/*" hidden>
         </div>
 
         <div class="controls">
-            <label for="format">Convert To:</label>
-            <select id="format">
-                <option value="image/svg+xml">SVG (Vector)</option>
-                <option value="image/png">PNG</option>
-                <option value="image/jpeg">JPEG</option>
-                <option value="image/webp">WebP</option>
-            </select>
-            <button id="convert-btn" disabled>Convert & Download</button>
+            <div class="control-group">
+                <label>Format</label>
+                <select id="format">
+                    <option value="image/svg+xml">SVG (Vector)</option>
+                    <option value="image/png">PNG</option>
+                    <option value="image/jpeg">JPEG</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Magnify (Zoom): <span id="zoom-val">1x</span></label>
+                <input type="range" id="zoom-slider" min="1" max="10" step="0.1" value="1">
+            </div>
         </div>
 
-        <div id="status-msg" class="status">Ready</div>
-        <canvas id="hidden-canvas" style="display:none;"></canvas>
+        <div class="preview-header">
+            <span id="loading">CONVERTING...</span>
+            <span style="font-size: 0.7rem; color: #888;">Inspect edges below before download</span>
+        </div>
+
+        <div class="preview-window" id="window">
+            <div id="zoom-container">
+                </div>
+        </div>
+
+        <button id="download-btn" style="width:100%; margin-top: 20px; display:none;">Download Final File</button>
+        <div class="status" id="status">Waiting for image...</div>
     </div>
 
     <script>
-        const dropZone = document.getElementById('drop-zone');
         const fileInput = document.getElementById('file-input');
-        const convertBtn = document.getElementById('convert-btn');
+        const dropZone = document.getElementById('drop-zone');
         const formatSelect = document.getElementById('format');
-        const canvas = document.getElementById('hidden-canvas');
-        const ctx = canvas.getContext('2d');
-        const statusMsg = document.getElementById('status-msg');
-        let currentFile = null;
-        let originalImg = null;
-
-        // File Selection Logic
-        dropZone.onclick = () => fileInput.click();
-        fileInput.onchange = (e) => loadFile(e.target.files[0]);
+        const zoomSlider = document.getElementById('zoom-slider');
+        const zoomVal = document.getElementById('zoom-val');
+        const zoomContainer = document.getElementById('zoom-container');
+        const downloadBtn = document.getElementById('download-btn');
+        const status = document.getElementById('status');
+        const loading = document.getElementById('loading');
         
-        window.ondragover = (e) => e.preventDefault();
-        window.ondrop = (e) => { e.preventDefault(); loadFile(e.dataTransfer.files[0]); };
+        let originalImg = null;
+        let hiddenCanvas = document.createElement('canvas');
+        let hCtx = hiddenCanvas.getContext('2d');
 
-        function loadFile(file) {
-            if (!file || !file.type.startsWith('image/')) return;
-            currentFile = file;
-            statusMsg.innerText = `Loaded: ${file.name}`;
-            
+        // 1. Zoom Logic
+        zoomSlider.oninput = () => {
+            const scale = zoomSlider.value;
+            zoomVal.innerText = `${scale}x`;
+            zoomContainer.style.transform = `scale(${scale})`;
+        };
+
+        // 2. File Handling
+        dropZone.onclick = () => fileInput.click();
+        fileInput.onchange = (e) => handleFile(e.target.files[0]);
+
+        function handleFile(file) {
+            if (!file) return;
+            status.innerText = `File: ${file.name}`;
             const reader = new FileReader();
             reader.onload = (e) => {
                 originalImg = new Image();
-                originalImg.onload = () => {
-                    canvas.width = originalImg.width;
-                    canvas.height = originalImg.height;
-                    ctx.drawImage(originalImg, 0, 0);
-                    convertBtn.disabled = false;
-                };
+                originalImg.onload = processFile;
                 originalImg.src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
 
-        // Conversion Logic
-        convertBtn.onclick = async () => {
-            const targetFormat = formatSelect.value;
-            statusMsg.innerText = "Converting...";
-            convertBtn.disabled = true;
+        // 3. Conversion Engine
+        async function processFile() {
+            loading.style.display = 'inline';
+            downloadBtn.style.display = 'none';
+            zoomSlider.value = 1;
+            zoomVal.innerText = '1x';
+            zoomContainer.style.transform = 'scale(1)';
+            
+            // Limit internal resolution for stability on iPhone
+            const max = 1000;
+            let w = originalImg.width, h = originalImg.height;
+            if (w > max || h > max) {
+                const r = Math.min(max/w, max/h);
+                w *= r; h *= r;
+            }
+            hiddenCanvas.width = w; hiddenCanvas.height = h;
+            hCtx.drawImage(originalImg, 0, 0, w, h);
 
-            try {
-                if (targetFormat === "image/svg+xml") {
-                    // Use ImageTracer for SVG
-                    const options = { ltres: 1, qtres: 1, pathomit: 8, numberofcolors: 16 };
-                    const svgString = ImageTracer.imagedataToSVG(ctx.getImageData(0,0,canvas.width,canvas.height), options);
-                    download(svgString, "converted.svg", "image/svg+xml");
+            setTimeout(() => {
+                const target = formatSelect.value;
+                zoomContainer.innerHTML = '';
+
+                if (target === "image/svg+xml") {
+                    const options = { ltres: 1, qtres: 1, pathomit: 10, numberofcolors: 16 };
+                    const svgString = ImageTracer.imagedataToSVG(hCtx.getImageData(0,0,w,h), options);
+                    zoomContainer.innerHTML = svgString;
                 } else {
-                    // Use Canvas for Raster (PNG, JPEG, WebP)
-                    const dataUrl = canvas.toDataURL(targetFormat, 0.9);
-                    const ext = targetFormat.split('/')[1];
-                    download(dataUrl, `converted.${ext}`, targetFormat, true);
+                    const img = document.createElement('img');
+                    img.src = hiddenCanvas.toDataURL(target, 0.9);
+                    img.style.width = '100%';
+                    zoomContainer.appendChild(img);
                 }
-                statusMsg.innerText = "Done!";
-            } catch (err) {
-                statusMsg.innerText = "Error during conversion.";
-                console.error(err);
-            }
-            convertBtn.disabled = false;
-        };
 
-        function download(content, filename, type, isBase64 = false) {
-            const a = document.createElement("a");
-            if (isBase64) {
-                a.href = content;
-            } else {
-                const blob = new Blob([content], { type });
-                a.href = URL.createObjectURL(blob);
-            }
-            a.download = filename;
-            a.click();
+                loading.style.display = 'none';
+                downloadBtn.style.display = 'block';
+            }, 100);
         }
+
+        formatSelect.onchange = () => { if(originalImg) processFile(); };
+
+        // 4. Download Logic
+        downloadBtn.onclick = () => {
+            const target = formatSelect.value;
+            const a = document.createElement('a');
+            
+            if (target === "image/svg+xml") {
+                const blob = new Blob([zoomContainer.innerHTML], {type: 'image/svg+xml'});
+                a.href = URL.createObjectURL(blob);
+                a.download = 'MAS-Converted.svg';
+            } else {
+                a.href = hiddenCanvas.toDataURL(target, 0.9);
+                a.download = `MAS-Converted.${target.split('/')[1]}`;
+            }
+            a.click();
+        };
     </script>
 </body>
 </html>
