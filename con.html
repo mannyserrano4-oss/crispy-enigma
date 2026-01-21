@@ -3,67 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MAS Design Engine | Red Force Fix</title>
+    <title>MAS Logo Vectorizer</title>
     <script src="https://cdn.jsdelivr.net/npm/imagetracerjs@1.2.6/imagetracer_v1.2.6.min.js"></script>
     <style>
         :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --accent: #38bdf8; --border: #334155; }
         body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
-        .container { width: 100%; max-width: 850px; background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        .drop-zone { border: 2px dashed var(--accent); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; background: rgba(56, 189, 248, 0.05); margin-bottom: 15px; }
-        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .control-group { display: flex; flex-direction: column; gap: 4px; font-size: 0.75rem; font-weight: bold; color: var(--accent); }
-        select, button, input[type="range"] { padding: 8px; border-radius: 6px; border: 1px solid var(--border); background: #0f172a; color: white; font-size: 0.9rem; }
+        .container { width: 100%; max-width: 800px; background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .drop-zone { border: 2px dashed var(--accent); border-radius: 12px; padding: 25px; text-align: center; cursor: pointer; background: rgba(56, 189, 248, 0.05); margin-bottom: 20px; }
+        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .control-group { display: flex; flex-direction: column; gap: 5px; font-size: 0.8rem; font-weight: bold; color: var(--accent); }
+        select, button, input[type="range"] { padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: #0f172a; color: white; font-size: 1rem; }
         button { background: var(--accent); color: #0f172a; border: none; font-weight: bold; cursor: pointer; }
         .preview-window { width: 100%; aspect-ratio: 1/1; background: #000; border: 2px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; touch-action: none; cursor: grab; display: flex; align-items: center; justify-content: center; }
         #pan-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transform-origin: center; transition: transform 0.05s linear; }
-        #zoom-content { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-        svg { width: 100% !important; height: 100% !important; display: block; overflow: visible !important; }
-        .status-bar { display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; color: #888; margin-bottom: 8px; }
-        #loading { color: #ff4757; font-weight: bold; display: none; }
+        #zoom-content { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+        svg { width: 100% !important; height: 100% !important; object-fit: contain; display: block; }
+        .status-bar { display: flex; justify-content: space-between; font-size: 0.7rem; color: #888; margin-bottom: 10px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2 style="text-align:center; margin: 0 0 10px 0;">MAS Design Engine</h2>
+        <h2 style="text-align:center; margin: 0 0 10px 0;">MAS Logo Engine</h2>
         <div class="drop-zone" onclick="document.getElementById('file-input').click()">
             <span>Tap to Upload Logo</span>
             <input type="file" id="file-input" accept="image/*" hidden>
         </div>
         <div class="controls">
             <div class="control-group">
+                <label>Format</label>
+                <select id="format"><option value="image/svg+xml">SVG (Vector)</option><option value="image/png">PNG</option></select>
+            </div>
+            <div class="control-group">
                 <label>Zoom: <span id="zoom-val">1x</span></label>
                 <input type="range" id="zoom-slider" min="1" max="100" value="1">
             </div>
-            <div class="control-group">
-                <label>Red Sensitivity: <span id="red-val">High</span></label>
-                <input type="range" id="color-slider" min="8" max="64" value="32">
-            </div>
-            <div class="control-group">
-                <label>Tattoo Detail</label>
-                <input type="range" id="detail-slider" min="0" max="2" step="0.1" value="0.1">
-            </div>
-            <div class="control-group">
-                <label>Format</label>
-                <select id="format"><option value="image/svg+xml">SVG</option><option value="image/png">PNG</option></select>
-            </div>
         </div>
         <div class="status-bar">
-            <span id="loading">ISOLATING RED CHANNELS...</span>
+            <span>Drag to Pan • Scale to 100x</span>
             <button onclick="resetView()" style="padding: 2px 8px; font-size: 0.6rem;">RESET VIEW</button>
         </div>
         <div class="preview-window" id="viewport">
             <div id="pan-container"><div id="zoom-content"></div></div>
         </div>
-        <button id="download-btn" style="width:100%; margin-top: 15px; display:none; padding: 12px;">Download SVG for Printing</button>
+        <button id="download-btn" style="width:100%; margin-top: 20px; display:none;">Download Vector File</button>
     </div>
     <script>
-        const fileInput = document.getElementById('file-input'), zoomSlider = document.getElementById('zoom-slider'), colorSlider = document.getElementById('color-slider'), detailSlider = document.getElementById('detail-slider'), zoomVal = document.getElementById('zoom-val'), colorVal = document.getElementById('color-val'), panContainer = document.getElementById('pan-container'), zoomContent = document.getElementById('zoom-content'), formatSelect = document.getElementById('format'), downloadBtn = document.getElementById('download-btn'), loading = document.getElementById('loading');
+        const fileInput = document.getElementById('file-input'), zoomSlider = document.getElementById('zoom-slider'), zoomVal = document.getElementById('zoom-val'), panContainer = document.getElementById('pan-container'), zoomContent = document.getElementById('zoom-content'), formatSelect = document.getElementById('format'), downloadBtn = document.getElementById('download-btn');
         let originalImg = null, scale = 1, pointX = 0, pointY = 0, start = { x: 0, y: 0 }, isDragging = false;
         function updateTransform() { panContainer.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`; }
         function resetView() { scale = 1; pointX = 0; pointY = 0; zoomSlider.value = 1; zoomVal.innerText = '1x'; updateTransform(); }
         zoomSlider.oninput = () => { scale = parseFloat(zoomSlider.value); zoomVal.innerText = `${scale}x`; updateTransform(); };
-        colorSlider.oninput = () => { if(originalImg) processFile(); };
-        detailSlider.oninput = () => { if(originalImg) processFile(); };
         const viewport = document.getElementById('viewport');
         viewport.addEventListener('mousedown', (e) => { isDragging = true; start = { x: e.clientX - pointX, y: e.clientY - pointY }; });
         viewport.addEventListener('touchstart', (e) => { isDragging = true; start = { x: e.touches[0].clientX - pointX, y: e.touches[0].clientY - pointY }; });
@@ -76,29 +65,24 @@
             const reader = new FileReader(); reader.onload = (ev) => { originalImg = new Image(); originalImg.onload = processFile; originalImg.src = ev.target.result; }; reader.readAsDataURL(file);
         };
         async function processFile() {
-            loading.style.display = 'inline';
-            const canvas = document.createElement('canvas'), ctx = canvas.getContext('2d'), max = 2000; 
+            resetView(); const canvas = document.createElement('canvas'), ctx = canvas.getContext('2d'), max = 1200; 
             let w = originalImg.width, h = originalImg.height, r = Math.min(max/w, max/h);
             canvas.width = w * r; canvas.height = h * r; ctx.drawImage(originalImg, 0, 0, canvas.width, canvas.height);
             setTimeout(() => {
                 const target = formatSelect.value; zoomContent.innerHTML = '';
                 if (target === "image/svg+xml") {
-                    const options = { 
-                        ltres: parseFloat(detailSlider.value), qtres: parseFloat(detailSlider.value), pathomit: 0, 
-                        numberofcolors: parseInt(colorSlider.value), mincolorratio: 0, colorsampling: 2, viewbox: true 
-                    };
-                    zoomContent.innerHTML = ImageTracer.imagedataToSVG(ctx.getImageData(0,0,canvas.width,canvas.height), options);
+                    zoomContent.innerHTML = ImageTracer.imagedataToSVG(ctx.getImageData(0,0,canvas.width,canvas.height), { ltres: 1, qtres: 1, pathomit: 8, viewbox: true });
                 } else {
-                    const img = document.createElement('img'); img.src = canvas.toDataURL(target, 1.0); zoomContent.appendChild(img);
+                    const img = document.createElement('img'); img.src = canvas.toDataURL(target, 0.9); zoomContent.appendChild(img);
                 }
-                loading.style.display = 'none'; downloadBtn.style.display = 'block';
+                downloadBtn.style.display = 'block';
             }, 50);
         }
         downloadBtn.onclick = () => {
-            const target = formatSelect.value; const a = document.createElement('a');
+            const target = formatSelect.value, a = document.createElement('a');
             if (target === "image/svg+xml") {
-                const blob = new Blob([zoomContent.innerHTML], {type: 'image/svg+xml'}); a.href = URL.createObjectURL(blob); a.download = 'MAS-Output.svg';
-            } else { a.href = zoomContent.querySelector('img').src; a.download = `MAS-Output.png`; }
+                const blob = new Blob([zoomContent.innerHTML], {type: 'image/svg+xml'}); a.href = URL.createObjectURL(blob); a.download = 'MAS-Logo.svg';
+            } else { a.href = zoomContent.querySelector('img').src; a.download = `MAS-Logo.png`; }
             a.click();
         };
     </script>
