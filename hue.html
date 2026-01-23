@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChromaShift - Image Color Theory Tool</title>
+    <style>
+        :root {
+            --bg: #1a1a1a;
+            --sidebar: #252525;
+            --text: #e0e0e0;
+            --accent: #4a90e2;
+            --border: #333;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar / Controls --- */
+        #controls {
+            width: 400px;
+            background: var(--sidebar);
+            border-right: 1px solid var(--border);
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .section {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+        }
+
+        h2 { font-size: 1.2rem; margin-top: 0; color: var(--accent); }
+        p { font-size: 0.85rem; color: #aaa; line-height: 1.4; }
+
+        .drop-zone {
+            border: 2px dashed var(--border);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .drop-zone:hover { border-color: var(--accent); }
+
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .color-swatch {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 4px;
+            border: 1px solid #000;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .color-swatch.active { ring: 3px solid var(--accent); outline: 2px solid white; }
+
+        .btn-group { display: flex; flex-wrap: wrap; gap: 5px; }
+        button {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        button:hover { background: #444; }
+
+        /* --- Preview Area --- */
+        #preview {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            background: #111;
+        }
+
+        .canvas-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 100%;
+        }
+
+        canvas {
+            max-width: 100%;
+            max-height: 40vh;
+            background: repeating-conic-gradient(#222 0% 25%, #333 0% 50%) 50% / 20px 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: #666; }
+
+        /* --- Modals / Grids --- */
+        #shade-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 2px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="controls">
+    <h2>ChromaShift</h2>
+    
+    <div class="section">
+        <div class="drop-zone" id="drop-zone">Click or Drop Image Here</div>
+        <input type="file" id="file-input" hidden accept="image/*">
+    </div>
+
+    <div class="section" id="palette-section" style="display:none;">
+        <label class="label">Detected Colors</label>
+        <div class="palette-grid" id="detected-palette"></div>
+        
+        <div style="margin-top:15px;">
+            <input type="checkbox" id="qr-mode"> <label for="qr-mode" style="font-size:0.8rem">QR Mode (High Contrast Protection)</label>
+        </div>
+    </div>
+
+    <div class="section" id="theory-section" style="display:none;">
+        <label class="label">Color Theory Logic</label>
+        <p id="theory-desc">Select a color above and choose a rule.</p>
+        <div class="btn-group">
+            <button onclick="applyTheory('comp')">Complementary</button>
+            <button onclick="applyTheory('triad')">Triadic</button>
+            <button onclick="applyTheory('analog')">Analogous</button>
+            <button onclick="applyTheory('mono')">Monochromatic</button>
+        </div>
+        <div class="palette-grid" id="suggested-palette"></div>
+    </div>
+
+    <div class="section" id="manual-section" style="display:none;">
+        <label class="label">Shades & Tints</label>
+        <div id="shade-grid"></div>
+    </div>
+
+    <button id="download-btn" style="display:none; width: 100%; background: var(--accent); font-weight: bold; padding: 15px;">DOWNLOAD IMAGE</button>
+</div>
+
+<div id="preview">
+    <div class="canvas-container">
+        <span class="label">Original</span>
+        <canvas id="canvas-orig"></canvas>
+    </div>
+    <div class="canvas-container">
+        <span class="label">Processed Preview</span>
+        <canvas id="canvas-proc"></canvas>
+    </div>
+</div>
+
+<script>
+    const fileInput = document.getElementById('file-input');
+    const dropZone = document.getElementById('drop-zone');
+    const canvasOrig = document.getElementById('canvas-orig');
+    const canvasProc = document.getElementById('canvas-proc');
+    const ctxOrig = canvasOrig.getContext('2d');
+    const ctxProc = canvasProc.getContext('2d');
+    
+    let originalImage = null;
+    let detectedColors = [];
+    let selectedColorIndex = 0;
+    let colorMap = new Map(); // Maps old hex to new hex
+
+    // Theory Descriptions
+    const theories = {
+        comp: "Opposites on the wheel. High contrast, makes logos pop.",
+        triad: "Three colors spaced equally. Vibrant and balanced.",
+        analog: "Neighbors on the wheel. Pleasing and low-stress.",
+        mono: "Variations in lightness. Professional and clean."
+    };
+
+    // --- Image Handling ---
+    dropZone.onclick = () => fileInput.click();
+    fileInput.onchange = (e) => handleImage(e.target.files[0]);
+
+    function handleImage(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+                originalImage = img;
+                setupCanvases(img);
+                extractPalette(img);
+                document.getElementById('palette-section').style.display = 'block';
+                document.getElementById('theory-section').style.display = 'block';
+                document.getElementById('download-btn').style.display = 'block';
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function setupCanvases(img) {
+        canvasOrig.width = canvasProc.width = img.width;
+        canvasOrig.height = canvasProc.height = img.height;
+        ctxOrig.drawImage(img, 0, 0);
+        ctxProc.drawImage(img, 0, 0);
+    }
+
+    // --- Color Extraction ---
+    function extractPalette(img) {
+        const data = ctxOrig.getImageData(0, 0, img.width, img.height).data;
+        const counts = {};
+        // Sample every 10th pixel for speed
+        for (let i = 0; i < data.length; i += 40) {
+            if (data[i+3] < 128) continue; // Skip transparent
+            const hex = rgbToHex(data[i], data[i+1], data[i+2]);
+            counts[hex] = (counts[hex] || 0) + 1;
+        }
+        
+        detectedColors = Object.entries(counts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 8)
+            .map(x => x[0]);
+
+        renderDetectedPalette();
+    }
+
+    function renderDetectedPalette() {
+        const container = document.getElementById('detected-palette');
+        container.innerHTML = '';
+        detectedColors.forEach((hex, i) => {
+            const div = document.createElement('div');
+            div.className = `color-swatch ${i === selectedColorIndex ? 'active' : ''}`;
+            div.style.backgroundColor = hex;
+            div.onclick = () => {
+                selectedColorIndex = i;
+                renderDetectedPalette();
+                renderShadeGrid(hex);
+            };
+            container.appendChild(div);
+        });
+        renderShadeGrid(detectedColors[selectedColorIndex]);
+    }
+
+    // --- Color Theory Logic ---
+    function applyTheory(type) {
+        const baseHex = detectedColors[selectedColorIndex];
+        const hsl = hexToHsl(baseHex);
+        document.getElementById('theory-desc').innerText = theories[type];
+        
+        let suggestions = [];
+        if (type === 'comp') suggestions = [hslToHex((hsl.h + 180) % 360, hsl.s, hsl.l)];
+        if (type === 'triad') suggestions = [hslToHex((hsl.h + 120) % 360, hsl.s, hsl.l), hslToHex((hsl.h + 240) % 360, hsl.s, hsl.l)];
+        if (type === 'analog') suggestions = [hslToHex((hsl.h + 30) % 360, hsl.s, hsl.l), hslToHex((hsl.h - 30 + 360) % 360, hsl.s, hsl.l)];
+        if (type === 'mono') suggestions = [hslToHex(hsl.h, hsl.s, hsl.l - 20), hslToHex(hsl.h, hsl.s, hsl.l + 20)];
+
+        const container = document.getElementById('suggested-palette');
+        container.innerHTML = '';
+        suggestions.forEach(hex => {
+            const div = document.createElement('div');
+            div.className = 'color-swatch';
+            div.style.backgroundColor = hex;
+            div.onclick = () => updateImageColor(baseHex, hex);
+            container.appendChild(div);
+        });
+    }
+
+    function renderShadeGrid(hex) {
+        document.getElementById('manual-section').style.display = 'block';
+        const grid = document.getElementById('shade-grid');
+        grid.innerHTML = '';
+        const hsl = hexToHsl(hex);
+        for (let l = 10; l <= 90; l += 8) {
+            const newHex = hslToHex(hsl.h, hsl.s, l);
+            const div = document.createElement('div');
+            div.className = 'color-swatch';
+            div.style.backgroundColor = newHex;
+            div.onclick = () => updateImageColor(hex, newHex);
+            grid.appendChild(div);
+        }
+    }
+
+    // --- Image Processing ---
+    function updateImageColor(oldHex, newHex) {
+        colorMap.set(oldHex.toLowerCase(), hexToRgb(newHex));
+        processImage();
+    }
+
+    function processImage() {
+        const imgData = ctxOrig.getImageData(0, 0, canvasOrig.width, canvasOrig.height);
+        const data = imgData.data;
+        const isQR = document.getElementById('qr-mode').checked;
+
+        for (let i = 0; i < data.length; i += 4) {
+            const r = data[i], g = data[i+1], b = data[i+2];
+            const hex = rgbToHex(r, g, b).toLowerCase();
+
+            if (isQR) {
+                // QR Logic: High contrast thresholding
+                const brightness = (0.299 * r + 0.587 * g + 0.114 * b);
+                if (brightness < 128 && colorMap.has(detectedColors[0].toLowerCase())) {
+                    const target = colorMap.get(detectedColors[0].toLowerCase());
+                    data[i] = target.r; data[i+1] = target.g; data[i+2] = target.b;
+                } else if (brightness >= 128 && colorMap.has(detectedColors[1]?.toLowerCase())) {
+                    const target = colorMap.get(detectedColors[1].toLowerCase());
+                    data[i] = target.r; data[i+1] = target.g; data[i+2] = target.b;
+                }
+            } else {
+                // Regular Logic: Exact match replacement
+                if (colorMap.has(hex)) {
+                    const target = colorMap.get(hex);
+                    data[i] = target.r; data[i+1] = target.g; data[i+2] = target.b;
+                }
+            }
+        }
+        ctxProc.putImageData(imgData, 0, 0);
+    }
+
+    // --- Utilities ---
+    function rgbToHex(r, g, b) {
+        return "#" + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+    }
+
+    function hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : null;
+    }
+
+    function hexToHsl(hex) {
+        let {r, g, b} = hexToRgb(hex);
+        r /= 255; g /= 255; b /= 255;
+        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        let h, s, l = (max + min) / 2;
+        if (max === min) h = s = 0;
+        else {
+            const d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+            h /= 6;
+        }
+        return { h: h * 360, s: s * 100, l: l * 100 };
+    }
+
+    function hslToHex(h, s, l) {
+        l /= 100;
+        const a = s * Math.min(l, 1 - l) / 100;
+        const f = n => {
+            const k = (n + h / 30) % 12;
+            const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+            return Math.round(255 * color).toString(16).padStart(2, '0');
+        };
+        return `#${f(0)}${f(8)}${f(4)}`;
+    }
+
+    document.getElementById('download-btn').onclick = () => {
+        const link = document.createElement('a');
+        link.download = 'chromashift-export.png';
+        link.href = canvasProc.toDataURL();
+        link.click();
+    };
+</script>
+
+</body>
+</html>
