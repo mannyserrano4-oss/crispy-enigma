@@ -1,9 +1,9 @@
-const CACHE_NAME = 'pomo-v2'; // Increment this (v3, v4...) to force an update
+const CACHE_NAME = 'pomo-v3'; // Increment this (v3, v4...) to force an update
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './day.jpg',
+  './day.gif',
   './bg-image.gif',
   './day.mp3',
   './night.mp3.mp3', 
