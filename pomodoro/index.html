@@ -272,20 +272,18 @@
        ========================================= */
     
     function updateMusicSource() {
-        const isCyber = html.getAttribute('data-theme') === 'cyber';
-        const newSrc = isCyber ? musicFiles.night : musicFiles.day;
-        const currentSrc = bgMusic.getAttribute('src');
-
-        // Only swap if the source is different
-        if (currentSrc !== newSrc) {
-            bgMusic.src = newSrc;
+            const isCyber = html.getAttribute('data-theme') === 'cyber';
+            const newSrc = isCyber ? musicFiles.night : musicFiles.day;
             
-            // FIX: If music was already enabled (even if paused by a system event), play the new track
+            // If the music is already set to this source, don't do anything
+            // This prevents the audio from stuttering when you toggle themes
+            if (bgMusic.getAttribute('src') === newSrc) return; 
+        
+            bgMusic.src = newSrc;
             if (musicEnabled) {
-                bgMusic.play().catch(e => console.log('Switched track'));
+                bgMusic.play().catch(e => {});
             }
         }
-    }
 
     // Toggle Music Button
     musicBtn.addEventListener('click', () => {
@@ -306,21 +304,21 @@
 
     // Theme Toggle (Icon Fix + Music Swap)
     themeBtn.addEventListener('click', (e) => {
-        playSound('click');
-        
-        if (html.getAttribute('data-theme') === 'cyber') {
-            // Switch to DAY
-            html.removeAttribute('data-theme'); 
-            themeBtn.innerHTML = iconLeaf; // Show Leaf
-        } else {
-            // Switch to NIGHT
-            html.setAttribute('data-theme', 'cyber'); 
-            themeBtn.innerHTML = iconRobot; // Show Robot
-        }
-        
-        updateVisuals(timeLeft);
-        updateMusicSource(); // <--- Forces music to swap immediately
-    });
+    playSound('click');
+    
+    if (html.getAttribute('data-theme') === 'cyber') {
+        html.removeAttribute('data-theme');
+        themeBtn.innerHTML = iconLeaf;
+        localStorage.setItem('pomoTheme', 'day'); // Saves "Day" to your phone
+    } else {
+        html.setAttribute('data-theme', 'cyber');
+        themeBtn.innerHTML = iconRobot;
+        localStorage.setItem('pomoTheme', 'cyber'); // Saves "Cyber" to your phone
+    }
+    
+    updateVisuals(timeLeft);
+    updateMusicSource();
+});
 
     // Ambiance Logic
     function syncAudio() {
@@ -443,7 +441,7 @@
        5. TIMER LOGIC
        ========================================= */
     function timerComplete() {
-        // Silent Finish
+        playSound('alarm');
         clearInterval(timerId); isRunning = false;
         startBtn.textContent = 'Start'; targetTime = null;
         localStorage.removeItem('targetTime');
@@ -483,9 +481,20 @@
             timerId = setInterval(() => {
                 const now = Date.now();
                 const distance = targetTime - now;
-                if (distance < 0) { timeLeft = 0; updateVisuals(0); timerComplete(); } 
-                else { timeLeft = Math.ceil(distance / 1000); updateVisuals(timeLeft); }
-            }, 1000);
+            
+                if (distance <= 0) { 
+                    timeLeft = 0; 
+                    updateVisuals(0); 
+                    timerComplete(); 
+                } else { 
+                    const newTimeLeft = Math.ceil(distance / 1000);
+                    // Only refresh the screen if the second actually changed
+                    if (newTimeLeft !== timeLeft) {
+                        timeLeft = newTimeLeft;
+                        updateVisuals(timeLeft);
+                    }
+                }
+            }, 200); // We check 5 times a second now for better accuracy
         }
     }
 
@@ -542,6 +551,28 @@
             .catch(err => console.log('Registration failed:', err));
     });
 }
+
+// This saves your checkbox choice immediately when you click it
+document.getElementById('auto-break').addEventListener('change', (e) => {
+    localStorage.setItem('pomoAutoBreak', e.target.checked);
+});
+    
+    // --- STARTUP LOGIC ---
+window.addEventListener('DOMContentLoaded', () => {
+    // 1. Load Theme
+    const savedTheme = localStorage.getItem('pomoTheme');
+    if (savedTheme === 'cyber') {
+        html.setAttribute('data-theme', 'cyber');
+        themeBtn.innerHTML = iconRobot;
+    }
+
+    // 2. Load Auto-Break Preference
+    const savedAutoBreak = localStorage.getItem('pomoAutoBreak') === 'true';
+    document.getElementById('auto-break').checked = savedAutoBreak;
+
+    // 3. Refresh Visuals
+    updateVisuals(timeLeft);
+});
     
 </script>
 </body>
