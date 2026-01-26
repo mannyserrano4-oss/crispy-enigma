@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <title>Pomodoro</title>
+    <meta name="apple-mobile-web-app-title" content="Pomodoro">
+    
+    <link rel="apple-touch-icon" href="icon.png">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <link rel="manifest" href="manifest.json">
+    
+    <style>
+        /* ... (Keep your CSS styles exactly the same below here) ... */
+        /* =========================================
+           STYLE CONFIGURATION
+           ========================================= */
+        :root {
+            /* DAY THEME */
+            --bg-color: #f4f1ea; 
+            /* Ensure you have uploaded 'day.jpg' or change this link */
+            --bg-image: url('day.jpg'); 
+            --text-color: #2e4a33; 
+            --glass-bg: rgba(255, 253, 240, 0.25); 
+            --font-family: 'Verdana', sans-serif;
+        }
+
+        [data-theme="cyber"] {
+            /* NIGHT THEME */
+            --bg-color: #050505; 
+            /* Ensure you have uploaded 'night.gif' or change this link */
+            --bg-image: url('bg-image.gif'); 
+            --text-color: #00ffff; 
+            --glass-bg: rgba(0, 0, 0, 0.6); 
+            --font-family: 'Courier New', monospace;
+        }
+
+        /* --- LAYOUT --- */
+        body {
+            margin: 0; height: 100vh; display: flex;
+            justify-content: center; align-items: center;
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            background-image: var(--bg-image);
+            background-size: cover; background-position: center;
+            transition: all 0.5s ease; overflow: hidden;
+        }
+        
+        /* The Blur Layer */
+        body::before {
+            content: ""; position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: inherit; filter: blur(5px); 
+            z-index: 0; 
+        }
+
+        .container {
+            position: relative; 
+            z-index: 10; /* Ensures buttons are always clickable */
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 25px; padding: 30px;
+            text-align: center; width: 90%; max-width: 400px;
+            color: var(--text-color);
+            box-shadow: 0 8px 32px 0 rgba(0,0,0,0.3);
+            transition: color 1s ease, background 0.5s ease;
+        }
+        
+        .header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        button { cursor: pointer; border: none; background: none; color: inherit; font-family: inherit; transition: 0.2s; }
+        
+        .theme-toggle, .settings-toggle { 
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0.8; width: 40px; height: 40px;
+        }
+        .theme-toggle svg, .settings-toggle svg {
+            width: 28px; height: 28px; fill: currentColor; transition: fill 1s linear;
+        }
+        .theme-toggle:hover, .settings-toggle:hover { transform: scale(1.1); opacity: 1; }
+        
+        /* TIMER VISUALS */
+        .timer-wrapper { position: relative; width: 220px; height: 220px; margin: 0 auto; }
+        svg.timer-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+        circle { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke 1s linear; }
+        .track { stroke: rgba(128, 128, 128, 0.3); }
+        .progress { stroke: var(--text-color); } 
+        
+        .time-display {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem; font-weight: bold;
+        }
+
+        /* BUTTONS */
+        .controls { margin-top: 25px; display: flex; justify-content: center; gap: 15px; }
+        button.btn-main {
+            padding: 10px 25px; border: 2px solid currentColor;
+            font-size: 1rem; border-radius: 50px; text-transform: uppercase; font-weight: bold;
+        }
+        button.btn-main:hover { background: currentColor; color: var(--glass-bg); }
+
+        .modes { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
+        .mode-btn { font-size: 0.85rem; padding: 5px 10px; border-radius: 10px; opacity: 0.6; }
+        .mode-btn.active { opacity: 1; font-weight: bold; background: rgba(128,128,128,0.2); }
+
+        /* SETTINGS PANEL */
+        #settings-panel {
+            display: none; margin-top: 20px;
+            border-top: 1px solid currentColor; padding-top: 15px;
+            font-size: 0.9rem; text-align: left;
+        }
+        .setting-row { margin: 10px 0; display: flex; justify-content: space-between; align-items: center; }
+        input[type="number"] {
+            width: 60px; padding: 5px; border-radius: 5px; border: 1px solid currentColor;
+            background: rgba(255,255,255,0.2); color: inherit;
+        }
+        select {
+            padding: 5px; border-radius: 5px; border: 1px solid currentColor;
+            background: rgba(255,255,255,0.2); color: inherit; width: 140px; cursor: pointer;
+        }
+        .custom-controls { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-custom {
+            flex: 1; padding: 8px; background: rgba(128,128,128,0.2);
+            border-radius: 8px; font-weight: bold; font-size: 0.8rem;
+        }
+        .btn-icon { font-size: 1.2rem; line-height: 1; }
+
+        /* SOUNDBOARD */
+        .soundboard {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.3);
+        }
+        .sound-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px; font-size: 0.9rem;
+        }
+
+/* TASK STYLES */
+        .task-item {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 10px; font-size: 0.9rem; transition: 0.3s;
+        }
+        .task-item input[type="checkbox"] {
+            cursor: pointer; accent-color: currentColor; width: 16px; height: 16px;
+        }
+        .task-text { flex: 1; cursor: pointer; }
+        .task-text.completed { text-decoration: line-through; opacity: 0.5; }
+        .delete-task { opacity: 0.4; font-size: 0.8rem; cursor: pointer; padding: 5px; }
+        .delete-task:hover { opacity: 1; }
+        
+        /* Custom scrollbar for task list */
+        #task-list::-webkit-scrollbar { width: 4px; }
+        #task-list::-webkit-scrollbar-thumb { background: currentColor; border-radius: 10px; }
+      
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <button id="theme-btn" class="theme-toggle" title="Switch Theme">
+            <svg viewBox="0 0 24 24"><path d="M17,8C8,10,5.9,16.17,3.82,21.34L5.71,22l1-2.3A4.49,4.49,0,0,0,8,20C19,20,22,3,22,3,21,5,14,5.25,9,6.25S2,11.5,2,13.5a6.22,6.22,0,0,0,1.75,3.75C7,8,17,8,17,8Z"/></svg>
+        </button>
+        <button id="settings-btn" class="settings-toggle" title="Settings">
+            <svg viewBox="0 0 24 24"><path d="M12,15.5A3.5,3.5,0,0,1,8.5,12A3.5,3.5,0,0,1,12,8.5A3.5,3.5,0,0,1,15.5,12A3.5,3.5,0,0,1,12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.35 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.35 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.04 4.95,18.95L7.44,17.95C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.95L19.05,18.95C19.27,19.04 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/></svg>
+        </button>
+    </div>
+
+    <div class="modes">
+        <button class="mode-btn active" id="mode-pomodoro" data-time="25" data-mode="work">Pomodoro</button>
+        <button class="mode-btn" id="mode-short" data-time="5" data-mode="break">Short Break</button>
+        <button class="mode-btn" id="mode-long" data-time="15" data-mode="break">Long Break</button>
+    </div>
+
+    <div class="timer-wrapper">
+        <svg class="timer-svg">
+            <circle class="track" cx="110" cy="110" r="95"></circle>
+            <circle class="progress" cx="110" cy="110" r="95"></circle>
+        </svg>
+        <div class="time-display" id="time-display">25:00</div>
+    </div>
+
+    <div class="controls">
+        <button class="btn-main" id="start-btn">Start</button>
+        <button class="btn-main" id="reset-btn">Reset</button>
+    </div>
+
+    <div class="soundboard">
+        <div class="sound-row">
+            <select id="ambience-select">
+                <option value="none">-- Noise Off --</option>
+                <option value="rain.mp3">Rain</option>
+                <option value="storm.mp3">Storm</option>
+                <option value="forest.mp3">Forest</option>
+                <option value="waves.mp3">Waves</option> 
+            </select>
+            <button id="ambience-btn" class="btn-icon">▶</button>
+        </div>
+
+        <div class="sound-row">
+            <span>Focus Music</span>
+            <button id="music-btn" class="btn-icon">▶</button>
+        </div>
+
+      <div class="soundboard" style="text-align: left; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 20px;">
+    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <input type="text" id="task-input" placeholder="Add a task..." 
+               style="flex: 1; background: rgba(128,128,128,0.1); border: 1px solid currentColor; color: inherit; padding: 8px; border-radius: 8px; font-family: inherit; font-size: 0.9rem;">
+        <button id="add-task-btn" style="border: 1px solid currentColor; padding: 0 15px; border-radius: 8px; font-weight: bold;">+</button>
+    </div>
+    <ul id="task-list" style="list-style: none; padding: 0; margin: 0; max-height: 150px; overflow-y: auto;"></ul>
+</div>
+      
+    </div>
+
+    <div id="settings-panel">
+        <div class="setting-row">
+            <label>Auto-start Breaks?</label>
+            <input type="checkbox" id="auto-break">
+        </div>
+        <div class="setting-row">
+            <label>Custom Work (min):</label>
+            <input type="number" id="custom-work-input" value="45">
+        </div>
+        <div class="setting-row">
+            <label>Custom Break (min):</label>
+            <input type="number" id="custom-break-input" value="10">
+        </div>
+        <div class="custom-controls">
+            <button class="btn-custom" id="start-custom-work">Start Work</button>
+            <button class="btn-custom" id="start-custom-break">Start Break</button>
+        </div>
+    </div>
+
+    <audio id="bg-music" loop></audio>
+    <audio id="ambience-player" loop></audio>
+</div>
+
+<script>
+ /* =========================================
+       1. FILES & ASSETS
+       ========================================= */
+    const musicFiles = {
+        day: 'day.mp3',
+        night: 'night.mp3.mp3' 
+    };
+
+    const alarmFiles = {
+        day: new Audio('alarm-day.mp3'),
+        night: new Audio('alarm-night.mp3')
+    };
+
+    const iconLeaf = `<svg viewBox="0 0 24 24"><path d="M17,8C8,10,5.9,16.17,3.82,21.34L5.71,22l1-2.3A4.49,4.49,0,0,0,8,20C19,20,22,3,22,3,21,5,14,5.25,9,6.25S2,11.5,2,13.5a6.22,6.22,0,0,0,1.75,3.75C7,8,17,8,17,8Z"/></svg>`;
+    const iconRobot = `<svg viewBox="0 0 24 24"><path d="M4.5,10.5V12.5H6.5V14.5H8.5V12.5H6.5V10.5H4.5M17.5,10.5V12.5H15.5V14.5H17.5V12.5H19.5V10.5H17.5M6,4V6H18V4H6M4,6V8H20V6H4M2,8V16H22V8H2M6,10H8V12H6V10M16,10H18V12H16V10M11,10H13V12H11V10Z"/></svg>`;
+
+    /* =========================================
+       2. SETUP & VARIABLES
+       ========================================= */
+    const colorsDay = { start: [0, 100, 0], end: [210, 180, 140] }; 
+    const colorsNight = { start: [0, 255, 255], end: [255, 20, 147] };
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const audioCtx = new AudioContext();
+
+    const circle = document.querySelector('.progress');
+    const radius = circle.r.baseVal.value;
+    const circumference = 2 * Math.PI * radius;
+    circle.style.strokeDasharray = `${circumference} ${circumference}`;
+
+    let timeLeft = 25 * 60;
+    let totalTime = 25 * 60;
+    let timerId = null;
+    let isRunning = false;
+    let currentMode = 'work'; 
+    let targetTime = null;
+    let wakeLock = null;
+
+    // Wake Lock Logic for the Shop
+    async function requestWakeLock() {
+        if ('wakeLock' in navigator) {
+            try {
+                wakeLock = await navigator.wakeLock.request('screen');
+            } catch (err) {
+                console.error(`${err.name}, ${err.message}`);
+            }
+        }
+    }
+
+    function releaseWakeLock() {
+        if (wakeLock !== null) {
+            wakeLock.release();
+            wakeLock = null;
+        }
+    }
+
+    let musicEnabled = false;
+    let ambienceEnabled = false;
+
+    const timeDisplay = document.getElementById('time-display');
+    const startBtn = document.getElementById('start-btn');
+    const html = document.documentElement;
+    const bgMusic = document.getElementById('bg-music');
+    const musicBtn = document.getElementById('music-btn');
+    const ambiencePlayer = document.getElementById('ambience-player');
+    const ambienceBtn = document.getElementById('ambience-btn');
+    const ambienceSelect = document.getElementById('ambience-select');
+    const themeBtn = document.getElementById('theme-btn');
+
+    /* =========================================
+       3. AUDIO LOGIC
+       ========================================= */
+    function updateMusicSource() {
+        const isCyber = html.getAttribute('data-theme') === 'cyber';
+        const newSrc = isCyber ? musicFiles.night : musicFiles.day;
+        
+        if (bgMusic.getAttribute('src') === newSrc) return; 
+
+        bgMusic.src = newSrc;
+        if (musicEnabled) {
+            bgMusic.play().catch(e => {});
+        }
+    }
+
+    musicBtn.addEventListener('click', () => {
+        playSound('click');
+        musicEnabled = !musicEnabled;
+        if(!bgMusic.getAttribute('src')) updateMusicSource();
+        musicBtn.textContent = musicEnabled ? '⏸' : '▶';
+        if(musicEnabled) { bgMusic.play().catch(e=>{}); } else { bgMusic.pause(); }
+    });
+
+    themeBtn.addEventListener('click', (e) => {
+        playSound('click');
+        if (html.getAttribute('data-theme') === 'cyber') {
+            html.removeAttribute('data-theme');
+            themeBtn.innerHTML = iconLeaf;
+            localStorage.setItem('pomoTheme', 'day');
+        } else {
+            html.setAttribute('data-theme', 'cyber');
+            themeBtn.innerHTML = iconRobot;
+            localStorage.setItem('pomoTheme', 'cyber');
+        }
+        updateVisuals(timeLeft);
+        updateMusicSource();
+    });
+
+    // Ambiance Logic
+    function syncAudio() {
+        if (isRunning) {
+            if (musicEnabled) bgMusic.play().catch(e=>{});
+            if (ambienceEnabled && ambienceSelect.value !== 'none') ambiencePlayer.play().catch(e=>{});
+        } else {
+            bgMusic.pause();
+            ambiencePlayer.pause();
+        }
+    }
+
+    ambienceBtn.addEventListener('click', () => {
+        playSound('click');
+        if (ambienceSelect.value === 'none') return;
+        ambienceEnabled = !ambienceEnabled;
+        ambienceBtn.textContent = ambienceEnabled ? '⏸' : '▶';
+        if(ambienceEnabled) {
+            ambiencePlayer.src = ambienceSelect.value;
+            ambiencePlayer.play().catch(e=>{});
+        } else {
+            ambiencePlayer.pause();
+        }
+    });
+
+    ambienceSelect.addEventListener('change', () => {
+        if (ambienceEnabled) {
+             if(ambienceSelect.value === 'none') {
+                 ambiencePlayer.pause(); ambienceEnabled = false; ambienceBtn.textContent = '▶';
+             } else {
+                 ambiencePlayer.src = ambienceSelect.value; ambiencePlayer.play().catch(e=>{});
+             }
+        }
+    });
+
+    /* =========================================
+       4. VISUALS & SOUND EFFECTS
+       ========================================= */
+    function interpolateColor(color1, color2, factor) {
+        let result = color1.slice();
+        for (let i = 0; i < 3; i++) {
+            result[i] = Math.round(result[i] + factor * (color2[i] - color1[i]));
+        }
+        return `rgb(${result[0]}, ${result[1]}, ${result[2]})`;
+    }
+
+    function updateVisuals(seconds) {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        const display = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+        timeDisplay.textContent = display;
+        
+        const percent = seconds / totalTime;
+        const offset = circumference - (percent * circumference);
+        circle.style.strokeDashoffset = offset;
+
+        const isCyber = html.getAttribute('data-theme') === 'cyber';
+        const palette = isCyber ? colorsNight : colorsDay;
+        const currentColor = interpolateColor(palette.start, palette.end, 1 - percent);
+        
+        circle.style.stroke = currentColor;
+        timeDisplay.style.color = currentColor;
+        document.querySelector('.container').style.color = currentColor;
+        document.documentElement.style.setProperty('--text-color', currentColor);
+        
+        // Update browser tab title
+        document.title = display + " - Pomodoro";
+    }
+
+    function playBeep(isCyber) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+        osc.type = isCyber ? 'sawtooth' : 'sine';
+        if(isCyber) {
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.linearRampToValueAtTime(600, now + 0.3);
+            gainNode.gain.setValueAtTime(0.3, now);
+            gainNode.gain.linearRampToValueAtTime(0, now + 1);
+        } else {
+            osc.frequency.setValueAtTime(440, now);
+            gainNode.gain.setValueAtTime(0.2, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+        }
+        osc.start(now); osc.stop(now + 2);
+    }
+
+    function playSound(type) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const isCyber = html.getAttribute('data-theme') === 'cyber';
+        
+        if (type === 'click') {
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            osc.type = isCyber ? 'square' : 'triangle';
+            osc.frequency.setValueAtTime(isCyber ? 600 : 300, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+            osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.1);
+        } 
+        else if (type === 'alarm') {
+            const sound = isCyber ? alarmFiles.night : alarmFiles.day;
+            sound.currentTime = 0;
+            const playPromise = sound.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => { playBeep(isCyber); });
+            }
+        }
+    }
+
+    function highlightMode(mode) {
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        if (mode === 'work') document.getElementById('mode-pomodoro').classList.add('active');
+        if (mode === 'break') document.getElementById('mode-short').classList.add('active');
+    }
+
+    /* =========================================
+       5. TIMER LOGIC
+       ========================================= */
+    function timerComplete() {
+        releaseWakeLock();
+        playSound('alarm');
+        clearInterval(timerId); isRunning = false;
+        startBtn.textContent = 'Start'; targetTime = null;
+        localStorage.removeItem('targetTime');
+        syncAudio(); 
+
+        const autoBreak = document.getElementById('auto-break').checked;
+
+        if (currentMode === 'work') {
+            setupTimer(5 * 60, 'break'); highlightMode('break');
+            if(autoBreak) setTimeout(() => startTimer(), 1000);
+        } else if (currentMode === 'break') {
+            setupTimer(25 * 60, 'work'); highlightMode('work');
+        } else if (currentMode === 'custom-work') {
+            const breakT = document.getElementById('custom-break-input').value;
+            setupTimer(breakT * 60, 'custom-break');
+            if(autoBreak) setTimeout(() => startTimer(), 1000);
+        } else if (currentMode === 'custom-break') {
+            const workT = document.getElementById('custom-work-input').value;
+            setupTimer(workT * 60, 'custom-work');
+        }
+    }
+
+    function startTimer() {
+        if (isRunning) {
+            clearInterval(timerId); isRunning = false;
+            startBtn.textContent = 'Start'; targetTime = null;
+            localStorage.removeItem('targetTime');
+            releaseWakeLock(); 
+            syncAudio();
+        } else {
+            isRunning = true; startBtn.textContent = 'Pause';
+            targetTime = Date.now() + (timeLeft * 1000);
+            localStorage.setItem('targetTime', targetTime);
+            requestWakeLock(); 
+            syncAudio();
+            
+            timerId = setInterval(() => {
+                const now = Date.now();
+                const distance = targetTime - now;
+                if (distance <= 0) { 
+                    timeLeft = 0; 
+                    updateVisuals(0); 
+                    timerComplete(); 
+                } else { 
+                    const newTimeLeft = Math.ceil(distance / 1000);
+                    if (newTimeLeft !== timeLeft) {
+                        timeLeft = newTimeLeft;
+                        updateVisuals(timeLeft);
+                    }
+                }
+            }, 200);
+        }
+    }
+
+    function setupTimer(seconds, mode) {
+        releaseWakeLock();
+        clearInterval(timerId); isRunning = false;
+        startBtn.textContent = 'Start'; timeLeft = seconds; totalTime = seconds;
+        currentMode = mode; targetTime = null;
+        localStorage.removeItem('targetTime'); 
+        syncAudio(); 
+        updateVisuals(seconds);
+    }
+
+    // EVENT LISTENERS
+    document.getElementById('start-btn').addEventListener('click', () => { playSound('click'); startTimer(); });
+    document.getElementById('reset-btn').addEventListener('click', () => { playSound('click'); setupTimer(totalTime, currentMode); });
+    
+    document.querySelectorAll('.mode-btn[data-time]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            playSound('click'); highlightMode(btn.dataset.mode === 'work' ? 'work' : 'break');
+            if(btn.id === 'mode-long') { document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
+            setupTimer(btn.dataset.time * 60, btn.dataset.mode);
+        });
+    });
+    
+    document.getElementById('start-custom-work').addEventListener('click', () => {
+        playSound('click'); const min = document.getElementById('custom-work-input').value;
+        document.getElementById('settings-panel').style.display = 'none'; highlightMode(''); setupTimer(min * 60, 'custom-work');
+    });
+    document.getElementById('start-custom-break').addEventListener('click', () => {
+        playSound('click'); const min = document.getElementById('custom-break-input').value;
+        document.getElementById('settings-panel').style.display = 'none'; highlightMode(''); setupTimer(min * 60, 'custom-break');
+    });
+    
+    document.getElementById('settings-btn').addEventListener('click', () => {
+        playSound('click');
+        const panel = document.getElementById('settings-panel');
+        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // iOS Resume Check
+    const savedTarget = localStorage.getItem('targetTime');
+    if (savedTarget) {
+        const now = Date.now();
+        if (savedTarget > now) {
+            targetTime = parseInt(savedTarget); timeLeft = Math.ceil((targetTime - now) / 1000); startTimer();
+        }
+    }
+    updateVisuals(timeLeft);
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('Service Worker registered!', reg))
+                .catch(err => console.log('Registration failed:', err));
+        });
+    }
+
+    document.getElementById('auto-break').addEventListener('change', (e) => {
+        localStorage.setItem('pomoAutoBreak', e.target.checked);
+    });
+
+  // --- TASK LOGIC ---
+    const taskInput = document.getElementById('task-input');
+    const addTaskBtn = document.getElementById('add-task-btn');
+    const taskList = document.getElementById('task-list');
+
+    // Load tasks from phone/computer memory
+    let tasks = JSON.parse(localStorage.getItem('pomoTasks') || '[]');
+
+    function saveTasks() {
+        localStorage.setItem('pomoTasks', JSON.stringify(tasks));
+    }
+
+    function renderTasks() {
+        taskList.innerHTML = '';
+        tasks.forEach((task, index) => {
+            const li = document.createElement('li');
+            li.className = 'task-item';
+            li.innerHTML = `
+                <input type="checkbox" ${task.completed ? 'checked' : ''} onclick="toggleTask(${index})">
+                <span class="task-text ${task.completed ? 'completed' : ''}" onclick="toggleTask(${index})">${task.text}</span>
+                <span class="delete-task" onclick="deleteTask(${index})">✕</span>
+            `;
+            taskList.appendChild(li);
+        });
+    }
+
+    function addTask() {
+        const text = taskInput.value.trim();
+        if (text) {
+            tasks.push({ text: text, completed: false });
+            taskInput.value = '';
+            saveTasks();
+            renderTasks();
+        }
+    }
+
+    window.toggleTask = function(index) {
+        tasks[index].completed = !tasks[index].completed;
+        saveTasks();
+        renderTasks();
+    };
+
+    window.deleteTask = function(index) {
+        tasks.splice(index, 1);
+        saveTasks();
+        renderTasks();
+    };
+
+    addTaskBtn.addEventListener('click', addTask);
+    taskInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addTask(); });
+
+    // Initial draw of the list
+    renderTasks();
+    
+    // --- STARTUP LOGIC ---
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedTheme = localStorage.getItem('pomoTheme');
+        if (savedTheme === 'cyber') {
+            html.setAttribute('data-theme', 'cyber');
+            themeBtn.innerHTML = iconRobot;
+        }
+        const savedAutoBreak = localStorage.getItem('pomoAutoBreak') === 'true';
+        document.getElementById('auto-break').checked = savedAutoBreak;
+        updateVisuals(timeLeft);
+    });
+    
+</script>
+</body>
+</html>
