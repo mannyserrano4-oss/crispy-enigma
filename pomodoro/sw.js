@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pomo-v3'; // Increment this (v3, v4...) to force an update
+const CACHE_NAME = 'pomo-v4'; // Increment this (v3, v4...) to force an update
 const ASSETS = [
   './',
   './index.html',
