@@ -330,16 +330,16 @@
         
             // --- FUTURE SHOP SETUP ---
             // When you get a shop, fill these out, uncomment them, and uncomment the 📍 and 🗺️ lines in the notes below.
-            //const shopName = "Fade Masters"; 
-            //const shopAddress = "1234 Barber Ln";
-            //const suiteChair = "Suite 10, Chair 3"; // Added Suite and Chair
-            //const shopCityState = "Tampa, FL 33602";
-            //const googleMapsLink = "https://maps.google.com/your-shop-link";
+            const shopName = "Moni's Barber Shop"; 
+            const shopAddress = "7744 Hillsborough Ave";
+            const suiteChair = "Chair 3"; // Added Suite and Chair
+            const shopCityState = "Tampa, FL 33615";
+            const googleMapsLink = "https://maps.app.goo.gl/7Nfu9sVU1XinWuiJ7?g_st=ic";
         
             const notesLine = [
-                // "📍 Shop: " + shopName + " (" + suiteChair + ")", // UNCOMMENT LATER
-                // "🏢 Address: " + shopAddress + ", " + shopCityState, // UNCOMMENT LATER
-                // "🗺️ Directions: " + googleMapsLink, // UNCOMMENT LATER
+                "📍 Shop: " + shopName + " (" + suiteChair + ")", // UNCOMMENT LATER
+                "🏢 Address: " + shopAddress + ", " + shopCityState, // UNCOMMENT LATER
+                "🗺️ Directions: " + googleMapsLink, // UNCOMMENT LATER
                 "📅 Book: https://mannyserrano4-oss.github.io/crispy-enigma/book/",
                 `💸 CashApp: https://cash.app/$${contact.cashApp}`,
                 `🏦 Zelle: ${contact.phone}`,
@@ -363,7 +363,7 @@
                 `URL:${contact.website}`,
                 
                 // MOBILE SEO: Categorizes you as a Tampa service while you are mobile.
-                `ADR;TYPE=WORK:;;;Tampa;FL;;USA`, 
+                `ADR;TYPE=WORK:;${suiteChair};${shopAddress};Tampa;FL;33602;USA`, 
         
                 /* 🏠 FUTURE SHOP ADDRESS: 
                    When you get a shop, delete the ADR line above and use this one instead:
