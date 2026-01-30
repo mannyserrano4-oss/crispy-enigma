@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ZenSpace</title>
+    <script src="https://browser.sentry-cdn.com/7.x.x/bundle.min.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="glass-container">
+    <h1 id="quote-display">"Peace begins with a smile."</h1>
+    
+    <div class="frequency-selector">
+        <button onclick="setFreq(528)">528Hz (Stress)</button>
+        <button onclick="setFreq(396)">396Hz (Fear)</button>
+        <button onclick="setFreq(432)">432Hz (Peace)</button>
+        <button onclick="setFreq(639)">639Hz (Love)</button>
+    </div>
+
+    <div class="timer-presets">
+        <button onclick="startTimer(1)">1m</button>
+        <button onclick="startTimer(5)">5m</button>
+        <button onclick="startTimer(10)">10m</button>
+        <input type="number" id="customTime" placeholder="Min">
+    </div>
+
+    <div id="countdown-display">00:00</div>
+</div>
+
+<script>
+    // 1. Sentry Initialization
+    Sentry.init({ dsn: "YOUR_SENTRY_DSN_HERE" });
+
+    // 2. Keep Screen On (Wake Lock)
+    let wakeLock = null;
+    const requestWakeLock = async () => {
+        try {
+            wakeLock = await navigator.wakeLock.request('screen');
+        } catch (err) {
+            console.error(`${err.name}, ${err.message}`);
+        }
+    };
+
+    // 3. Audio & Timer Logic
+    let timerInterval;
+    function startTimer(minutes) {
+        requestWakeLock();
+        let seconds = minutes * 60;
+        
+        // Dynamic Color Change logic
+        const hue = Math.min(200 + (minutes * 5), 360); 
+        document.body.style.backgroundColor = `hsl(${hue}, 70%, 90%)`;
+
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            seconds--;
+            updateDisplay(seconds);
+            if (seconds <= 0) {
+                clearInterval(timerInterval);
+                if (wakeLock) wakeLock.release();
+            }
+        }, 1000);
+    }
+
+    function updateDisplay(sec) {
+        const m = Math.floor(sec / 60);
+        const s = sec % 60;
+        document.getElementById('countdown-display').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+</script>
+</body>
+</html>
