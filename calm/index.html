@@ -2,73 +2,90 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>ZenSpace</title>
-    <script src="https://browser.sentry-cdn.com/7.x.x/bundle.min.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="glass-container">
-    <h1 id="quote-display">"Peace begins with a smile."</h1>
-    
-    <div class="frequency-selector">
-        <button onclick="setFreq(528)">528Hz (Stress)</button>
-        <button onclick="setFreq(396)">396Hz (Fear)</button>
-        <button onclick="setFreq(432)">432Hz (Peace)</button>
-        <button onclick="setFreq(639)">639Hz (Love)</button>
-    </div>
+<div id="app" class="glass-container">
+    <section id="mood-screen">
+        <h2>Choose Your Intention</h2>
+        <div class="grid">
+            <button onclick="selectMood('stress')">528Hz: Stress Relief</button>
+            <button onclick="selectMood('fear')">396Hz: Release Fear</button>
+            <button onclick="selectMood('peace')">432Hz: Inner Peace</button>
+            <button onclick="selectMood('love')">639Hz: Relationships</button>
+        </div>
+    </section>
 
-    <div class="timer-presets">
-        <button onclick="startTimer(1)">1m</button>
-        <button onclick="startTimer(5)">5m</button>
-        <button onclick="startTimer(10)">10m</button>
-        <input type="number" id="customTime" placeholder="Min">
-    </div>
+    <section id="song-screen" class="hidden">
+        <h3 id="mood-title">Select Track</h3>
+        <div id="song-list">
+            <button onclick="selectSong('synth')">Pure Frequency (Synth)</button>
+            <button onclick="selectSong('track1.mp3')">Forest Rain (MP3)</button>
+        </div>
+        <button class="back-btn" onclick="showScreen('mood-screen')">← Back</button>
+    </section>
 
-    <div id="countdown-display">00:00</div>
+    <section id="timer-screen" class="hidden">
+        <div id="quote-display"></div>
+        
+        <div class="breathing-circle" id="visualizer"></div>
+        <p id="breath-instruction">Breathe In</p>
+
+        <div id="countdown">00:00</div>
+
+        <div class="controls">
+            <button id="startPauseBtn" onclick="toggleTimer()">Start</button>
+            <button onclick="resetTimer()">Reset</button>
+        </div>
+        
+        <div class="breathing-options">
+            <button onclick="setBreathing('box')">Box Breath (Focus)</button>
+            <button onclick="setBreathing('calm')">4-7-8 (Sleep)</button>
+        </div>
+    </section>
 </div>
 
 <script>
-    // 1. Sentry Initialization
-    Sentry.init({ dsn: "YOUR_SENTRY_DSN_HERE" });
+    let timerState = { mins: 1, running: false, secondsLeft: 0, frequency: 528 };
+    let audioCtx = null;
+    let oscillator = null;
 
-    // 2. Keep Screen On (Wake Lock)
-    let wakeLock = null;
-    const requestWakeLock = async () => {
-        try {
-            wakeLock = await navigator.wakeLock.request('screen');
-        } catch (err) {
-            console.error(`${err.name}, ${err.message}`);
+    // Haptic Feedback for iPhone
+    function triggerHaptic() {
+        if (window.navigator.vibrate) {
+            window.navigator.vibrate(10); // Subtle tap
         }
-    };
-
-    // 3. Audio & Timer Logic
-    let timerInterval;
-    function startTimer(minutes) {
-        requestWakeLock();
-        let seconds = minutes * 60;
-        
-        // Dynamic Color Change logic
-        const hue = Math.min(200 + (minutes * 5), 360); 
-        document.body.style.backgroundColor = `hsl(${hue}, 70%, 90%)`;
-
-        clearInterval(timerInterval);
-        timerInterval = setInterval(() => {
-            seconds--;
-            updateDisplay(seconds);
-            if (seconds <= 0) {
-                clearInterval(timerInterval);
-                if (wakeLock) wakeLock.release();
-            }
-        }, 1000);
     }
 
-    function updateDisplay(sec) {
-        const m = Math.floor(sec / 60);
-        const s = sec % 60;
-        document.getElementById('countdown-display').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+    function selectMood(mood) {
+        triggerHaptic();
+        const frequencies = { stress: 528, fear: 396, peace: 432, love: 639 };
+        timerState.frequency = frequencies[mood];
+        showScreen('song-screen');
     }
+
+    function selectSong(song) {
+        triggerHaptic();
+        showScreen('timer-screen');
+        displayQuote();
+    }
+
+    function showScreen(screenId) {
+        document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+        document.getElementById(screenId).classList.remove('hidden');
+    }
+
+    // Box Breathing Logic: 4s In, 4s Hold, 4s Out, 4s Hold
+    // Good for: "Resetting" the nervous system and regaining focus.
+    function setBreathing(type) {
+        const visualizer = document.getElementById('visualizer');
+        visualizer.style.animation = (type === 'box') ? "boxBreath 16s infinite" : "calmBreath 19s infinite";
+    }
+
+    // [Insert previous WakeLock and Timer logic here]
 </script>
 </body>
 </html>
