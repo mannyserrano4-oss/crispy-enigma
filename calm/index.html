@@ -7,8 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>ZenSpace</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://browser.sentry-cdn.com/7.x.x/bundle.min.js" crossorigin="anonymous"></script>
-</head>
+    </head>
 <body>
 
 <div id="app" class="glass-container">
@@ -43,8 +42,9 @@
             <button onclick="prepTimer(20)">20m</button>
             <button onclick="prepTimer(30)">30m</button>
             <button onclick="prepTimer(45)">45m</button>
-            <input type="number" id="custom-min" placeholder="Custom" onchange="prepTimer(this.value)">
+            <input type="number" id="custom-min" placeholder="Custom Min" onchange="prepTimer(this.value)">
         </div>
+        <button class="back-btn" onclick="showScreen('song-screen')">← Back</button>
     </section>
 
     <section id="meditation-screen" class="hidden">
@@ -73,16 +73,7 @@
 
 <script src="quotes.js"></script>
 <script>
-
-    if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js')
-    .then(() => console.log("ZenSpace is ready for offline use!"))
-    .catch((err) => console.log("Service Worker failed", err));
-}
-    
-    // 1. Setup & State
-    Sentry.init({ dsn: "YOUR_SENTRY_DSN" });
-    
+    // 1. Initial State
     let state = {
         freq: '528',
         track: 'synth',
@@ -94,13 +85,30 @@
     };
 
     let timerInterval;
-    let audioContext;
+    let audioCtx;
     let oscillator;
 
-    // 2. Navigation & UI Logic
+    // 2. Start-up Logic
+    document.addEventListener('DOMContentLoaded', () => {
+        // Register Service Worker for Offline Mode
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
+        }
+        // Force the app to start on the first screen
+        showScreen('mood-screen');
+    });
+
+    // 3. Navigation
     function showScreen(id) {
-        document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
+        document.querySelectorAll('section').forEach(s => {
+            s.classList.add('hidden');
+            s.style.display = 'none'; 
+        });
+        const target = document.getElementById(id);
+        if (target) {
+            target.classList.remove('hidden');
+            target.style.display = 'block';
+        }
         hapticFeedback();
     }
 
@@ -116,29 +124,37 @@
     }
 
     function prepTimer(mins) {
-        state.duration = mins;
-        state.timeLeft = mins * 60;
+        const val = parseInt(mins);
+        if (isNaN(val)) return;
+        state.duration = val;
+        state.timeLeft = val * 60;
         updateTimerDisplay();
-        updateThemeColor(mins);
+        updateThemeColor(val);
         
-        // Pick a fresh quote
-        const list = meditationQuotes[state.freq];
-        document.getElementById('quote-text').innerText = list[Math.floor(Math.random() * list.length)];
+        // Pick Quote
+        if (typeof meditationQuotes !== 'undefined') {
+            const list = meditationQuotes[state.freq];
+            document.getElementById('quote-text').innerText = list[Math.floor(Math.random() * list.length)];
+        }
         
         showScreen('meditation-screen');
     }
 
-    // 3. The Core Logic
+    // 4. Meditation Logic
     async function toggleMeditation() {
         hapticFeedback();
+        const btn = document.getElementById('playPauseBtn');
         if (!state.isActive) {
             state.isActive = true;
-            document.getElementById('playPauseBtn').innerText = "Pause";
+            btn.innerText = "Pause";
             startTimer();
             startAudio();
-            requestWakeLock();
+            if ('wakeLock' in navigator) {
+                state.wakeLock = await navigator.wakeLock.request('screen');
+            }
         } else {
             stopMeditation();
+            btn.innerText = "Start";
         }
     }
 
@@ -148,7 +164,7 @@
             updateTimerDisplay();
             if (state.timeLeft <= 0) {
                 stopMeditation();
-                hapticFeedback(true); // Long vibe on finish
+                hapticFeedback(true);
             }
         }, 1000);
     }
@@ -161,21 +177,17 @@
         if (state.wakeLock) state.wakeLock.release();
     }
 
-    // 4. Audio & Haptics
     function startAudio() {
         if (state.track === 'synth') {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.frequency.setValueAtTime(parseFloat(state.freq), audioContext.currentTime);
-            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime); // Soft volume
-            
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.frequency.setValueAtTime(parseFloat(state.freq), audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
             oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
+            gainNode.connect(audioCtx.destination);
             oscillator.start();
         } else {
-            // Logic for playing your specific MP3 file
             window.currentAudio = new Audio(state.track);
             window.currentAudio.loop = true;
             window.currentAudio.play();
@@ -193,43 +205,28 @@
         }
     }
 
-    // 5. Visuals
-    function updateThemeColor(mins) {
-        const colors = {
-            1: '#f9d5e5', // Pink
-            5: '#d1eaee', // Blue
-            10: '#e2f0cb', // Green
-            20: '#ffdac1', // Peach
-            45: '#b5ead7'  // Mint
-        };
-        document.body.style.backgroundColor = colors[mins] || '#f3e5f5';
-    }
-
-    function setTechnique(type) {
-        hapticFeedback();
-        state.technique = type;
-        const circle = document.getElementById('circle');
-        const guide = document.getElementById('breath-guide');
-        
-        if (type === 'box') {
-            circle.style.animation = "boxBreath 16s infinite";
-            guide.innerText = "Box Breathing: In, Hold, Out, Hold";
-        } else {
-            circle.style.animation = "calmBreath 19s infinite";
-            guide.innerText = "4-7-8: Deep Calm";
-        }
-    }
-
     function updateTimerDisplay() {
         const m = Math.floor(state.timeLeft / 60);
         const s = state.timeLeft % 60;
         document.getElementById('display-timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
     }
 
-    async function requestWakeLock() {
-        try {
-            state.wakeLock = await navigator.wakeLock.request('screen');
-        } catch (err) { console.error(err); }
+    function updateThemeColor(mins) {
+        const colors = { 1: '#f9d5e5', 5: '#d1eaee', 10: '#e2f0cb', 20: '#ffdac1', 45: '#b5ead7' };
+        document.body.style.backgroundColor = colors[mins] || '#f3e5f5';
+    }
+
+    function setTechnique(type) {
+        hapticFeedback();
+        const circle = document.getElementById('circle');
+        const guide = document.getElementById('breath-guide');
+        if (type === 'box') {
+            circle.style.animation = "boxBreath 16s infinite";
+            guide.innerText = "Box Breathing: In, Hold, Out, Hold";
+        } else {
+            circle.style.animation = "calmBreath 19s infinite";
+            guide.innerText = "4-7-8: In, Hold, Out";
+        }
     }
 
     function resetAll() {
@@ -239,4 +236,3 @@
 </script>
 </body>
 </html>
-
