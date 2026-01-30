@@ -1,59 +1,164 @@
+/* 1. Global Reset & Soft Aesthetics */
 :root {
-    --pastel-blue: #d1eaee;
-    --pastel-pink: #f9d5e5;
     --glass: rgba(255, 255, 255, 0.25);
+    --glass-border: rgba(255, 255, 255, 0.4);
+    --text: #4a4a4a;
+    --bg-default: #f3e5f5; /* Soft Lavender */
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
     margin: 0;
-    background: var(--pastel-blue);
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-default);
+    color: var(--text);
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
+    transition: background-color 3s ease-in-out;
     overflow: hidden;
-    transition: background 3s ease-in-out;
 }
 
+/* 2. The Glass Container - Centered for iPad */
 .glass-container {
     background: var(--glass);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid var(--glass-border);
     border-radius: 40px;
-    padding: 2rem;
-    width: 80%;
-    max-width: 500px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+    padding: 2.5rem;
+    width: 90%;
+    max-width: 500px; /* Prevents stretching too wide on iPad */
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
     text-align: center;
+    animation: fadeIn 0.8s ease-out;
+}
+
+/* 3. Typography & Buttons */
+h1, h2 {
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    margin-bottom: 1.5rem;
+}
+
+.grid, .timer-grid, .song-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+button {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--glass-border);
+    padding: 18px 10px;
+    border-radius: 20px;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+button:active {
+    transform: scale(0.96);
+    background: rgba(255, 255, 255, 0.8);
+}
+
+/* 4. The Breathing Visualizer */
+#visualizer-container {
+    margin: 30px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .breathing-circle {
-    width: 150px;
-    height: 150px;
+    width: 140px;
+    height: 140px;
     background: white;
     border-radius: 50%;
-    margin: 20px auto;
-    opacity: 0.6;
-    box-shadow: 0 0 50px white;
+    box-shadow: 0 0 40px rgba(255, 255, 255, 0.8);
+    opacity: 0.7;
+    margin-bottom: 15px;
 }
 
-/* Box Breathing Animation */
+/* 5. Breathing Animations */
 @keyframes boxBreath {
-    0%, 100% { transform: scale(1); }    /* Hold */
-    25% { transform: scale(1.5); }       /* In */
-    50% { transform: scale(1.5); }       /* Hold */
-    75% { transform: scale(1); }         /* Out */
+    0%, 100% { transform: scale(1); opacity: 0.4; } /* Hold */
+    25% { transform: scale(1.6); opacity: 0.8; }    /* In */
+    50% { transform: scale(1.6); opacity: 0.8; }    /* Hold */
+    75% { transform: scale(1); opacity: 0.4; }      /* Out */
 }
 
-.hidden { display: none; }
+@keyframes calmBreath {
+    0% { transform: scale(1); opacity: 0.3; }       /* Start */
+    21% { transform: scale(1.7); opacity: 0.9; }    /* In (4s) */
+    58% { transform: scale(1.7); opacity: 0.9; }    /* Hold (7s) */
+    100% { transform: scale(1); opacity: 0.3; }      /* Out (8s) */
+}
 
-button {
-    background: rgba(255, 255, 255, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    padding: 15px;
+/* 6. Section Visibility Logic */
+section {
+    display: none;
+}
+
+section:not(.hidden) {
+    display: block;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* 7. iPad Landscape Optimization */
+@media (min-width: 768px) and (orientation: landscape) {
+    .glass-container {
+        max-width: 700px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 40px;
+        padding: 3rem;
+    }
+    
+    #visualizer-container {
+        flex: 1;
+    }
+    
+    .grid, .timer-grid {
+        flex: 1;
+    }
+}
+
+/* 8. Extra Pretty Touches */
+#display-timer {
+    font-size: 3rem;
+    font-weight: 200;
+    margin: 1rem 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.back-btn {
+    background: transparent;
+    border: none;
+    font-size: 14px;
+    opacity: 0.6;
+    margin-top: 10px;
+}
+
+input[type="number"] {
+    background: rgba(255, 255, 255, 0.3);
+    border: 1px solid var(--glass-border);
     border-radius: 20px;
-    font-weight: 500;
-    margin: 5px;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
+    padding: 15px;
+    text-align: center;
+    font-size: 16px;
+    outline: none;
 }
