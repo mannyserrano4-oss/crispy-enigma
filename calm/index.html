@@ -73,6 +73,13 @@
 
 <script src="quotes.js"></script>
 <script>
+
+    if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js')
+    .then(() => console.log("ZenSpace is ready for offline use!"))
+    .catch((err) => console.log("Service Worker failed", err));
+}
+    
     // 1. Setup & State
     Sentry.init({ dsn: "YOUR_SENTRY_DSN" });
     
@@ -232,3 +239,4 @@
 </script>
 </body>
 </html>
+
