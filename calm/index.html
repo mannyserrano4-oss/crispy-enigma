@@ -3,89 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>ZenSpace</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://browser.sentry-cdn.com/7.x.x/bundle.min.js" crossorigin="anonymous"></script>
 </head>
 <body>
 
 <div id="app" class="glass-container">
+    
     <section id="mood-screen">
-        <h2>Choose Your Intention</h2>
+        <h1 class="fade-in">How do you want to feel?</h1>
         <div class="grid">
-            <button onclick="selectMood('stress')">528Hz: Stress Relief</button>
-            <button onclick="selectMood('fear')">396Hz: Release Fear</button>
-            <button onclick="selectMood('peace')">432Hz: Inner Peace</button>
-            <button onclick="selectMood('love')">639Hz: Relationships</button>
+            <button onclick="selectMood('528', 'Stress Relief')">528Hz: Stress Relief</button>
+            <button onclick="selectMood('396', 'Release Fear')">396Hz: Release Fear</button>
+            <button onclick="selectMood('432', 'Inner Peace')">432Hz: Inner Peace</button>
+            <button onclick="selectMood('639', 'Relationships')">639Hz: Relationships</button>
         </div>
     </section>
 
     <section id="song-screen" class="hidden">
-        <h3 id="mood-title">Select Track</h3>
-        <div id="song-list">
-            <button onclick="selectSong('synth')">Pure Frequency (Synth)</button>
-            <button onclick="selectSong('track1.mp3')">Forest Rain (MP3)</button>
+        <h2 id="mood-label">Select Track</h2>
+        <div class="song-list">
+            <button onclick="selectTrack('synth')">Pure Solfeggio (Synth)</button>
+            <button onclick="selectTrack('ocean_waves.mp3')">Ocean Waves (MP3)</button>
+            <button onclick="selectTrack('forest_rain.mp3')">Forest Rain (MP3)</button>
         </div>
         <button class="back-btn" onclick="showScreen('mood-screen')">← Back</button>
     </section>
 
-    <section id="timer-screen" class="hidden">
-        <div id="quote-display"></div>
-        
-        <div class="breathing-circle" id="visualizer"></div>
-        <p id="breath-instruction">Breathe In</p>
+    <section id="timer-settings" class="hidden">
+        <h2>Duration</h2>
+        <div class="timer-grid">
+            <button onclick="prepTimer(1)">1m</button>
+            <button onclick="prepTimer(3)">3m</button>
+            <button onclick="prepTimer(5)">5m</button>
+            <button onclick="prepTimer(10)">10m</button>
+            <button onclick="prepTimer(20)">20m</button>
+            <button onclick="prepTimer(30)">30m</button>
+            <button onclick="prepTimer(45)">45m</button>
+            <input type="number" id="custom-min" placeholder="Custom" onchange="prepTimer(this.value)">
+        </div>
+    </section>
 
-        <div id="countdown">00:00</div>
+    <section id="meditation-screen" class="hidden">
+        <div id="quote-area">
+            <p id="quote-text"></p>
+        </div>
+
+        <div id="visualizer-container">
+            <div class="breathing-circle" id="circle"></div>
+            <p id="breath-guide">Breathe In</p>
+        </div>
+
+        <div id="display-timer">00:00</div>
 
         <div class="controls">
-            <button id="startPauseBtn" onclick="toggleTimer()">Start</button>
-            <button onclick="resetTimer()">Reset</button>
+            <button id="playPauseBtn" onclick="toggleMeditation()">Start</button>
+            <button onclick="resetAll()">Reset</button>
         </div>
-        
-        <div class="breathing-options">
-            <button onclick="setBreathing('box')">Box Breath (Focus)</button>
-            <button onclick="setBreathing('calm')">4-7-8 (Sleep)</button>
+
+        <div class="technique-picker">
+            <button onclick="setTechnique('box')">Box Breath</button>
+            <button onclick="setTechnique('calm')">4-7-8 Calm</button>
         </div>
     </section>
 </div>
 
+<script src="quotes.js"></script>
 <script>
-    let timerState = { mins: 1, running: false, secondsLeft: 0, frequency: 528 };
-    let audioCtx = null;
-    let oscillator = null;
+    // 1. Setup & State
+    Sentry.init({ dsn: "YOUR_SENTRY_DSN" });
+    
+    let state = {
+        freq: '528',
+        track: 'synth',
+        duration: 1,
+        timeLeft: 0,
+        isActive: false,
+        technique: 'box',
+        wakeLock: null
+    };
 
-    // Haptic Feedback for iPhone
-    function triggerHaptic() {
-        if (window.navigator.vibrate) {
-            window.navigator.vibrate(10); // Subtle tap
-        }
+    let timerInterval;
+    let audioContext;
+    let oscillator;
+
+    // 2. Navigation & UI Logic
+    function showScreen(id) {
+        document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+        hapticFeedback();
     }
 
-    function selectMood(mood) {
-        triggerHaptic();
-        const frequencies = { stress: 528, fear: 396, peace: 432, love: 639 };
-        timerState.frequency = frequencies[mood];
+    function selectMood(hz, label) {
+        state.freq = hz;
+        document.getElementById('mood-label').innerText = label;
         showScreen('song-screen');
     }
 
-    function selectSong(song) {
-        triggerHaptic();
-        showScreen('timer-screen');
-        displayQuote();
+    function selectTrack(file) {
+        state.track = file;
+        showScreen('timer-settings');
     }
 
-    function showScreen(screenId) {
-        document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
-        document.getElementById(screenId).classList.remove('hidden');
+    function prepTimer(mins) {
+        state.duration = mins;
+        state.timeLeft = mins * 60;
+        updateTimerDisplay();
+        updateThemeColor(mins);
+        
+        // Pick a fresh quote
+        const list = meditationQuotes[state.freq];
+        document.getElementById('quote-text').innerText = list[Math.floor(Math.random() * list.length)];
+        
+        showScreen('meditation-screen');
     }
 
-    // Box Breathing Logic: 4s In, 4s Hold, 4s Out, 4s Hold
-    // Good for: "Resetting" the nervous system and regaining focus.
-    function setBreathing(type) {
-        const visualizer = document.getElementById('visualizer');
-        visualizer.style.animation = (type === 'box') ? "boxBreath 16s infinite" : "calmBreath 19s infinite";
+    // 3. The Core Logic
+    async function toggleMeditation() {
+        hapticFeedback();
+        if (!state.isActive) {
+            state.isActive = true;
+            document.getElementById('playPauseBtn').innerText = "Pause";
+            startTimer();
+            startAudio();
+            requestWakeLock();
+        } else {
+            stopMeditation();
+        }
     }
 
-    // [Insert previous WakeLock and Timer logic here]
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            state.timeLeft--;
+            updateTimerDisplay();
+            if (state.timeLeft <= 0) {
+                stopMeditation();
+                hapticFeedback(true); // Long vibe on finish
+            }
+        }, 1000);
+    }
+
+    function stopMeditation() {
+        state.isActive = false;
+        clearInterval(timerInterval);
+        document.getElementById('playPauseBtn').innerText = "Start";
+        stopAudio();
+        if (state.wakeLock) state.wakeLock.release();
+    }
+
+    // 4. Audio & Haptics
+    function startAudio() {
+        if (state.track === 'synth') {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.frequency.setValueAtTime(parseFloat(state.freq), audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime); // Soft volume
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.start();
+        } else {
+            // Logic for playing your specific MP3 file
+            window.currentAudio = new Audio(state.track);
+            window.currentAudio.loop = true;
+            window.currentAudio.play();
+        }
+    }
+
+    function stopAudio() {
+        if (oscillator) oscillator.stop();
+        if (window.currentAudio) window.currentAudio.pause();
+    }
+
+    function hapticFeedback(isLong = false) {
+        if (navigator.vibrate) {
+            navigator.vibrate(isLong ? [100, 50, 100] : 10);
+        }
+    }
+
+    // 5. Visuals
+    function updateThemeColor(mins) {
+        const colors = {
+            1: '#f9d5e5', // Pink
+            5: '#d1eaee', // Blue
+            10: '#e2f0cb', // Green
+            20: '#ffdac1', // Peach
+            45: '#b5ead7'  // Mint
+        };
+        document.body.style.backgroundColor = colors[mins] || '#f3e5f5';
+    }
+
+    function setTechnique(type) {
+        hapticFeedback();
+        state.technique = type;
+        const circle = document.getElementById('circle');
+        const guide = document.getElementById('breath-guide');
+        
+        if (type === 'box') {
+            circle.style.animation = "boxBreath 16s infinite";
+            guide.innerText = "Box Breathing: In, Hold, Out, Hold";
+        } else {
+            circle.style.animation = "calmBreath 19s infinite";
+            guide.innerText = "4-7-8: Deep Calm";
+        }
+    }
+
+    function updateTimerDisplay() {
+        const m = Math.floor(state.timeLeft / 60);
+        const s = state.timeLeft % 60;
+        document.getElementById('display-timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+
+    async function requestWakeLock() {
+        try {
+            state.wakeLock = await navigator.wakeLock.request('screen');
+        } catch (err) { console.error(err); }
+    }
+
+    function resetAll() {
+        stopMeditation();
+        showScreen('mood-screen');
+    }
 </script>
 </body>
 </html>
