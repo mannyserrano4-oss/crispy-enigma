@@ -102,11 +102,12 @@
                     <label class="block text-xs font-bold text-violet-700 uppercase tracking-wider mb-1">Service</label>
                     <div class="relative">
                         <select id="cService" class="form-input appearance-none cursor-pointer" onchange="updatePrice()">
-                            <option value="Haircut" data-price="25">Haircut ($25)</option>
-                            <option value="Skin Fade" data-price="30">Skin Fade ($30)</option>
-                            <option value="Beard Trim" data-price="15">Beard Trim ($15)</option>
+                            <option value="Haircut" data-price="25">Basic Haircut ($25)</option>
+                            <option value="Skin Fade" data-price="30">Fade ($30)</option>
+                            <option value="Beard Trim" data-price="15">Beard Service ($15)</option>
                             <option value="Full Service" data-price="35">Full Service ($35)</option>
                             <option value="Line Up" data-price="15">Line Up Only ($15)</option>
+							<option value="Senior Haircut" data-price="17">Senior Haircut ($17)</option>
                             <option value="House Call" data-price="50+">House Call ($50 + Travel Fee)</option>
                             <option value="General Inquiry" data-price="0">General Inquiry</option>
                         </select>
@@ -293,6 +294,10 @@
                         <div class="min-w-[20px] text-center"><i class="fa-solid fa-calendar-check text-violet-500"></i></div>
                         <div><span class="font-bold text-violet-800">Cuttiversary:</span> 50% off your yearly anniversary.</div>
                     </li>
+					<li class="flex items-start gap-3 text-xs text-gray-700">
+					    <div class="min-w-[20px] text-center"><i class="fa-solid fa-cane text-violet-500"></i></div>
+					    <div><span class="font-bold text-violet-800">Seniors (65+):</span> Special $17 rate for all standard haircuts.</div>
+					</li>
                 </ul>
                 <div class="mt-3 pt-3 border-t border-violet-200/60">
                     <a href="sms:?&body=Yo%2C%20you%20need%20a%20new%20barber.%20Go%20see%20Manny%20at%20MAS%20Barbery.%20Use%20this%20link%20to%20book%20and%20show%20him%20this%20text%20for%20%245%20off%3A%0a%0ahttps%3A%2F%2Fmannyserrano4-oss.github.io%2Fcrispy-enigma%2Fbook" 
