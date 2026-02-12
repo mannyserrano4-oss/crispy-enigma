@@ -57,6 +57,16 @@
             opacity: 1;
             bottom: 50px;
         }
+
+		@media (max-width: 640px) {
+		    .sticky-action-bar {
+		        position: sticky;
+		        bottom: 10px;
+		        z-index: 40;
+		        box-shadow: 0 -10px 15px -3px rgba(0, 0, 0, 0.1);
+		    }
+		}
+		
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4 text-gray-800">
@@ -264,13 +274,15 @@
                         <i class="fa-solid fa-user-plus mr-1"></i> Tap here to save my number first
                     </button>
                 </div>
-                
-                <button onclick="sendRequest('sms')" class="w-full bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:-translate-y-1 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-comment-sms"></i> Send via Text
-                </button>
-                <button onclick="sendRequest('wa')" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:-translate-y-1 flex items-center justify-center gap-2">
-                    <i class="fa-brands fa-whatsapp text-xl"></i> Send via WhatsApp
-                </button>
+				
+                <div id="sticky-anchor"></div> <div class="sticky-action-bar space-y-3 bg-white/80 backdrop-blur-md p-2 rounded-xl">
+	                <button onclick="sendRequest('sms')" class="w-full bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:-translate-y-1 flex items-center justify-center gap-2">
+	                    <i class="fa-solid fa-comment-sms"></i> Send via Text
+	                </button>
+	                <button onclick="sendRequest('wa')" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:-translate-y-1 flex items-center justify-center gap-2">
+	                    <i class="fa-brands fa-whatsapp text-xl"></i> Send via WhatsApp
+	                </button>
+				</div>
             </div>
 
             <div class="bg-gradient-to-br from-violet-50 to-white border border-violet-200 rounded-lg p-4 shadow-sm">
@@ -321,20 +333,25 @@
                         </div>
                     </details>
                     
-                        	<details class="group bg-white border border-violet-100 rounded-lg open:shadow-md transition-all mt-2">
-    <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-3 text-sm text-violet-800 bg-violet-50/50 hover:bg-violet-100 rounded-lg">
-        <span>📍 Where is the shop located?</span>
-        <span class="transition group-open:rotate-180"><i class="fa-solid fa-chevron-down text-xs"></i></span>
-    </summary>
-    <div class="text-gray-600 text-xs p-3 pt-2 leading-relaxed">
-        <a href="https://maps.app.goo.gl/7Nfu9sVU1XinWuiJ7?g_st=ic" 
-           target="_blank" 
-           class="text-violet-600 font-bold underline decoration-violet-300">
-           7744 W Hillsborough Ave, Tampa FL 33615
-        </a>
-        <p class="mt-1 text-[10px] text-gray-400">(Tap address to open Google Maps)</p>
-    </div>
-</details>  
+                	<details class="group bg-white border border-violet-100 rounded-lg open:shadow-md transition-all mt-2">
+				    <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-3 text-sm text-violet-800 bg-violet-50/50 hover:bg-violet-100 rounded-lg">
+				        <span>📍 Where is the shop located?</span>
+				        <span class="transition group-open:rotate-180"><i class="fa-solid fa-chevron-down text-xs"></i></span>
+				    </summary>
+				    <div class="text-gray-600 text-xs p-3 pt-2 leading-relaxed">
+				        <a href="https://www.google.com/maps/search/?api=1&query=7744+W+Hillsborough+Ave+Tampa+FL+33615" 
+				           target="_blank" 
+				           class="text-violet-600 font-bold underline decoration-violet-300 block mb-1">
+				           7744 W Hillsborough Ave, Tampa FL 33615
+				        </a>
+				        <p class="text-[10px] text-gray-400 mb-3">(Tap address to open Maps)</p>
+				        
+				        <button onclick="navigator.clipboard.writeText('7744 W Hillsborough Ave, Tampa FL 33615'); showToast('Address copied!')" 
+				                class="flex items-center gap-2 text-[10px] font-bold text-violet-500 hover:text-violet-700 uppercase tracking-wider bg-violet-50 px-2 py-1 rounded border border-violet-100 transition-colors">
+				            <i class="fa-solid fa-copy"></i> Copy Address for GPS
+				        </button>
+				    </div>
+				</details> 
 
 					<!--	<a href="https://maps.app.goo.gl/7Nfu9sVU1XinWuiJ7?g_st=ic " 
    target="_blank" 
@@ -606,7 +623,14 @@
             newLink.click();
             URL.revokeObjectURL(url);
         }
-       
+
+		// Prevent selecting past dates/times
+		const dateInput = document.getElementById('cDate');
+		const now = new Date();
+		// Offset for local timezone to match the 'datetime-local' format (YYYY-MM-DDTHH:mm)
+		now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+		dateInput.min = now.toISOString().slice(0, 16);
+	   
     </script>
 </body>
 </html>
