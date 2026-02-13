@@ -332,7 +332,7 @@
 				        <a href="https://www.google.com/maps/search/?api=1&query=7744+W+Hillsborough+Ave+Tampa+FL+33615" 
 				           target="_blank" 
 				           class="text-violet-600 font-bold underline decoration-violet-300 block mb-1">
-				           7744 W Hillsborough Ave, Tampa FL 33615
+				           7744 W Hillsborough Ave, Tampa, FL 33615
 				        </a>
 				        <p class="text-[10px] text-gray-400 mb-3">(Tap address to open Maps)</p>
 				        
@@ -366,14 +366,18 @@
                     </details>
 
                     <details class="group bg-white border border-violet-100 rounded-lg open:shadow-md transition-all">
-                        <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-3 text-sm text-violet-800 bg-violet-50/50 hover:bg-violet-100 rounded-lg">
-                            <span>⏱️ Running Late?</span>
-                            <span class="transition group-open:rotate-180"><i class="fa-solid fa-chevron-down text-xs"></i></span>
-                        </summary>
-                        <div class="text-gray-600 text-xs p-3 pt-0 leading-relaxed">
-                            There is a 15-minute grace period. After that, we may need to reschedule to respect the next client's time.
-                        </div>
-                    </details>
+						    <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-3 text-sm text-violet-800 bg-violet-50/50 hover:bg-violet-100 rounded-lg">
+						        <span>⏱️ Running Late?</span>
+						        <span class="transition group-open:rotate-180"><i class="fa-solid fa-chevron-down text-xs"></i></span>
+						    </summary>
+						    <div class="text-gray-600 text-xs p-3 pt-0 leading-relaxed">
+						        <p class="mb-3">There is a 15-minute grace period. After that, we may need to reschedule to respect the next client's time.</p>
+						        
+						        <a href="tel:9014437338" class="inline-flex items-center gap-2 bg-violet-600 text-white px-3 py-2 rounded-lg font-bold text-[10px] hover:bg-violet-700 transition-colors shadow-sm">
+						            <i class="fa-solid fa-phone"></i> CALL MANNY
+						        </a>
+						    </div>
+						</details>
 
                     <details class="group bg-white border border-violet-100 rounded-lg open:shadow-md transition-all mt-2">
                         <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-3 text-sm text-violet-800 bg-violet-50/50 hover:bg-violet-100 rounded-lg">
@@ -459,6 +463,18 @@
                 document.getElementById('cHouseSafety').checked = false;
             }
 
+			// --- NEW: SMART PLACEHOLDER LOGIC ---
+    const notesArea = document.getElementById('cNotes');
+    if (isHouseCall) {
+        notesArea.placeholder = "🏠 Please provide your address and any gate codes...";
+    } else if (select.value === "Fade") {
+        notesArea.placeholder = "✂️ High, mid, or low fade? Any specific beard goals?";
+    } else if (select.value === "General Inquiry") {
+        notesArea.placeholder = "Ask me anything! Or tell me a joke for a 0% discount...";
+    } else {
+        notesArea.placeholder = "House Calls: Please provide your address. Shop Cuts: Any specific hair goals?";
+    }
+			
             // B. Add Checkboxes (Eyebrows, etc)
             // We look for any checkbox with class 'addon-checkbox' that is checked
             document.querySelectorAll('.addon-checkbox:checked').forEach(box => {
