@@ -157,7 +157,7 @@
         .client-card.due { border-left-color: var(--status-due); }
         .client-card.overdue { border-left-color: var(--status-overdue); }
         .cc-top { display: flex; justify-content: space-between; align-items: center; }
-        .cc-name { font-size: 1.2rem; font-weight: 800; }
+        .cc-name { font-size: 1.2rem; font-weight: 800; text-transform: capitalize; }
         .cc-due { font-size: 0.8rem; font-weight: 600; padding: 4px 8px; border-radius: 6px; background: var(--input-bg); color: var(--text-sub); }
         .cc-info { color: var(--text-sub); font-size: 0.9rem; margin-top: 5px; }
         .loyalty-visual { color: var(--p-blue-dark); font-size: 0.8rem; letter-spacing: 2px; margin-top: 5px;}
@@ -247,6 +247,20 @@
         .tag-badge {
             padding: 4px 10px; border-radius: 6px; background: var(--input-bg); font-size: 0.75rem; 
             color: var(--text-sub); border: 1px solid var(--border); font-weight: 600;
+        }
+
+        /* --- CUSTOM VIBE TAG COLORS --- */
+        .tag-badge[data-vibe="Late"] { 
+            border-color: var(--status-overdue); color: var(--status-overdue); background: rgba(255, 166, 158, 0.1); 
+        }
+        .tag-badge[data-vibe="Tipper"] { 
+            border-color: var(--status-good); color: var(--p-green-dark); background: rgba(183, 228, 199, 0.15); 
+        }
+        .tag-badge[data-vibe="Cash Only"] { 
+            border-color: var(--p-gold); color: #b8860b; background: rgba(255, 215, 0, 0.1); 
+        }
+        .tag-badge[data-vibe="Silent"] { 
+            border-color: var(--p-blue-dark); color: var(--p-blue-dark); background: rgba(162, 210, 255, 0.15); 
         }
 
         .icebreaker-box {
@@ -353,7 +367,7 @@
     <div id="viewModal" class="overlay">
         <div class="sheet">
             <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                <h2 style="margin:0; font-size:1.8rem;" id="vName">Name</h2>
+                <h2 style="margin:0; font-size:1.8rem; text-transform: capitalize;" id="vName">Name</h2>
                 <div style="font-weight:700; color:var(--p-blue-dark);" onclick="editClient()">EDIT</div>
             </div>
             <p id="vSub" style="color:var(--text-sub); margin-top:-10px;">Phone</p>
@@ -788,7 +802,7 @@
             const tagDiv = document.getElementById('vTags');
             tagDiv.innerHTML = '';
             if(c.tags && c.tags.length > 0) {
-                c.tags.forEach(t => { tagDiv.innerHTML += `<span class="tag-badge">${t}</span>`; });
+                c.tags.forEach(t => { tagDiv.innerHTML += `<span class="tag-badge" data-vibe="${t}">${t}</span>`; });
             }
 
             document.getElementById('vLoyalty').innerText = getLoyaltyVisual(c.loyalty);
