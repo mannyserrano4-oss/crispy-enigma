@@ -1110,34 +1110,32 @@
     const loc = isHouseCall ? c.address : settings.location; 
     
     // --- TIME MATH ---
-    const minMs = 60000; // 1 minute in milliseconds
+    const minMs = 60000; 
     const cutDuration = 120 * minMs; // 2 hours
-    const bufferAfter = 15 * minMs;  // 15 minutes
-    
-    // If house call: 30m travel + 15m buffer (45m total). Otherwise, standard 15m.
+    const bufferAfter = 15 * minMs;  // 15 mins
     const bufferBefore = isHouseCall ? (45 * minMs) : (15 * minMs);
     
-    // Calculate final start and end times by subtracting/adding to the selected cut time
     const start = new Date(cutTime.getTime() - bufferBefore);
     const end = new Date(cutTime.getTime() + cutDuration + bufferAfter); 
     
     const fmt = (x) => x.toISOString().replace(/-|:|\.\d\d\d/g,""); 
     
+    // --- FORMAT ACTUAL TIME FOR TITLE ---
+    const displayTime = cutTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+
     // --- NOTES (DESCRIPTION) ---
-    const formulaTxt = c.formula ? `Formula: ${c.formula}` : 'Formula: None saved';
-    const icebreakerTxt = c.icebreaker ? `Ask about: ${c.icebreaker}` : '';
-    // The \\n adds a line break inside the calendar event notes
+    // Change the emojis inside the quotes below whenever you want
+    const formulaTxt = c.formula ? `📝 Formula: ${c.formula}` : '📝 Formula: None saved';
+    const icebreakerTxt = c.icebreaker ? `💡 Ask about: ${c.icebreaker}` : '';
     const desc = `${formulaTxt}\\n${icebreakerTxt}`.trim();
 
     // Build the .ics file string
-    const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART:${fmt(start)}\nDTEND:${fmt(end)}\nSUMMARY:Cut - ${c.name}\nLOCATION:${loc}\nDESCRIPTION:${desc}\nEND:VEVENT\nEND:VCALENDAR`; 
+    const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART:${fmt(start)}\nDTEND:${fmt(end)}\nSUMMARY:Cut - ${c.name} (${displayTime})\nLOCATION:${loc}\nDESCRIPTION:${desc}\nEND:VEVENT\nEND:VCALENDAR`; 
     
     const blob = new Blob([ics], {type:'text/calendar;charset=utf-8'}); 
     const url = URL.createObjectURL(blob); 
     const a = document.createElement('a'); 
     a.href = url; 
-    
-    // Optional upgrade: dynamically names the file after the client (e.g., John_Doe_appt.ics)
     a.download = `${c.name.replace(/\s+/g, '_')}_appt.ics`; 
     a.click(); 
     
