@@ -1085,17 +1085,57 @@
             closeModal('settingsModal');
             const div = document.getElementById('statsContent');
             div.innerHTML = '';
-            const years = {};
+
+            const currentYear = new Date().getFullYear().toString();
+            let currentYearTotal = 0;
+            const months = new Array(12).fill(0);
+            const pastYears = {};
+
+            // Sort data into this year's months vs past years
             history.forEach(h => {
-                const y = h.date.split('-')[0];
-                if(!years[y]) years[y] = 0;
-                years[y] += h.amount;
+                const [y, m, d] = h.date.split('-');
+                if (y === currentYear) {
+                    currentYearTotal += h.amount;
+                    months[parseInt(m) - 1] += h.amount;
+                } else {
+                    if(!pastYears[y]) pastYears[y] = 0;
+                    pastYears[y] += h.amount;
+                }
             });
-            let html = '<div class="v-grid">';
-            Object.keys(years).sort().reverse().forEach(y => {
-                html += `<div class="v-box"><span class="v-big" style="color:var(--p-green-dark)">$${years[y].toFixed(2)}</span><span style="font-size:0.7rem;">${y} Revenue</span></div>`;
+
+            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const currentMonthIndex = new Date().getMonth();
+
+            // 1. Big Current Year Header
+            let html = `<div style="text-align:center; margin-bottom:20px;">
+                <span style="font-size:0.8rem; color:var(--text-sub); text-transform:uppercase; font-weight:800;">${currentYear} YTD Revenue</span><br>
+                <span style="font-size:2.5rem; font-weight:900; color:var(--p-green-dark);">$${currentYearTotal.toFixed(2)}</span>
+            </div>`;
+
+            // 2. The 12-Month Grid (3 columns, 4 rows)
+            html += '<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom: 25px;">';
+            months.forEach((amt, i) => {
+                // Highlights the current month box
+                const isCurrent = (i === currentMonthIndex) ? 'border-color:var(--p-blue-dark); background:rgba(162,210,255,0.1);' : 'border-color:var(--border);';
+                // Dims future months that have $0
+                const valColor = amt > 0 ? 'color:var(--text-main);' : 'color:var(--text-sub); opacity:0.4;';
+                
+                html += `<div style="background:var(--input-bg); padding:12px 5px; border-radius:12px; text-align:center; border: 2px solid transparent; ${isCurrent}">
+                    <span style="font-size:0.7rem; color:var(--text-sub); text-transform:uppercase; font-weight:800;">${monthNames[i]}</span><br>
+                    <span style="font-size:1rem; font-weight:800; ${valColor}">$${amt.toFixed(0)}</span>
+                </div>`;
             });
             html += '</div>';
+
+            // 3. Past Years Summary (Only shows if you have data from last year)
+            if (Object.keys(pastYears).length > 0) {
+                html += `<h4 style="margin-bottom:10px; color:var(--text-main);">Past Years</h4><div class="v-grid">`;
+                Object.keys(pastYears).sort().reverse().forEach(y => {
+                    html += `<div class="v-box" style="padding:10px;"><span class="v-big" style="font-size:1.1rem;">$${pastYears[y].toFixed(2)}</span><span style="font-size:0.7rem;">${y}</span></div>`;
+                });
+                html += `</div>`;
+            }
+
             div.innerHTML = html;
             openModal('statsModal');
         }
