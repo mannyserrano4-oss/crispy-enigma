@@ -609,6 +609,10 @@
             <div class="sms-opt" onclick="sendSms('longtime')">👋 Long Time No See <i class="fas fa-chevron-right"></i></div>
             <div class="sms-opt" onclick="sendSms('followup')">✂️ Follow Up <i class="fas fa-chevron-right"></i></div>
             <div class="sms-opt" onclick="sendSms('review')">⭐ Request Review <i class="fas fa-chevron-right"></i></div>
+            
+            <div class="sms-opt" onclick="sendSms('bday')">🎂 Happy Birthday <i class="fas fa-chevron-right"></i></div>
+            <div class="sms-opt" onclick="sendSms('noshow')">🚩 Missed Cut (No-Show) <i class="fas fa-chevron-right"></i></div>
+            
             <div class="sms-opt" onclick="sendSms('custom')">💬 Custom Message <i class="fas fa-chevron-right"></i></div>
             <button class="btn btn-red" onclick="closeModal('smsModal')">Cancel</button>
         </div>
@@ -1424,6 +1428,11 @@
             if(type === 'longtime') msg = `Hey ${first}, been a while! Time to clean up that cut?`; 
             if(type === 'followup') msg = `Appreciate you coming through ${first}! How's the cut treating you?`; 
             if(type === 'review') msg = `Yo ${first}, appreciate the cut! If you have a sec, rate it here:\n\nhttps://mannyserrano4-oss.github.io/crispy-enigma/reviews`; 
+            
+            // --- NEW TEXT TEMPLATES ---
+            if(type === 'bday') msg = `Yo ${first}, saw it's your birthday month! Hit me up to claim that half-off cut.`;
+            if(type === 'noshow') msg = `Hey ${first}, had you down for a cut today. Let me know if we need to reschedule.`;
+            
             if(type === 'custom') msg = `Hey ${first}, `;
             
             const ua = navigator.userAgent.toLowerCase();
