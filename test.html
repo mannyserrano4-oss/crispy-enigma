@@ -155,7 +155,16 @@
             box-shadow: var(--shadow); border-left: 6px solid var(--status-good); position: relative;
         }
         .client-card.due { border-left-color: var(--status-due); }
-        .client-card.overdue { border-left-color: var(--status-overdue); }
+        .client-card.overdue { 
+            border-left-color: var(--status-overdue); 
+            animation: overduePulse 2s infinite ease-in-out;
+        }
+
+        @keyframes overduePulse {
+            0% { border-left-color: var(--status-overdue); }
+            50% { border-left-color: rgba(255, 0, 84, 0.2); }
+            100% { border-left-color: var(--status-overdue); }
+        }
         .cc-top { display: flex; justify-content: space-between; align-items: center; }
         .cc-name { font-size: 1.2rem; font-weight: 800; text-transform: capitalize; }
         .cc-due { font-size: 0.8rem; font-weight: 600; padding: 4px 8px; border-radius: 6px; background: var(--input-bg); color: var(--text-sub); }
@@ -453,17 +462,17 @@
             <input type="date" id="payDate" style="margin-bottom:15px;">
 
             <label>Base Price ($)</label>
-            <input type="number" id="payPrice" onchange="calcTotal()" inputmode="decimal">
+            <input type="number" id="payPrice" onchange="calcTotal()" inputmode="decimal" onfocus="this.select()">
 
             <label>Discounts</label>
             <div id="discountList"></div>
             <div id="customDiscBox" style="display:none;">
                 <label>Custom Discount (%)</label>
-                <input type="number" id="payCustomPct" placeholder="e.g. 50" oninput="calcTotal()" inputmode="decimal">
+                <input type="number" id="payCustomPct" placeholder="e.g. 50" oninput="calcTotal()" inputmode="decimal" onfocus="this.select()">
             </div>
 
             <label>Tip ($)</label>
-            <input type="number" id="payTip" value="0" onchange="calcTotal()" inputmode="decimal">
+            <input type="number" id="payTip" value="0" onchange="calcTotal()" inputmode="decimal" onfocus="this.select()">
 
             <div style="background:var(--input-bg); padding:15px; border-radius:12px; margin:20px 0; text-align:center;">
                 <span style="color:var(--text-sub); font-size:0.8rem;">TOTAL REVENUE</span><br>
@@ -487,10 +496,10 @@
             <p style="color:var(--text-sub); margin-top:-10px; font-size:0.8rem;">Fast revenue entry (No profile needed).</p>
             
             <label>Service Price ($)</label>
-            <input type="number" id="wPrice" value="35" inputmode="decimal">
+            <input type="number" id="wPrice" value="35" inputmode="decimal" onfocus="this.select()">
 
             <label>Tip ($)</label>
-            <input type="number" id="wTip" value="0" inputmode="decimal">
+            <input type="number" id="wTip" value="0" inputmode="decimal" onfocus="this.select()">
 
             <button class="btn btn-green" onclick="saveWalkIn()">Record Walk-In</button>
             <button class="btn btn-ghost" onclick="closeModal('walkInModal')">Cancel</button>
@@ -516,8 +525,8 @@
                 <div style="border:2px solid var(--p-green); padding:15px; border-radius:15px; margin-bottom:15px; background:rgba(183,228,199,0.1);">
                     <label style="color:var(--p-green-dark)">Service</label>
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                        <div><label>Price</label><input type="number" id="ePrice" value="35"></div>
-                        <div><label>Freq (Wks)</label><input type="number" id="eFreq" value="4"></div>
+                        <div><label>Price</label><input type="number" id="ePrice" value="35" onfocus="this.select()"></div>
+                        <div><label>Freq (Wks)</label><input type="number" id="eFreq" value="4" onfocus="this.select()"></div>
                     </div>
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                         <div><label>First Cut</label><input type="date" id="eFirst"></div>
