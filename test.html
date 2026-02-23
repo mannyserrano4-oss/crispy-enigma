@@ -356,9 +356,9 @@
         </div>
 
         <div class="tabs">
-            <button class="tab-btn active" onclick="setTab('all', this)">All</button>
-            <button class="tab-btn" onclick="setTab('due', this)">Due</button>
-            <button class="tab-btn" onclick="setTab('overdue', this)">Overdue</button>
+            <button class="tab-btn active" id="tabAll" onclick="setTab('all', this)">All</button>
+            <button class="tab-btn" id="tabDue" onclick="setTab('due', this)">Due</button>
+            <button class="tab-btn" id="tabOverdue" onclick="setTab('overdue', this)">Overdue</button>
         </div>
     </div>
 
@@ -756,6 +756,21 @@
             const list = document.getElementById('list');
             list.innerHTML = '';
 
+            // --- NEW: Live Pipeline Counters ---
+            let countAll = 0, countDue = 0, countOver = 0;
+            clients.forEach(c => {
+                if(c.archived) return; // Skips archived clients in the count
+                countAll++;
+                const stat = getStatus(c);
+                if(stat === 'due') countDue++;
+                if(stat === 'overdue') countOver++;
+            });
+
+            if(document.getElementById('tabAll')) document.getElementById('tabAll').innerText = `All (${countAll})`;
+            if(document.getElementById('tabDue')) document.getElementById('tabDue').innerText = `Due (${countDue})`;
+            if(document.getElementById('tabOverdue')) document.getElementById('tabOverdue').innerText = `Overdue (${countOver})`;
+            // -----------------------------------
+            
             let filtered = clients.filter(c => {
                 if(search && !c.name.toLowerCase().includes(search.toLowerCase())) return false;
                 if (viewArchives) return c.archived === true;
@@ -806,7 +821,15 @@
             let nameDisplay = c.name;
             if(c.strikes > 0) nameDisplay += ` (${c.strikes} Strike${c.strikes>1?'s':''})`;
             document.getElementById('vName').innerText = nameDisplay;
-            document.getElementById('vSub').innerText = c.phone || 'No Phone';
+            // --- NEW: Phone Number Auto-Formatting ---
+            let displayPhone = 'No Phone';
+            if (c.phone) {
+                const cleaned = ('' + c.phone).replace(/\D/g, ''); // Strips out dashes or spaces
+                const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/); // Looks for exactly 10 digits
+                displayPhone = match ? `(${match[1]}) ${match[2]}-${match[3]}` : c.phone;
+            }
+            document.getElementById('vSub').innerText = displayPhone;
+            // -----------------------------------------
             document.getElementById('vFormula').innerText = c.formula || "No cut formula saved.";
             
             let b = '';
