@@ -629,6 +629,8 @@
             <div class="sms-opt" onclick="sendSms('bday')">🎂 Happy Birthday <i class="fas fa-chevron-right"></i></div>
             <div class="sms-opt" onclick="sendSms('noshow')">🚩 Missed Cut (No-Show) <i class="fas fa-chevron-right"></i></div>
             
+            <div class="sms-opt" onclick="sendSms('loyalty')">🏆 Loyalty Update <i class="fas fa-chevron-right"></i></div>
+            
             <div class="sms-opt" onclick="sendSms('custom')">💬 Custom Message <i class="fas fa-chevron-right"></i></div>
             <button class="btn btn-red" onclick="closeModal('smsModal')">Cancel</button>
         </div>
@@ -1511,6 +1513,21 @@
             // --- NEW TEXT TEMPLATES ---
             if(type === 'bday') msg = `Yo ${first}, saw it's your birthday month! Hit me up to claim that half-off cut.`;
             if(type === 'noshow') msg = `Hey ${first}, had you down for a cut today. Let me know if we need to reschedule.`;
+            
+            // --- NEW DYNAMIC LOYALTY TEXT ---
+            if(type === 'loyalty') {
+                const banked = c.banked || 0;
+                const points = c.loyalty || 0;
+                const cutsLeft = 5 - points;
+                
+                if (banked > 0) {
+                    msg = `Yo ${first}, you've got a FREE cut banked and ready to use! Let me know when you want to cash it in.`;
+                } else if (cutsLeft === 1) {
+                    msg = `Yo ${first}, you are exactly ONE cut away from a freebie! Let's get you in the chair and finish off that punch card.`;
+                } else {
+                    msg = `Yo ${first}, just checking in! You're ${cutsLeft} cuts away from earning your free one. Hit me up when you need a fresh fade.`;
+                }
+            }
             
             if(type === 'custom') msg = `Hey ${first}, `;
             
