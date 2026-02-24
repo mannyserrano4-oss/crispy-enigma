@@ -435,6 +435,7 @@
                 <div class="v-box">
                     <span class="v-big" style="color:var(--p-green-dark)" id="vCredit">$0.00</span>
                     <span style="font-size:0.7rem; text-transform:uppercase;">Ref Credit</span>
+                    <div id="vRefCount" style="font-size:0.65rem; color:var(--p-blue-dark); font-weight:800; margin-top:4px; display:none;"></div>
                 </div>
                 <div class="v-box">
                     <span class="v-big" id="vTotalCuts">0</span>
@@ -898,6 +899,18 @@
 
             document.getElementById('vLoyalty').innerText = getLoyaltyVisual(c.loyalty);
             document.getElementById('vCredit').innerText = `$${(c.credit||0).toFixed(2)}`;
+            
+            // --- NEW: Top Promoter Tracker ---
+            // Scans the whole list to see who typed this client's name as a referral
+            const refCount = clients.filter(x => x.refBy && x.refBy.toLowerCase() === c.name.toLowerCase()).length;
+            const refDiv = document.getElementById('vRefCount');
+            
+            if (refCount > 0) {
+                refDiv.innerText = `🏆 ${refCount} REFERRED`;
+                refDiv.style.display = 'block';
+            } else {
+                refDiv.style.display = 'none';
+            }
             document.getElementById('vTotalCuts').innerText = c.cuts||0;
             document.getElementById('vLTV').innerText = `$${(c.spent||0).toFixed(2)}`;
             
