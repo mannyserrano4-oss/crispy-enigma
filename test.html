@@ -1663,11 +1663,19 @@
         // --- NEW PROMO BLAST LOGIC ---
         function openPromo() {
             const select = document.getElementById('promoTarget');
-            select.innerHTML = '<option value="all">All Active Clients</option>';
-            // Loads your custom vibe tags into the dropdown automatically
+            // Injecting the Smart Batches
+            select.innerHTML = `
+                <option value="all">All Active Clients</option>
+                <option value="smart_overdue">⏰ Overdue (Lost Clients)</option>
+                <option value="smart_vip">👑 VIPs (High Spenders)</option>
+                <option value="smart_housecall">🚗 Mobile / House Call Clients</option>
+                <option value="smart_1away">🎟️ 1 Cut Away from Free</option>
+                <optgroup label="By Vibe Tag">
+            `;
             VIBE_TAGS.forEach(t => {
-                select.innerHTML += `<option value="${t}">Tag: ${t}</option>`;
+                select.innerHTML += `<option value="${t}">${t}</option>`;
             });
+            select.innerHTML += `</optgroup>`;
             
             buildPromoList();
             openModal('promoModal');
@@ -1679,7 +1687,17 @@
             const target = document.getElementById('promoTarget').value;
             
             let targets = clients.filter(c => !c.archived && c.phone);
-            if (target !== 'all') {
+            
+            // Apply Smart Filters
+            if (target === 'smart_overdue') {
+                targets = targets.filter(c => getStatus(c) === 'overdue');
+            } else if (target === 'smart_vip') {
+                targets = targets.filter(c => (c.spent || 0) >= 200);
+            } else if (target === 'smart_housecall') {
+                targets = targets.filter(c => c.address && c.address.trim() !== '');
+            } else if (target === 'smart_1away') {
+                targets = targets.filter(c => (c.loyalty || 0) === 4);
+            } else if (target !== 'all') {
                 targets = targets.filter(c => c.tags && c.tags.includes(target));
             }
             
@@ -1696,18 +1714,29 @@
                 div.style.alignItems = 'center';
                 div.style.padding = '8px 10px';
                 div.style.borderBottom = '1px solid var(--border)';
+                div.style.transition = 'opacity 0.3s ease'; // Smooth fade out
                 
                 div.innerHTML = `
                     <div style="font-weight:700;">${c.name}</div>
-                    <button class="btn btn-primary" style="background:var(--p-purple); color:black; width:auto; padding:6px 12px; margin:0; font-size:0.8rem;" onclick="firePromo('${c.phone}', '${first}')">Send Text</button>
+                    <button class="btn btn-primary" style="background:var(--p-purple); color:black; width:auto; padding:6px 12px; margin:0; font-size:0.8rem;" onclick="firePromo('${c.phone}', '${first}', this)">Send Text</button>
                 `;
                 listDiv.appendChild(div);
             });
         }
 
-        function firePromo(phone, firstName) {
+        function firePromo(phone, firstName, btn) {
             let msg = document.getElementById('promoMsg').value;
-            msg = msg.replace('[Name]', firstName); // Swaps [Name] if you type it in the box
+            msg = msg.replace('[Name]', firstName); 
+            
+            // --- Visual Anti-Double Send Feedback ---
+            btn.innerText = 'Sent ✓';
+            btn.style.background = 'var(--bg-card)';
+            btn.style.color = 'var(--text-sub)';
+            btn.style.border = '1px solid var(--border)';
+            btn.style.boxShadow = 'none';
+            btn.onclick = null; // Kills the button so you can't tap it twice
+            btn.parentElement.style.opacity = '0.4'; // Fades out the whole row
+            // ----------------------------------------
             
             const ua = navigator.userAgent.toLowerCase();
             const isApple = ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1;
