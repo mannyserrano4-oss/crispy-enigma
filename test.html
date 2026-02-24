@@ -630,9 +630,12 @@
             <div class="sms-opt" onclick="sendSms('confirm')">📅 Confirm Appointment <i class="fas fa-chevron-right"></i></div>
             <div class="sms-opt" onclick="sendSms('longtime')">👋 Long Time No See <i class="fas fa-chevron-right"></i></div>
             <div class="sms-opt" onclick="sendSms('followup')">✂️ Follow Up <i class="fas fa-chevron-right"></i></div>
-            <div class="sms-opt" onclick="sendSms('review')">⭐ Request Review <i class="fas fa-chevron-right"></i></div>
+                        <div class="sms-opt" onclick="sendSms('review')">⭐ Request Review <i class="fas fa-chevron-right"></i></div>
+            
+            <div id="btn48hr" class="sms-opt" style="display:none; border-color:var(--p-blue); background:rgba(162,210,255,0.1);" onclick="sendSms('checkin')">💈 48-Hr Satisfaction Check <i class="fas fa-chevron-right"></i></div>
             
             <div class="sms-opt" onclick="sendSms('bday')">🎂 Happy Birthday <i class="fas fa-chevron-right"></i></div>
+
             <div class="sms-opt" onclick="sendSms('noshow')">🚩 Missed Cut (No-Show) <i class="fas fa-chevron-right"></i></div>
             
             <div class="sms-opt" onclick="sendSms('loyalty')">🏆 Loyalty Update <i class="fas fa-chevron-right"></i></div>
@@ -1566,19 +1569,44 @@
         
         async function deleteClient() { if(await customConfirm("Permanently delete this client?")) { clients = clients.filter(c => c.id !== document.getElementById('eId').value); saveAll(); closeModal('editModal'); render(); } }
         async function addStrike() { const c = getClient(activeId); if(await customConfirm(`Mark ${c.name} as a No-Show? \n\nAdds a Strike 🚩.`)) { c.strikes = (c.strikes || 0) + 1; saveAll(); closeModal('viewModal'); render(); } }
-        async function removeStrike() { const c = getClient(activeId); if(await customConfirm("Remove one Strike 🚩?")) { c.strikes = Math.max(0, (c.strikes || 0) - 1); saveAll(); closeModal('viewModal'); render(); } }
-        function openSmsMenu() { openModal('smsModal'); }
+                async function removeStrike() { const c = getClient(activeId); if(await customConfirm("Remove one Strike 🚩?")) { c.strikes = Math.max(0, (c.strikes || 0) - 1); saveAll(); closeModal('viewModal'); render(); } }
+        
+        function openSmsMenu() { 
+            const c = getClient(activeId);
+            const btn48 = document.getElementById('btn48hr');
+            
+            // Default to hidden
+            btn48.style.display = 'none';
+            
+            // Check if they had a cut within the last 2 days
+            if(c.last) {
+                // We use your getTodayIso() function to make sure timezones don't mess up the math
+                const lastDate = new Date(c.last + 'T00:00:00');
+                const today = new Date(getTodayIso() + 'T00:00:00');
+                const diffTime = today - lastDate;
+                const diffDays = diffTime / (1000 * 60 * 60 * 24);
+                
+                if(diffDays >= 0 && diffDays <= 2) {
+                    btn48.style.display = 'flex';
+                }
+            }
+            
+            openModal('smsModal'); 
+        }
 
         function sendSms(type) { 
+ 
             const c = getClient(activeId); if(!c || !c.phone) return alert('No phone saved.'); 
             const first = c.name.split(' ')[0]; let msg = ''; 
             if(type === 'late') msg = `Hey ${first}, running about 15 mins late. So sorry!`; 
             if(type === 'confirm') msg = `Yo ${first}, just confirming our cut. You still good?`; 
             if(type === 'longtime') msg = `Hey ${first}, been a while! Time to clean up that cut?`; 
             if(type === 'followup') msg = `Appreciate you coming through ${first}! How's the cut treating you?`; 
-            if(type === 'review') msg = `Yo ${first}, appreciate the cut! If you have a sec, rate it here:\n\nhttps://mannyserrano4-oss.github.io/crispy-enigma/reviews`; 
+                        if(type === 'review') msg = `Yo ${first}, appreciate the cut! If you have a sec, rate it here:\n\nhttps://mannyserrano4-oss.github.io/crispy-enigma/reviews`;
             
             // --- NEW TEXT TEMPLATES ---
+            if(type === 'checkin') msg = `Yo ${first}, just checking in to make sure that cut is still sitting right and styling easy for you.`;
+
             if(type === 'bday') msg = `Yo ${first}, saw it's your birthday month! Hit me up to claim that half-off cut.`;
             if(type === 'noshow') msg = `Hey ${first}, had you down for a cut today. Let me know if we need to reschedule.`;
             
