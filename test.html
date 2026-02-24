@@ -359,6 +359,8 @@
         <div class="top-row">
             <div class="logo">The Black Book <br><span>MAS Barbery</span></div>
             <div style="display:flex; gap:15px; align-items:center;">
+                <div onclick="openQrMenu()"><i class="fas fa-qrcode" style="font-size:1.2rem; color:var(--text-sub); cursor:pointer;"></i></div>
+                
                 <div onclick="copyRoster()"><i class="fas fa-clipboard-list" style="font-size:1.2rem; color:var(--text-sub); cursor:pointer;"></i></div>
                 
                 <div class="theme-toggle" onclick="toggleTheme()"><div class="toggle-dot"></div></div>
@@ -636,6 +638,30 @@
         </div>
     </div>
 
+    <div id="qrMenuModal" class="overlay" style="z-index: 850;">
+        <div class="sheet">
+            <h3>Client Scan Hub</h3>
+            <p style="color:var(--text-sub); margin-top:-10px; font-size:0.8rem;">Have the client scan your screen.</p>
+            
+            <div class="sms-opt" onclick="showQr('review')">⭐ Leave a Review <i class="fas fa-qrcode"></i></div>
+            <div class="sms-opt" onclick="showQr('card')">📇 Digital Business Card <i class="fas fa-qrcode"></i></div>
+            <div class="sms-opt" onclick="showQr('aftercare')">🧴 Beard & Hair Aftercare <i class="fas fa-qrcode"></i></div>
+            <div class="sms-opt" onclick="showQr('book')">📅 Book Next Appointment <i class="fas fa-qrcode"></i></div>
+            
+            <button class="btn btn-red" onclick="closeModal('qrMenuModal')" style="margin-top:10px;">Cancel</button>
+        </div>
+    </div>
+
+    <div id="qrDisplayModal" class="overlay" style="z-index: 900; align-items:center; justify-content:center;">
+        <div class="confirm-box" style="width:90%; max-width:400px; padding:30px 20px;">
+            <h3 id="qrTitle" style="margin-top:0; font-size:1.5rem;">Scan Me</h3>
+            <div style="background:#fff; padding:15px; border-radius:15px; display:inline-block; margin: 15px 0;">
+                <img id="qrImage" src="" alt="QR Code" style="width:200px; height:200px; display:block;">
+            </div>
+            <button class="btn btn-ghost" onclick="backToQrMenu()">Back to Menu</button>
+        </div>
+    </div>
+    
     <div id="confirmModal" class="overlay" style="align-items:center; justify-content:center; z-index:1000;">
         <div class="confirm-box">
             <div class="confirm-title" id="cMsg">Are you sure?</div>
@@ -1539,6 +1565,40 @@
             closeModal('smsModal'); 
         }
 
+        // --- NEW QR HUB LOGIC ---
+        function openQrMenu() {
+            openModal('qrMenuModal');
+        }
+
+        function showQr(type) {
+            closeModal('qrMenuModal');
+            
+            const titleMap = {
+                'review': 'Leave a Review',
+                'card': 'MAS Barbery Card',
+                'aftercare': 'Aftercare Guide',
+                'book': 'Book Appointment'
+            };
+            
+            // These are the exact filenames you need to use when you save your images!
+            const imgMap = {
+                'review': 'qr-review.png',
+                'card': 'qr-card.png',
+                'aftercare': 'qr-aftercare.png',
+                'book': 'qr-book.png'
+            };
+            
+            document.getElementById('qrTitle').innerText = titleMap[type];
+            document.getElementById('qrImage').src = imgMap[type];
+            
+            openModal('qrDisplayModal');
+        }
+
+        function backToQrMenu() {
+            closeModal('qrDisplayModal');
+            openModal('qrMenuModal');
+        }
+        
         function restoreData(input) {
             const r = new FileReader();
             r.onload = (e) => {
