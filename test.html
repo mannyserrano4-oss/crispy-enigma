@@ -359,6 +359,8 @@
         <div class="top-row">
             <div class="logo">The Black Book <br><span>MAS Barbery</span></div>
             <div style="display:flex; gap:15px; align-items:center;">
+                <div onclick="openPromo()"><i class="fas fa-bullhorn" style="font-size:1.2rem; color:var(--p-purple-dark); cursor:pointer;"></i></div>
+
                 <div onclick="openSos()"><i class="fas fa-life-ring" style="font-size:1.2rem; color:var(--status-overdue); cursor:pointer;"></i></div>
                 
                 <div onclick="openQrMenu()"><i class="fas fa-qrcode" style="font-size:1.2rem; color:var(--text-sub); cursor:pointer;"></i></div>
@@ -655,6 +657,26 @@
                 </div>
 
             <button class="btn btn-ghost" onclick="closeModal('sosModal')">Cancel</button>
+        </div>
+    </div>
+
+    <div id="promoModal" class="overlay" style="z-index: 850;">
+        <div class="sheet">
+            <h3 style="color:var(--p-purple-dark); margin-bottom: 5px;">📢 Promo Blast</h3>
+            <p style="color:var(--text-sub); margin-top:0; font-size:0.8rem;">Safely text groups without making a group chat.</p>
+            
+            <label>Target Audience</label>
+            <select id="promoTarget" style="margin-bottom:15px;" onchange="buildPromoList()">
+                <option value="all">All Active Clients</option>
+                </select>
+
+            <label>The Message</label>
+            <textarea id="promoMsg" rows="3" style="border-color:var(--p-purple-dark); font-weight:600;">Got a few spots open later this week! Let me know if you need to lock one in. 💈</textarea>
+            
+            <div id="promoList" style="max-height: 250px; overflow-y: auto; margin: 15px 0; border: 1px solid var(--border); border-radius: 12px; padding: 5px;">
+                </div>
+
+            <button class="btn btn-ghost" onclick="closeModal('promoModal')">Close</button>
         </div>
     </div>
     
@@ -1630,6 +1652,62 @@
             let msg = document.getElementById('sosMsg').value;
             // Personalize the message with their name if you put [Name] in it, or just leave it as-is
             msg = msg.replace('[Name]', firstName);
+            
+            const ua = navigator.userAgent.toLowerCase();
+            const isApple = ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1;
+            const sep = isApple ? '&' : '?';
+            
+            window.location.href = `sms:${phone}${sep}body=${encodeURIComponent(msg)}`;
+        }
+
+        // --- NEW PROMO BLAST LOGIC ---
+        function openPromo() {
+            const select = document.getElementById('promoTarget');
+            select.innerHTML = '<option value="all">All Active Clients</option>';
+            // Loads your custom vibe tags into the dropdown automatically
+            VIBE_TAGS.forEach(t => {
+                select.innerHTML += `<option value="${t}">Tag: ${t}</option>`;
+            });
+            
+            buildPromoList();
+            openModal('promoModal');
+        }
+
+        function buildPromoList() {
+            const listDiv = document.getElementById('promoList');
+            listDiv.innerHTML = '';
+            const target = document.getElementById('promoTarget').value;
+            
+            let targets = clients.filter(c => !c.archived && c.phone);
+            if (target !== 'all') {
+                targets = targets.filter(c => c.tags && c.tags.includes(target));
+            }
+            
+            if (targets.length === 0) {
+                listDiv.innerHTML = '<div style="padding:15px; text-align:center; color:var(--text-sub);">No clients found for this target.</div>';
+                return;
+            }
+
+            targets.forEach(c => {
+                const first = c.name.split(' ')[0];
+                const div = document.createElement('div');
+                div.style.display = 'flex';
+                div.style.justifyContent = 'space-between';
+                div.style.alignItems = 'center';
+                div.style.padding = '8px 10px';
+                div.style.borderBottom = '1px solid var(--border)';
+                
+                div.innerHTML = `
+                    <div style="font-weight:700;">${c.name}</div>
+                    <button class="btn btn-primary" style="background:var(--p-purple); color:black; width:auto; padding:6px 12px; margin:0; font-size:0.8rem;" onclick="firePromo('${c.phone}', '${first}')">Send Text</button>
+                `;
+                listDiv.appendChild(div);
+            });
+        }
+
+        function firePromo(phone, firstName) {
+            let msg = document.getElementById('promoMsg').value;
+            msg = msg.replace('[Name]', firstName); // Swaps [Name] if you type it in the box
             
             const ua = navigator.userAgent.toLowerCase();
             const isApple = ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1;
