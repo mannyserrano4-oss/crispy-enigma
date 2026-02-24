@@ -359,6 +359,8 @@
         <div class="top-row">
             <div class="logo">The Black Book <br><span>MAS Barbery</span></div>
             <div style="display:flex; gap:15px; align-items:center;">
+                <div onclick="openSos()"><i class="fas fa-life-ring" style="font-size:1.2rem; color:var(--status-overdue); cursor:pointer;"></i></div>
+                
                 <div onclick="openQrMenu()"><i class="fas fa-qrcode" style="font-size:1.2rem; color:var(--text-sub); cursor:pointer;"></i></div>
                 
                 <div onclick="copyRoster()"><i class="fas fa-clipboard-list" style="font-size:1.2rem; color:var(--text-sub); cursor:pointer;"></i></div>
@@ -640,6 +642,22 @@
         </div>
     </div>
 
+    <div id="sosModal" class="overlay" style="z-index: 850;">
+        <div class="sheet">
+            <h3>🚨 Cancellation Radar</h3>
+            <p style="color:var(--text-sub); margin-top:-10px; font-size:0.8rem;">Rapid-fire texts to clients who need a cut right now.</p>
+            
+            <label>The Bait (Edit if needed)</label>
+            <textarea id="sosMsg" rows="3" style="border-color:var(--status-overdue); font-weight:600;">Yo! Just had a last-minute cancellation for today. First person to claim the spot gets $10 off. Let me know! 💈</textarea>
+            
+            <label style="margin-top:10px;">Prime Targets (Due & Overdue)</label>
+            <div id="sosList" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 12px; padding: 5px;">
+                </div>
+
+            <button class="btn btn-ghost" onclick="closeModal('sosModal')">Cancel</button>
+        </div>
+    </div>
+    
     <div id="qrMenuModal" class="overlay" style="z-index: 850;">
         <div class="sheet">
             <h3>Client Scan Hub</h3>
@@ -1572,6 +1590,54 @@
             closeModal('smsModal'); 
         }
 
+        // --- NEW SOS RADAR LOGIC ---
+        function openSos() {
+            const listDiv = document.getElementById('sosList');
+            listDiv.innerHTML = '';
+            
+            // 1. Find targets who are Due/Overdue AND have a phone number
+            let targets = clients.filter(c => !c.archived && c.phone && (getStatus(c) === 'due' || getStatus(c) === 'overdue'));
+            
+            // 2. Sort them by biggest spenders (LTV) first so you hit your best clients first
+            targets.sort((a, b) => (b.spent || 0) - (a.spent || 0));
+
+            if (targets.length === 0) {
+                listDiv.innerHTML = '<div style="padding:15px; text-align:center; color:var(--text-sub);">Everyone is caught up! No prime targets right now.</div>';
+            } else {
+                targets.forEach(c => {
+                    const first = c.name.split(' ')[0];
+                    const div = document.createElement('div');
+                    div.style.display = 'flex';
+                    div.style.justifyContent = 'space-between';
+                    div.style.alignItems = 'center';
+                    div.style.padding = '10px';
+                    div.style.borderBottom = '1px solid var(--border)';
+                    
+                    div.innerHTML = `
+                        <div>
+                            <div style="font-weight:700;">${c.name}</div>
+                            <div style="font-size:0.7rem; color:var(--text-sub);">${getStatus(c).toUpperCase()} • Avg $${c.price || 35}</div>
+                        </div>
+                        <button class="btn btn-primary" style="width:auto; padding:8px 15px; margin:0; font-size:0.8rem;" onclick="fireSos('${c.phone}', '${first}')">Text</button>
+                    `;
+                    listDiv.appendChild(div);
+                });
+            }
+            openModal('sosModal');
+        }
+
+        function fireSos(phone, firstName) {
+            let msg = document.getElementById('sosMsg').value;
+            // Personalize the message with their name if you put [Name] in it, or just leave it as-is
+            msg = msg.replace('[Name]', firstName);
+            
+            const ua = navigator.userAgent.toLowerCase();
+            const isApple = ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1;
+            const sep = isApple ? '&' : '?';
+            
+            window.location.href = `sms:${phone}${sep}body=${encodeURIComponent(msg)}`;
+        }
+        
         // --- NEW QR HUB LOGIC ---
         function openQrMenu() {
             openModal('qrMenuModal');
