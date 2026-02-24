@@ -1656,8 +1656,16 @@
             if (targets.length === 0) {
                 listDiv.innerHTML = '<div style="padding:15px; text-align:center; color:var(--text-sub);">Everyone is caught up! No prime targets right now.</div>';
             } else {
-                targets.forEach(c => {
+                                targets.forEach(c => {
                     const first = c.name.split(' ')[0];
+                    
+                    // --- NEW: Calculate True Average Spend ---
+                    let trueAvg = c.price || 35; // Default to base price
+                    if (c.cuts && c.cuts > 0 && c.spent) {
+                        trueAvg = (c.spent / c.cuts).toFixed(0); // Actual math: Total spent divided by number of cuts
+                    }
+                    // -----------------------------------------
+
                     const div = document.createElement('div');
                     div.style.display = 'flex';
                     div.style.justifyContent = 'space-between';
@@ -1668,12 +1676,13 @@
                     div.innerHTML = `
                         <div>
                             <div style="font-weight:700;">${c.name}</div>
-                            <div style="font-size:0.7rem; color:var(--text-sub);">${getStatus(c).toUpperCase()} • Avg $${c.price || 35}</div>
+                            <div style="font-size:0.7rem; color:var(--text-sub);">${getStatus(c).toUpperCase()} • Avg $${trueAvg}</div>
                         </div>
                         <button class="btn btn-primary" style="width:auto; padding:8px 15px; margin:0; font-size:0.8rem;" onclick="fireSos('${c.phone}', '${first}')">Text</button>
                     `;
                     listDiv.appendChild(div);
                 });
+
             }
             openModal('sosModal');
         }
