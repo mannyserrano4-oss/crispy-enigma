@@ -633,6 +633,8 @@
             
             <div class="sms-opt" onclick="sendSms('loyalty')">🏆 Loyalty Update <i class="fas fa-chevron-right"></i></div>
             
+            <div class="sms-opt" onclick="sendSms('aftercare')">🧴 Send Aftercare Link <i class="fas fa-chevron-right"></i></div>
+            
             <div class="sms-opt" onclick="sendSms('custom')">💬 Custom Message <i class="fas fa-chevron-right"></i></div>
             <button class="btn btn-red" onclick="closeModal('smsModal')">Cancel</button>
         </div>
@@ -645,7 +647,7 @@
             
             <div class="sms-opt" onclick="showQr('review')">⭐ Leave a Review <i class="fas fa-qrcode"></i></div>
             <div class="sms-opt" onclick="showQr('card')">📇 Digital Business Card <i class="fas fa-qrcode"></i></div>
-            <div class="sms-opt" onclick="showQr('aftercare')">🧴 Beard & Hair Aftercare <i class="fas fa-qrcode"></i></div>
+            <div class="sms-opt" onclick="showQr('save')">💾 Save MAS Barbery <i class="fas fa-qrcode"></i></div>
             <div class="sms-opt" onclick="showQr('book')">📅 Book Next Appointment <i class="fas fa-qrcode"></i></div>
             
             <button class="btn btn-red" onclick="closeModal('qrMenuModal')" style="margin-top:10px;">Cancel</button>
@@ -1555,6 +1557,11 @@
                 }
             }
             
+            // --- NEW AFTERCARE TEXT ---
+            if(type === 'aftercare') {
+                msg = `Yo ${first}, here is the link to my aftercare guide to keep everything looking fresh until the next cut: https://mannyserrano4-oss.github.io/crispy-enigma/aftercare/`;
+            }
+            
             if(type === 'custom') msg = `Hey ${first}, `;
             
             const ua = navigator.userAgent.toLowerCase();
@@ -1576,7 +1583,7 @@
             const titleMap = {
                 'review': 'Leave a Review',
                 'card': 'MAS Barbery Card',
-                'aftercare': 'Aftercare Guide',
+                'save': 'Save Contact',
                 'book': 'Book Appointment'
             };
             
@@ -1584,7 +1591,7 @@
             const imgMap = {
                 'review': 'qr-review.png',
                 'card': 'qr-card.png',
-                'aftercare': 'qr-aftercare.png',
+                'save': 'qr-save.png',
                 'book': 'qr-book.png'
             };
             
