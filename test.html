@@ -346,8 +346,10 @@
         <div class="top-row">
             <div class="logo">The Black Book <br><span>MAS Barbery</span></div>
             <div style="display:flex; gap:15px; align-items:center;">
+                <div onclick="copyRoster()"><i class="fas fa-clipboard-list" style="font-size:1.2rem; color:var(--text-sub); cursor:pointer;"></i></div>
+                
                 <div class="theme-toggle" onclick="toggleTheme()"><div class="toggle-dot"></div></div>
-                <div onclick="openSettings()"><i class="fas fa-cog" style="font-size:1.2rem; color:var(--text-sub);"></i></div>
+                <div onclick="openSettings()"><i class="fas fa-cog" style="font-size:1.2rem; color:var(--text-sub); cursor:pointer;"></i></div>
             </div>
         </div>
 
@@ -635,7 +637,15 @@
             <label>When?</label>
             <input type="datetime-local" id="schedDate">
             <label>Where?</label>
-            <select id="schedLoc"><option value="shop">My Shop</option><option value="client">Client Home</option></select>
+            <select id="schedLoc" style="margin-bottom:15px;"><option value="shop">My Shop</option><option value="client">Client Home</option></select>
+            
+            <label>Service Type</label>
+            <select id="schedService" style="margin-bottom:20px;">
+                <option value="120">Full Cut & Beard (2 hrs)</option>
+                <option value="90">Standard Cut (1.5 hrs)</option>
+                <option value="60">Express Cut (1 hr)</option>
+                <option value="45">Lineup / Trim (45 mins)</option>
+            </select>
             <button class="btn btn-primary" onclick="addToCalendar()">Add to Calendar</button>
             <button class="btn btn-ghost" onclick="closeModal('schedModal')">Cancel</button>
         </div>
@@ -1268,9 +1278,12 @@
     const loc = isHouseCall ? c.address : settings.location; 
     
     // --- TIME MATH ---
-    const minMs = 60000; 
-    const cutDuration = 120 * minMs; // 2 hours
-    const bufferAfter = 15 * minMs;  // 15 mins
+            const minMs = 60000; 
+            // Grabs the exact minutes from your new dropdown
+            const selectedMins = parseInt(document.getElementById('schedService').value) || 120;
+            const cutDuration = selectedMins * minMs; 
+            
+            const bufferAfter = 15 * minMs;
     const bufferBefore = isHouseCall ? (45 * minMs) : (15 * minMs);
     
     const start = new Date(cutTime.getTime() - bufferBefore);
@@ -1528,6 +1541,34 @@
                 }).catch(err => {
                     alert("Failed to copy. Your browser might not support it.");
                 });
+            }
+        }
+
+        function copyRoster() {
+            const today = new Date().toLocaleDateString(undefined, {weekday: 'long', month: 'short', day: 'numeric'});
+            let text = `💈 MAS Barbery - ${today}\n\n`;
+            
+            // Grabs today's current take
+            const todayStr = getTodayIso();
+            const todayRev = history.filter(h => h.date === todayStr).reduce((s, h) => s + h.amount, 0);
+            text += `💰 Today's Take So Far: $${todayRev.toFixed(2)}\n\n`;
+            
+            // Grabs everyone marked "Due"
+            const dueClients = clients.filter(c => !c.archived && getStatus(c) === 'due');
+            text += `🔥 PIPELINE / DUE FOR A CUT (${dueClients.length}):\n`;
+            
+            if (dueClients.length === 0) {
+                text += `- All caught up!\n`;
+            } else {
+                dueClients.forEach(c => {
+                    text += `- ${c.name} (Avg $${c.price || 35})\n`;
+                });
+            }
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert("Daily Roster & Pipeline copied!");
+                }).catch(err => alert("Failed to copy."));
             }
         }
         
