@@ -1685,7 +1685,22 @@
             const listDiv = document.getElementById('promoList');
             listDiv.innerHTML = '';
             const target = document.getElementById('promoTarget').value;
+            const msgBox = document.getElementById('promoMsg');
             
+            // --- NEW: AUTO-CHANGING TEXT TEMPLATES ---
+            if (target === 'smart_overdue') {
+                msgBox.value = "Yo [Name]! It's been a minute since you were in the chair. Got a few spots open this week if you want to get fresh. Let me know! 💈";
+            } else if (target === 'smart_vip') {
+                msgBox.value = "Yo [Name], giving my top guys first dibs on the schedule for the week. Let me know if you need to lock in a prime spot!";
+            } else if (target === 'smart_housecall') {
+                msgBox.value = "Hey [Name], mapping out my mobile cut routes for the week. Let me know if you need me to pull up and get you right! 🚗";
+            } else if (target === 'smart_1away') {
+                msgBox.value = "Yo [Name]! You are exactly ONE cut away from earning a freebie. Hit me up to grab a spot this week so we can finish off that punch card! 🏆";
+            } else {
+                msgBox.value = "Got a few spots open later this week! Let me know if you need to lock one in. 💈";
+            }
+            // ------------------------------------------
+
             let targets = clients.filter(c => !c.archived && c.phone);
             
             // Apply Smart Filters
