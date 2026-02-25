@@ -507,6 +507,11 @@
 
             <label>Base Price ($)</label>
             <input type="number" id="payPrice" onchange="calcTotal()" inputmode="decimal" onfocus="this.select()">
+            
+            <div id="multiCutBox"></div>
+            <button class="btn btn-ghost" style="padding: 10px; margin-top: -5px; margin-bottom: 20px; border: 2px dashed var(--p-blue); color: var(--p-blue-dark);" onclick="addMultiCut()">
+                <i class="fas fa-user-plus"></i> Add Additional Cut
+            </button>
 
             <label>Discounts</label>
             <div id="discountList"></div>
@@ -1061,7 +1066,11 @@
             document.getElementById('payTip').value = 0; 
             document.getElementById('payDate').value = getTodayIso(); 
             document.getElementById('customDiscBox').style.display = 'none'; 
-            selectedDisc = 'none'; 
+            
+            // NEW: Clears any extra cuts from the last person's checkout
+            document.getElementById('multiCutBox').innerHTML = '';
+            
+            selectedDisc = 'none';
             
             const nextDate = new Date();
             nextDate.setDate(nextDate.getDate() + ((c.freq || 4) * 7));
@@ -1078,19 +1087,45 @@
             calcTotal(); 
         }
 
+        function addMultiCut() {
+            const box = document.getElementById('multiCutBox');
+            const div = document.createElement('div');
+            div.style.display = 'flex';
+            div.style.gap = '10px';
+            div.style.marginBottom = '10px';
+            div.innerHTML = `
+                <input type="number" class="extra-cut-price" value="30" onchange="calcTotal()" inputmode="decimal" onfocus="this.select()" style="margin-bottom:0;">
+                <button class="btn btn-red" style="width: auto; margin-bottom: 0; padding: 0 15px;" onclick="this.parentElement.remove(); calcTotal();"><i class="fas fa-trash"></i></button>
+            `;
+            box.appendChild(div);
+            calcTotal();
+        }
+
         function calcTotal() { 
-            const base = parseFloat(document.getElementById('payPrice').value) || 0; 
+            const primary = parseFloat(document.getElementById('payPrice').value) || 0; 
             const tip = parseFloat(document.getElementById('payTip').value) || 0; 
+            
+            // Sum up the adjustable extra cuts
+            let extraTotal = 0;
+            document.querySelectorAll('.extra-cut-price').forEach(input => {
+                extraTotal += parseFloat(input.value) || 0;
+            });
+            
+            const totalBase = primary + extraTotal;
+            
             let discount = 0; 
-            if(selectedDisc === 'free') discount = base; 
-            if(selectedDisc === 'half') discount = base * 0.5; 
-            if(selectedDisc === 'credit') discount = Math.min(base, 5); 
+            // Discounts apply to the primary cut specifically so you don't lose money on multi-cuts!
+            if(selectedDisc === 'free') discount = primary; 
+            if(selectedDisc === 'half') discount = primary * 0.5; 
+            if(selectedDisc === 'credit') discount = Math.min(totalBase, 5); 
             if(selectedDisc === 'custom') { 
                 const pct = parseFloat(document.getElementById('payCustomPct').value) || 0; 
-                discount = base * (pct / 100); 
+                discount = totalBase * (pct / 100); 
             } 
+            
             const giveback = discount; 
-            const total = (base - discount) + tip; 
+            const total = (totalBase - discount) + tip; 
+            
             document.getElementById('payTotal').innerText = `$${total.toFixed(2)}`; 
             document.getElementById('givebackDisplay').innerText = `Giveback: $${giveback.toFixed(2)}`; 
             return { total, giveback };
@@ -1112,28 +1147,38 @@
                 wasCreditFlag = true;
             }
 
+            // Calculate how many cuts happened in this one transaction
+            const extraCuts = document.querySelectorAll('.extra-cut-price').length;
+            const totalCutsThisSession = 1 + extraCuts;
+
             c.spent = (c.spent || 0) + totals.total;
             c.giveback = (c.giveback || 0) + totals.giveback;
-            c.cuts = (c.cuts || 0) + 1;
+            c.cuts = (c.cuts || 0) + totalCutsThisSession;
             c.last = document.getElementById('payDate').value;
 
             // --- SMART UNDO TRACKING ---
             history.push({
                 clientId: c.id,
-                clientName: c.name,
+                clientName: c.name + (extraCuts > 0 ? ` (+${extraCuts})` : ''),
                 date: c.last,
                 amount: totals.total,
                 wasFree: wasFreeFlag,
                 wasCredit: wasCreditFlag,
-                givebackAmt: totals.giveback
+                givebackAmt: totals.giveback,
+                cutsLogged: totalCutsThisSession // Tells undo how many to subtract
             });
 
-            if(selectedDisc !== 'free') {
-                c.loyalty = (c.loyalty || 0) + 1;
-                if(c.loyalty >= 5) {        //change this number to 10 if you want to increase the required amount
+            // Loyalty logic handling multiple cuts at once
+            let earnedLoyalty = totalCutsThisSession;
+            if(selectedDisc === 'free') earnedLoyalty -= 1; // The free cut doesn't earn a point, but the extra cuts do!
+
+            if(earnedLoyalty > 0) {
+                c.loyalty = (c.loyalty || 0) + earnedLoyalty;
+                // Use a loop just in case they log enough cuts to bank multiple freebies at once
+                while(c.loyalty >= 5) {
                     c.banked = (c.banked || 0) + 1;
-                    c.loyalty = 0;
-                    await customConfirm("🎉 High Five! Client reached 5 cuts. Free Cut banked."); // this too
+                    c.loyalty -= 5;
+                    await customConfirm("🎉 High Five! Client reached 5 cuts. Free Cut banked.");
                 }
             }
             
