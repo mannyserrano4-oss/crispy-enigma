@@ -1868,7 +1868,7 @@
             }
         }
 
-        function copyRoster() {
+                function copyRoster() {
             const today = new Date().toLocaleDateString(undefined, {weekday: 'long', month: 'short', day: 'numeric'});
             let text = `💈 MAS Barbery - ${today}\n\n`;
             
@@ -1877,15 +1877,26 @@
             const todayRev = history.filter(h => h.date === todayStr).reduce((s, h) => s + h.amount, 0);
             text += `💰 Today's Take So Far: $${todayRev.toFixed(2)}\n\n`;
             
-            // Grabs everyone marked "Due"
-            const dueClients = clients.filter(c => !c.archived && getStatus(c) === 'due');
-            text += `🔥 PIPELINE / DUE FOR A CUT (${dueClients.length}):\n`;
+            // Grabs everyone marked "Due" OR "Overdue"
+            const dueClients = clients.filter(c => !c.archived && (getStatus(c) === 'due' || getStatus(c) === 'overdue'));
+            
+            // Sorts them by highest spenders first
+            dueClients.sort((a, b) => (b.spent || 0) - (a.spent || 0));
+
+            text += `🔥 PIPELINE / DUE & OVERDUE (${dueClients.length}):\n`;
             
             if (dueClients.length === 0) {
                 text += `- All caught up!\n`;
             } else {
                 dueClients.forEach(c => {
-                    text += `- ${c.name} (Avg $${c.price || 35})\n`;
+                    // Calculates True Average
+                    let trueAvg = c.price || 35;
+                    if (c.cuts && c.cuts > 0 && c.spent) {
+                        trueAvg = (c.spent / c.cuts).toFixed(0);
+                    }
+                    // Adds an alarm clock if they are overdue
+                    const statusIcon = getStatus(c) === 'overdue' ? '⏰ ' : '';
+                    text += `- ${statusIcon}${c.name} (Avg $${trueAvg})\n`;
                 });
             }
             
@@ -1895,6 +1906,7 @@
                 }).catch(err => alert("Failed to copy."));
             }
         }
+
         
     </script>
     
