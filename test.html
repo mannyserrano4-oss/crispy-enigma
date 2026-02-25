@@ -550,6 +550,22 @@
         </div>
     </div>
 
+    <div id="walkInConvertModal" class="overlay" style="z-index:910;">
+        <div class="sheet">
+            <h3>🚀 Convert to Regular?</h3>
+            <p style="color:var(--text-sub); margin-top:-10px; font-size:0.8rem;">Cash logged! Hand them the phone to save their profile and send a welcome text.</p>
+            
+            <label>Name</label>
+            <input type="text" id="wcName" placeholder="First & Last Name" autocapitalize="words" style="text-transform: capitalize;">
+            
+            <label>Phone Number</label>
+            <input type="tel" id="wcPhone" placeholder="Mobile Number">
+
+            <button class="btn btn-primary" onclick="convertWalkIn()">Save Client & Send Text</button>
+            <button class="btn btn-ghost" onclick="closeModal('walkInConvertModal')">Skip (Don't Save)</button>
+        </div>
+    </div>
+
     <div id="editModal" class="overlay">
         <div class="sheet">
             <h3 id="eTitle">Client</h3>
@@ -1138,6 +1154,8 @@
             openModal('walkInModal');
         }
 
+        let lastWalkInObj = null;
+
         function saveWalkIn() {
             const price = parseFloat(document.getElementById('wPrice').value) || 0;
             const tip = parseFloat(document.getElementById('wTip').value) || 0;
@@ -1145,6 +1163,7 @@
 
             if (total <= 0) return alert("Please enter an amount.");
 
+            // 1. Log the temporary walk-in revenue
             history.push({
                 clientId: 'walkin',
                 clientName: '🚶 Walk-In Client',
@@ -1154,11 +1173,72 @@
                 wasCredit: false,
                 givebackAmt: 0
             });
-
             saveAll();
+            
+            // 2. Clear out the converter boxes
+            document.getElementById('wcName').value = '';
+            document.getElementById('wcPhone').value = '';
+            
+            // 3. Save the exact spot in history so we can overwrite it if they convert
+            lastWalkInObj = {
+                historyIndex: history.length - 1,
+                spent: total,
+                basePrice: price
+            };
+
             closeModal('walkInModal');
             render();
-            alert(`Walk-In Recorded: $${total.toFixed(2)}`);
+            
+            // 4. Pop open the converter screen!
+            openModal('walkInConvertModal');
+        }
+
+        function convertWalkIn() {
+            let rawName = document.getElementById('wcName').value.trim();
+            const phone = document.getElementById('wcPhone').value.trim();
+            
+            if (!rawName) return alert("Please enter a name to convert.");
+            
+            const cleanName = rawName.replace(/\b\w/g, char => char.toUpperCase());
+            const newId = Date.now().toString();
+            const todayStr = getTodayIso();
+            
+            const newClient = {
+                id: newId,
+                name: cleanName,
+                phone: phone,
+                price: lastWalkInObj.basePrice || 35,
+                cuts: 1,
+                spent: lastWalkInObj.spent,
+                first: todayStr,
+                last: todayStr,
+                freq: 4,
+                loyalty: 1,
+                banked: 0,
+                strikes: 0,
+                giveback: 0,
+                archived: false
+            };
+            clients.push(newClient);
+            
+            // Retroactively rewrite the receipt to show their real name!
+            history[lastWalkInObj.historyIndex].clientId = newId;
+            history[lastWalkInObj.historyIndex].clientName = cleanName;
+            
+            saveAll();
+            closeModal('walkInConvertModal');
+            render();
+            
+            if (phone) {
+                const first = cleanName.split(' ')[0];
+                const msg = `Yo ${first}, welcome to MAS Barbery! Appreciate you stopping in today. Save this number, and let me know when you need your next cut. 💈`;
+                
+                const ua = navigator.userAgent.toLowerCase();
+                const isApple = ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1;
+                const sep = isApple ? '&' : '?';
+                
+                window.location.href = `sms:${phone}${sep}body=${encodeURIComponent(msg)}`;
+            }
         }
 
         // --- SMART UNDO FEATURE ---
@@ -1712,6 +1792,7 @@
             select.innerHTML = `
                 <option value="all">All Active Clients</option>
                 <option value="smart_overdue">⏰ Overdue (Lost Clients)</option>
+                <option value="smart_ghost">👻 Ghosts (90+ Days MIA)</option>
                 <option value="smart_vip">👑 VIPs (High Spenders)</option>
                 <option value="smart_housecall">🚗 Mobile / House Call Clients</option>
                 <option value="smart_1away">🎟️ 1 Cut Away from Free</option>
@@ -1735,6 +1816,8 @@
             // --- NEW: AUTO-CHANGING TEXT TEMPLATES ---
             if (target === 'smart_overdue') {
                 msgBox.value = "Yo [Name]! It's been a minute since you were in the chair. Got a few spots open this week if you want to get fresh. Let me know! 💈";
+            } else if (target === 'smart_ghost') {
+                msgBox.value = "Yo [Name]! It's been a minute. If you've been looking for a reason to get fresh, I'm knocking $10 off your cut if you book this week. Let's get you back in the chair! 💈";
             } else if (target === 'smart_vip') {
                 msgBox.value = "Yo [Name], giving my top guys first dibs on the schedule for the week. Let me know if you need to lock in a prime spot!";
             } else if (target === 'smart_housecall') {
@@ -1751,6 +1834,13 @@
             // Apply Smart Filters
             if (target === 'smart_overdue') {
                 targets = targets.filter(c => getStatus(c) === 'overdue');
+            } else if (target === 'smart_ghost') {
+                const today = new Date();
+                targets = targets.filter(c => {
+                    if (!c.last) return false;
+                    const daysMIA = (today - new Date(c.last)) / (1000 * 60 * 60 * 24);
+                    return daysMIA >= 90; // Filters for guys missing for 3+ months
+                });
             } else if (target === 'smart_vip') {
                 targets = targets.filter(c => (c.spent || 0) >= 200);
             } else if (target === 'smart_housecall') {
