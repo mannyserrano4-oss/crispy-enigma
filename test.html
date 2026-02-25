@@ -1081,7 +1081,15 @@
             addOpt(opts, 'none', 'No Discount', true); 
             if((c.banked || 0) > 0) addOpt(opts, 'free', `Redeem 1 Free Cut (Banked: ${c.banked})`); 
             if((c.credit || 0) > 0) addOpt(opts, 'credit', `Redeem $5 Credit (Bal: $${c.credit})`); 
-            if( (c.dob && isMonth(c.dob)) || (c.first && isAnniversary(c.first)) ) { addOpt(opts, 'half', `Redeem 50% Off (Special Month)`); } 
+            
+            // --- NEW: Only shows the 50% off if they haven't used it this year ---
+            const currentYear = new Date().getFullYear();
+            const hasUsedThisYear = c.lastHalfOffYear === currentYear;
+            
+            if( !hasUsedThisYear && ((c.dob && isMonth(c.dob)) || (c.first && isAnniversary(c.first))) ) { 
+                addOpt(opts, 'half', `Redeem 50% Off (Special Month)`); 
+            } 
+            
             addOpt(opts, 'custom', 'Custom % Discount'); 
             openModal('checkoutModal'); 
             calcTotal(); 
@@ -1145,6 +1153,10 @@
             if(selectedDisc === 'credit') {
                 c.credit = Math.max(0, (c.credit || 0) - 5);
                 wasCreditFlag = true;
+            }
+            // --- NEW: Locks the 50% discount if used so it can't be used twice a year ---
+            if(selectedDisc === 'half') {
+                c.lastHalfOffYear = new Date(document.getElementById('payDate').value).getFullYear();
             }
 
             // Calculate how many cuts happened in this one transaction
