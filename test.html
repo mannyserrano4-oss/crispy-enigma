@@ -1800,20 +1800,16 @@
         // --- NEW PROMO BLAST LOGIC ---
         function openPromo() {
             const select = document.getElementById('promoTarget');
-            // Injecting the Smart Batches
             select.innerHTML = `
                 <option value="all">All Active Clients</option>
                 <option value="smart_overdue">⏰ Overdue (Lost Clients)</option>
                 <option value="smart_ghost">👻 Ghosts (90+ Days MIA)</option>
                 <option value="smart_vip">👑 VIPs (High Spenders)</option>
+                <option value="smart_bday">🎂 Birthdays This Month (50% Off)</option>
+                <option value="smart_anni">🏅 Anniversaries This Month (50% Off)</option>
                 <option value="smart_housecall">🚗 Mobile / House Call Clients</option>
                 <option value="smart_1away">🎟️ 1 Cut Away from Free</option>
-                <optgroup label="By Vibe Tag">
             `;
-            VIBE_TAGS.forEach(t => {
-                select.innerHTML += `<option value="${t}">${t}</option>`;
-            });
-            select.innerHTML += `</optgroup>`;
             
             buildPromoList();
             openModal('promoModal');
@@ -1830,6 +1826,10 @@
                 msgBox.value = "Yo [Name]! It's been a minute since you were in the chair. Got a few spots open this week if you want to get fresh. Let me know! 💈";
             } else if (target === 'smart_ghost') {
                 msgBox.value = "Yo [Name]! It's been a minute. If you've been looking for a reason to get fresh, I'm knocking $10 off your cut if you book this week. Let's get you back in the chair! 💈";
+            } else if (target === 'smart_bday') {
+                msgBox.value = "Yo [Name], happy birthday month! 🎂 Let me know when you want to slide in this month to claim your 50% off birthday cut.";
+            } else if (target === 'smart_anni') {
+                msgBox.value = "Yo [Name], happy anniversary! 🏅 It's been another year since you first sat in my chair. Hit me up this month to claim your 50% off loyalty cut.";
             } else if (target === 'smart_vip') {
                 msgBox.value = "Yo [Name], giving my top guys first dibs on the schedule for the week. Let me know if you need to lock in a prime spot!";
             } else if (target === 'smart_housecall') {
@@ -1853,6 +1853,12 @@
                     const daysMIA = (today - new Date(c.last)) / (1000 * 60 * 60 * 24);
                     return daysMIA >= 90; // Filters for guys missing for 3+ months
                 });
+            } else if (target === 'smart_bday') {
+                // Uses your existing isMonth() helper
+                targets = targets.filter(c => c.dob && isMonth(c.dob));
+            } else if (target === 'smart_anni') {
+                // Uses your existing isAnniversary() helper
+                targets = targets.filter(c => c.first && isAnniversary(c.first));
             } else if (target === 'smart_vip') {
                 targets = targets.filter(c => (c.spent || 0) >= 200);
             } else if (target === 'smart_housecall') {
