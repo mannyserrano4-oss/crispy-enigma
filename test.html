@@ -559,7 +559,12 @@
             <input type="text" id="wcName" placeholder="First & Last Name" autocapitalize="words" style="text-transform: capitalize;">
             
             <label>Phone Number</label>
-            <input type="tel" id="wcPhone" placeholder="Mobile Number">
+            <input type="tel" id="wcPhone" placeholder="Mobile Number" style="margin-bottom:10px;">
+            
+            <label style="display:flex; align-items:center; gap:10px; margin-bottom:20px; text-transform:none; color:var(--p-green-dark);">
+                <input type="checkbox" id="wcOffer" style="width:20px; height:20px; margin:0;" checked>
+                <span style="font-size:0.9rem; font-weight:700;">Include $5 Off Welcome Offer</span>
+            </label>
 
             <button class="btn btn-primary" onclick="convertWalkIn()">Save Client & Send Text</button>
             <button class="btn btn-ghost" onclick="closeModal('walkInConvertModal')">Skip (Don't Save)</button>
@@ -1229,9 +1234,16 @@
             closeModal('walkInConvertModal');
             render();
             
-            if (phone) {
+           if (phone) {
                 const first = cleanName.split(' ')[0];
-                const msg = `Yo ${first}, welcome to MAS Barbery! Appreciate you stopping in today. Save this number, and let me know when you need your next cut. 💈`;
+                const includeOffer = document.getElementById('wcOffer').checked;
+                
+                let msg = `Yo ${first}, welcome to MAS Barbery! Appreciate you stopping in today. Save this number, and let me know when you need your next cut. 💈`;
+                
+                // --- NEW: Appends the $5 Offer if the box is checked ---
+                if (includeOffer) {
+                    msg = `Yo ${first}, welcome to MAS Barbery! Appreciate you stopping in today. Save this number. Hit me up for your next cut and I'll knock $5 off to welcome you to the roster. 💈`;
+                }
                 
                 const ua = navigator.userAgent.toLowerCase();
                 const isApple = ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1;
