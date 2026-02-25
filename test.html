@@ -557,7 +557,7 @@
                 <input type="hidden" id="eId">
                 <div style="border:2px solid var(--p-blue); padding:15px; border-radius:15px; margin-bottom:15px; background:rgba(162,210,255,0.1);">
                     <label style="color:var(--p-blue-dark)">Identity</label>
-                    <input type="text" id="eName" placeholder="Full Name" required style="border-color:var(--p-blue);">
+                    <input type="text" id="eName" placeholder="Full Name" required autocapitalize="words" style="border-color:var(--p-blue); text-transform: capitalize;">
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                         <input type="tel" id="ePhone" placeholder="Phone">
                         <input type="text" id="eInsta" placeholder="Insta @">
@@ -1547,8 +1547,14 @@
             } 
             const selectedTags = Array.from(document.querySelectorAll('#eTags .tag-pill.active')).map(x => x.innerText);
             const formFirst = document.getElementById('eFirst').value; 
+            
+            // --- NEW: Auto-Capitalize First and Last Name ---
+            let cleanName = document.getElementById('eName').value.trim();
+            cleanName = cleanName.replace(/\b\w/g, char => char.toUpperCase());
+            // ------------------------------------------------
+
             const data = { 
-                id: id, name: document.getElementById('eName').value, phone: document.getElementById('ePhone').value, 
+                id: id, name: cleanName, phone: document.getElementById('ePhone').value, 
                 insta: document.getElementById('eInsta').value, email: document.getElementById('eEmail').value, 
                 address: document.getElementById('eAddr').value, price: parseFloat(document.getElementById('ePrice').value), 
                 freq: parseInt(document.getElementById('eFreq').value), first: formFirst, dob: document.getElementById('eDob').value, 
