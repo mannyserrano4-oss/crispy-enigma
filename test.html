@@ -1082,13 +1082,16 @@
             if((c.banked || 0) > 0) addOpt(opts, 'free', `Redeem 1 Free Cut (Banked: ${c.banked})`); 
             if((c.credit || 0) > 0) addOpt(opts, 'credit', `Redeem $5 Credit (Bal: $${c.credit})`); 
             
-            // --- NEW: Only shows the 50% off if they haven't used it this year ---
             const currentYear = new Date().getFullYear();
-            const hasUsedThisYear = c.lastHalfOffYear === currentYear;
             
-            if( !hasUsedThisYear && ((c.dob && isMonth(c.dob)) || (c.first && isAnniversary(c.first))) ) { 
-                addOpt(opts, 'half', `Redeem 50% Off (Special Month)`); 
-            } 
+            // --- NEW: Separate checks for Birthday and Anniversary ---
+            if (c.dob && isMonth(c.dob) && c.lastBdayYear !== currentYear) {
+                addOpt(opts, 'bdayHalf', `Redeem 50% Off (Birthday)`);
+            }
+            if (c.first && isAnniversary(c.first) && c.lastAnniYear !== currentYear) {
+                addOpt(opts, 'anniHalf', `Redeem 50% Off (Anniversary)`);
+            }
+            // -------------------------------------------------------- 
             
             addOpt(opts, 'custom', 'Custom % Discount'); 
             openModal('checkoutModal'); 
@@ -1124,7 +1127,7 @@
             let discount = 0; 
             // Discounts apply to the primary cut specifically so you don't lose money on multi-cuts!
             if(selectedDisc === 'free') discount = primary; 
-            if(selectedDisc === 'half') discount = primary * 0.5; 
+            if(selectedDisc === 'bdayHalf' || selectedDisc === 'anniHalf') discount = primary * 0.5; 
             if(selectedDisc === 'credit') discount = Math.min(totalBase, 5); 
             if(selectedDisc === 'custom') { 
                 const pct = parseFloat(document.getElementById('payCustomPct').value) || 0; 
@@ -1154,9 +1157,14 @@
                 c.credit = Math.max(0, (c.credit || 0) - 5);
                 wasCreditFlag = true;
             }
-            // --- NEW: Locks the 50% discount if used so it can't be used twice a year ---
-            if(selectedDisc === 'half') {
-                c.lastHalfOffYear = new Date(document.getElementById('payDate').value).getFullYear();
+            
+            // --- NEW: Locks the specific 50% discount so it can't be used twice a year ---
+            const cutYear = new Date(document.getElementById('payDate').value).getFullYear();
+            if(selectedDisc === 'bdayHalf') {
+                c.lastBdayYear = cutYear;
+            }
+            if(selectedDisc === 'anniHalf') {
+                c.lastAnniYear = cutYear;
             }
 
             // Calculate how many cuts happened in this one transaction
