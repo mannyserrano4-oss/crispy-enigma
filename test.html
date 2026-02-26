@@ -800,6 +800,21 @@
             <button class="btn btn-indigo" style="border: 2px solid var(--p-green-dark); color:var(--p-green-dark);" onclick="exportData()">
                 <i class="fas fa-save"></i> Save Full Backup (.json)
             </button>
+
+            <hr style="border-color:var(--border); margin:20px 0;">
+            
+            <h4 style="margin-bottom:10px; color:var(--text-main);">Global Price Update</h4>
+            <div style="background:var(--input-bg); padding:15px; border-radius:15px; border:1px solid var(--border); margin-bottom:20px;">
+                <label>New Base Price ($)</label>
+                <input type="number" id="setNewPrice" placeholder="e.g. 40" style="margin-bottom:10px;" inputmode="decimal">
+                
+                <label style="display:flex; align-items:center; gap:10px; margin-bottom:15px; text-transform:none; color:var(--text-main);">
+                    <input type="checkbox" id="setGrandfather" style="width:20px; height:20px; margin:0;" checked>
+                    <span style="font-size:0.85rem; font-weight:700;">Grandfather VIPs (Keep Top Spenders at current price)</span>
+                </label>
+                
+                <button class="btn btn-primary" style="padding:12px; margin:0;" onclick="massPriceUpdate()">Update All Prices</button>
+            </div>
             
             <hr style="border-color:var(--border); margin:20px 0;">
             <input type="file" id="restoreFile" hidden onchange="restoreData(this)">
@@ -948,6 +963,15 @@
                 if(c.dob && isMonth(c.dob)) badges += `<span class="badge" style="color:var(--p-pink-dark)"><i class="fas fa-birthday-cake"></i></span>`;
                 if(c.first && isAnniversary(c.first)) badges += `<span class="badge" style="color:var(--p-purple)"><i class="fas fa-medal"></i></span>`;
                 if (c.spent >= 250) badges += `<span style="color:var(--p-gold); margin-left:5px;"><i class="fas fa-crown"></i></span>`;
+                
+                // --- NEW: TIP RADAR ---
+                // If they have cuts, and their true average spend is at least $5 over their base price
+                if (c.cuts > 0 && c.spent && c.price) {
+                    const avgSpend = c.spent / c.cuts;
+                    if (avgSpend >= c.price + 5) badges += `<span style="margin-left:5px; font-size:0.9rem;" title="Consistent Tipper">💸</span>`;
+                }
+                // ----------------------
+                
                 let flags = '';
                 if(c.strikes > 0) flags = ' ' + '🚩'.repeat(Math.min(c.strikes, 3));
 
@@ -1600,6 +1624,38 @@
             saveAll(); 
             closeModal('settingsModal'); 
         }
+
+        // --- NEW: MASS PRICE BUMP LOGIC ---
+        async function massPriceUpdate() {
+            const newPrice = parseFloat(document.getElementById('setNewPrice').value);
+            if (!newPrice || newPrice <= 0) return alert("Please enter a valid new price.");
+            
+            const protectVips = document.getElementById('setGrandfather').checked;
+            
+            if(await customConfirm(`Update base price to $${newPrice} for all active clients?\n\n${protectVips ? "(VIPs with $200+ LTV will be protected)" : "(NO EXCLUSIONS - Everyone updates)"}`)) {
+                let updatedCount = 0;
+                let protectedCount = 0;
+                
+                clients.forEach(c => {
+                    if (c.archived) return; // Ignore hidden clients
+                    
+                    // Check VIP status if the box is checked
+                    if (protectVips && (c.spent || 0) >= 200) {
+                        protectedCount++;
+                        return; // Skips this VIP to protect their price
+                    }
+                    
+                    c.price = newPrice;
+                    updatedCount++;
+                });
+                
+                saveAll();
+                render();
+                document.getElementById('setNewPrice').value = '';
+                alert(`Success! Updated ${updatedCount} clients to $${newPrice}.\nProtected VIPs: ${protectedCount}`);
+            }
+        }
+        // ----------------------------------
         
         function exportData() { const s = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({clients, settings, history})); const a = document.createElement('a'); a.href = s; a.download = 'backup.json'; a.click(); }
         function toggleTheme() { document.body.classList.toggle('dark-mode'); isDark = document.body.classList.contains('dark-mode'); localStorage.setItem('theme', isDark ? 'dark' : 'light'); }
