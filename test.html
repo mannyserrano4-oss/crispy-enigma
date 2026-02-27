@@ -223,9 +223,22 @@
             background: var(--input-bg); color: var(--text-main); font-size: 1rem; margin-bottom: 15px;
             box-sizing: border-box; transition: border-color 0.2s; appearance: none;
         }
-        input:focus { border-color: var(--p-blue-dark); outline: none; background: var(--bg-card); }
+                input:focus { border-color: var(--p-blue-dark); outline: none; background: var(--bg-card); }
+
+        /* --- BRINGS BACK CHECKBOX GRAPHICS --- */
+        input[type="checkbox"] {
+            appearance: auto;
+            -webkit-appearance: auto;
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            margin: 0;
+            padding: 0;
+            accent-color: var(--p-green-dark);
+        }
 
         .btn {
+
             width: 100%; padding: 18px; border-radius: 16px; border: none; font-size: 1rem; font-weight: 700;
             cursor: pointer; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 10px;
         }
