@@ -922,10 +922,13 @@
             const list = document.getElementById('list');
             list.innerHTML = '';
 
-            // --- NEW: Live Pipeline Counters ---
+                        // --- NEW: Live Pipeline Counters (Archive Aware) ---
             let countAll = 0, countDue = 0, countOver = 0;
             clients.forEach(c => {
-                if(c.archived) return; // Skips archived clients in the count
+                // Matches the counter to whatever view you are currently in
+                const isArchived = !!c.archived;
+                if (isArchived !== viewArchives) return; 
+
                 countAll++;
                 const stat = getStatus(c);
                 if(stat === 'due') countDue++;
@@ -936,6 +939,7 @@
             if(document.getElementById('tabDue')) document.getElementById('tabDue').innerText = `Due (${countDue})`;
             if(document.getElementById('tabOverdue')) document.getElementById('tabOverdue').innerText = `Overdue (${countOver})`;
             // -----------------------------------
+
             
             let filtered = clients.filter(c => {
                 if(search && !c.name.toLowerCase().includes(search.toLowerCase())) return false;
