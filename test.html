@@ -325,6 +325,19 @@
         .tag-badge[data-vibe="Movie lover"] { border-color: #e91e63; color: #e91e63; background: rgba(233, 30, 99, 0.1); }
         .tag-badge[data-vibe="Foodie"] { border-color: #8bc34a; color: #8bc34a; background: rgba(139, 195, 74, 0.1); }
 
+        /* --- NEW: ADD-ON MATRIX STYLING --- */
+        .addon-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+        .addon-pill {
+            padding: 8px 14px; border-radius: 12px; background: var(--input-bg); 
+            border: 2px solid var(--border); font-size: 0.85rem; font-weight: 600; 
+            cursor: pointer; transition: all 0.2s; user-select: none; color: var(--text-sub);
+        }
+        .addon-pill.active {
+            background: rgba(162, 210, 255, 0.2);
+            color: var(--p-blue-dark);
+            border-color: var(--p-blue-dark);
+        }
+
         .icebreaker-box {
             background: linear-gradient(135deg, #fff9c4 0%, #fff176 100%);
             border: 2px solid var(--p-gold); color: #5d4037; padding: 15px; border-radius: 14px;
@@ -460,7 +473,9 @@
                 <div id="vNotesBox" class="v-notes-box" onclick="this.classList.toggle('expanded')"></div>
             </div>
 
-            <div class="formula-box" id="vFormula">"No cut formula saved."</div>
+            <div class="formula-box" id="vFormula" style="margin-bottom:10px;">"No cut formula saved."</div>
+            
+            <div id="vLastAddons" style="font-size:0.8rem; color:var(--p-blue-dark); font-weight:700; text-align:center; margin-bottom:20px; display:none;"></div>
 
             <div class="contact-grid">
                 <a id="btnCall" href="#" class="c-btn"><i class="fas fa-phone"></i> Call</a>
@@ -535,6 +550,16 @@
             
             <label>Date of Cut</label>
             <input type="date" id="payDate" style="margin-bottom:15px;">
+
+            <label>Services / Add-Ons</label>
+            <div class="addon-grid" id="checkoutAddons">
+                <div class="addon-pill" onclick="toggleAddon(this, 0)">🧔 Beard</div>
+                <div class="addon-pill" onclick="toggleAddon(this, 0)">🧖‍♂️ Hot Towel</div>
+                <div class="addon-pill" onclick="toggleAddon(this, 0)">✒️ Enhancements</div>
+                <div class="addon-pill" onclick="toggleAddon(this, 0)">✂️ Eyebrows</div>
+                <div class="addon-pill" onclick="toggleAddon(this, 0)">🧴 Wash</div>
+            </div>
+            <p style="font-size:0.7rem; color:var(--text-sub); margin-top:-5px; margin-bottom:15px; font-style:italic;">*Currently tracking for records. Price modifiers set to $0.</p>
 
             <label>Base Price ($)</label>
             <input type="number" id="payPrice" onchange="calcTotal()" inputmode="decimal" onfocus="this.select()">
@@ -1062,8 +1087,18 @@
                 displayPhone = match ? `(${match[1]}) ${match[2]}-${match[3]}` : c.phone;
             }
             document.getElementById('vSub').innerText = displayPhone;
-            // -----------------------------------------
+           // -----------------------------------------
             document.getElementById('vFormula').innerText = c.formula || "No cut formula saved.";
+            
+            // --- NEW: DISPLAY LAST ADD-ONS ---
+            const addonDiv = document.getElementById('vLastAddons');
+            if (c.lastAddons && c.lastAddons.length > 0) {
+                addonDiv.innerText = "Last Setup: " + c.lastAddons.join(', ');
+                addonDiv.style.display = 'block';
+            } else {
+                addonDiv.style.display = 'none';
+            }
+            
             // --- NEW: Instagram Quick-Copy Logic ---
             const instaDisp = document.getElementById('vInstaDisplay');
             if(c.insta && c.insta.trim() !== '') {
@@ -1194,6 +1229,17 @@
 
 
         // --- CHECKOUT & REVENUE ---
+        
+        // Future-proof toggle function for when you start charging
+        function toggleAddon(el, priceBump) {
+            el.classList.toggle('active');
+            /* WHEN YOU ARE READY TO CHARGE: Delete the /* and * / around this block!
+               let currentBase = parseFloat(document.getElementById('payPrice').value) || 0;
+               if(el.classList.contains('active')) document.getElementById('payPrice').value = currentBase + priceBump;
+               else document.getElementById('payPrice').value = currentBase - priceBump;
+               calcTotal();
+            */
+        }
 
         function openCheckout() { 
             const c = getClient(activeId); 
@@ -1201,6 +1247,14 @@
             document.getElementById('payTip').value = 0; 
             document.getElementById('payDate').value = getTodayIso(); 
             document.getElementById('customDiscBox').style.display = 'none'; 
+            
+            // --- NEW: Reset and Auto-Select past Add-ons ---
+            document.querySelectorAll('#checkoutAddons .addon-pill').forEach(p => {
+                p.classList.remove('active');
+                if (c.lastAddons && c.lastAddons.includes(p.innerText)) {
+                    p.classList.add('active'); // Smart memory!
+                }
+            });
             
             // NEW: Clears any extra cuts from the last person's checkout
             document.getElementById('multiCutBox').innerHTML = '';
@@ -1302,9 +1356,13 @@
                 c.lastAnniYear = cutYear;
             }
 
-            // Calculate how many cuts happened in this one transaction
+           // Calculate how many cuts happened in this one transaction
             const extraCuts = document.querySelectorAll('.extra-cut-price').length;
             const totalCutsThisSession = 1 + extraCuts;
+            
+            // --- NEW: Grab selected Add-ons and save to profile ---
+            const activeAddons = Array.from(document.querySelectorAll('#checkoutAddons .addon-pill.active')).map(x => x.innerText);
+            c.lastAddons = activeAddons;
 
             c.spent = (c.spent || 0) + totals.total;
             c.giveback = (c.giveback || 0) + totals.giveback;
