@@ -950,8 +950,8 @@
             const todayStr = getTodayIso();
             const todayRev = history.filter(h => h.date === todayStr).reduce((s, h) => s + h.amount, 0);
             
-            // Only count clients that are NOT archived
-            const activeClients = clients.filter(c => !c.archived).length;
+            // Only count active clients (no archives, no blacklists)
+            const activeClients = clients.filter(c => !c.archived && !c.blacklisted).length;
 
             document.getElementById('mToday').innerText = '$' + todayRev.toLocaleString(undefined, {minimumFractionDigits: 2});
             document.getElementById('mRev').innerText = '$' + totalRev.toLocaleString(undefined, {minimumFractionDigits: 2});
@@ -967,12 +967,12 @@
             const list = document.getElementById('list');
             list.innerHTML = '';
 
-                        // --- NEW: Live Pipeline Counters (Archive Aware) ---
+                       // --- NEW: Live Pipeline Counters (Archive & Blacklist Aware) ---
             let countAll = 0, countDue = 0, countOver = 0;
             clients.forEach(c => {
                 // Matches the counter to whatever view you are currently in
-                const isArchived = !!c.archived;
-                if (isArchived !== viewArchives) return; 
+                const isHidden = !!(c.archived || c.blacklisted);
+                if (isHidden !== viewArchives) return; 
 
                 countAll++;
                 const stat = getStatus(c);
