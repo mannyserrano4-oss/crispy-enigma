@@ -355,6 +355,16 @@
         .confirm-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 10px; }
         .confirm-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
         
+        /* --- NEW: FLASH UNDO BANNER --- */
+        .flash-banner {
+            display: none; position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+            background: #2C2C35; color: #fff; padding: 12px 20px; border-radius: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 9999; align-items: center; gap: 15px;
+            font-weight: 700; font-size: 0.9rem; border: 1px solid #444;
+            animation: slideUpFade 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        @keyframes slideUpFade { from {transform: translate(-50%, 20px); opacity: 0;} to {transform: translate(-50%, 0); opacity: 1;} }
+
         #crashModal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a1a; color: #ff6b6b;
             z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center;
@@ -891,7 +901,11 @@
             <button class="btn btn-red" onclick="closeModal('settingsModal')">Close Menu</button>
         </div>
     </div>
-
+    
+    <div id="flashUndoBanner" class="flash-banner">
+        <span>✅ Cut Saved</span>
+        <button onclick="executeFlashUndo()" style="background:var(--p-pink); color:black; border:none; padding:6px 15px; border-radius:20px; font-weight:800; cursor:pointer; font-size:0.8rem;">UNDO</button>
+    </div>
 
     <script>
         // --- DATA STATE ---
@@ -1399,6 +1413,10 @@
             closeModal('checkoutModal');
             closeModal('viewModal');
             render();
+            
+            // --- NEW: TRIGGER THE FLASH UNDO ---
+            // Grabs the exact index of the receipt we just created
+            triggerFlashUndo(c.id, history.length - 1);
         }
 
         async function smartBook() {
@@ -1508,6 +1526,66 @@
                 const sep = isApple ? '&' : '?';
                 
                 window.location.href = `sms:${phone}${sep}body=${encodeURIComponent(msg)}`;
+            }
+        }
+
+       // --- NEW: FLASH UNDO LOGIC ---
+        let undoTimer = null;
+        let lastHistoryIndex = null;
+
+        function triggerFlashUndo(clientId, histIndex) {
+            lastHistoryIndex = histIndex;
+            const banner = document.getElementById('flashUndoBanner');
+            banner.style.display = 'flex';
+            
+            if(undoTimer) clearTimeout(undoTimer);
+            
+            // Hides the banner automatically after 5 seconds
+            undoTimer = setTimeout(() => {
+                banner.style.display = 'none';
+            }, 5000);
+        }
+
+        function executeFlashUndo() {
+            if(undoTimer) clearTimeout(undoTimer);
+            document.getElementById('flashUndoBanner').style.display = 'none';
+            
+            if (lastHistoryIndex !== null && history[lastHistoryIndex]) {
+                const h = history[lastHistoryIndex];
+                const c = getClient(h.clientId);
+                
+                if(c) {
+                    // Silently reverse the money and cuts
+                    c.spent = Math.max(0, (c.spent || 0) - h.amount);
+                    c.cuts = Math.max(0, (c.cuts || 0) - (h.cutsLogged || 1));
+                    c.giveback = Math.max(0, (c.giveback || 0) - (h.givebackAmt || 0));
+                    
+                    if (h.wasFree) {
+                        c.banked = (c.banked || 0) + 1;
+                    } else if (h.wasCredit) {
+                        c.credit = (c.credit || 0) + 5;
+                    } else {
+                        // Reverse loyalty points cleanly
+                        let pointsToReverse = h.cutsLogged || 1;
+                        while(pointsToReverse > 0) {
+                            if (c.loyalty === 0 && (c.banked || 0) > 0) {
+                                c.banked--;
+                                c.loyalty = 4; // Loops back to 4 points
+                            } else {
+                                c.loyalty = Math.max(0, (c.loyalty || 0) - 1);
+                            }
+                            pointsToReverse--;
+                        }
+                    }
+                }
+                // Erase the receipt from history
+                history.splice(lastHistoryIndex, 1);
+                saveAll();
+                render();
+                
+                // Immediately pop the checkout screen back open!
+                activeId = h.clientId;
+                openCheckout();
             }
         }
 
