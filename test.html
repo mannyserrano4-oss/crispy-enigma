@@ -169,13 +169,25 @@
             background: var(--bg-card); border-radius: 18px; padding: 18px; margin-bottom: 15px;
             box-shadow: var(--shadow); border-left: 6px solid var(--status-good); position: relative;
         }
-        .client-card.due { border-left-color: var(--status-due); }
+                .client-card.due { border-left-color: var(--status-due); }
         .client-card.overdue { 
             border-left-color: var(--status-overdue); 
             animation: overduePulse 2s infinite ease-in-out;
         }
+        
+        /* --- NEW: BLACKLIST CARD STYLE --- */
+        .client-card.blacklisted {
+            background: #ffebee;
+            border-left: 6px solid #d32f2f;
+            opacity: 0.8;
+        }
+        body.dark-mode .client-card.blacklisted {
+            background: #3b1a1a;
+            border-left: 6px solid #ff4d4d;
+        }
 
         @keyframes overduePulse {
+
             0% { border-left-color: var(--status-overdue); }
             50% { border-left-color: rgba(255, 0, 84, 0.2); }
             100% { border-left-color: var(--status-overdue); }
@@ -481,19 +493,25 @@
                 </div>
             </div>
 
-            <button class="btn btn-green" onclick="openCheckout()"><i class="fas fa-cash-register"></i> Record Cut / Checkout</button>
-            <button class="btn btn-ghost" style="color:var(--status-overdue); border-color:var(--status-overdue); margin-top:10px;" onclick="addStrike()">
+                        <button id="btnCheckout" class="btn btn-green" onclick="openCheckout()"><i class="fas fa-cash-register"></i> Record Cut / Checkout</button>
+            <button id="btnAddStrike" class="btn btn-ghost" style="color:var(--status-overdue); border-color:var(--status-overdue); margin-top:10px;" onclick="addStrike()">
                 <i class="fas fa-ban"></i> Record No-Show (Add Strike)
             </button>
             <button id="btnRemStrike" class="btn btn-ghost" style="color:var(--text-sub); border-color:var(--border); margin-top:10px; display:none;" onclick="removeStrike()">
                 <i class="fas fa-eraser"></i> Remove Strike
             </button>
 
-            <button id="btnArchive" class="btn btn-ghost" style="border:none; color:var(--text-sub); font-size:0.9rem; margin-top:10px;" onclick="toggleArchive()">
-                <i class="fas fa-archive"></i> Archive Client (Hide)
-            </button>
+            <div style="display:flex; justify-content:space-between; gap:10px; margin-top:10px;">
+                <button id="btnArchive" class="btn btn-ghost" style="flex:1; border:none; color:var(--text-sub); font-size:0.85rem;" onclick="toggleArchive()">
+                    <i class="fas fa-archive"></i> Archive
+                </button>
+                <button id="btnBlacklist" class="btn btn-ghost" style="flex:1; border:none; color:#d32f2f; font-size:0.85rem; font-weight:800;" onclick="toggleBlacklist()">
+                    <i class="fas fa-skull"></i> Blacklist
+                </button>
+            </div>
             
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px;">
+            <div id="vBottomGrid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px;">
+
                 <button class="btn btn-primary" onclick="openSchedule()"><i class="fas fa-calendar"></i> Schedule</button>
                 <button class="btn btn-ghost" onclick="openInsta()" id="btnInsta"><i class="fab fa-instagram"></i> Instagram</button>
             </div>
@@ -968,12 +986,16 @@
             // -----------------------------------
 
             
-            let filtered = clients.filter(c => {
+                        let filtered = clients.filter(c => {
                 if(search && !c.name.toLowerCase().includes(search.toLowerCase())) return false;
-                if (viewArchives) return c.archived === true;
-                else if (c.archived === true) return false;
+                
+                // --- NEW: Pushes Blacklisted clients to the hidden view ---
+                const isHidden = c.archived || c.blacklisted; 
+                if (viewArchives) return isHidden === true;
+                else if (isHidden === true) return false;
 
                 if(!search && activeFilter === 'due') return getStatus(c) === 'due';
+
                 if(!search && activeFilter === 'overdue') return getStatus(c) === 'overdue';
                 return true;
             });
@@ -1006,12 +1028,17 @@
                 let flags = '';
                 if(c.strikes > 0) flags = ' ' + '🚩'.repeat(Math.min(c.strikes, 3));
 
-                const div = document.createElement('div');
-                div.className = `client-card ${stat}`;
+                                const div = document.createElement('div');
+                // Adds the 'blacklisted' class to paint it red
+                div.className = `client-card ${c.blacklisted ? 'blacklisted' : stat}`;
                 div.onclick = () => showClient(c.id);
+                
+                const skullFlag = c.blacklisted ? ' <span style="color:#d32f2f;">💀 DO NOT CUT</span>' : '';
+                
                 div.innerHTML = `
                     <div class="cc-top">
-                        <div class="cc-name">${c.name} ${badges}${flags}</div>
+                        <div class="cc-name">${c.name} ${badges}${flags}${skullFlag}</div>
+
                         <div class="cc-due">${getDueStr(c)}</div>
                     </div>
                     <div class="cc-info">Last: ${formatPretty(c.last)}</div>
@@ -1108,13 +1135,48 @@
                 } else { navBtn.style.display = 'none'; }
             }
             
-            const arcBtn = document.getElementById('btnArchive');
-            arcBtn.innerHTML = c.archived ? '<i class="fas fa-box-open"></i> Restore Client' : '<i class="fas fa-archive"></i> Archive Client (Hide)';
+                        const arcBtn = document.getElementById('btnArchive');
+            arcBtn.innerHTML = c.archived ? '<i class="fas fa-box-open"></i> Restore' : '<i class="fas fa-archive"></i> Archive';
+
+            const blBtn = document.getElementById('btnBlacklist');
+            blBtn.innerHTML = c.blacklisted ? '<i class="fas fa-undo"></i> Remove Blacklist' : '<i class="fas fa-skull"></i> Blacklist';
+            
+            // --- SECURITY SHUTDOWN IF BLACKLISTED ---
+            const contactLinks = document.querySelectorAll('.c-btn');
+            const chkBtn = document.getElementById('btnCheckout');
+            const formulaBox = document.getElementById('vFormula');
+            
+            if (c.blacklisted) {
+                contactLinks.forEach(link => { link.style.pointerEvents = 'none'; link.style.opacity = '0.3'; });
+                if(chkBtn) chkBtn.style.display = 'none';
+                formulaBox.innerText = "💀 BLACKLISTED: DO NOT BOOK OR CUT THIS CLIENT.";
+                formulaBox.style.color = "#d32f2f";
+                formulaBox.style.borderColor = "#d32f2f";
+            } else {
+                contactLinks.forEach(link => { link.style.pointerEvents = 'auto'; link.style.opacity = '1'; });
+                if(chkBtn) chkBtn.style.display = 'flex';
+                formulaBox.style.color = "var(--p-blue-dark)";
+                formulaBox.style.borderColor = "var(--p-blue)";
+            }
+            // -----------------------------------------
 
             openModal('viewModal');
         }
 
+        async function toggleBlacklist() {
+            const c = getClient(activeId);
+            const action = c.blacklisted ? "Remove from Blacklist?" : "💀 BLACKLIST this client?\n\nThey will be painted red, moved to archives, and all checkout/text buttons will be disabled.";
+            if(await customConfirm(action)) {
+                c.blacklisted = !c.blacklisted;
+                c.archived = false; // Prevents overlapping statuses
+                saveAll(); 
+                closeModal('viewModal'); 
+                render();
+            }
+        }
+
         // --- CHECKOUT & REVENUE ---
+
         function openCheckout() { 
             const c = getClient(activeId); 
             document.getElementById('payPrice').value = c.price || 35; 
