@@ -2204,11 +2204,13 @@
                 <option value="smart_overdue">⏰ Overdue (Lost Clients)</option>
                 <option value="smart_ghost">👻 Ghosts (90+ Days MIA)</option>
                 <option value="smart_vip">👑 VIPs (High Spenders)</option>
-                <option value="smart_bday">🎂 Birthdays This Month (50% Off)</option>
+                                <option value="smart_bday">🎂 Birthdays This Month (50% Off)</option>
                 <option value="smart_anni">🏅 Anniversaries This Month (50% Off)</option>
                 <option value="smart_housecall">🚗 Mobile / House Call Clients</option>
                 <option value="smart_1away">🎟️ 1 Cut Away from Free</option>
+                <option value="smart_wrapped">🎁 End of Year 'Wrapped' Text</option>
             `;
+
             
             buildPromoList();
             openModal('promoModal');
@@ -2233,12 +2235,15 @@
                 msgBox.value = "Yo [Name], giving my top guys first dibs on the schedule for the week. Let me know if you need to lock in a prime spot!";
             } else if (target === 'smart_housecall') {
                 msgBox.value = "Hey [Name], mapping out my mobile cut routes for the week. Let me know if you need me to pull up and get you right! 🚗";
-            } else if (target === 'smart_1away') {
+                        } else if (target === 'smart_1away') {
                 msgBox.value = "Yo [Name]! You are exactly ONE cut away from earning a freebie. Hit me up to grab a spot this week so we can finish off that punch card! 🏆";
+            } else if (target === 'smart_wrapped') {
+                msgBox.value = "Yo [Name], crazy year! You sat in the chair [Cuts] times, got the '[Formula]' down to a science, and were my #[Rank] top client of the year. Appreciate your loyalty, here's $10 off your first cut in January. 💈";
             } else {
                 msgBox.value = "Got a few spots open later this week! Let me know if you need to lock one in. 💈";
             }
             // ------------------------------------------
+
 
             let targets = clients.filter(c => !c.archived && c.phone);
             
@@ -2283,26 +2288,46 @@
                 div.style.borderBottom = '1px solid var(--border)';
                 div.style.transition = 'opacity 0.3s ease'; // Smooth fade out
                 
-                div.innerHTML = `
+                                div.innerHTML = `
                     <div style="font-weight:700;">${c.name}</div>
-                    <button class="btn btn-primary" style="background:var(--p-purple); color:black; width:auto; padding:6px 12px; margin:0; font-size:0.8rem;" onclick="firePromo('${c.phone}', '${first}', this)">Send Text</button>
+                    <button class="btn btn-primary" style="background:var(--p-purple); color:black; width:auto; padding:6px 12px; margin:0; font-size:0.8rem;" onclick="firePromo('${c.phone}', '${first}', this, '${c.id}')">Send Text</button>
                 `;
                 listDiv.appendChild(div);
+
             });
         }
 
-        function firePromo(phone, firstName, btn) {
+                function firePromo(phone, firstName, btn, clientId) {
             let msg = document.getElementById('promoMsg').value;
             msg = msg.replace('[Name]', firstName); 
             
+            // --- NEW: INJECT SPOTIFY WRAPPED STATS ---
+            if (clientId && msg.includes('[Rank]')) {
+                const c = getClient(clientId);
+                if (c) {
+                    // 1. Calculate their rank (Sorts all active clients by LTV)
+                    const activeSpenders = clients.filter(x => !x.archived && !x.blacklisted).sort((a,b) => (b.spent||0) - (a.spent||0));
+                    const rank = activeSpenders.findIndex(x => x.id === c.id) + 1;
+                    
+                    // 2. Format their formula (or fallback if blank)
+                    const formulaText = (c.formula && c.formula.trim() !== '') ? c.formula.toLowerCase() : 'signature look';
+                    
+                    // 3. Swap the tags
+                    msg = msg.replace('[Cuts]', c.cuts || 1);
+                    msg = msg.replace('[Formula]', formulaText);
+                    msg = msg.replace('[Rank]', rank);
+                }
+            }
+            // ------------------------------------------
+
             // --- Visual Anti-Double Send Feedback ---
             btn.innerText = 'Sent ✓';
             btn.style.background = 'var(--bg-card)';
             btn.style.color = 'var(--text-sub)';
             btn.style.border = '1px solid var(--border)';
             btn.style.boxShadow = 'none';
-            btn.onclick = null; // Kills the button so you can't tap it twice
-            btn.parentElement.style.opacity = '0.4'; // Fades out the whole row
+            btn.onclick = null; 
+            btn.parentElement.style.opacity = '0.4'; 
             // ----------------------------------------
             
             const ua = navigator.userAgent.toLowerCase();
@@ -2311,6 +2336,7 @@
             
             window.location.href = `sms:${phone}${sep}body=${encodeURIComponent(msg)}`;
         }
+
         
         // --- NEW QR HUB LOGIC ---
         function openQrMenu() {
