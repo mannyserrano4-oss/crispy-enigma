@@ -786,55 +786,69 @@
         </div>
     </div>
 
-    <div id="settingsModal" class="overlay">
+        <div id="settingsModal" class="overlay">
         <div class="sheet">
-            <h3>Settings</h3>
-            <label>Shop Location</label>
-            <input type="text" id="setLoc" placeholder="Address">
-            <button class="btn btn-primary" onclick="saveSettings()">Save</button>
+            <h2 style="margin-top:0; margin-bottom: 20px; font-size:1.8rem;">⚙️ Settings</h2>
             
-            <hr style="border-color:var(--border); margin:20px 0;">
-            
-            <button class="btn btn-green" onclick="openHistory()">View Transaction History</button>
-            <button class="btn btn-green" style="background:var(--p-purple); color:black;" onclick="openStats()">View Revenue Stats</button>
-            <button class="btn btn-ghost" onclick="toggleArchiveMode()"><span id="archiveLabel">View Archived Clients</span></button>
-            
-            <hr style="border-color:var(--border); margin:20px 0;">
-            
-            <button class="btn btn-primary" onclick="exportRobustExcel()">
-                <i class="fas fa-file-excel"></i> Download Visual Report (.html)
-            </button>
-            <button class="btn btn-ghost" onclick="exportHistoryCSV()">
-                <i class="fas fa-table"></i> Download Transaction CSV (Tax)
-            </button>
-            <button class="btn btn-teal" onclick="exportSimpleCSV()">
-                <i class="fas fa-user-tag"></i> Download Client List CSV
-            </button>
-            <button class="btn btn-indigo" style="border: 2px solid var(--p-green-dark); color:var(--p-green-dark);" onclick="exportData()">
-                <i class="fas fa-save"></i> Save Full Backup (.json)
-            </button>
+            <h4 style="margin: 0 0 8px 5px; color:var(--text-sub); text-transform:uppercase; font-size:0.75rem; letter-spacing:1px;">Dashboard & Analytics</h4>
+            <div style="background:var(--input-bg); border: 1px solid var(--border); border-radius: 16px; padding: 15px; margin-bottom: 25px;">
+                <button class="btn btn-green" style="background:var(--p-purple); color:black;" onclick="openStats()"><i class="fas fa-chart-line"></i> View Revenue Stats</button>
+                <button class="btn btn-green" onclick="openHistory()"><i class="fas fa-list"></i> Transaction History</button>
+                <button class="btn btn-ghost" style="margin-bottom:0; border-color:var(--border);" onclick="toggleArchiveMode()"><i class="fas fa-archive"></i> <span id="archiveLabel">View Archived Clients</span></button>
+            </div>
 
-            <hr style="border-color:var(--border); margin:20px 0;">
-            
-            <h4 style="margin-bottom:10px; color:var(--text-main);">Global Price Update</h4>
-            <div style="background:var(--input-bg); padding:15px; border-radius:15px; border:1px solid var(--border); margin-bottom:20px;">
-                <label>New Base Price ($)</label>
-                <input type="number" id="setNewPrice" placeholder="e.g. 40" style="margin-bottom:10px;" inputmode="decimal">
+            <h4 style="margin: 0 0 8px 5px; color:var(--text-sub); text-transform:uppercase; font-size:0.75rem; letter-spacing:1px;">Shop Management</h4>
+            <div style="background:var(--input-bg); border: 1px solid var(--border); border-radius: 16px; padding: 15px; margin-bottom: 25px;">
+                <label>📍 Shop Location (For Calendar)</label>
+                <div style="display:flex; gap:10px; margin-bottom:25px;">
+                    <input type="text" id="setLoc" placeholder="Address" style="margin-bottom:0;">
+                    <button class="btn btn-primary" style="width:auto; margin-bottom:0; padding:0 20px;" onclick="saveSettings()">Save</button>
+                </div>
+
+                <label>🏷️ Global Price Update</label>
+                <input type="number" id="setNewPrice" placeholder="New Base Price (e.g. 40)" style="margin-bottom:10px;" inputmode="decimal">
                 
                 <label style="display:flex; align-items:center; gap:10px; margin-bottom:15px; text-transform:none; color:var(--text-main);">
                     <input type="checkbox" id="setGrandfather" style="width:20px; height:20px; margin:0;" checked>
-                    <span style="font-size:0.85rem; font-weight:700;">Grandfather VIPs (Keep Top Spenders at current price)</span>
+                    <span style="font-size:0.85rem; font-weight:700;">Grandfather VIPs ($200+ LTV)</span>
                 </label>
                 
-                <button class="btn btn-primary" style="padding:12px; margin:0;" onclick="massPriceUpdate()">Update All Prices</button>
+                <button class="btn btn-primary" style="padding:12px; margin:0;" onclick="massPriceUpdate()">Apply Price Update</button>
             </div>
-            
-            <hr style="border-color:var(--border); margin:20px 0;">
-            <input type="file" id="restoreFile" hidden onchange="restoreData(this)">
-            <button class="btn btn-orange" onclick="document.getElementById('restoreFile').click()">Restore From Backup</button>
-            <button class="btn btn-red" onclick="closeModal('settingsModal')">Close</button>
+
+            <details style="background:var(--bg-card); border: 2px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                <summary style="font-weight: 800; color: var(--text-main); font-size:1.1rem; outline: none; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center;">
+                    <span><i class="fas fa-database" style="color:var(--p-blue-dark); margin-right:8px;"></i> Data & Backups</span>
+                    <i class="fas fa-chevron-down" style="color:var(--text-sub); font-size:0.9rem;"></i>
+                </summary>
+                
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="exportRobustExcel()">
+                        <i class="fas fa-file-excel"></i> Download Visual Report (.html)
+                    </button>
+                    <button class="btn btn-ghost" onclick="exportHistoryCSV()">
+                        <i class="fas fa-table"></i> Download Transaction CSV (Tax)
+                    </button>
+                    <button class="btn btn-teal" onclick="exportSimpleCSV()">
+                        <i class="fas fa-user-tag"></i> Download Client List CSV
+                    </button>
+                    
+                    <hr style="border-color:var(--border); margin:20px 0;">
+                    
+                    <button class="btn btn-indigo" style="border: 2px solid var(--p-green-dark); color:var(--p-green-dark);" onclick="exportData()">
+                        <i class="fas fa-download"></i> Save Full Backup (.json)
+                    </button>
+                    <input type="file" id="restoreFile" hidden onchange="restoreData(this)">
+                    <button class="btn btn-orange" style="margin-bottom:0;" onclick="document.getElementById('restoreFile').click()">
+                        <i class="fas fa-upload"></i> Restore From Backup
+                    </button>
+                </div>
+            </details>
+
+            <button class="btn btn-red" onclick="closeModal('settingsModal')">Close Menu</button>
         </div>
     </div>
+
 
     <script>
         // --- DATA STATE ---
