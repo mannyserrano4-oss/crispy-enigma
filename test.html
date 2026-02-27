@@ -2245,11 +2245,15 @@
             // ------------------------------------------
 
 
-            let targets = clients.filter(c => !c.archived && c.phone);
+                        // --- NEW: Excludes both archives AND blacklisted guys ---
+            let targets = clients.filter(c => !c.archived && !c.blacklisted && c.phone);
             
             // Apply Smart Filters
-            if (target === 'smart_overdue') {
+            if (target === 'smart_wrapped') {
+                // Do nothing! We want everyone active to be in the Wrapped list.
+            } else if (target === 'smart_overdue') {
                 targets = targets.filter(c => getStatus(c) === 'overdue');
+
             } else if (target === 'smart_ghost') {
                 const today = new Date();
                 targets = targets.filter(c => {
