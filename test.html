@@ -1118,6 +1118,9 @@
             clients.forEach(c => {
                 if (c.archived || c.blacklisted || !c.last || !c.phone) return;
                 
+                // NEW: Skips them if we already checked in for their most recent cut!
+                if (c.lastCheckIn === c.last) return;
+                
                 const lastDate = new Date(c.last + 'T00:00:00');
                 const diffDays = Math.floor((todayDate - lastDate) / (1000 * 60 * 60 * 24));
                 
@@ -1128,7 +1131,7 @@
                     listDiv.innerHTML += `
                         <div style="background:rgba(255,255,255,0.15); padding:10px 15px; border-radius:12px; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                             <span style="color:#fff; font-weight:700; font-size:0.95rem;">${c.name}</span>
-                            <button class="btn" style="background:#fff; color:var(--p-blue-dark); width:auto; padding:6px 15px; margin:0; font-size:0.8rem; box-shadow:none;" onclick="fireConcierge('${c.phone}', '${first}', this)">Text</button>
+                            <button class="btn" style="background:#fff; color:var(--p-blue-dark); width:auto; padding:6px 15px; margin:0; font-size:0.8rem; box-shadow:none;" onclick="fireConcierge('${c.phone}', '${first}', this, '${c.id}')">Text</button>
                         </div>
                     `;
                 }
@@ -1137,11 +1140,26 @@
             box.style.display = found > 0 ? 'block' : 'none';
         }
 
-        function fireConcierge(phone, first, btn) {
+        function fireConcierge(phone, first, btn, clientId) {
             const msg = `Yo ${first}, just checking in to make sure that cut is still sitting right and styling easy for you.`;
+            
+            // --- NEW: Save the check-in stamp to memory ---
+            const c = getClient(clientId);
+            if(c) {
+                c.lastCheckIn = c.last; // Locks it to this specific haircut date
+                saveAll();
+            }
+            // ----------------------------------------
+            
             btn.innerText = 'Sent ✓';
             btn.style.opacity = '0.5';
             btn.style.pointerEvents = 'none';
+            
+            // Automatically hides their name from the radar after 1.5 seconds!
+            setTimeout(() => {
+                btn.parentElement.style.display = 'none';
+            }, 1500);
+            
             const ua = navigator.userAgent.toLowerCase();
             const sep = (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1) ? '&' : '?';
             window.location.href = `sms:${phone}${sep}body=${encodeURIComponent(msg)}`;
