@@ -446,6 +446,13 @@
         </div>
     </div>
 
+    <div id="conciergeBox" style="display:none; margin: 15px 20px 0 20px; background: linear-gradient(135deg, var(--p-blue-dark) 0%, #3a7bd5 100%); border-radius: 16px; padding: 15px; box-shadow: 0 4px 15px rgba(100, 149, 237, 0.4);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <span style="color:#fff; font-weight:800; font-size:1.1rem;"><i class="fas fa-concierge-bell"></i> 48-Hr Quality Check</span>
+        </div>
+        <div id="conciergeList"></div>
+    </div>
+
     <div id="list" class="client-list"></div>
 
     <div class="footer-bar">
@@ -678,6 +685,15 @@
                     <label style="color:var(--p-purple-dark); margin-bottom:5px;">💡 Icebreaker (Ask next time)</label>
                     <input type="text" id="eIcebreaker" placeholder="e.g. Ask how the Mexico trip was" style="border-color:var(--p-gold); background:#fffde7;">
                     
+                    <label style="margin-top:10px;">Acquisition Source</label>
+                    <select id="eSource" style="margin-bottom:15px; border-color:var(--p-purple);">
+                        <option value="Unknown">Unknown / Walk-In</option>
+                        <option value="Instagram">Instagram</option>
+                        <option value="Word of Mouth">Word of Mouth / Referral</option>
+                        <option value="Google">Google / Maps</option>
+                        <option value="Other">Other</option>
+                    </select>
+
                     <input type="text" id="eRef" placeholder="Referred By..." oninput="searchRef(this.value)">
                     <div id="refResults" style="background:var(--bg-card); display:none; border:1px solid var(--border); padding:10px;"></div>
                     
@@ -1074,10 +1090,9 @@
                 
                 const skullFlag = c.blacklisted ? ' <span style="color:#d32f2f;">💀 DO NOT CUT</span>' : '';
                 
-                div.innerHTML = `
+               div.innerHTML = `
                     <div class="cc-top">
                         <div class="cc-name">${c.name} ${badges}${flags}${skullFlag}</div>
-
                         <div class="cc-due">${getDueStr(c)}</div>
                     </div>
                     <div class="cc-info">Last: ${formatPretty(c.last)}</div>
@@ -1085,7 +1100,53 @@
                 `;
                 list.appendChild(div);
             });
+            
+            renderConcierge(); // Fires the 48-hour check
         }
+
+        // --- NEW: 48-HOUR CONCIERGE LOGIC ---
+        function renderConcierge() {
+            const box = document.getElementById('conciergeBox');
+            const listDiv = document.getElementById('conciergeList');
+            if (!box) return;
+            
+            listDiv.innerHTML = '';
+            const todayStr = getTodayIso();
+            const todayDate = new Date(todayStr + 'T00:00:00');
+            
+            let found = 0;
+            clients.forEach(c => {
+                if (c.archived || c.blacklisted || !c.last || !c.phone) return;
+                
+                const lastDate = new Date(c.last + 'T00:00:00');
+                const diffDays = Math.floor((todayDate - lastDate) / (1000 * 60 * 60 * 24));
+                
+                // Exactly 2 days ago!
+                if (diffDays === 2) {
+                    found++;
+                    const first = c.name.split(' ')[0];
+                    listDiv.innerHTML += `
+                        <div style="background:rgba(255,255,255,0.15); padding:10px 15px; border-radius:12px; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                            <span style="color:#fff; font-weight:700; font-size:0.95rem;">${c.name}</span>
+                            <button class="btn" style="background:#fff; color:var(--p-blue-dark); width:auto; padding:6px 15px; margin:0; font-size:0.8rem; box-shadow:none;" onclick="fireConcierge('${c.phone}', '${first}', this)">Text</button>
+                        </div>
+                    `;
+                }
+            });
+            
+            box.style.display = found > 0 ? 'block' : 'none';
+        }
+
+        function fireConcierge(phone, first, btn) {
+            const msg = `Yo ${first}, just checking in to make sure that cut is still sitting right and styling easy for you.`;
+            btn.innerText = 'Sent ✓';
+            btn.style.opacity = '0.5';
+            btn.style.pointerEvents = 'none';
+            const ua = navigator.userAgent.toLowerCase();
+            const sep = (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1) ? '&' : '?';
+            window.location.href = `sms:${phone}${sep}body=${encodeURIComponent(msg)}`;
+        }
+        // ------------------------------------
 
         function showClient(id) {
             activeId = id;
@@ -1666,7 +1727,7 @@
             });
             html += '</div>';
 
-            // 3. Past Years Summary (Only shows if you have data from last year)
+           // 3. Past Years Summary (Only shows if you have data from last year)
             if (Object.keys(pastYears).length > 0) {
                 html += `<h4 style="margin-bottom:10px; color:var(--text-main);">Past Years</h4><div class="v-grid">`;
                 Object.keys(pastYears).sort().reverse().forEach(y => {
@@ -1674,6 +1735,26 @@
                 });
                 html += `</div>`;
             }
+
+            // --- NEW: ACQUISITION ROI HEATMAP ---
+            let sources = { 'Instagram': 0, 'Word of Mouth': 0, 'Google': 0, 'Unknown': 0, 'Other': 0 };
+            clients.forEach(c => {
+                if (c.archived || c.blacklisted) return;
+                const src = c.source || 'Unknown';
+                if (sources[src] !== undefined) sources[src] += (c.spent || 0);
+                else sources['Other'] += (c.spent || 0);
+            });
+            
+            html += `<h4 style="margin-top:25px; margin-bottom:10px; color:var(--text-main);">🎯 Marketing ROI (LTV)</h4>`;
+            html += `<div class="v-grid" style="grid-template-columns: 1fr 1fr; gap:10px;">`;
+            // Sorts them so your highest money-maker is always top left
+            Object.keys(sources).sort((a,b) => sources[b] - sources[a]).forEach(s => {
+                if (sources[s] > 0) {
+                    html += `<div class="v-box" style="padding:12px 5px;"><span class="v-big" style="font-size:1.1rem; color:var(--p-blue-dark);">$${sources[s].toFixed(0)}</span><span style="font-size:0.7rem;">${s}</span></div>`;
+                }
+            });
+            html += `</div>`;
+            // ------------------------------------
 
             // --- NEW: TOP PROMOTERS LEADERBOARD ---
             let refCounts = {};
@@ -1965,6 +2046,7 @@
             document.getElementById('eEmail').value = ''; 
             document.getElementById('eAddr').value = ''; 
             document.getElementById('eRef').value = ''; 
+            document.getElementById('eSource').value = 'Unknown'; // Default for new guys
             document.getElementById('eNotes').value = ''; 
             document.getElementById('eIcebreaker').value = ''; 
             document.getElementById('eFormula').value = ''; 
@@ -2000,6 +2082,7 @@
             document.getElementById('eFreq').value = c.freq; 
             document.getElementById('eFirst').value = c.first; 
             document.getElementById('eDob').value = c.dob; 
+            document.getElementById('eSource').value = c.source || 'Unknown';
             document.getElementById('eRef').value = c.refBy || ''; 
             document.getElementById('eNotes').value = c.notes; 
             document.getElementById('eIcebreaker').value = c.icebreaker || '';
@@ -2044,6 +2127,8 @@
             cleanName = cleanName.replace(/\b\w/g, char => char.toUpperCase());
             // ------------------------------------------------
 
+            // ------------------------------------------------
+
             const data = { 
                 id: id, name: cleanName, phone: document.getElementById('ePhone').value, 
                 insta: document.getElementById('eInsta').value, email: document.getElementById('eEmail').value, 
@@ -2051,6 +2136,7 @@
                 freq: parseInt(document.getElementById('eFreq').value), first: formFirst, dob: document.getElementById('eDob').value, 
                 refBy: refName, notes: document.getElementById('eNotes').value, icebreaker: document.getElementById('eIcebreaker').value,
                 formula: document.getElementById('eFormula').value, tags: selectedTags,
+                source: document.getElementById('eSource').value, // NEW: Saves where they came from
                 credit: isNew ? creditAdd : getClient(id).credit, 
                 banked: parseInt(document.getElementById('eBanked').value) || 0, 
                 loyalty: parseInt(document.getElementById('eLoyalty').value) || 0, 
