@@ -694,6 +694,11 @@
                         <option value="Other">Other</option>
                     </select>
 
+                    <label style="display:flex; align-items:center; gap:10px; margin-bottom:15px; color:var(--text-main); text-transform:none;">
+                        <input type="checkbox" id="eComedy" style="width:20px; height:20px; margin:0;">
+                        <span style="font-size:0.85rem; font-weight:700; color:var(--p-purple-dark);">🎭 Add to Comedy Show Invites</span>
+                    </label>
+
                     <input type="text" id="eRef" placeholder="Referred By..." oninput="searchRef(this.value)">
                     <div id="refResults" style="background:var(--bg-card); display:none; border:1px solid var(--border); padding:10px;"></div>
                     
@@ -2064,7 +2069,8 @@
             document.getElementById('eEmail').value = ''; 
             document.getElementById('eAddr').value = ''; 
             document.getElementById('eRef').value = ''; 
-            document.getElementById('eSource').value = 'Unknown'; // Default for new guys
+           document.getElementById('eSource').value = 'Unknown'; // Default for new guys
+            document.getElementById('eComedy').checked = false; // Default for new guys
             document.getElementById('eNotes').value = ''; 
             document.getElementById('eIcebreaker').value = ''; 
             document.getElementById('eFormula').value = ''; 
@@ -2101,6 +2107,7 @@
             document.getElementById('eFirst').value = c.first; 
             document.getElementById('eDob').value = c.dob; 
             document.getElementById('eSource').value = c.source || 'Unknown';
+            document.getElementById('eComedy').checked = c.comedyList || false;
             document.getElementById('eRef').value = c.refBy || ''; 
             document.getElementById('eNotes').value = c.notes; 
             document.getElementById('eIcebreaker').value = c.icebreaker || '';
@@ -2152,9 +2159,10 @@
                 insta: document.getElementById('eInsta').value, email: document.getElementById('eEmail').value, 
                 address: document.getElementById('eAddr').value, price: parseFloat(document.getElementById('ePrice').value), 
                 freq: parseInt(document.getElementById('eFreq').value), first: formFirst, dob: document.getElementById('eDob').value, 
-                refBy: refName, notes: document.getElementById('eNotes').value, icebreaker: document.getElementById('eIcebreaker').value,
+               refBy: refName, notes: document.getElementById('eNotes').value, icebreaker: document.getElementById('eIcebreaker').value,
                 formula: document.getElementById('eFormula').value, tags: selectedTags,
                 source: document.getElementById('eSource').value, // NEW: Saves where they came from
+                comedyList: document.getElementById('eComedy').checked, // NEW: Saves Comedy VIP status
                 credit: isNew ? creditAdd : getClient(id).credit, 
                 banked: parseInt(document.getElementById('eBanked').value) || 0, 
                 loyalty: parseInt(document.getElementById('eLoyalty').value) || 0, 
@@ -2310,9 +2318,10 @@
                 <option value="smart_vip">👑 VIPs (High Spenders)</option>
                                 <option value="smart_bday">🎂 Birthdays This Month (50% Off)</option>
                 <option value="smart_anni">🏅 Anniversaries This Month (50% Off)</option>
-                <option value="smart_housecall">🚗 Mobile / House Call Clients</option>
+               <option value="smart_housecall">🚗 Mobile / House Call Clients</option>
                 <option value="smart_1away">🎟️ 1 Cut Away from Free</option>
                 <option value="smart_wrapped">🎁 End of Year 'Wrapped' Text</option>
+                <option value="smart_comedy">🎙️ Comedy Show Invites</option>
             `;
 
             
@@ -2343,18 +2352,21 @@
                 msgBox.value = "Yo [Name]! You are exactly ONE cut away from earning a freebie. Hit me up to grab a spot this week so we can finish off that punch card! 🏆";
             } else if (target === 'smart_wrapped') {
                 msgBox.value = "Yo [Name], crazy year! You sat in the chair [Cuts] times, got the '[Formula]' down to a science, and were my #[Rank] top client of the year. Appreciate your loyalty, here's $10 off your first cut in January. 💈";
+            } else if (target === 'smart_comedy') {
+                msgBox.value = "Yo [Name]! I'm hopping on stage this [Day] at [Venue]. I'm [Hosting / Doing a Guest Spot], would love to see you in the crowd! Let me know if you want the ticket link. 🎤";
             } else {
                 msgBox.value = "Got a few spots open later this week! Let me know if you need to lock one in. 💈";
             }
             // ------------------------------------------
 
-
-                        // --- NEW: Excludes both archives AND blacklisted guys ---
+            // --- NEW: Excludes both archives AND blacklisted guys ---
             let targets = clients.filter(c => !c.archived && !c.blacklisted && c.phone);
             
             // Apply Smart Filters
             if (target === 'smart_wrapped') {
                 // Do nothing! We want everyone active to be in the Wrapped list.
+            } else if (target === 'smart_comedy') {
+                targets = targets.filter(c => c.comedyList === true);
             } else if (target === 'smart_overdue') {
                 targets = targets.filter(c => getStatus(c) === 'overdue');
 
