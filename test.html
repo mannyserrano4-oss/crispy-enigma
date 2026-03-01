@@ -1564,9 +1564,10 @@
             
             // --- NEW: Locks the specific 50% discount so it can't be used twice a year ---
             const cutYear = parseInt(document.getElementById('payDate').value.split('-')[0]); // Safe Year extraction prevents UTC Timezone bugs
-            const prevBday = c.lastBdayYear; // Saves state for Undo
-            const prevAnni = c.lastAnniYear;
-            const prevLastDate = c.last; // Prevents "Last Cut" radar corruption if undone
+            // Must force 'null' instead of 'undefined' so JSON stringify doesn't erase the key!
+            const prevBday = c.lastBdayYear === undefined ? null : c.lastBdayYear; 
+            const prevAnni = c.lastAnniYear === undefined ? null : c.lastAnniYear;
+            const prevLastDate = c.last === undefined ? null : c.last;
             
             if(selectedDisc === 'bdayHalf') {
                 c.lastBdayYear = cutYear;
@@ -2290,7 +2291,13 @@
         }
 
         function showCrashScreen(msg) { const m = document.getElementById('crashModal'); document.getElementById('crashMsg').innerText = msg; m.style.display = 'flex'; }
-        function emergencyCopy() { const raw = localStorage.getItem('bbClients'); if(navigator.clipboard) { navigator.clipboard.writeText(raw).then(() => alert("Copied!")); } else { prompt("Copy:", raw); } }
+        function emergencyCopy() { 
+            const c = localStorage.getItem('bbClients') || '[]'; 
+            const h = localStorage.getItem('bbHistory') || '[]'; 
+            const s = localStorage.getItem('bbSettings') || '{}'; 
+            const raw = JSON.stringify({clients: JSON.parse(c), history: JSON.parse(h), settings: JSON.parse(s)}); 
+            if(navigator.clipboard) { navigator.clipboard.writeText(raw).then(() => alert("Full Backup Copied!")); } else { prompt("Copy Full Backup:", raw); } 
+        }
         function factoryReset() { if(confirm("This deletes everything. Sure?")) { localStorage.clear(); location.reload(); } }
         
         function addOpt(parent, val, label, selected = false) { 
@@ -2368,11 +2375,11 @@
             document.getElementById('ePhone').value = c.phone; 
             document.getElementById('eInsta').value = c.insta; 
             document.getElementById('eEmail').value = c.email || ''; 
-            document.getElementById('ePrice').value = c.price; 
-            document.getElementById('eAddr').value = c.address; 
-            document.getElementById('eFreq').value = c.freq; 
-            document.getElementById('eFirst').value = c.first; 
-            document.getElementById('eDob').value = c.dob; 
+           document.getElementById('ePrice').value = c.price || 35; 
+            document.getElementById('eAddr').value = c.address || ''; 
+            document.getElementById('eFreq').value = c.freq || 4; 
+            document.getElementById('eFirst').value = c.first || ''; 
+            document.getElementById('eDob').value = c.dob || ''; 
             document.getElementById('eSource').value = c.source || 'Unknown';
             document.getElementById('eComedy').checked = c.comedyList || false;
             document.getElementById('eRef').value = c.refBy || ''; 
@@ -2410,7 +2417,7 @@
                 if(referee) { 
                     referee.credit = (referee.credit || 0) + 5; 
                     creditAdd = 5; 
-                    await customConfirm(`Linked to ${referee.name}! $5 added to both.`); 
+                    alert(`✅ Linked to ${referee.name}! $5 added to both accounts.`); 
                 } else {
                     alert(`Note: No client found named "${refName}". No referral credit applied.`);
                 }
