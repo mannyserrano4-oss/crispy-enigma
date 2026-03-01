@@ -1022,12 +1022,15 @@
         }
 
         // --- PERFORMANCE FIX: Decouple Math from Rendering ---
-        function render(search = '') {
+        function render(search = null) {
+            // If no search term is explicitly passed, grab whatever is currently in the search bar
+            const currentSearch = search !== null ? search : (document.querySelector('.search-input').value || '');
+            
             // Only recalculate metrics if NOT searching
-            if (!search) {
+            if (!currentSearch) {
                 updateMetrics();
             }
-            renderList(search);
+            renderList(currentSearch);
         }
 
         function handleSearch(val) {
@@ -2094,7 +2097,7 @@
             } else div.style.display='none'; 
         }
 
-        function openSchedule() { openModal('schedModal'); }
+        function openSchedule() {              // Pre-fills with today's date/time to prevent Invalid Date crash             const now = new Date();             const y = now.getFullYear();             const m = String(now.getMonth() + 1).padStart(2, '0');             const d = String(now.getDate()).padStart(2, '0');             const h = String(now.getHours()).padStart(2, '0');             const min = String(now.getMinutes()).padStart(2, '0');             document.getElementById('schedDate').value = `${y}-${m}-${d}T${h}:${min}`;             openModal('schedModal');          }
         function openSettings() { openModal('settingsModal'); }
         
         function openHistory() { 
@@ -2399,7 +2402,11 @@
             } 
         }
         
-        async function addStrike() { 
+        async saveAll(); 
+                render(); 
+                showClient(activeId); // Refreshes the UI to immediately show the new fee
+            } 
+        } { 
             const c = getClient(activeId); 
             if(await customConfirm(`Mark ${c.name} as a No-Show? \n\nAdds a Strike 🚩.`)) { 
                 c.strikes = (c.strikes || 0) + 1; 
@@ -2415,9 +2422,11 @@
                     }
                 }
                 
-                saveAll(); 
-                closeModal('viewModal'); 
+               saveAll(); 
                 render(); 
+                showClient(activeId); // Refreshes the UI to immediately show the new fee
+            } 
+        }
             } 
         }
 
