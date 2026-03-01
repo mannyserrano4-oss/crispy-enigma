@@ -1525,6 +1525,7 @@
             document.getElementById('chkFeeBox').style.display = 'none';
             if (!c.deposit || c.deposit <= 0) document.getElementById('chkLedgerBox').style.display = 'none';
             calcTotal();
+            saveAll(); // Ensure it actually saves the waiver to the database
         }
 
         async function finalizeCut() {
@@ -2365,9 +2366,16 @@
             saveAll(); closeModal('editModal'); render(); 
         }
         
-        async function deleteClient() {              if(await customConfirm("Permanently delete this client? 
-
-This will also erase their transaction history.")) {                  const idToDelete = document.getElementById('eId').value;                 clients = clients.filter(c => c.id !== idToDelete);                  history = history.filter(h => h.clientId !== idToDelete);                  saveAll();                  closeModal('editModal');                  render();              }          }
+        async function deleteClient() { 
+            if(await customConfirm("Permanently delete this client?\n\nThis will also erase their transaction history.")) { 
+                const idToDelete = document.getElementById('eId').value;
+                clients = clients.filter(c => c.id !== idToDelete); 
+                history = history.filter(h => h.clientId !== idToDelete); 
+                saveAll(); 
+                closeModal('editModal'); 
+                render(); 
+            } 
+        }
         
         async function addStrike() { 
             const c = getClient(activeId); 
@@ -2788,10 +2796,12 @@ This will also erase their transaction history.")) {                  const idTo
                 });
             }
             
-            if (navigator.clipboard) {
+            if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(text).then(() => {
                     alert("Daily Roster & Pipeline copied!");
-                }).catch(err => alert("Failed to copy."));
+                }).catch(() => prompt("Browser blocked auto-copy. Copy manually:", text));
+            } else {
+                prompt("Browser blocked auto-copy. Copy manually:", text);
             }
         }
 
