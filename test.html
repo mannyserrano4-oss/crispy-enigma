@@ -2030,6 +2030,31 @@
         function isMonth(d) { if(!d) return false; const [y, m] = d.split('-'); return parseInt(m) - 1 === new Date().getMonth(); }
         function isAnniversary(d) { if(!d) return false; const [y, m] = d.split('-'); const now = new Date(); return parseInt(m) - 1 === now.getMonth() && parseInt(y) !== now.getFullYear(); }
         function openInsta() { const c = getClient(activeId); if(c.insta) window.open(`https://instagram.com/${c.insta.replace('@','')}`); }
+        
+        function copyInsta() {
+            const instaDisp = document.getElementById('vInstaDisplay');
+            const handle = instaDisp.dataset.handle;
+            if (handle && navigator.clipboard) {
+                navigator.clipboard.writeText(handle).then(() => {
+                    alert("Instagram handle copied!");
+                }).catch(err => console.error("Clipboard failed", err));
+            }
+        }
+
+        function copyRoster() {
+            const activeClients = clients.filter(c => !c.archived && !c.blacklisted);
+            if (activeClients.length === 0) return alert("No active clients to copy.");
+            
+            const rosterList = activeClients.map(c => c.name).join('\n');
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(rosterList).then(() => {
+                    alert("Client roster copied to clipboard!");
+                });
+            } else {
+                alert("Clipboard API not supported on this browser.");
+            }
+        }
+
         let isConfirmOpen = false;
         function customConfirm(msg) { 
             if (isConfirmOpen) return Promise.resolve(false);
