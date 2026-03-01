@@ -747,7 +747,6 @@
                     <p style="font-size: 0.65rem; color: var(--text-sub); margin: 0; font-style: italic;">
                         *Use this to manually fix mistakes. 5 points automatically = 1 Banked Cut.
                     </p>
-                    </p>
                 </div>
 
                 <button class="btn btn-primary">Save Client</button>
@@ -2366,7 +2365,9 @@
             saveAll(); closeModal('editModal'); render(); 
         }
         
-        async function deleteClient() { if(await customConfirm("Permanently delete this client?")) { clients = clients.filter(c => c.id !== document.getElementById('eId').value); saveAll(); closeModal('editModal'); render(); } }
+        async function deleteClient() {              if(await customConfirm("Permanently delete this client? 
+
+This will also erase their transaction history.")) {                  const idToDelete = document.getElementById('eId').value;                 clients = clients.filter(c => c.id !== idToDelete);                  history = history.filter(h => h.clientId !== idToDelete);                  saveAll();                  closeModal('editModal');                  render();              }          }
         
         async function addStrike() { 
             const c = getClient(activeId); 
@@ -2745,12 +2746,13 @@
 
         function copyInsta() {
             const handle = document.getElementById('vInstaDisplay').dataset.handle;
-            if(handle && navigator.clipboard) {
+            if(!handle) return;
+            if(navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(handle).then(() => {
                     alert("Instagram handle copied for tagging!");
-                }).catch(err => {
-                    alert("Failed to copy. Your browser might not support it.");
-                });
+                }).catch(() => prompt("Browser blocked auto-copy. Copy manually:", handle));
+            } else {
+                prompt("Browser blocked auto-copy. Copy manually:", handle);
             }
         }
 
