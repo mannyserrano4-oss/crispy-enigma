@@ -1577,11 +1577,19 @@
                 givebackAmt: totals.giveback,
                 cutsLogged: totalCutsThisSession, // Tells undo how many to subtract
                 clearedFee: c.pendingFee || 0, // Saves it just in case of undo
+                clearedFeeReason: c.feeReason || "",
                 clearedDep: c.deposit || 0
             });
             
-            // --- NEW: CLEAR LEDGER ---
-            const cutCostWithFees = (totalBase - discount) + tip + c.pendingFee;
+           // --- NEW: CLEAR LEDGER ---
+            const primary = parseFloat(document.getElementById('payPrice').value) || 0;
+            const tip = parseFloat(document.getElementById('payTip').value) || 0;
+            let extraTotal = 0;
+            document.querySelectorAll('.extra-cut-price').forEach(inp => extraTotal += parseFloat(inp.value) || 0);
+            const totalBase = primary + extraTotal;
+            const discount = totals.giveback;
+
+            const cutCostWithFees = (totalBase - discount) + tip + (c.pendingFee || 0);
             c.pendingFee = 0;
             c.feeReason = "";
             c.deposit = c.deposit > cutCostWithFees ? c.deposit - cutCostWithFees : 0;
@@ -1778,7 +1786,10 @@
                     }
                     
                     // --- NEW: RESTORE LEDGER ON UNDO ---
-                    if (h.clearedFee) c.pendingFee = h.clearedFee;
+                    if (h.clearedFee) {
+                        c.pendingFee = h.clearedFee;
+                        c.feeReason = h.clearedFeeReason || "Restored Fee";
+                    }
                     if (h.clearedDep) c.deposit = h.clearedDep;
                 }
                 // Erase the receipt from history
@@ -1821,8 +1832,11 @@
                         pointsToReverse--;
                     }
                     
-                    // --- NEW: RESTORE LEDGER ON UNDO ---
-                    if (h.clearedFee) c.pendingFee = h.clearedFee;
+                   // --- NEW: RESTORE LEDGER ON UNDO ---
+                    if (h.clearedFee) {
+                        c.pendingFee = h.clearedFee;
+                        c.feeReason = h.clearedFeeReason || "Restored Fee";
+                    }
                     if (h.clearedDep) c.deposit = h.clearedDep;
                 }
                 history.splice(idx, 1);
@@ -2365,8 +2379,10 @@
                 pendingFee: isNew ? 0 : (getClient(id).pendingFee || 0),
                 feeReason: isNew ? "" : (getClient(id).feeReason || ""),
                 deposit: isNew ? 0 : (getClient(id).deposit || 0),
-                lastCheckIn: isNew ? "" : (getClient(id).lastCheckIn || "")
-            }; 
+                lastCheckIn: isNew ? "" : (getClient(id).lastCheckIn || ""),
+                lastBdayYear: isNew ? null : getClient(id).lastBdayYear,
+                lastAnniYear: isNew ? null : getClient(id).lastAnniYear
+            };
             if(isNew) clients.push(data); 
             else { const idx = clients.findIndex(x => x.id === id); clients[idx] = data; } 
             saveAll(); closeModal('editModal'); render(); 
@@ -2734,6 +2750,7 @@
         }
         
         function restoreData(input) {
+            if (!input.files || input.files.length === 0) return;
             const r = new FileReader();
             r.onload = (e) => {
                 try {
