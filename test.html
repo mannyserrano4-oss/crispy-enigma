@@ -843,24 +843,20 @@
         </div>
     </div>
     
-    <div id="confirmModal" class="overlay" style="align-items:flex-start; justify-content:center; z-index:9999; background:transparent; backdrop-filter:none; pointer-events:none;">
-        <div class="confirm-box" style="pointer-events:auto; margin-top:calc(env(safe-area-inset-top, 20px) + 15px); padding:20px; border-radius:24px; box-shadow:0 15px 40px rgba(0,0,0,0.25); border:1px solid var(--border); animation: dropDownToast 0.4s cubic-bezier(0.19, 1, 0.22, 1); max-width: 380px;">
-            <div class="confirm-title" id="cMsg" style="font-size:0.95rem; font-weight:700; margin-bottom:15px; white-space:pre-wrap; line-height:1.4; color:var(--text-main);">Are you sure?</div>
-            <div class="confirm-btns" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:0;">
-                <button class="btn btn-ghost" id="cNo" style="margin:0; padding:12px; border-radius:14px; background:var(--input-bg); border:none; font-size:0.9rem; font-weight:800; color:var(--text-sub);">No</button>
-                <button class="btn btn-primary" id="cYes" style="margin:0; padding:12px; border-radius:14px; font-size:0.9rem; font-weight:800; background:var(--p-blue); color:#000;">Yes</button>
-            </div>
+    <div id="confirmModal" style="display:none; position:fixed; top:calc(env(safe-area-inset-top, 20px) + 15px); left:50%; transform:translateX(-50%); z-index:9999; width:90%; max-width:380px; background:var(--bg-card); padding:20px; border-radius:24px; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:1px solid var(--border); animation: dropDownToast 0.4s cubic-bezier(0.19, 1, 0.22, 1);">
+        <div class="confirm-title" id="cMsg" style="font-size:0.95rem; font-weight:700; margin-bottom:15px; white-space:pre-wrap; line-height:1.4; color:var(--text-main); text-align:center;">Are you sure?</div>
+        <div class="confirm-btns" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:0;">
+            <button class="btn btn-ghost" id="cNo" style="margin:0; padding:12px; border-radius:14px; background:var(--input-bg); border:none; font-size:0.9rem; font-weight:800; color:var(--text-sub);">No</button>
+            <button class="btn btn-primary" id="cYes" style="margin:0; padding:12px; border-radius:14px; font-size:0.9rem; font-weight:800; background:var(--p-blue); color:#000;">Yes</button>
         </div>
     </div>
 
-    <div id="promptModal" class="overlay" style="align-items:flex-start; justify-content:center; z-index:9999; background:transparent; backdrop-filter:none; pointer-events:none;">
-        <div class="confirm-box" style="pointer-events:auto; margin-top:calc(env(safe-area-inset-top, 20px) + 15px); padding:20px; border-radius:24px; box-shadow:0 15px 40px rgba(0,0,0,0.25); border:1px solid var(--border); animation: dropDownToast 0.4s cubic-bezier(0.19, 1, 0.22, 1); max-width: 380px;">
-            <div class="confirm-title" id="pMsg" style="font-size:0.95rem; font-weight:700; margin-bottom:10px; white-space:pre-wrap; line-height:1.4; color:var(--text-main);">Enter value</div>
-            <input type="text" id="pInput" style="margin-bottom:15px; text-align:center; padding:10px; font-weight:bold; font-size:1.1rem; border-color:var(--p-blue);">
-            <div class="confirm-btns" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:0;">
-                <button class="btn btn-ghost" id="pCancel" style="margin:0; padding:12px; border-radius:14px; background:var(--input-bg); border:none; font-size:0.9rem; font-weight:800; color:var(--text-sub);">Cancel</button>
-                <button class="btn btn-primary" id="pSubmit" style="margin:0; padding:12px; border-radius:14px; font-size:0.9rem; font-weight:800; background:var(--p-blue); color:#000;">Submit</button>
-            </div>
+    <div id="promptModal" style="display:none; position:fixed; top:calc(env(safe-area-inset-top, 20px) + 15px); left:50%; transform:translateX(-50%); z-index:9999; width:90%; max-width:380px; background:var(--bg-card); padding:20px; border-radius:24px; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:1px solid var(--border); animation: dropDownToast 0.4s cubic-bezier(0.19, 1, 0.22, 1);">
+        <div class="confirm-title" id="pMsg" style="font-size:0.95rem; font-weight:700; margin-bottom:10px; white-space:pre-wrap; line-height:1.4; color:var(--text-main); text-align:center;">Enter value</div>
+        <input type="text" id="pInput" style="margin-bottom:15px; text-align:center; padding:10px; font-weight:bold; font-size:1.1rem; border-color:var(--p-blue); width:100%; box-sizing:border-box;">
+        <div class="confirm-btns" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:0;">
+            <button class="btn btn-ghost" id="pCancel" style="margin:0; padding:12px; border-radius:14px; background:var(--input-bg); border:none; font-size:0.9rem; font-weight:800; color:var(--text-sub);">Cancel</button>
+            <button class="btn btn-primary" id="pSubmit" style="margin:0; padding:12px; border-radius:14px; font-size:0.9rem; font-weight:800; background:var(--p-blue); color:#000;">Submit</button>
         </div>
     </div>
     
@@ -2014,7 +2010,7 @@
             isConfirmOpen = true;
             return new Promise((resolve) => { 
                 document.getElementById('cMsg').innerText = msg; 
-                document.getElementById('confirmModal').style.display = 'flex'; 
+                document.getElementById('confirmModal').style.display = 'block'; 
                 
                 document.getElementById('cYes').onclick = () => { 
                     document.getElementById('confirmModal').style.display = 'none'; 
@@ -2041,7 +2037,7 @@
                 inputEl.type = inputMode === "decimal" ? "number" : "text";
                 inputEl.placeholder = placeholder;
                 inputEl.value = '';
-                document.getElementById('promptModal').style.display = 'flex';
+                document.getElementById('promptModal').style.display = 'block';
                 inputEl.focus();
 
                 document.getElementById('pSubmit').onclick = () => {
@@ -2370,7 +2366,9 @@
                 // --- NEW: STRIKE-TO-FEE LINK ---
                 if(await customConfirm(`Add a Penalty Fee to their next cut for this No-Show?`)) {
                     const feeAmt = await customPrompt("Enter the penalty fee amount:", "e.g. 15", "decimal");
-                    if(feeAmt !== null && feeAmt.trim() !== '' && !isNaN(feeAmt)) {
+                   if (feeAmt !== null && (feeAmt.trim() === '' || isNaN(feeAmt))) {
+                        alert("Invalid fee amount. Strike saved, but no fee was added.");
+                    } else if(feeAmt !== null && feeAmt.trim() !== '' && !isNaN(feeAmt)) {
                         c.pendingFee = (c.pendingFee || 0) + parseFloat(feeAmt);
                         c.feeReason = "No-Show / Late Cancel";
                     }
@@ -2386,6 +2384,9 @@
         async function promptDeposit() {
             const c = getClient(activeId);
             const depAmt = await customPrompt(`Log a pre-paid deposit for ${c.name}:`, "e.g. 20", "decimal");
+            
+            if (depAmt === null) return; // They clicked cancel
+            if (depAmt.trim() === '' || isNaN(depAmt)) return alert("Please enter a valid number.");
             
             if(depAmt !== null && depAmt.trim() !== '' && !isNaN(depAmt)) {
                 c.deposit = (c.deposit || 0) + parseFloat(depAmt);
