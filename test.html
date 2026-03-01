@@ -493,6 +493,11 @@
             <div class="formula-box" id="vFormula" style="margin-bottom:10px;">"No cut formula saved."</div>
             
             <div id="vLastAddons" style="font-size:0.8rem; color:var(--p-blue-dark); font-weight:700; text-align:center; margin-bottom:20px; display:none;"></div>
+            
+            <div id="vLedgerBox" style="display:none; background:var(--input-bg); border:1px solid var(--border); border-radius:12px; padding:15px; margin-bottom:20px; text-align:center;">
+                <div id="vPendingFee" style="color:var(--status-overdue); font-weight:800; font-size:1.05rem; margin-bottom:5px; display:none;"></div>
+                <div id="vDeposit" style="color:var(--p-green); font-weight:800; font-size:1.05rem; display:none;"></div>
+            </div>
 
             <div class="contact-grid">
                 <a id="btnCall" href="#" class="c-btn"><i class="fas fa-phone"></i> Call</a>
@@ -525,7 +530,12 @@
                 </div>
             </div>
 
-                        <button id="btnCheckout" class="btn btn-green" onclick="openCheckout()"><i class="fas fa-cash-register"></i> Record Cut / Checkout</button>
+                       <button id="btnCheckout" class="btn btn-green" onclick="openCheckout()"><i class="fas fa-cash-register"></i> Record Cut / Checkout</button>
+            
+            <button id="btnDeposit" class="btn btn-ghost" style="color:var(--p-green); border-color:var(--p-green); margin-top:10px;" onclick="promptDeposit()">
+                <i class="fas fa-hand-holding-usd"></i> Log Deposit / Pre-Pay
+            </button>
+            
             <button id="btnAddStrike" class="btn btn-ghost" style="color:var(--status-overdue); border-color:var(--status-overdue); margin-top:10px;" onclick="addStrike()">
                 <i class="fas fa-ban"></i> Record No-Show (Add Strike)
             </button>
@@ -577,6 +587,16 @@
                 <div class="addon-pill" onclick="toggleAddon(this, 0)">🧴 Wash</div>
             </div>
             <p style="font-size:0.7rem; color:var(--text-sub); margin-top:-5px; margin-bottom:15px; font-style:italic;">*Currently tracking for records. Price modifiers set to $0.</p>
+
+            <div id="chkLedgerBox" style="display:none; margin-bottom:15px; background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:12px;">
+                <div id="chkFeeBox" style="display:none; justify-content:space-between; align-items:center; color:var(--status-overdue); font-weight:700; margin-bottom:8px;">
+                    <span id="chkFeeText">⚠️ Fee: $0</span>
+                    <button onclick="waiveFee()" style="background:transparent; border:1px solid var(--status-overdue); color:var(--status-overdue); border-radius:8px; padding:4px 10px; font-size:0.7rem;">Waive</button>
+                </div>
+                <div id="chkDepBox" style="display:none; color:var(--p-green); font-weight:700;">
+                    ✅ Deposit Paid: -$0
+                </div>
+            </div>
 
             <label>Base Price ($)</label>
             <input type="number" id="payPrice" onchange="calcTotal()" inputmode="decimal" onfocus="this.select()">
@@ -1197,6 +1217,27 @@
                 addonDiv.style.display = 'none';
             }
             
+            // --- NEW: LEDGER DISPLAY ---
+            const ledgerBox = document.getElementById('vLedgerBox');
+            const feeBox = document.getElementById('vPendingFee');
+            const depBox = document.getElementById('vDeposit');
+            
+            if ((c.pendingFee && c.pendingFee > 0) || (c.deposit && c.deposit > 0)) {
+                ledgerBox.style.display = 'block';
+                if (c.pendingFee && c.pendingFee > 0) {
+                    feeBox.style.display = 'block';
+                    feeBox.innerText = `⚠️ Pending Fee: $${c.pendingFee.toFixed(2)} (${c.feeReason || 'Penalty'})`;
+                } else feeBox.style.display = 'none';
+                
+                if (c.deposit && c.deposit > 0) {
+                    depBox.style.display = 'block';
+                    depBox.innerText = `✅ Deposit Paid: $${c.deposit.toFixed(2)}`;
+                } else depBox.style.display = 'none';
+            } else {
+                ledgerBox.style.display = 'none';
+            }
+            // -----------------------------------------
+            
             // --- NEW: Instagram Quick-Copy Logic ---
             const instaDisp = document.getElementById('vInstaDisplay');
             if(c.insta && c.insta.trim() !== '') {
@@ -1357,6 +1398,27 @@
             // NEW: Clears any extra cuts from the last person's checkout
             document.getElementById('multiCutBox').innerHTML = '';
             
+            // --- NEW: LEDGER INTERCEPT UI ---
+            const chkLedger = document.getElementById('chkLedgerBox');
+            const chkFeeBox = document.getElementById('chkFeeBox');
+            const chkDepBox = document.getElementById('chkDepBox');
+            
+            if ((c.pendingFee && c.pendingFee > 0) || (c.deposit && c.deposit > 0)) {
+                chkLedger.style.display = 'block';
+                if (c.pendingFee && c.pendingFee > 0) {
+                    chkFeeBox.style.display = 'flex';
+                    document.getElementById('chkFeeText').innerText = `⚠️ Fee: $${c.pendingFee.toFixed(2)} (${c.feeReason || 'Penalty'})`;
+                } else chkFeeBox.style.display = 'none';
+                
+                if (c.deposit && c.deposit > 0) {
+                    chkDepBox.style.display = 'block';
+                    chkDepBox.innerText = `✅ Deposit Paid: -$${c.deposit.toFixed(2)}`;
+                } else chkDepBox.style.display = 'none';
+            } else {
+                chkLedger.style.display = 'none';
+            }
+            // --------------------------------
+            
             selectedDisc = 'none';
             
             const nextDate = new Date();
@@ -1400,8 +1462,13 @@
         }
 
         function calcTotal() { 
+            const c = getClient(activeId);
             const primary = parseFloat(document.getElementById('payPrice').value) || 0; 
             const tip = parseFloat(document.getElementById('payTip').value) || 0; 
+            
+            // --- NEW: Grab LEDGER Amounts ---
+            const fee = c.pendingFee || 0;
+            const dep = c.deposit || 0;
             
             // Sum up the adjustable extra cuts
             let extraTotal = 0;
@@ -1422,11 +1489,29 @@
             } 
             
             const giveback = discount; 
-            const total = (totalBase - discount) + tip; 
             
-            document.getElementById('payTotal').innerText = `$${total.toFixed(2)}`; 
+            // Calculate final total including fees and deposits (preventing negative totals)
+            const total = Math.max(0, (totalBase - discount) + tip + fee - dep); 
+            
+            const totEl = document.getElementById('payTotal');
+            totEl.innerText = `$${total.toFixed(2)}`; 
+            
+            // Make total green if their deposit covered the whole cost
+            if (dep > ((totalBase - discount) + tip + fee)) totEl.style.color = 'var(--p-green)';
+            else totEl.style.color = 'var(--p-green-dark)';
+            
             document.getElementById('givebackDisplay').innerText = `Giveback: $${giveback.toFixed(2)}`; 
             return { total, giveback };
+        }
+
+        // --- NEW: WAIVE FEE ---
+        function waiveFee() {
+            const c = getClient(activeId);
+            c.pendingFee = 0;
+            c.feeReason = "";
+            document.getElementById('chkFeeBox').style.display = 'none';
+            if (!c.deposit || c.deposit <= 0) document.getElementById('chkLedgerBox').style.display = 'none';
+            calcTotal();
         }
 
         async function finalizeCut() {
@@ -1467,7 +1552,7 @@
             c.cuts = (c.cuts || 0) + totalCutsThisSession;
             c.last = document.getElementById('payDate').value;
 
-            // --- SMART UNDO TRACKING ---
+           // --- SMART UNDO TRACKING ---
             history.push({
                 clientId: c.id,
                 clientName: c.name + (extraCuts > 0 ? ` (+${extraCuts})` : ''),
@@ -1476,8 +1561,16 @@
                 wasFree: wasFreeFlag,
                 wasCredit: wasCreditFlag,
                 givebackAmt: totals.giveback,
-                cutsLogged: totalCutsThisSession // Tells undo how many to subtract
+                cutsLogged: totalCutsThisSession, // Tells undo how many to subtract
+                clearedFee: c.pendingFee || 0, // Saves it just in case of undo
+                clearedDep: c.deposit || 0
             });
+            
+            // --- NEW: CLEAR LEDGER ---
+            c.pendingFee = 0;
+            c.feeReason = "";
+            c.deposit = 0;
+            // -------------------------
 
             // Loyalty logic handling multiple cuts at once
             let earnedLoyalty = totalCutsThisSession;
@@ -2179,8 +2272,41 @@
         }
         
         async function deleteClient() { if(await customConfirm("Permanently delete this client?")) { clients = clients.filter(c => c.id !== document.getElementById('eId').value); saveAll(); closeModal('editModal'); render(); } }
-        async function addStrike() { const c = getClient(activeId); if(await customConfirm(`Mark ${c.name} as a No-Show? \n\nAdds a Strike 🚩.`)) { c.strikes = (c.strikes || 0) + 1; saveAll(); closeModal('viewModal'); render(); } }
-                async function removeStrike() { const c = getClient(activeId); if(await customConfirm("Remove one Strike 🚩?")) { c.strikes = Math.max(0, (c.strikes || 0) - 1); saveAll(); closeModal('viewModal'); render(); } }
+        
+        async function addStrike() { 
+            const c = getClient(activeId); 
+            if(await customConfirm(`Mark ${c.name} as a No-Show? \n\nAdds a Strike 🚩.`)) { 
+                c.strikes = (c.strikes || 0) + 1; 
+                
+                // --- NEW: STRIKE-TO-FEE LINK ---
+                if(confirm(`Do you want to add a Penalty Fee to their next cut for this No-Show?\n\nHit OK to add a fee, or Cancel to skip.`)) {
+                    const feeAmt = prompt("Enter the penalty fee amount (e.g. 15):");
+                    if(feeAmt && !isNaN(feeAmt)) {
+                        c.pendingFee = (c.pendingFee || 0) + parseFloat(feeAmt);
+                        c.feeReason = "No-Show / Late Cancel";
+                        alert(`Added $${parseFloat(feeAmt).toFixed(2)} penalty fee to their tab.`);
+                    }
+                }
+                
+                saveAll(); 
+                closeModal('viewModal'); 
+                render(); 
+            } 
+        }
+
+        // --- NEW: LOG DEPOSIT ---
+        function promptDeposit() {
+            const c = getClient(activeId);
+            const depAmt = prompt(`Log a pre-paid deposit for ${c.name} (e.g. 20):`);
+            if(depAmt && !isNaN(depAmt)) {
+                c.deposit = (c.deposit || 0) + parseFloat(depAmt);
+                saveAll(); 
+                render(); 
+                showClient(activeId);
+            }
+        }
+        
+        async function removeStrike() { const c = getClient(activeId); if(await customConfirm("Remove one Strike 🚩?")) { c.strikes = Math.max(0, (c.strikes || 0) - 1); saveAll(); closeModal('viewModal'); render(); } }
         
         function openSmsMenu() { 
             const c = getClient(activeId);
