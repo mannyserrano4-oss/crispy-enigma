@@ -2476,19 +2476,17 @@
         }
 
         function sendSms(type) { 
- 
             const c = getClient(activeId); if(!c || !c.phone) return alert('No phone saved.'); 
             const first = c.name.split(' ')[0]; let msg = ''; 
             if(type === 'late') msg = `Hey ${first}, running about 15 mins late. So sorry!`; 
             if(type === 'confirm') msg = `Yo ${first}, just confirming our cut. You still good?`; 
             if(type === 'longtime') msg = `Hey ${first}, been a while! Time to clean up that cut?`; 
             if(type === 'followup') msg = `Appreciate you coming through ${first}! How's the cut treating you?`; 
-                        if(type === 'review') msg = `Yo ${first}, appreciate the cut! If you have a sec, rate it here:\n\nhttps://mannyserrano4-oss.github.io/crispy-enigma/reviews`;
+            if(type === 'review') msg = `Yo ${first}, appreciate the cut! If you have a sec, rate it here:\n\nhttps://mannyserrano4-oss.github.io/crispy-enigma/reviews`;
             
             // --- NEW TEXT TEMPLATES ---
             if(type === 'checkin') msg = `Yo ${first}, just checking in to make sure that cut is still sitting right and styling easy for you.`;
-
-            if(type === 'bday') msg = `Yo ${first}, saw it's your birthday month! Hit me up to claim that half-off cut.`;
+            if(type === 'bday') msg = `Yo ${first}, saw it's your birthday month! 🎂 Hit me up to claim that half-off cut.`;
             if(type === 'noshow') msg = `Hey ${first}, had you down for a cut today. Let me know if we need to reschedule.`;
             
             // --- NEW DYNAMIC LOYALTY TEXT ---
@@ -2535,7 +2533,7 @@
             if (targets.length === 0) {
                 listDiv.innerHTML = '<div style="padding:15px; text-align:center; color:var(--text-sub);">Everyone is caught up! No prime targets right now.</div>';
             } else {
-                                targets.forEach(c => {
+                targets.forEach(c => {
                     const first = c.name.split(' ')[0];
                     
                     // --- NEW: Calculate True Average Spend ---
@@ -2586,7 +2584,7 @@
                 <option value="smart_overdue">⏰ Overdue (Lost Clients)</option>
                 <option value="smart_ghost">👻 Ghosts (90+ Days MIA)</option>
                 <option value="smart_vip">👑 VIPs (High Spenders)</option>
-                                <option value="smart_bday">🎂 Birthdays This Month (50% Off)</option>
+                <option value="smart_bday">🎂 Birthdays This Month (50% Off)</option>
                 <option value="smart_anni">🏅 Anniversaries This Month (50% Off)</option>
                <option value="smart_housecall">🚗 Mobile / House Call Clients</option>
                 <option value="smart_1away">🎟️ 1 Cut Away from Free</option>
@@ -2618,7 +2616,7 @@
                 msgBox.value = "Yo [Name], giving my top guys first dibs on the schedule for the week. Let me know if you need to lock in a prime spot!";
             } else if (target === 'smart_housecall') {
                 msgBox.value = "Hey [Name], mapping out my mobile cut routes for the week. Let me know if you need me to pull up and get you right! 🚗";
-                        } else if (target === 'smart_1away') {
+            } else if (target === 'smart_1away') {
                 msgBox.value = "Yo [Name]! You are exactly ONE cut away from earning a freebie. Hit me up to grab a spot this week so we can finish off that punch card! 🏆";
             } else if (target === 'smart_wrapped') {
                 msgBox.value = "Yo [Name], crazy year! You sat in the chair [Cuts] times, got the '[Formula]' down to a science, and were my #[Rank] top client of the year. Appreciate your loyalty, here's $10 off your first cut in January. 💈";
@@ -2639,7 +2637,6 @@
                 targets = targets.filter(c => c.comedyList === true);
             } else if (target === 'smart_overdue') {
                 targets = targets.filter(c => getStatus(c) === 'overdue');
-
             } else if (target === 'smart_ghost') {
                 const today = new Date();
                 targets = targets.filter(c => {
@@ -2678,7 +2675,7 @@
                 div.style.borderBottom = '1px solid var(--border)';
                 div.style.transition = 'opacity 0.3s ease'; // Smooth fade out
                 
-                                div.innerHTML = `
+                div.innerHTML = `
                     <div style="font-weight:700;">${c.name}</div>
                     <button class="btn btn-primary" style="background:var(--p-purple); color:black; width:auto; padding:6px 12px; margin:0; font-size:0.8rem;" onclick="firePromo('${c.phone}', '${first}', this, '${c.id}')">Send Text</button>
                 `;
@@ -2687,7 +2684,7 @@
             });
         }
 
-                function firePromo(phone, firstName, btn, clientId) {
+        function firePromo(phone, firstName, btn, clientId) {
             let msg = document.getElementById('promoMsg').value;
             msg = msg.replaceAll('[Name]', firstName); 
             
@@ -2727,7 +2724,6 @@
             window.location.href = `sms:${phone}${sep}body=${encodeURIComponent(msg)}`;
         }
 
-        
         // --- NEW QR HUB LOGIC ---
         function openQrMenu() {
             openModal('qrMenuModal');
@@ -2774,74 +2770,6 @@
             r.readAsText(input.files[0]);
             input.value = ''; // Resets the file input so it can trigger again
         }
-    </script>
-
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js')
-            .then(registration => {
-              console.log('ServiceWorker registration successful with scope: ', registration.scope);
-            }, err => {
-              console.log('ServiceWorker registration failed: ', err);
-            });
-        });
-      }
-
-        function copyInsta() {
-            const handle = document.getElementById('vInstaDisplay').dataset.handle;
-            if(!handle) return;
-            if(navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(handle).then(() => {
-                    alert("Instagram handle copied for tagging!");
-                }).catch(() => prompt("Browser blocked auto-copy. Copy manually:", handle));
-            } else {
-                prompt("Browser blocked auto-copy. Copy manually:", handle);
-            }
-        }
-
-                function copyRoster() {
-            const today = new Date().toLocaleDateString(undefined, {weekday: 'long', month: 'short', day: 'numeric'});
-            let text = `💈 MAS Barbery - ${today}\n\n`;
-            
-            // Grabs today's current take
-            const todayStr = getTodayIso();
-            const todayRev = history.filter(h => h.date === todayStr).reduce((s, h) => s + h.amount, 0);
-            text += `💰 Today's Take So Far: $${todayRev.toFixed(2)}\n\n`;
-            
-            // Grabs everyone marked "Due" OR "Overdue"
-            const dueClients = clients.filter(c => !c.archived && (getStatus(c) === 'due' || getStatus(c) === 'overdue'));
-            
-            // Sorts them by highest spenders first
-            dueClients.sort((a, b) => (b.spent || 0) - (a.spent || 0));
-
-            text += `🔥 PIPELINE / DUE & OVERDUE (${dueClients.length}):\n`;
-            
-            if (dueClients.length === 0) {
-                text += `- All caught up!\n`;
-            } else {
-                dueClients.forEach(c => {
-                    // Calculates True Average
-                    let trueAvg = c.price || 35;
-                    if (c.cuts && c.cuts > 0 && c.spent) {
-                        trueAvg = (c.spent / c.cuts).toFixed(0);
-                    }
-                    // Adds an alarm clock if they are overdue
-                    const statusIcon = getStatus(c) === 'overdue' ? '⏰ ' : '';
-                    text += `- ${statusIcon}${c.name} (Avg $${trueAvg})\n`;
-                });
-            }
-            
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(text).then(() => {
-                    alert("Daily Roster & Pipeline copied!");
-                }).catch(() => prompt("Browser blocked auto-copy. Copy manually:", text));
-            } else {
-                prompt("Browser blocked auto-copy. Copy manually:", text);
-            }
-        }
-
-        
     </script>
     
 </body>
