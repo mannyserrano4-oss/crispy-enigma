@@ -1581,9 +1581,10 @@
             });
             
             // --- NEW: CLEAR LEDGER ---
+            const cutCostWithFees = (totalBase - discount) + tip + c.pendingFee;
             c.pendingFee = 0;
             c.feeReason = "";
-            c.deposit = 0;
+            c.deposit = c.deposit > cutCostWithFees ? c.deposit - cutCostWithFees : 0;
             // -------------------------
 
             // Loyalty logic handling multiple cuts at once
@@ -1615,8 +1616,10 @@
             const c = getClient(activeId);
             const nextDate = new Date();
             nextDate.setDate(nextDate.getDate() + ((c.freq || 4) * 7));
-            const iso = nextDate.toISOString().slice(0, 10) + "T10:00";
-            document.getElementById('schedDate').value = iso;
+            const y = nextDate.getFullYear();
+            const m = String(nextDate.getMonth() + 1).padStart(2, '0');
+            const d = String(nextDate.getDate()).padStart(2, '0');
+            document.getElementById('schedDate').value = `${y}-${m}-${d}T10:00`;
             openModal('schedModal');
         }
 
@@ -2171,7 +2174,14 @@
             }
         }
         
-        function exportData() { const s = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({clients, settings, history})); const a = document.createElement('a'); a.href = s; a.download = 'backup.json'; a.click(); }
+        function exportData() { 
+            const s = JSON.stringify({clients, settings, history}); 
+            const blob = new Blob([s], {type: 'application/json'}); 
+            const url = URL.createObjectURL(blob); 
+            const a = document.createElement('a'); 
+            a.href = url; a.download = 'backup.json'; a.click(); 
+            setTimeout(() => URL.revokeObjectURL(url), 5000);
+        }
         function toggleTheme() { document.body.classList.toggle('dark-mode'); isDark = document.body.classList.contains('dark-mode'); localStorage.setItem('theme', isDark ? 'dark' : 'light'); }
         function getStatus(c) { const refDate = c.last || c.first; if(!refDate) return 'good'; const last = new Date(refDate); const today = new Date(); const days = (today - last)/(1000*60*60*24); const freqDays = (c.freq || 4) * 7; if(days >= 56) return 'overdue'; if(days >= freqDays) return 'due'; return 'good'; }
         function getDueStr(c) { const refDate = c.last || c.first; if(!refDate) return 'Today'; const last = new Date(refDate); last.setDate(last.getDate() + ((c.freq||4)*7)); return last.toLocaleDateString(undefined, {month:'short', day:'numeric'}); }
@@ -2515,7 +2525,7 @@
         function fireSos(phone, firstName) {
             let msg = document.getElementById('sosMsg').value;
             // Personalize the message with their name if you put [Name] in it, or just leave it as-is
-            msg = msg.replace('[Name]', firstName);
+            msg = msg.replaceAll('[Name]', firstName);
             
             const ua = navigator.userAgent.toLowerCase();
             const isApple = ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1;
@@ -2635,7 +2645,7 @@
 
                 function firePromo(phone, firstName, btn, clientId) {
             let msg = document.getElementById('promoMsg').value;
-            msg = msg.replace('[Name]', firstName); 
+            msg = msg.replaceAll('[Name]', firstName); 
             
             // --- NEW: INJECT SPOTIFY WRAPPED STATS ---
             if (clientId && msg.includes('[Rank]')) {
