@@ -1548,13 +1548,16 @@
             }
             
             // --- NEW: Locks the specific 50% discount so it can't be used twice a year ---
-            const cutYear = new Date(document.getElementById('payDate').value).getFullYear();
-            if(selectedDisc === 'bdayHalf') {
-                c.lastBdayYear = cutYear;
-            }
-            if(selectedDisc === 'anniHalf') {
-                c.lastAnniYear = cutYear;
-            }
+            const cutYear = new Date(document.getElementById('payDate').value).getFullYear();
+            const prevBday = c.lastBdayYear; // Saves state for Undo
+            const prevAnni = c.lastAnniYear;
+            
+            if(selectedDisc === 'bdayHalf') {
+                c.lastBdayYear = cutYear;
+            }
+            if(selectedDisc === 'anniHalf') {
+                c.lastAnniYear = cutYear;
+            }
 
            // Calculate how many cuts happened in this one transaction
             const extraCuts = document.querySelectorAll('.extra-cut-price').length;
@@ -1579,10 +1582,12 @@
                 wasCredit: wasCreditFlag,
                 givebackAmt: totals.giveback,
                 cutsLogged: totalCutsThisSession, // Tells undo how many to subtract
-                clearedFee: c.pendingFee || 0, // Saves it just in case of undo
-                clearedFeeReason: c.feeReason || "",
-                clearedDep: c.deposit || 0
-            });
+                clearedFee: c.pendingFee || 0, // Saves it just in case of undo
+                clearedFeeReason: c.feeReason || "",
+                clearedDep: c.deposit || 0,
+                restoredBdayYear: prevBday,
+                restoredAnniYear: prevAnni
+            });
             
            // --- NEW: CLEAR LEDGER ---
             const primary = parseFloat(document.getElementById('payPrice').value) || 0;
@@ -1788,13 +1793,15 @@
                         pointsToReverse--;
                     }
                     
-                    // --- NEW: RESTORE LEDGER ON UNDO ---
-                    if (h.clearedFee) {
-                        c.pendingFee = h.clearedFee;
-                        c.feeReason = h.clearedFeeReason || "Restored Fee";
-                    }
-                    if (h.clearedDep) c.deposit = h.clearedDep;
-                }
+                   // --- NEW: RESTORE LEDGER ON UNDO ---
+                    if (h.clearedFee) {
+                        c.pendingFee = h.clearedFee;
+                        c.feeReason = h.clearedFeeReason || "Restored Fee";
+                    }
+                    if (h.clearedDep) c.deposit = h.clearedDep;
+                    if (h.restoredBdayYear !== undefined) c.lastBdayYear = h.restoredBdayYear;
+                    if (h.restoredAnniYear !== undefined) c.lastAnniYear = h.restoredAnniYear;
+                }
                 // Erase the receipt from history
                 history.splice(lastHistoryIndex, 1);
                 saveAll();
@@ -1835,13 +1842,15 @@
                         pointsToReverse--;
                     }
                     
-                   // --- NEW: RESTORE LEDGER ON UNDO ---
-                    if (h.clearedFee) {
-                        c.pendingFee = h.clearedFee;
-                        c.feeReason = h.clearedFeeReason || "Restored Fee";
-                    }
-                    if (h.clearedDep) c.deposit = h.clearedDep;
-                }
+                  // --- NEW: RESTORE LEDGER ON UNDO ---
+                    if (h.clearedFee) {
+                        c.pendingFee = h.clearedFee;
+                        c.feeReason = h.clearedFeeReason || "Restored Fee";
+                    }
+                    if (h.clearedDep) c.deposit = h.clearedDep;
+                    if (h.restoredBdayYear !== undefined) c.lastBdayYear = h.restoredBdayYear;
+                    if (h.restoredAnniYear !== undefined) c.lastAnniYear = h.restoredAnniYear;
+                }
                 history.splice(idx, 1);
                 saveAll();
                 render();
@@ -2280,15 +2289,16 @@
         }
         
         function captureEditState() {
-            const fields = ['eName', 'ePhone', 'eInsta', 'eEmail', 'eAddr', 'ePrice', 'eFreq', 'eFirst', 'eDob', 'eRef', 'eNotes', 'eIcebreaker', 'eFormula', 'eBanked', 'eLoyalty'];
-            let state = "";
-            fields.forEach(f => {
-                const el = document.getElementById(f);
-                if (el) state += el.value;
-            });
-            state += Array.from(document.querySelectorAll('#eTags .tag-pill.active')).map(x => x.innerText).join("");
-            return state;
-        }
+            const fields = ['eName', 'ePhone', 'eInsta', 'eEmail', 'eAddr', 'ePrice', 'eFreq', 'eFirst', 'eDob', 'eRef', 'eNotes', 'eIcebreaker', 'eFormula', 'eBanked', 'eLoyalty', 'eSource'];
+            let state = "";
+            fields.forEach(f => {
+                const el = document.getElementById(f);
+                if (el) state += el.value;
+            });
+            state += document.getElementById('eComedy').checked ? "yes" : "no";
+            state += Array.from(document.querySelectorAll('#eTags .tag-pill.active')).map(x => x.innerText).join("");
+            return state;
+        }
 
         async function cancelEdit() {
             const currentState = captureEditState();
@@ -2401,10 +2411,10 @@
                 formula: document.getElementById('eFormula').value, tags: selectedTags,
                 source: document.getElementById('eSource').value, // NEW: Saves where they came from
                 comedyList: document.getElementById('eComedy').checked, // NEW: Saves Comedy VIP status
-                credit: isNew ? creditAdd : getClient(id).credit, 
-                banked: parseInt(document.getElementById('eBanked').value) || 0, 
-                loyalty: parseInt(document.getElementById('eLoyalty').value) || 0, 
-                spent: isNew ? 0 : getClient(id).spent, 
+                credit: isNew ? creditAdd : getClient(id).credit, 
+                banked: Math.max(0, parseInt(document.getElementById('eBanked').value) || 0), 
+                loyalty: Math.min(4, Math.max(0, parseInt(document.getElementById('eLoyalty').value) || 0)), 
+                spent: isNew ? 0 : getClient(id).spent, 
                 giveback: isNew ? 0 : getClient(id).giveback, cuts: isNew ? 0 : getClient(id).cuts, 
                 // --- LAST CUT SYNC FIX ---
                 last: isNew ? formFirst : getClient(id).last, 
