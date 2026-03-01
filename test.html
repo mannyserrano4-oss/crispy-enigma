@@ -740,12 +740,13 @@
                             <input type="number" id="eBanked" value="0" min="0" inputmode="numeric" pattern="[0-9]*">
                         </div>
                         <div>
-                            <label style="font-size:0.7rem;">Points (0-4 ✂️)</label>   <!-- 0-9 here -->
+                            <label style="font-size:0.7rem;">Points (0-4 ✂️)</label>
                             <input type="number" id="eLoyalty" value="0" min="0" max="4" inputmode="numeric" pattern="[0-9]*">
                         </div>
                     </div>
                     <p style="font-size: 0.65rem; color: var(--text-sub); margin: 0; font-style: italic;">
-                        *Use this to manually fix mistakes. 5 points automatically = 1 Banked Cut.  <!-- 10 points -->
+                        *Use this to manually fix mistakes. 5 points automatically = 1 Banked Cut.
+                    </p>
                     </p>
                 </div>
 
@@ -975,9 +976,13 @@
 
         // --- CORE FUNCTIONS ---
         function saveAll() {
-            localStorage.setItem('bbClients', JSON.stringify(clients));
-            localStorage.setItem('bbHistory', JSON.stringify(history));
-            localStorage.setItem('bbSettings', JSON.stringify(settings));
+            try {
+                localStorage.setItem('bbClients', JSON.stringify(clients));
+                localStorage.setItem('bbHistory', JSON.stringify(history));
+                localStorage.setItem('bbSettings', JSON.stringify(settings));
+            } catch (e) {
+                alert("⚠️ STORAGE LIMIT REACHED! Data not saved. Please go to Settings, Export your Full Backup, and then Factory Reset to clear out old history.");
+            }
         }
 
         try {
@@ -1621,9 +1626,10 @@
 
             if (total <= 0) return alert("Please enter an amount.");
 
-            // 1. Log the temporary walk-in revenue
+           // 1. Log the temporary walk-in revenue
+            const walkInTempId = 'walkin_' + Date.now();
             history.push({
-                clientId: 'walkin',
+                clientId: walkInTempId,
                 clientName: '🚶 Walk-In Client',
                 date: getTodayIso(),
                 amount: total,
@@ -1637,9 +1643,9 @@
             document.getElementById('wcName').value = '';
             document.getElementById('wcPhone').value = '';
             
-            // 3. Save the exact spot in history so we can overwrite it if they convert
+            // 3. Save the exact ID so we can overwrite it safely if they convert
             lastWalkInObj = {
-                historyIndex: history.length - 1,
+                tempId: walkInTempId,
                 spent: total,
                 basePrice: price
             };
@@ -1680,8 +1686,11 @@
             clients.push(newClient);
             
             // Retroactively rewrite the receipt to show their real name!
-            history[lastWalkInObj.historyIndex].clientId = newId;
-            history[lastWalkInObj.historyIndex].clientName = cleanName;
+            const histIndex = history.findIndex(h => h.clientId === lastWalkInObj.tempId);
+            if (histIndex > -1) {
+                history[histIndex].clientId = newId;
+                history[histIndex].clientName = cleanName;
+            }
             
             saveAll();
             closeModal('walkInConvertModal');
@@ -1788,7 +1797,7 @@
                         // Reverse loyalty point
                         if (c.loyalty === 0 && (c.banked || 0) > 0) {
                             c.banked--;
-                            c.loyalty = 4; // change 4 to 9
+                           c.loyalty = 4;
                         } else {
                             c.loyalty = Math.max(0, (c.loyalty || 0) - 1);
                         }
@@ -1939,15 +1948,19 @@
 
         function exportHistoryCSV() {
             let csv = "Date,Client,Amount\n";
-            history.forEach(h => { csv += `${h.date},${h.clientName.replace(/,/g," ")},${h.amount}\n`; });
+            history.forEach(h => { 
+                const safeName = `"${(h.clientName || '').replace(/"/g, '""')}"`;
+                csv += `${h.date},${safeName},${h.amount}\n`; 
+            });
             downloadCSV(csv, 'BlackBook_Transactions.csv');
         }
-                function exportSimpleCSV() {
+        function exportSimpleCSV() {
             let csv = "Name,Phone,Email,Status,Strikes,Total_Spent,Last_Cut\n";
             clients.forEach(c => {
-                if (c.archived || c.blacklisted) return; // Keeps graveyard guys out of the export
+                if (c.archived || c.blacklisted) return; 
                 const safePhone = `\t${c.phone}`;
-                csv += `${c.name.replace(/,/g," ")},${safePhone},${c.email || ''},${getStatus(c)},${c.strikes||0},${c.spent},${c.last}\n`;
+                const safeName = `"${(c.name || '').replace(/"/g, '""')}"`;
+                csv += `${safeName},${safePhone},${c.email || ''},${getStatus(c)},${c.strikes||0},${c.spent},${c.last}\n`;
             });
             downloadCSV(csv, 'BlackBook_Clients.csv');
         }
@@ -1982,7 +1995,26 @@
         function isMonth(d) { return new Date(d).getMonth() === new Date().getMonth(); }
         function isAnniversary(d) { const dt = new Date(d); const now = new Date(); return dt.getMonth() === now.getMonth() && dt.getFullYear() !== now.getFullYear(); }
         function openInsta() { const c = getClient(activeId); if(c.insta) window.open(`https://instagram.com/${c.insta.replace('@','')}`); }
-        function customConfirm(msg) { return new Promise((resolve) => { document.getElementById('cMsg').innerText = msg; document.getElementById('confirmModal').style.display = 'flex'; document.getElementById('cYes').onclick = () => { document.getElementById('confirmModal').style.display = 'none'; resolve(true); }; document.getElementById('cNo').onclick = () => { document.getElementById('confirmModal').style.display = 'none'; resolve(false); }; }); }
+        let isConfirmOpen = false;
+        function customConfirm(msg) { 
+            if (isConfirmOpen) return Promise.resolve(false);
+            isConfirmOpen = true;
+            return new Promise((resolve) => { 
+                document.getElementById('cMsg').innerText = msg; 
+                document.getElementById('confirmModal').style.display = 'flex'; 
+                
+                document.getElementById('cYes').onclick = () => { 
+                    document.getElementById('confirmModal').style.display = 'none'; 
+                    isConfirmOpen = false;
+                    resolve(true); 
+                }; 
+                document.getElementById('cNo').onclick = () => { 
+                    document.getElementById('confirmModal').style.display = 'none'; 
+                    isConfirmOpen = false;
+                    resolve(false); 
+                }; 
+            }); 
+        }
         
         function searchRef(val) { 
             const div = document.getElementById('refResults'); 
@@ -2643,6 +2675,7 @@
                 } catch(err) { alert("Error loading file: " + err); }
             };
             r.readAsText(input.files[0]);
+            input.value = ''; // Resets the file input so it can trigger again
         }
     </script>
 
