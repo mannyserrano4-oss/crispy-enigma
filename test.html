@@ -724,7 +724,7 @@
                         <span style="font-size:0.85rem; font-weight:700; color:var(--p-purple-dark);">🎭 Add to Comedy Show Invites</span>
                     </label>
 
-                    <input type="text" id="eRef" placeholder="Referred By..." oninput="searchRef(this.value)">
+                    <input type="text" id="eRef" placeholder="Referred By..." oninput="searchRef(this.value)" onblur="setTimeout(() => document.getElementById('refResults').style.display='none', 200)">
                     <div id="refResults" style="background:var(--bg-card); display:none; border:1px solid var(--border); padding:10px;"></div>
                     
                     <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1817,9 +1817,8 @@
                     }
                     if (h.clearedDep) c.deposit = h.clearedDep;
                     if (h.restoredBdayYear !== undefined) c.lastBdayYear = h.restoredBdayYear;
-                    if (h.restoredAnniYear !== undefined) c.lastAnniYear = h.restoredAnniYear;
-if (h.restoredBdayYear !== undefined) c.lastBdayYear = h.restoredBdayYear; // Added this line
-if (h.restoredLastDate !== undefined) c.last = h.restoredLastDate;
+                    if (h.restoredAnniYear !== undefined) c.lastAnniYear = h.restoredAnniYear;
+                    if (h.restoredLastDate !== undefined) c.last = h.restoredLastDate;
                 }
                 // Erase the receipt from history
                 history.splice(lastHistoryIndex, 1);
@@ -1868,9 +1867,8 @@ if (h.restoredLastDate !== undefined) c.last = h.restoredLastDate;
                     }
                     if (h.clearedDep) c.deposit = h.clearedDep;
                     if (h.restoredBdayYear !== undefined) c.lastBdayYear = h.restoredBdayYear;
-                    if (h.restoredAnniYear !== undefined) c.lastAnniYear = h.restoredAnniYear;
-if (h.restoredBdayYear !== undefined) c.lastBdayYear = h.restoredBdayYear; // Added this line
-if (h.restoredLastDate !== undefined) c.last = h.restoredLastDate;
+                    if (h.restoredAnniYear !== undefined) c.lastAnniYear = h.restoredAnniYear;
+                    if (h.restoredLastDate !== undefined) c.last = h.restoredLastDate;
                 }
                 history.splice(idx, 1);
                 saveAll();
@@ -2403,7 +2401,11 @@ if (h.restoredLastDate !== undefined) c.last = h.restoredLastDate;
             const refName = document.getElementById('eRef').value.trim(); 
             let creditAdd = 0; 
 
-            if(isNew && refName) { 
+           // Check if referral is newly added (works for new clients AND existing ones being updated)
+            const existingClient = isNew ? null : getClient(id);
+            const isNewReferral = refName && (isNew || existingClient.refBy !== refName);
+            
+            if(isNewReferral) { 
                 const referee = clients.find(x => x.name.toLowerCase() === refName.toLowerCase()); 
                 if(referee) { 
                     referee.credit = (referee.credit || 0) + 5; 
@@ -2412,7 +2414,7 @@ if (h.restoredLastDate !== undefined) c.last = h.restoredLastDate;
                 } else {
                     alert(`Note: No client found named "${refName}". No referral credit applied.`);
                 }
-            } 
+            }
             const selectedTags = Array.from(document.querySelectorAll('#eTags .tag-pill.active')).map(x => x.innerText);
             const formFirst = document.getElementById('eFirst').value; 
             
@@ -2432,7 +2434,7 @@ if (h.restoredLastDate !== undefined) c.last = h.restoredLastDate;
                 formula: document.getElementById('eFormula').value, tags: selectedTags,
                 source: document.getElementById('eSource').value || 'Unknown', // NEW: Saves where they came from
                 comedyList: document.getElementById('eComedy').checked, // NEW: Saves Comedy VIP status
-                credit: isNew ? creditAdd : getClient(id).credit, 
+                credit: isNew ? creditAdd : ((getClient(id).credit || 0) + creditAdd), 
                 banked: Math.max(0, parseInt(document.getElementById('eBanked').value) || 0), 
                 loyalty: Math.min(APP_CONFIG.cutsRequiredForFree - 1, Math.max(0, parseInt(document.getElementById('eLoyalty').value) || 0)),
                 spent: isNew ? 0 : getClient(id).spent, 
