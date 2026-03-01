@@ -1754,6 +1754,10 @@
                             pointsToReverse--;
                         }
                     }
+                    
+                    // --- NEW: RESTORE LEDGER ON UNDO ---
+                    if (h.clearedFee) c.pendingFee = h.clearedFee;
+                    if (h.clearedDep) c.deposit = h.clearedDep;
                 }
                 // Erase the receipt from history
                 history.splice(lastHistoryIndex, 1);
@@ -1789,6 +1793,10 @@
                             c.loyalty = Math.max(0, (c.loyalty || 0) - 1);
                         }
                     }
+                    
+                    // --- NEW: RESTORE LEDGER ON UNDO ---
+                    if (h.clearedFee) c.pendingFee = h.clearedFee;
+                    if (h.clearedDep) c.deposit = h.clearedDep;
                 }
                 history.splice(idx, 1);
                 saveAll();
@@ -2264,7 +2272,15 @@
                 // --- LAST CUT SYNC FIX ---
                 last: isNew ? formFirst : getClient(id).last, 
                 strikes: isNew ? 0 : (getClient(id).strikes || 0), 
-                archived: isNew ? false : (getClient(id).archived || false) 
+                archived: isNew ? false : (getClient(id).archived || false),
+                // --- NEW: PREVENT HIDDEN DATA WIPE ---
+                blacklisted: isNew ? false : (getClient(id).blacklisted || false),
+                blacklistReason: isNew ? "" : (getClient(id).blacklistReason || ""),
+                lastAddons: isNew ? [] : (getClient(id).lastAddons || []),
+                pendingFee: isNew ? 0 : (getClient(id).pendingFee || 0),
+                feeReason: isNew ? "" : (getClient(id).feeReason || ""),
+                deposit: isNew ? 0 : (getClient(id).deposit || 0),
+                lastCheckIn: isNew ? "" : (getClient(id).lastCheckIn || "")
             }; 
             if(isNew) clients.push(data); 
             else { const idx = clients.findIndex(x => x.id === id); clients[idx] = data; } 
