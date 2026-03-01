@@ -1095,10 +1095,10 @@
                 filtered.sort((a,b) => a.name.localeCompare(b.name));
             } else {
                 filtered.sort((a,b) => {
-                    const dateA = new Date(a.last || a.first || '2000-01-01');
-                    const dateB = new Date(b.last || b.first || '2000-01-01');
-                    return dateA - dateB; 
-                });
+                    const dateA = a.last || a.first || '2000-01-01';
+                    const dateB = b.last || b.first || '2000-01-01';
+                    return dateA.localeCompare(dateB); 
+                });
             }
 
             filtered.forEach(c => {
@@ -1759,22 +1759,23 @@
                     c.giveback = Math.max(0, (c.giveback || 0) - (h.givebackAmt || 0));
                     
                     if (h.wasFree) {
-                        c.banked = (c.banked || 0) + 1;
-                    } else if (h.wasCredit) {
-                        c.credit = (c.credit || 0) + 5;
-                    } else {
-                        // Reverse loyalty points cleanly
-                        let pointsToReverse = h.cutsLogged || 1;
-                        while(pointsToReverse > 0) {
-                            if (c.loyalty === 0 && (c.banked || 0) > 0) {
-                                c.banked--;
-                                c.loyalty = 4; // Loops back to 4 points
-                            } else {
-                                c.loyalty = Math.max(0, (c.loyalty || 0) - 1);
-                            }
-                            pointsToReverse--;
-                        }
-                    }
+                        c.banked = (c.banked || 0) + 1;
+                    }
+                    if (h.wasCredit) {
+                        c.credit = (c.credit || 0) + 5;
+                    }
+                    // Reverse loyalty points cleanly
+                    let pointsToReverse = h.cutsLogged || 1;
+                    if (h.wasFree) pointsToReverse -= 1; // Free cut didn't give a point
+                    while(pointsToReverse > 0) {
+                        if (c.loyalty === 0 && (c.banked || 0) > 0) {
+                            c.banked--;
+                            c.loyalty = 4; // Loops back to 4 points
+                        } else {
+                            c.loyalty = Math.max(0, (c.loyalty || 0) - 1);
+                        }
+                        pointsToReverse--;
+                    }
                     
                     // --- NEW: RESTORE LEDGER ON UNDO ---
                     if (h.clearedFee) c.pendingFee = h.clearedFee;
@@ -1801,23 +1802,24 @@
                     c.cuts = Math.max(0, (c.cuts || 0) - (h.cutsLogged || 1));
                     c.giveback = Math.max(0, (c.giveback || 0) - (h.givebackAmt || 0));
                     
-                    if (h.wasFree) {
-                        c.banked = (c.banked || 0) + 1;
-                    } else if (h.wasCredit) {
-                        c.credit = (c.credit || 0) + 5;
-                    } else {
-                        // Reverse loyalty points cleanly
-                        let pointsToReverse = h.cutsLogged || 1;
-                        while(pointsToReverse > 0) {
-                            if (c.loyalty === 0 && (c.banked || 0) > 0) {
-                                c.banked--;
-                                c.loyalty = 4;
-                            } else {
-                                c.loyalty = Math.max(0, (c.loyalty || 0) - 1);
-                            }
-                            pointsToReverse--;
-                        }
-                    }
+                   if (h.wasFree) {
+                        c.banked = (c.banked || 0) + 1;
+                    }
+                    if (h.wasCredit) {
+                        c.credit = (c.credit || 0) + 5;
+                    }
+                    // Reverse loyalty points cleanly
+                    let pointsToReverse = h.cutsLogged || 1;
+                    if (h.wasFree) pointsToReverse -= 1; // Free cut didn't give a point
+                    while(pointsToReverse > 0) {
+                        if (c.loyalty === 0 && (c.banked || 0) > 0) {
+                            c.banked--;
+                            c.loyalty = 4; // Loops back to 4 points
+                        } else {
+                            c.loyalty = Math.max(0, (c.loyalty || 0) - 1);
+                        }
+                        pointsToReverse--;
+                    }
                     
                     // --- NEW: RESTORE LEDGER ON UNDO ---
                     if (h.clearedFee) c.pendingFee = h.clearedFee;
@@ -2008,8 +2010,8 @@
         
         function getClient(id) { return clients.find(x => x.id === id); }
         function setTab(t, btn) { activeFilter = t; document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); render(); }
-        function isMonth(d) { return new Date(d).getMonth() === new Date().getMonth(); }
-        function isAnniversary(d) { const dt = new Date(d); const now = new Date(); return dt.getMonth() === now.getMonth() && dt.getFullYear() !== now.getFullYear(); }
+        function isMonth(d) { if(!d) return false; const [y, m] = d.split('-'); return parseInt(m) - 1 === new Date().getMonth(); }
+        function isAnniversary(d) { if(!d) return false; const [y, m] = d.split('-'); const now = new Date(); return parseInt(m) - 1 === now.getMonth() && parseInt(y) !== now.getFullYear(); }
         function openInsta() { const c = getClient(activeId); if(c.insta) window.open(`https://instagram.com/${c.insta.replace('@','')}`); }
         let isConfirmOpen = false;
         function customConfirm(msg) { 
@@ -2187,8 +2189,8 @@
             setTimeout(() => URL.revokeObjectURL(url), 5000);
         }
         function toggleTheme() { document.body.classList.toggle('dark-mode'); isDark = document.body.classList.contains('dark-mode'); localStorage.setItem('theme', isDark ? 'dark' : 'light'); }
-        function getStatus(c) { const refDate = c.last || c.first; if(!refDate) return 'good'; const last = new Date(refDate); const today = new Date(); const days = (today - last)/(1000*60*60*24); const freqDays = (c.freq || 4) * 7; if(days >= 56) return 'overdue'; if(days >= freqDays) return 'due'; return 'good'; }
-        function getDueStr(c) { const refDate = c.last || c.first; if(!refDate) return 'Today'; const last = new Date(refDate); last.setDate(last.getDate() + ((c.freq||4)*7)); return last.toLocaleDateString(undefined, {month:'short', day:'numeric'}); }
+        function getStatus(c) { const refDate = c.last || c.first; if(!refDate) return 'good'; const last = new Date(refDate + 'T00:00:00'); const today = new Date(); const days = (today - last)/(1000*60*60*24); const freqDays = (c.freq || 4) * 7; if(days >= 56) return 'overdue'; if(days >= freqDays) return 'due'; return 'good'; }
+        function getDueStr(c) { const refDate = c.last || c.first; if(!refDate) return 'Today'; const last = new Date(refDate + 'T00:00:00'); last.setDate(last.getDate() + ((c.freq||4)*7)); return last.toLocaleDateString(undefined, {month:'short', day:'numeric'}); }
         function getLoyaltyVisual(n) { n = n || 0; let s = ''; for(let i=0; i<5; i++) { s += (i < n) ? '✂️' : '⚪'; } return s; } 
         
         function exportRobustExcel() {
