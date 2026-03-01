@@ -1589,8 +1589,10 @@
             c.cuts = (c.cuts || 0) + totalCutsThisSession;
             c.last = document.getElementById('payDate').value;
 
-           // --- SMART UNDO TRACKING ---
+          // --- SMART UNDO TRACKING ---
+            const txnId = Date.now().toString(); // Create a unique footprint
             history.push({
+                txnId: txnId, 
                 clientId: c.id,
                 clientName: c.name + (extraCuts > 0 ? ` (+${extraCuts})` : ''),
                 date: c.last,
@@ -1640,9 +1642,8 @@
             closeModal('viewModal');
             render();
             
-            // --- NEW: TRIGGER THE FLASH UNDO ---
-            // Grabs the exact index of the receipt we just created
-            triggerFlashUndo(c.id, history.length - 1);
+           // --- NEW: TRIGGER THE FLASH UNDO ---
+            triggerFlashUndo(c.id, txnId);
         }
 
         async function smartBook() {
@@ -1713,6 +1714,9 @@
             const newId = Date.now().toString();
             const todayStr = getTodayIso();
             
+           // Grab the checkbox state BEFORE creating the profile
+            const includeOffer = document.getElementById('wcOffer').checked;
+            
             const newClient = {
                 id: newId,
                 name: cleanName,
@@ -1727,6 +1731,7 @@
                 banked: 0,
                 strikes: 0,
                 giveback: 0,
+                credit: includeOffer ? 5 : 0, // Gives them the actual money
                 archived: false
             };
             clients.push(newClient);
@@ -1763,10 +1768,10 @@
 
        // --- NEW: FLASH UNDO LOGIC ---
         let undoTimer = null;
-        let lastHistoryIndex = null;
+        let lastTxnId = null;
 
-        function triggerFlashUndo(clientId, histIndex) {
-            lastHistoryIndex = histIndex;
+        function triggerFlashUndo(clientId, txnId) {
+            lastTxnId = txnId;
             const banner = document.getElementById('flashUndoBanner');
             banner.style.display = 'flex';
             
@@ -1782,8 +1787,11 @@
             if(undoTimer) clearTimeout(undoTimer);
             document.getElementById('flashUndoBanner').style.display = 'none';
             
-            if (lastHistoryIndex !== null && history[lastHistoryIndex]) {
-                const h = history[lastHistoryIndex];
+            // Securely find the exact transaction no matter how the array shifts
+            const histIndex = history.findIndex(h => h.txnId === lastTxnId);
+            
+            if (histIndex > -1 && history[histIndex]) {
+                const h = history[histIndex];
                 const c = getClient(h.clientId);
                 
                 if(c) {
@@ -1793,36 +1801,36 @@
                     c.giveback = Math.max(0, (c.giveback || 0) - (h.givebackAmt || 0));
                     
                     if (h.wasFree) {
-                        c.banked = (c.banked || 0) + 1;
-                    }
-                    if (h.wasCredit) {
-                        c.credit = (c.credit || 0) + 5;
-                    }
-                    // Reverse loyalty points cleanly
-                    let pointsToReverse = h.cutsLogged || 1;
-                    if (h.wasFree) pointsToReverse -= 1; // Free cut didn't give a point
-                   while(pointsToReverse > 0) {
-                        if (c.loyalty === 0 && (c.banked || 0) > 0) {
-                            c.banked--;
-                            c.loyalty = APP_CONFIG.cutsRequiredForFree - 1; // Dynamically loops back to max points
-                        } else {
-                            c.loyalty = Math.max(0, (c.loyalty || 0) - 1);
-                        }
-                        pointsToReverse--;
-                    }
-                    
-                    // --- NEW: RESTORE LEDGER ON UNDO ---
-                    if (h.clearedFee) {
-                        c.pendingFee = h.clearedFee;
-                        c.feeReason = h.clearedFeeReason || "Restored Fee";
-                    }
-                    if (h.clearedDep) c.deposit = h.clearedDep;
-                    if (h.restoredBdayYear !== undefined) c.lastBdayYear = h.restoredBdayYear;
+                        c.banked = (c.banked || 0) + 1;
+                    }
+                    if (h.wasCredit) {
+                        c.credit = (c.credit || 0) + 5;
+                    }
+                    // Reverse loyalty points cleanly
+                    let pointsToReverse = h.cutsLogged || 1;
+                    if (h.wasFree) pointsToReverse -= 1; // Free cut didn't give a point
+                   while(pointsToReverse > 0) {
+                        if (c.loyalty === 0 && (c.banked || 0) > 0) {
+                            c.banked--;
+                            c.loyalty = APP_CONFIG.cutsRequiredForFree - 1; // Dynamically loops back to max points
+                        } else {
+                            c.loyalty = Math.max(0, (c.loyalty || 0) - 1);
+                        }
+                        pointsToReverse--;
+                    }
+                    
+                    // --- NEW: RESTORE LEDGER ON UNDO ---
+                    if (h.clearedFee) {
+                        c.pendingFee = h.clearedFee;
+                        c.feeReason = h.clearedFeeReason || "Restored Fee";
+                    }
+                    if (h.clearedDep) c.deposit = h.clearedDep;
+                    if (h.restoredBdayYear !== undefined) c.lastBdayYear = h.restoredBdayYear;
                     if (h.restoredAnniYear !== undefined) c.lastAnniYear = h.restoredAnniYear;
                     if (h.restoredLastDate !== undefined) c.last = h.restoredLastDate;
-                }
+                }
                 // Erase the receipt from history
-                history.splice(lastHistoryIndex, 1);
+                history.splice(histIndex, 1);
                 saveAll();
                 render();
                 
@@ -2458,8 +2466,8 @@
                 feeReason: isNew ? "" : (getClient(id).feeReason || ""),
                 deposit: isNew ? 0 : (getClient(id).deposit || 0),
                 lastCheckIn: isNew ? "" : (getClient(id).lastCheckIn || ""),
-                lastBdayYear: isNew ? null : getClient(id).lastBdayYear,
-                lastAnniYear: isNew ? null : getClient(id).lastAnniYear
+                lastBdayYear: isNew ? null : (getClient(id).lastBdayYear ?? null),
+                lastAnniYear: isNew ? null : (getClient(id).lastAnniYear ?? null)
             };
             if(isNew) clients.push(data); 
             else { const idx = clients.findIndex(x => x.id === id); clients[idx] = data; } 
