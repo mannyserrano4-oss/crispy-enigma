@@ -378,8 +378,13 @@
         
                 /* --- FIX FOR ICEBREAKER VISIBILITY --- */
         #eIcebreaker {
-            color: #212121 !important; /* Force dark text to contrast with yellow bg */
-            -webkit-text-fill-color: #212121 !important; /* Ensures iOS renders it dark */
+            color: #212121 !important; 
+            -webkit-text-fill-color: #212121 !important; 
+        }
+        body.dark-mode #eIcebreaker {
+            color: #000 !important;
+            -webkit-text-fill-color: #000 !important;
+            background: #fff9c4 !important; /* Keep it yellow enough to read black text */
         }
         
         /* Optional: Make the yellow background slightly darker in dark mode so it hurts eyes less */
@@ -956,7 +961,6 @@
     </div>
 
     <script>
-        <script>
         // --- APP CONFIGURATION ---
         const APP_CONFIG = {
             cutsRequiredForFree: 5 // ⚙️ Change this to 10 for "Every 10th Cut Free"
@@ -1814,7 +1818,8 @@
                     if (h.clearedDep) c.deposit = h.clearedDep;
                     if (h.restoredBdayYear !== undefined) c.lastBdayYear = h.restoredBdayYear;
                     if (h.restoredAnniYear !== undefined) c.lastAnniYear = h.restoredAnniYear;
-                    if (h.restoredLastDate !== undefined) c.last = h.restoredLastDate; // Safely restores radar position
+if (h.restoredBdayYear !== undefined) c.lastBdayYear = h.restoredBdayYear; // Added this line
+if (h.restoredLastDate !== undefined) c.last = h.restoredLastDate;
                 }
                 // Erase the receipt from history
                 history.splice(lastHistoryIndex, 1);
@@ -1864,7 +1869,8 @@
                     if (h.clearedDep) c.deposit = h.clearedDep;
                     if (h.restoredBdayYear !== undefined) c.lastBdayYear = h.restoredBdayYear;
                     if (h.restoredAnniYear !== undefined) c.lastAnniYear = h.restoredAnniYear;
-                    if (h.restoredLastDate !== undefined) c.last = h.restoredLastDate; // Safely restores radar position
+if (h.restoredBdayYear !== undefined) c.lastBdayYear = h.restoredBdayYear; // Added this line
+if (h.restoredLastDate !== undefined) c.last = h.restoredLastDate;
                 }
                 history.splice(idx, 1);
                 saveAll();
@@ -2424,7 +2430,7 @@
                 freq: parseInt(document.getElementById('eFreq').value), first: formFirst, dob: document.getElementById('eDob').value, 
                refBy: refName, notes: document.getElementById('eNotes').value, icebreaker: document.getElementById('eIcebreaker').value,
                 formula: document.getElementById('eFormula').value, tags: selectedTags,
-                source: document.getElementById('eSource').value, // NEW: Saves where they came from
+                source: document.getElementById('eSource').value || 'Unknown', // NEW: Saves where they came from
                 comedyList: document.getElementById('eComedy').checked, // NEW: Saves Comedy VIP status
                 credit: isNew ? creditAdd : getClient(id).credit, 
                 banked: Math.max(0, parseInt(document.getElementById('eBanked').value) || 0), 
