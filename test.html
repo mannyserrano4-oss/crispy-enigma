@@ -1802,10 +1802,18 @@
                 const c = getClient(h.clientId);
                 
                 if(c) {
-                    // Silently reverse the money and cuts
+                   // Silently reverse the money and cuts
                     c.spent = Math.max(0, (c.spent || 0) - h.amount);
-                    c.cuts = Math.max(0, (c.cuts || 0) - (h.cutsLogged || 1));
                     c.giveback = Math.max(0, (c.giveback || 0) - (h.givebackAmt || 0));
+                    
+                    // Safely handles 0 cuts (like deposits) without JS reading 0 as false
+                    const cutsToReverse = h.cutsLogged !== undefined ? h.cutsLogged : 1;
+                    c.cuts = Math.max(0, (c.cuts || 0) - cutsToReverse);
+
+                    // If this was a standalone deposit, pull it out of their balance
+                    if (h.depositAdded) {
+                        c.deposit = Math.max(0, (c.deposit || 0) - h.depositAdded);
+                    }
                     
                     if (h.wasFree) {
                         c.banked = (c.banked || 0) + 1;
@@ -1814,7 +1822,7 @@
                         c.credit = (c.credit || 0) + 5;
                     }
                     // Reverse loyalty points cleanly
-                    let pointsToReverse = h.cutsLogged || 1;
+                    let pointsToReverse = cutsToReverse;
                     if (h.wasFree) pointsToReverse -= 1; // Free cut didn't give a point
                    while(pointsToReverse > 0) {
                         if (c.loyalty === 0 && (c.banked || 0) > 0) {
@@ -1853,18 +1861,27 @@
             if(await customConfirm(`Delete $${h.amount.toFixed(2)} entry for ${h.clientName}?\n\nThis will reverse their stats and loyalty.`)) {
                 const c = getClient(h.clientId);
                 if(c) {
+                    // Silently reverse the money and cuts
                     c.spent = Math.max(0, (c.spent || 0) - h.amount);
-                    c.cuts = Math.max(0, (c.cuts || 0) - (h.cutsLogged || 1));
                     c.giveback = Math.max(0, (c.giveback || 0) - (h.givebackAmt || 0));
                     
-                   if (h.wasFree) {
-                        c.banked = (c.banked || 0) + 1;
-                    }
-                    if (h.wasCredit) {
-                        c.credit = (c.credit || 0) + 5;
-                    }
-                    // Reverse loyalty points cleanly
-                    let pointsToReverse = h.cutsLogged || 1;
+                    // Safely handles 0 cuts (like deposits) without JS reading 0 as false
+                    const cutsToReverse = h.cutsLogged !== undefined ? h.cutsLogged : 1;
+                    c.cuts = Math.max(0, (c.cuts || 0) - cutsToReverse);
+
+                    // If this was a standalone deposit, pull it out of their balance
+                    if (h.depositAdded) {
+                        c.deposit = Math.max(0, (c.deposit || 0) - h.depositAdded);
+                    }
+                    
+                    if (h.wasFree) {
+                        c.banked = (c.banked || 0) + 1;
+                    }
+                    if (h.wasCredit) {
+                        c.credit = (c.credit || 0) + 5;
+                    }
+                    // Reverse loyalty points cleanly
+                    let pointsToReverse = cutsToReverse;
                     if (h.wasFree) pointsToReverse -= 1; // Free cut didn't give a point
                    while(pointsToReverse > 0) {
                         if (c.loyalty === 0 && (c.banked || 0) > 0) {
@@ -2070,7 +2087,17 @@
         }
         
         function getClient(id) { return clients.find(x => x.id === id); }
-        function setTab(t, btn) { activeFilter = t; document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); render(); }
+        function setTab(t, btn) { 
+            activeFilter = t; 
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
+            btn.classList.add('active'); 
+            
+            // Clear the search bar when switching tabs so the UI isn't confusingly locked
+            const searchInput = document.querySelector('.search-input');
+            if(searchInput.value) searchInput.value = '';
+            
+            render(''); 
+        }
         function isMonth(d) { if(!d) return false; const [y, m] = d.split('-'); return parseInt(m) - 1 === new Date().getMonth(); }
         function isAnniversary(d) { if(!d) return false; const [y, m] = d.split('-'); const now = new Date(); return parseInt(m) - 1 === now.getMonth() && parseInt(y) !== now.getFullYear(); }
         function openInsta() { const c = getClient(activeId); if(c.insta) window.open(`https://instagram.com/${c.insta.replace('@','')}`); }
@@ -2524,7 +2551,24 @@
             if (depAmt.trim() === '' || isNaN(depAmt)) return alert("Please enter a valid number.");
             
             if(depAmt !== null && depAmt.trim() !== '' && !isNaN(depAmt)) {
-                c.deposit = (c.deposit || 0) + parseFloat(depAmt);
+                const amt = parseFloat(depAmt);
+                c.deposit = (c.deposit || 0) + amt;
+                c.spent = (c.spent || 0) + amt; // Adds to their lifetime value immediately
+                
+                // Log the revenue so it shows up in today's take!
+                history.push({
+                    txnId: Date.now().toString(),
+                    clientId: c.id,
+                    clientName: c.name + ' (Pre-Paid Deposit)',
+                    date: getTodayIso(),
+                    amount: amt,
+                    wasFree: false,
+                    wasCredit: false,
+                    givebackAmt: 0,
+                    cutsLogged: 0, // Special case: doesn't count as a haircut
+                    depositAdded: amt // Flag so Undo knows how to reverse it
+                });
+
                 saveAll(); 
                 render(); 
                 showClient(activeId);
