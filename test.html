@@ -1589,7 +1589,21 @@
             c.cuts = (c.cuts || 0) + totalCutsThisSession;
             c.last = document.getElementById('payDate').value;
 
-          // --- SMART UNDO TRACKING ---
+          // Calculate exactly how much money is exchanging hands BEFORE we wipe it
+            const primary = parseFloat(document.getElementById('payPrice').value) || 0;
+            const tip = parseFloat(document.getElementById('payTip').value) || 0;
+            let extraTotal = 0;
+            document.querySelectorAll('.extra-cut-price').forEach(inp => extraTotal += parseFloat(inp.value) || 0);
+            
+            const totalBase = primary + extraTotal;
+            const discount = totals.giveback;
+            
+            const feeClearedAmt = c.pendingFee || 0;
+            const originalDeposit = c.deposit || 0;
+            const cutCostWithFees = (totalBase - discount) + tip + feeClearedAmt;
+            const depositUsed = originalDeposit > cutCostWithFees ? cutCostWithFees : originalDeposit;
+
+            // --- SMART UNDO TRACKING ---
             const txnId = Date.now().toString(); // Create a unique footprint
             history.push({
                 txnId: txnId, 
@@ -1600,27 +1614,19 @@
                 wasFree: wasFreeFlag,
                 wasCredit: wasCreditFlag,
                 givebackAmt: totals.giveback,
-                cutsLogged: totalCutsThisSession, // Tells undo how many to subtract
-                clearedFee: c.pendingFee || 0, // Saves it just in case of undo
-                clearedFeeReason: c.feeReason || "",
-                clearedDep: c.deposit || 0,
-                restoredBdayYear: prevBday,
-                restoredAnniYear: prevAnni,
-                restoredLastDate: prevLastDate
-            });
+                cutsLogged: totalCutsThisSession, 
+                feeCleared: feeClearedAmt, // Saves exactly what was waived
+                clearedFeeReason: c.feeReason || "",
+                depositUsed: depositUsed, // Saves exactly what was spent
+                restoredBdayYear: prevBday,
+                restoredAnniYear: prevAnni,
+                restoredLastDate: prevLastDate
+            });
             
-           // --- NEW: CLEAR LEDGER ---
-            const primary = parseFloat(document.getElementById('payPrice').value) || 0;
-            const tip = parseFloat(document.getElementById('payTip').value) || 0;
-            let extraTotal = 0;
-            document.querySelectorAll('.extra-cut-price').forEach(inp => extraTotal += parseFloat(inp.value) || 0);
-            const totalBase = primary + extraTotal;
-            const discount = totals.giveback;
-
-            const cutCostWithFees = (totalBase - discount) + tip + (c.pendingFee || 0);
+            // --- CLEAR LEDGER ---
             c.pendingFee = 0;
             c.feeReason = "";
-            c.deposit = c.deposit > cutCostWithFees ? c.deposit - cutCostWithFees : 0;
+            c.deposit = originalDeposit - depositUsed;
             // -------------------------
 
             // Loyalty logic handling multiple cuts at once
@@ -1676,6 +1682,7 @@
            // 1. Log the temporary walk-in revenue
             const walkInTempId = 'walkin_' + Date.now();
             history.push({
+                txnId: Date.now().toString(), // Added for data consistency
                 clientId: walkInTempId,
                 clientName: '🚶 Walk-In Client',
                 date: getTodayIso(),
@@ -1819,12 +1826,12 @@
                         pointsToReverse--;
                     }
                     
-                    // --- NEW: RESTORE LEDGER ON UNDO ---
-                    if (h.clearedFee) {
-                        c.pendingFee = h.clearedFee;
+                   // --- NEW: RESTORE LEDGER SAFELY ON UNDO ---
+                    if (h.feeCleared) {
+                        c.pendingFee = (c.pendingFee || 0) + h.feeCleared; // Safely adds the old fee back
                         c.feeReason = h.clearedFeeReason || "Restored Fee";
                     }
-                    if (h.clearedDep) c.deposit = h.clearedDep;
+                    if (h.depositUsed) c.deposit = (c.deposit || 0) + h.depositUsed; // Safely refunds the spent deposit without erasing newer ones
                     if (h.restoredBdayYear !== undefined) c.lastBdayYear = h.restoredBdayYear;
                     if (h.restoredAnniYear !== undefined) c.lastAnniYear = h.restoredAnniYear;
                     if (h.restoredLastDate !== undefined) c.last = h.restoredLastDate;
@@ -1869,12 +1876,12 @@
                         pointsToReverse--;
                     }
                     
-                    // --- NEW: RESTORE LEDGER ON UNDO ---
-                    if (h.clearedFee) {
-                        c.pendingFee = h.clearedFee;
-                        c.feeReason = h.clearedFeeReason || "Restored Fee";
-                    }
-                    if (h.clearedDep) c.deposit = h.clearedDep;
+                    // --- NEW: RESTORE LEDGER SAFELY ON UNDO ---
+                    if (h.feeCleared) {
+                        c.pendingFee = (c.pendingFee || 0) + h.feeCleared; // Safely adds the old fee back
+                        c.feeReason = h.clearedFeeReason || "Restored Fee";
+                    }
+                    if (h.depositUsed) c.deposit = (c.deposit || 0) + h.depositUsed; // Safely refunds the spent deposit without erasing newer ones
                     if (h.restoredBdayYear !== undefined) c.lastBdayYear = h.restoredBdayYear;
                     if (h.restoredAnniYear !== undefined) c.lastAnniYear = h.restoredAnniYear;
                     if (h.restoredLastDate !== undefined) c.last = h.restoredLastDate;
@@ -2418,7 +2425,8 @@
 
            // Check if referral is newly added (works for new clients AND existing ones being updated)
             const existingClient = isNew ? null : getClient(id);
-            const isNewReferral = refName && (isNew || existingClient.refBy !== refName);
+            // Only trigger referral rewards if they didn't already have one! Prevents infinite farming.
+            const isNewReferral = refName && (isNew || !existingClient.refBy);
             
             if(isNewReferral) { 
                 const referee = clients.find(x => x.name.toLowerCase() === refName.toLowerCase()); 
