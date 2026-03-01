@@ -2097,7 +2097,17 @@
             } else div.style.display='none'; 
         }
 
-        function openSchedule() {              // Pre-fills with today's date/time to prevent Invalid Date crash             const now = new Date();             const y = now.getFullYear();             const m = String(now.getMonth() + 1).padStart(2, '0');             const d = String(now.getDate()).padStart(2, '0');             const h = String(now.getHours()).padStart(2, '0');             const min = String(now.getMinutes()).padStart(2, '0');             document.getElementById('schedDate').value = `${y}-${m}-${d}T${h}:${min}`;             openModal('schedModal');          }
+        function openSchedule() { 
+            // Pre-fills with today's date/time to prevent Invalid Date crash
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            const h = String(now.getHours()).padStart(2, '0');
+            const min = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('schedDate').value = `${y}-${m}-${d}T${h}:${min}`;
+            openModal('schedModal'); 
+        }
         function openSettings() { openModal('settingsModal'); }
         
         function openHistory() { 
@@ -2402,11 +2412,7 @@
             } 
         }
         
-        async saveAll(); 
-                render(); 
-                showClient(activeId); // Refreshes the UI to immediately show the new fee
-            } 
-        } { 
+        async function addStrike() {
             const c = getClient(activeId); 
             if(await customConfirm(`Mark ${c.name} as a No-Show? \n\nAdds a Strike 🚩.`)) { 
                 c.strikes = (c.strikes || 0) + 1; 
@@ -2414,7 +2420,7 @@
                 // --- NEW: STRIKE-TO-FEE LINK ---
                 if(await customConfirm(`Add a Penalty Fee to their next cut for this No-Show?`)) {
                     const feeAmt = await customPrompt("Enter the penalty fee amount:", "e.g. 15", "decimal");
-                   if (feeAmt !== null && (feeAmt.trim() === '' || isNaN(feeAmt))) {
+                    if (feeAmt !== null && (feeAmt.trim() === '' || isNaN(feeAmt))) {
                         alert("Invalid fee amount. Strike saved, but no fee was added.");
                     } else if(feeAmt !== null && feeAmt.trim() !== '' && !isNaN(feeAmt)) {
                         c.pendingFee = (c.pendingFee || 0) + parseFloat(feeAmt);
@@ -2422,11 +2428,9 @@
                     }
                 }
                 
-               saveAll(); 
+                saveAll(); 
                 render(); 
                 showClient(activeId); // Refreshes the UI to immediately show the new fee
-            } 
-        }
             } 
         }
 
