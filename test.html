@@ -843,12 +843,23 @@
         </div>
     </div>
     
-    <div id="confirmModal" class="overlay" style="align-items:center; justify-content:center; z-index:1000;">
-        <div class="confirm-box">
-            <div class="confirm-title" id="cMsg">Are you sure?</div>
-            <div class="confirm-btns">
-                <button class="btn btn-ghost" id="cNo">No</button>
-                <button class="btn btn-primary" id="cYes">Yes</button>
+    <div id="confirmModal" class="overlay" style="align-items:flex-start; justify-content:center; z-index:9999; background:transparent; backdrop-filter:none; pointer-events:none;">
+        <div class="confirm-box" style="pointer-events:auto; margin-top:calc(env(safe-area-inset-top, 20px) + 15px); padding:20px; border-radius:24px; box-shadow:0 15px 40px rgba(0,0,0,0.25); border:1px solid var(--border); animation: dropDownToast 0.4s cubic-bezier(0.19, 1, 0.22, 1); max-width: 380px;">
+            <div class="confirm-title" id="cMsg" style="font-size:0.95rem; font-weight:700; margin-bottom:15px; white-space:pre-wrap; line-height:1.4; color:var(--text-main);">Are you sure?</div>
+            <div class="confirm-btns" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:0;">
+                <button class="btn btn-ghost" id="cNo" style="margin:0; padding:12px; border-radius:14px; background:var(--input-bg); border:none; font-size:0.9rem; font-weight:800; color:var(--text-sub);">No</button>
+                <button class="btn btn-primary" id="cYes" style="margin:0; padding:12px; border-radius:14px; font-size:0.9rem; font-weight:800; background:var(--p-blue); color:#000;">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="promptModal" class="overlay" style="align-items:flex-start; justify-content:center; z-index:9999; background:transparent; backdrop-filter:none; pointer-events:none;">
+        <div class="confirm-box" style="pointer-events:auto; margin-top:calc(env(safe-area-inset-top, 20px) + 15px); padding:20px; border-radius:24px; box-shadow:0 15px 40px rgba(0,0,0,0.25); border:1px solid var(--border); animation: dropDownToast 0.4s cubic-bezier(0.19, 1, 0.22, 1); max-width: 380px;">
+            <div class="confirm-title" id="pMsg" style="font-size:0.95rem; font-weight:700; margin-bottom:10px; white-space:pre-wrap; line-height:1.4; color:var(--text-main);">Enter value</div>
+            <input type="text" id="pInput" style="margin-bottom:15px; text-align:center; padding:10px; font-weight:bold; font-size:1.1rem; border-color:var(--p-blue);">
+            <div class="confirm-btns" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:0;">
+                <button class="btn btn-ghost" id="pCancel" style="margin:0; padding:12px; border-radius:14px; background:var(--input-bg); border:none; font-size:0.9rem; font-weight:800; color:var(--text-sub);">Cancel</button>
+                <button class="btn btn-primary" id="pSubmit" style="margin:0; padding:12px; border-radius:14px; font-size:0.9rem; font-weight:800; background:var(--p-blue); color:#000;">Submit</button>
             </div>
         </div>
     </div>
@@ -1360,7 +1371,9 @@
             } else {
                 if(await customConfirm("💀 BLACKLIST this client?\n\nThey will be painted red, moved to archives, and all checkout/text buttons will be disabled.")) {
                     // NEW: Asks for the reason right before banning them
-                    const reason = prompt("Why are they being blacklisted? (Optional)");
+                    const reason = await customPrompt("Why are they being blacklisted? (Optional)", "Reason...");
+                    if (reason === null) return; // Stop if they hit cancel
+
                     c.blacklisted = true;
                     c.archived = false; 
                     c.blacklistReason = reason || "No reason provided.";
@@ -2015,6 +2028,34 @@
                 }; 
             }); 
         }
+
+        // --- NEW: Custom Input Prompt Logic ---
+        let isPromptOpen = false;
+        function customPrompt(msg, placeholder = "", inputMode = "text") {
+            if (isPromptOpen) return Promise.resolve(null);
+            isPromptOpen = true;
+            return new Promise((resolve) => {
+                document.getElementById('pMsg').innerText = msg;
+                const inputEl = document.getElementById('pInput');
+                inputEl.inputMode = inputMode; 
+                inputEl.type = inputMode === "decimal" ? "number" : "text";
+                inputEl.placeholder = placeholder;
+                inputEl.value = '';
+                document.getElementById('promptModal').style.display = 'flex';
+                inputEl.focus();
+
+                document.getElementById('pSubmit').onclick = () => {
+                    document.getElementById('promptModal').style.display = 'none';
+                    isPromptOpen = false;
+                    resolve(inputEl.value);
+                };
+                document.getElementById('pCancel').onclick = () => {
+                    document.getElementById('promptModal').style.display = 'none';
+                    isPromptOpen = false;
+                    resolve(null); // Returns null if they cancel
+                };
+            });
+        }
         
         function searchRef(val) { 
             const div = document.getElementById('refResults'); 
@@ -2327,12 +2368,11 @@
                 c.strikes = (c.strikes || 0) + 1; 
                 
                 // --- NEW: STRIKE-TO-FEE LINK ---
-                if(confirm(`Do you want to add a Penalty Fee to their next cut for this No-Show?\n\nHit OK to add a fee, or Cancel to skip.`)) {
-                    const feeAmt = prompt("Enter the penalty fee amount (e.g. 15):");
-                    if(feeAmt && !isNaN(feeAmt)) {
+                if(await customConfirm(`Add a Penalty Fee to their next cut for this No-Show?`)) {
+                    const feeAmt = await customPrompt("Enter the penalty fee amount:", "e.g. 15", "decimal");
+                    if(feeAmt !== null && feeAmt.trim() !== '' && !isNaN(feeAmt)) {
                         c.pendingFee = (c.pendingFee || 0) + parseFloat(feeAmt);
                         c.feeReason = "No-Show / Late Cancel";
-                        alert(`Added $${parseFloat(feeAmt).toFixed(2)} penalty fee to their tab.`);
                     }
                 }
                 
@@ -2343,10 +2383,11 @@
         }
 
         // --- NEW: LOG DEPOSIT ---
-        function promptDeposit() {
+        async function promptDeposit() {
             const c = getClient(activeId);
-            const depAmt = prompt(`Log a pre-paid deposit for ${c.name} (e.g. 20):`);
-            if(depAmt && !isNaN(depAmt)) {
+            const depAmt = await customPrompt(`Log a pre-paid deposit for ${c.name}:`, "e.g. 20", "decimal");
+            
+            if(depAmt !== null && depAmt.trim() !== '' && !isNaN(depAmt)) {
                 c.deposit = (c.deposit || 0) + parseFloat(depAmt);
                 saveAll(); 
                 render(); 
