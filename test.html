@@ -1697,9 +1697,10 @@
             document.getElementById('wcName').value = '';
             document.getElementById('wcPhone').value = '';
             
-            // 3. Save the exact ID so we can overwrite it safely if they convert
+           // 3. Save the exact ID AND txnId so we can overwrite it safely if they convert
             lastWalkInObj = {
                 tempId: walkInTempId,
+                txnId: history[history.length - 1].txnId, // Grabs the ID we just generated
                 spent: total,
                 basePrice: price
             };
@@ -1743,8 +1744,8 @@
             };
             clients.push(newClient);
             
-            // Retroactively rewrite the receipt to show their real name!
-            const histIndex = history.findIndex(h => h.clientId === lastWalkInObj.tempId);
+            // Retroactively rewrite the receipt to show their real name using the exact txnId!
+            const histIndex = history.findIndex(h => h.txnId === lastWalkInObj.txnId);
             if (histIndex > -1) {
                 history[histIndex].clientId = newId;
                 history[histIndex].clientName = cleanName;
