@@ -1791,14 +1791,14 @@
             }
         }
 
-        // --- SMART UNDO FEATURE ---
+       // --- SMART UNDO FEATURE ---
         async function deleteTransaction(idx) {
             const h = history[idx];
             if(await customConfirm(`Delete $${h.amount.toFixed(2)} entry for ${h.clientName}?\n\nThis will reverse their stats and loyalty.`)) {
                 const c = getClient(h.clientId);
                 if(c) {
                     c.spent = Math.max(0, (c.spent || 0) - h.amount);
-                    c.cuts = Math.max(0, (c.cuts || 0) - 1);
+                    c.cuts = Math.max(0, (c.cuts || 0) - (h.cutsLogged || 1));
                     c.giveback = Math.max(0, (c.giveback || 0) - (h.givebackAmt || 0));
                     
                     if (h.wasFree) {
@@ -1806,12 +1806,16 @@
                     } else if (h.wasCredit) {
                         c.credit = (c.credit || 0) + 5;
                     } else {
-                        // Reverse loyalty point
-                        if (c.loyalty === 0 && (c.banked || 0) > 0) {
-                            c.banked--;
-                           c.loyalty = 4;
-                        } else {
-                            c.loyalty = Math.max(0, (c.loyalty || 0) - 1);
+                        // Reverse loyalty points cleanly
+                        let pointsToReverse = h.cutsLogged || 1;
+                        while(pointsToReverse > 0) {
+                            if (c.loyalty === 0 && (c.banked || 0) > 0) {
+                                c.banked--;
+                                c.loyalty = 4;
+                            } else {
+                                c.loyalty = Math.max(0, (c.loyalty || 0) - 1);
+                            }
+                            pointsToReverse--;
                         }
                     }
                     
