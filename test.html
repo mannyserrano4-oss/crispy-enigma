@@ -595,7 +595,7 @@
             <h3>Revenue Stats</h3>
             <p style="color:var(--text-sub); margin-top:-10px; font-size:0.9rem;">Your yearly performance at a glance.</p>
             <div id="statsContent"></div>
-            <button class="btn btn-ghost" onclick="closeModal('statsModal')">Close</button>
+            <button class="btn btn-ghost" onclick="closeModal('statsModal'); openModal('settingsModal')"><i class="fas fa-arrow-left"></i> Back to Settings</button>
         </div>
     </div>
 
@@ -938,7 +938,7 @@
         <div class="sheet">
             <h3>Transaction History</h3>
             <div id="historyList" style="margin-bottom:20px;"></div>
-            <button class="btn btn-ghost" onclick="closeModal('historyModal')">Close</button>
+            <button class="btn btn-ghost" onclick="closeModal('historyModal'); openModal('settingsModal')"><i class="fas fa-arrow-left"></i> Back to Settings</button>
         </div>
     </div>
 
