@@ -858,26 +858,10 @@
         </div>
     </div>
 
-    <div id="briefingModal" class="overlay" style="z-index: 900;">
-        <div class="sheet">
-            <h2 style="margin-top:0; margin-bottom:5px; font-size:1.8rem; display:flex; align-items:center; gap:10px;">
-                <i class="fas fa-coffee" style="color:#8d6e63;"></i> The Morning Brief
-            </h2>
-            <p style="color:var(--text-sub); margin-top:0; font-size:0.9rem; font-weight:600; margin-bottom:20px;" id="briefingDate">...</p>
-            
-            <div id="briefingContent"></div>
-            
-            <button class="btn btn-primary" style="margin-top:10px; background:var(--bg-card); border:2px solid var(--border); color:var(--text-main); box-shadow:none;" onclick="closeModal('briefingModal')">Let's Get to Work</button>
-        </div>
-    </div>
-    
     <div id="moreMenuModal" class="overlay" style="z-index: 850;">
         <div class="sheet">
             <h3 style="margin-top: 0; margin-bottom: 20px;">More Actions</h3>
-            <div class="sms-opt" onclick="closeModal('moreMenuModal'); openBriefing()" style="background: linear-gradient(135deg, #fff9c4 0%, #fff176 100%); border: 1px solid var(--p-gold);">
-                <span style="color: #5d4037; font-weight: 800;"><i class="fas fa-coffee" style="width:25px; color: #5d4037;"></i> Daily Briefing</span>
-                <i class="fas fa-chevron-right" style="font-size:0.8rem; color: #5d4037;"></i>
-            </div>
+            
             <div class="sms-opt" onclick="closeModal('moreMenuModal'); openBriefing()" style="background: linear-gradient(135deg, #fff9c4 0%, #fff176 100%); border: 1px solid var(--p-gold);">
                 <span style="color: #5d4037; font-weight: 800;"><i class="fas fa-coffee" style="width:25px; color: #5d4037;"></i> Daily Briefing</span>
                 <i class="fas fa-chevron-right" style="font-size:0.8rem; color: #5d4037;"></i>
@@ -885,11 +869,6 @@
             
             <div class="sms-opt" onclick="closeModal('moreMenuModal'); openQrMenu()">
                 <span><i class="fas fa-qrcode" style="width:25px; color:var(--text-sub);"></i> QR Scan Hub</span>
-                <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--text-sub);"></i>
-            </div>
-            
-            <div class="sms-opt" onclick="closeModal('moreMenuModal'); copyRoster()">
-                <span><i class="fas fa-clipboard-list" style="width:25px; color:var(--text-sub);"></i> Copy Client Roster</span>
                 <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--text-sub);"></i>
             </div>
             
@@ -906,7 +885,6 @@
             <button class="btn btn-ghost" onclick="closeModal('moreMenuModal')" style="margin-top: 15px;">Close</button>
         </div>
     </div>
-
     <div id="qrMenuModal" class="overlay" style="z-index: 850;">
         <div class="sheet">
             <h3>Client Scan Hub</h3>
