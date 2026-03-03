@@ -473,9 +473,12 @@
 
     <div id="viewModal" class="overlay">
         <div class="sheet">
-            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                 <h2 style="margin:0; font-size:1.8rem; text-transform: capitalize;" id="vName">Name</h2>
-                <div style="font-weight:700; color:var(--p-blue-dark);" onclick="editClient()">EDIT</div>
+                <div style="display:flex; gap:15px; align-items:center;">
+                    <div style="font-weight:700; color:var(--p-blue-dark); cursor:pointer;" onclick="editClient()">EDIT</div>
+                    <i class="fas fa-times" style="font-size:1.6rem; color:var(--text-sub); cursor:pointer; padding-left:5px;" onclick="closeModal('viewModal')"></i>
+                </div>
             </div>
             <p id="vSub" style="color:var(--text-sub); margin-top:-10px;">Phone</p>
             <p id="vInstaDisplay" style="color:#E1306C; font-size:0.9rem; margin-top:-5px; margin-bottom:15px; cursor:pointer; display:none; font-weight: 700;" onclick="copyInsta()">
@@ -601,7 +604,10 @@
 
     <div id="checkoutModal" class="overlay" style="z-index:800;">
         <div class="sheet">
-            <h3>Checkout</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 style="margin:0;">Checkout</h3>
+                <i class="fas fa-times" style="font-size:1.6rem; color:var(--text-sub); cursor:pointer;" onclick="closeModal('checkoutModal')"></i>
+            </div>
             
             <label>Date of Cut</label>
             <input type="date" id="payDate" style="margin-bottom:15px;">
@@ -699,7 +705,10 @@
 
     <div id="editModal" class="overlay">
         <div class="sheet">
-            <h3 id="eTitle">Client</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 id="eTitle" style="margin:0;">Client</h3>
+                <i class="fas fa-times" style="font-size:1.6rem; color:var(--text-sub); cursor:pointer;" onclick="cancelEdit()"></i>
+            </div>
             <form onsubmit="event.preventDefault(); saveClient();">
                 <input type="hidden" id="eId">
                 <div style="border:2px solid var(--p-blue); padding:15px; border-radius:15px; margin-bottom:15px; background:rgba(162,210,255,0.1);">
@@ -1436,7 +1445,10 @@
                div.innerHTML = `
                     <div class="cc-top">
                         <div class="cc-name">${c.name} ${badges}${flags}${skullFlag}</div>
-                        <div class="cc-due">${getDueStr(c)}</div>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div class="cc-due">${getDueStr(c)}</div>
+                            ${!c.blacklisted ? `<div onclick="event.stopPropagation(); activeId='${c.id}'; openCheckout();" style="background:var(--p-green); color:#000; width:32px; height:32px; border-radius:10px; display:flex; align-items:center; justify-content:center; box-shadow: 0 2px 8px rgba(183, 228, 199, 0.4);"><i class="fas fa-cash-register"></i></div>` : ''}
+                        </div>
                     </div>
                     <div class="cc-info">Last: ${formatPretty(c.last)}</div>
                     <div class="loyalty-visual">${getLoyaltyVisual(c.loyalty)}</div>
