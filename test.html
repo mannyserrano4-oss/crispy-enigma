@@ -804,24 +804,18 @@
             <label>Target Audience</label>
             <select id="promoTarget" style="margin-bottom:15px;" onchange="buildPromoList()">
                 <option value="all">All Active Clients</option>
-                </select>
+            </select>
 
             <label>The Message</label>
             <textarea id="promoMsg" rows="3" style="border-color:var(--p-purple-dark); font-weight:600;">Got a few spots open later this week! Let me know if you need to lock one in. 💈</textarea>
             
-                        <div id="promoList" style="max-height: 250px; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; margin: 15px 0; border: 1px solid var(--border); border-radius: 12px; padding: 5px;">
-
-                </div>
+            <div id="promoList" style="max-height: 250px; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; margin: 15px 0; border: 1px solid var(--border); border-radius: 12px; padding: 5px;">
+            </div>
 
             <button class="btn btn-ghost" onclick="closeModal('promoModal')">Close</button>
         </div>
     </div>
 
-
-    <button class="btn btn-ghost" onclick="closeModal('promoModal')">Close</button>
-        </div>
-    </div>
-    
     <div id="moreMenuModal" class="overlay" style="z-index: 850;">
         <div class="sheet">
             <h3 style="margin-top: 0; margin-bottom: 20px;">More Actions</h3>
@@ -849,11 +843,7 @@
             <button class="btn btn-ghost" onclick="closeModal('moreMenuModal')" style="margin-top: 15px;">Close</button>
         </div>
     </div>
-    <div id="qrMenuModal" class="overlay" style="z-index: 850;">
-        <div class="sheet">
-            <h3>Client Scan Hub</h3>
-            <p style="color:var(--text-sub); margin-top:-10px; font-size:0.8rem;">Have the client scan your screen.</p>
-    
+
     <div id="qrMenuModal" class="overlay" style="z-index: 850;">
         <div class="sheet">
             <h3>Client Scan Hub</h3>
