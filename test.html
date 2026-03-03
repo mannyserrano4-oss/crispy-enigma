@@ -1169,6 +1169,48 @@
                 });
             }
 
+            // --- NEW: EMPTY STATES ---
+            if (filtered.length === 0) {
+                let emptyIcon = "fas fa-users";
+                let emptyText = "No clients found.";
+                let emptySub = "Try adjusting your search or add a new client.";
+
+                if (search) {
+                    emptyIcon = "fas fa-search";
+                    emptyText = "No Matches Found";
+                    emptySub = `No one on the roster named "${search}".`;
+                } else if (viewArchives) {
+                    emptyIcon = "fas fa-ghost";
+                    emptyText = "The Graveyard is Empty";
+                    emptySub = "No archived or blacklisted clients.";
+                } else if (activeFilter === 'overdue') {
+                    emptyIcon = "fas fa-check-circle";
+                    emptyText = "Everyone is Caught Up!";
+                    emptySub = "No clients are currently overdue. Great retention! 🚀";
+                } else if (activeFilter === 'due') {
+                    emptyIcon = "fas fa-calendar-check";
+                    emptyText = "No one due yet.";
+                    emptySub = "Your pipeline is looking clear.";
+                } else if (activeFilter === 'all') {
+                    emptyIcon = "fas fa-user-plus";
+                    emptyText = "Your Book is Empty";
+                    emptySub = "Tap the + button below to add your first client.";
+                }
+
+                list.innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px; opacity: 0.6; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <i class="${emptyIcon}" style="font-size: 3.5rem; margin-bottom: 15px; color: var(--text-sub);"></i>
+                        <h3 style="margin: 0 0 8px 0; color: var(--text-main); font-weight: 800;">${emptyText}</h3>
+                        <p style="margin: 0; font-size: 0.9rem; color: var(--text-sub); line-height: 1.4;">${emptySub}</p>
+                    </div>
+                `;
+                
+                // Triggers the 48-hr check even if the main list is empty, then stops the function
+                renderConcierge(); 
+                return; 
+            }
+            // --- END EMPTY STATES ---
+            
             filtered.forEach(c => {
                 const stat = getStatus(c);
                 let badges = '';
