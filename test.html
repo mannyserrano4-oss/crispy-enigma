@@ -2693,7 +2693,7 @@
             VIBE_TAGS.forEach(t => { 
                 const pill = document.createElement('div'); 
                 pill.className = 'tag-pill'; 
-                pill.innerText = t; 
+                pill.textContent = t; 
                 pill.onclick = () => pill.classList.toggle('active'); 
                 tagBox.appendChild(pill); 
             });
@@ -2729,7 +2729,7 @@
             VIBE_TAGS.forEach(t => {
                 const pill = document.createElement('div');
                 pill.className = `tag-pill ${myTags.includes(t) ? 'active' : ''}`;
-                pill.innerText = t;
+                pill.textContent = t;
                 pill.onclick = () => pill.classList.toggle('active');
                 tagBox.appendChild(pill);
             });
