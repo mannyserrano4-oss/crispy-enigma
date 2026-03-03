@@ -1074,7 +1074,12 @@
         };
 
         function openModal(id) { 
-            document.getElementById(id).style.display = 'flex'; 
+            const modalEl = document.getElementById(id);
+            
+            // NEW: Automatically snap all <details> drawers shut when opening a menu!
+            modalEl.querySelectorAll('details').forEach(d => d.removeAttribute('open'));
+            
+            modalEl.style.display = 'flex'; 
             document.body.style.overflow = 'hidden';
         }
 
