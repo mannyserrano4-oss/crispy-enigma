@@ -703,7 +703,7 @@
             <form onsubmit="event.preventDefault(); saveClient();">
                 <input type="hidden" id="eId">
                 <div style="border:2px solid var(--p-blue); padding:15px; border-radius:15px; margin-bottom:15px; background:rgba(162,210,255,0.1);">
-                    <label style="color:var(--p-blue-dark)">Identity</label>
+                    <label style="color:var(--p-blue-dark); font-size:1rem; margin-bottom:10px;">Identity</label>
                     <input type="text" id="eName" placeholder="Full Name" required autocapitalize="words" style="border-color:var(--p-blue); text-transform: capitalize;">
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                         <input type="tel" id="ePhone" placeholder="Phone">
@@ -713,69 +713,83 @@
                     <input type="text" id="eAddr" placeholder="Address">
                 </div>
 
-                <div style="border:2px solid var(--p-green); padding:15px; border-radius:15px; margin-bottom:15px; background:rgba(183,228,199,0.1);">
-                    <label style="color:var(--p-green-dark)">Service</label>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                        <div><label>Price</label><input type="number" id="ePrice" value="35" onfocus="this.select()"></div>
-                        <div><label>Freq (Wks)</label><input type="number" id="eFreq" value="4" onfocus="this.select()"></div>
-                    </div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                        <div><label>First Cut</label><input type="date" id="eFirst"></div>
-                        <div><label>Birthday</label><input type="date" id="eDob"></div>
-                    </div>
-                    <label style="margin-top:10px;">The Formula</label>
-                    <input type="text" id="eFormula" placeholder="e.g. Mid fade, #1.5 into #3">
-                </div>
-
-                <div style="border:2px solid var(--p-purple); padding:15px; border-radius:15px; margin-bottom:15px; background:rgba(205,180,219,0.1);">
-                    <label style="color:var(--p-purple)">Connection & Vibe</label>
-                    
-                    <label style="color:var(--p-purple-dark); margin-bottom:5px;">💡 Icebreaker (Ask next time)</label>
-                    <input type="text" id="eIcebreaker" placeholder="e.g. Ask how the Mexico trip was" style="border-color:var(--p-gold); background:#fffde7;">
-                    
-                    <label style="margin-top:10px;">Acquisition Source</label>
-                    <select id="eSource" style="margin-bottom:15px; border-color:var(--p-purple);">
-                        <option value="Unknown">Unknown / Walk-In</option>
-                        <option value="Instagram">Instagram</option>
-                        <option value="Word of Mouth">Word of Mouth / Referral</option>
-                        <option value="Google">Google / Maps</option>
-                        <option value="Other">Other</option>
-                    </select>
-
-                    <label style="display:flex; align-items:center; gap:10px; margin-bottom:15px; color:var(--text-main); text-transform:none;">
-                        <input type="checkbox" id="eComedy" style="width:20px; height:20px; margin:0;">
-                        <span style="font-size:0.85rem; font-weight:700; color:var(--p-purple-dark);">🎭 Add to Comedy Show Invites</span>
-                    </label>
-
-                    <input type="text" id="eRef" placeholder="Referred By..." oninput="searchRef(this.value)" onblur="setTimeout(() => document.getElementById('refResults').style.display='none', 200)">
-                    <div id="refResults" style="background:var(--bg-card); display:none; border:1px solid var(--border); padding:10px;"></div>
-                    
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <label>Permanent Notes</label>
-                        <span onclick="insertDate()" style="font-size:0.7rem; color:var(--p-blue-dark); cursor:pointer; font-weight:bold;">+ Insert Date</span>
-                    </div>
-                    <textarea id="eNotes" rows="3" placeholder="Permanent info (Wife, Job, etc)"></textarea>
-                    
-                    <label style="margin-top:10px;">Vibe Tags</label>
-                    <div class="tag-grid" id="eTags"></div>
-                </div>
-
-                <div style="border:2px solid #FFD700; padding:15px; border-radius:15px; margin-bottom:15px; background:rgba(255, 215, 0, 0.05);">
-                    <label style="color:#b8860b;">Admin: Loyalty & Rewards</label>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:8px;">
-                        <div>
-                            <label style="font-size:0.7rem;">Banked Free Cuts</label>
-                            <input type="number" id="eBanked" value="0" min="0" inputmode="numeric" pattern="[0-9]*">
+                <details style="border:2px solid var(--p-green); padding:15px; border-radius:15px; margin-bottom:15px; background:rgba(183,228,199,0.1);">
+                    <summary style="color:var(--p-green-dark); font-weight:800; font-size:1rem; outline:none; cursor:pointer; list-style:none; display:flex; justify-content:space-between; align-items:center;">
+                        <span><i class="fas fa-cut" style="margin-right:8px;"></i> Service Details</span>
+                        <i class="fas fa-chevron-down" style="font-size:0.8rem;"></i>
+                    </summary>
+                    <div style="margin-top:15px;">
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                            <div><label>Price</label><input type="number" id="ePrice" value="35" onfocus="this.select()"></div>
+                            <div><label>Freq (Wks)</label><input type="number" id="eFreq" value="4" onfocus="this.select()"></div>
                         </div>
-                        <div>
-                            <label style="font-size:0.7rem;" id="lblLoyaltyEdit">Points (0-4 ✂️)</label>
-                            <input type="number" id="eLoyalty" value="0" min="0" inputmode="numeric" pattern="[0-9]*">
-                        </div>
-                    </div>
-                    <p style="font-size: 0.65rem; color: var(--text-sub); margin: 0; font-style: italic;" id="lblLoyaltyNote">
-                        *Use this to manually fix mistakes. 5 points automatically = 1 Banked Cut.
-                    </p>
-                </div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                            <div><label>First Cut</label><input type="date" id="eFirst"></div>
+                            <div><label>Birthday</label><input type="date" id="eDob"></div>
+                        </div>
+                        <label style="margin-top:10px;">The Formula</label>
+                        <input type="text" id="eFormula" placeholder="e.g. Mid fade, #1.5 into #3">
+                    </div>
+                </details>
+
+                <details style="border:2px solid var(--p-purple); padding:15px; border-radius:15px; margin-bottom:15px; background:rgba(205,180,219,0.1);">
+                    <summary style="color:var(--p-purple); font-weight:800; font-size:1rem; outline:none; cursor:pointer; list-style:none; display:flex; justify-content:space-between; align-items:center;">
+                        <span><i class="fas fa-users" style="margin-right:8px;"></i> Connection & Vibe</span>
+                        <i class="fas fa-chevron-down" style="font-size:0.8rem;"></i>
+                    </summary>
+                    <div style="margin-top:15px;">
+                        <label style="color:var(--p-purple-dark); margin-bottom:5px;">💡 Icebreaker (Ask next time)</label>
+                        <input type="text" id="eIcebreaker" placeholder="e.g. Ask how the Mexico trip was" style="border-color:var(--p-gold); background:#fffde7;">
+                        
+                        <label style="margin-top:10px;">Acquisition Source</label>
+                        <select id="eSource" style="margin-bottom:15px; border-color:var(--p-purple);">
+                            <option value="Unknown">Unknown / Walk-In</option>
+                            <option value="Instagram">Instagram</option>
+                            <option value="Word of Mouth">Word of Mouth / Referral</option>
+                            <option value="Google">Google / Maps</option>
+                            <option value="Other">Other</option>
+                        </select>
+
+                        <label style="display:flex; align-items:center; gap:10px; margin-bottom:15px; color:var(--text-main); text-transform:none;">
+                            <input type="checkbox" id="eComedy" style="width:20px; height:20px; margin:0;">
+                            <span style="font-size:0.85rem; font-weight:700; color:var(--p-purple-dark);">🎭 Add to Comedy Show Invites</span>
+                        </label>
+
+                        <input type="text" id="eRef" placeholder="Referred By..." oninput="searchRef(this.value)" onblur="setTimeout(() => document.getElementById('refResults').style.display='none', 200)">
+                        <div id="refResults" style="background:var(--bg-card); display:none; border:1px solid var(--border); padding:10px;"></div>
+                        
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <label>Permanent Notes</label>
+                            <span onclick="insertDate()" style="font-size:0.7rem; color:var(--p-blue-dark); cursor:pointer; font-weight:bold;">+ Insert Date</span>
+                        </div>
+                        <textarea id="eNotes" rows="3" placeholder="Permanent info (Wife, Job, etc)"></textarea>
+                        
+                        <label style="margin-top:10px;">Vibe Tags</label>
+                        <div class="tag-grid" id="eTags"></div>
+                    </div>
+                </details>
+
+                <details style="border:2px solid #FFD700; padding:15px; border-radius:15px; margin-bottom:15px; background:rgba(255, 215, 0, 0.05);">
+                    <summary style="color:#b8860b; font-weight:800; font-size:1rem; outline:none; cursor:pointer; list-style:none; display:flex; justify-content:space-between; align-items:center;">
+                        <span><i class="fas fa-crown" style="margin-right:8px; filter:none;"></i> Admin: Loyalty & Rewards</span>
+                        <i class="fas fa-chevron-down" style="font-size:0.8rem;"></i>
+                    </summary>
+                    <div style="margin-top:15px;">
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:10px;">
+                            <div>
+                                <label style="font-size:0.7rem;">Banked Free Cuts</label>
+                                <input type="number" id="eBanked" value="0" min="0" inputmode="numeric" pattern="[0-9]*" style="margin-bottom:0;">
+                            </div>
+                            <div>
+                                <label style="font-size:0.7rem;" id="lblLoyaltyEdit">Points (0-4 ✂️)</label>
+                                <input type="number" id="eLoyalty" value="0" min="0" inputmode="numeric" pattern="[0-9]*" style="margin-bottom:0;">
+                            </div>
+                        </div>
+                        <p style="font-size: 0.65rem; color: var(--text-sub); margin: 0; font-style: italic;" id="lblLoyaltyNote">
+                            *Use this to manually fix mistakes. 5 points automatically = 1 Banked Cut.
+                        </p>
+                    </div>
+                </details>
 
                 <button class="btn btn-primary">Save Client</button>
                 <button type="button" class="btn btn-red" onclick="deleteClient()">Delete</button>
