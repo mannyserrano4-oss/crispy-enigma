@@ -477,6 +477,34 @@
             <p id="vInstaDisplay" style="color:#E1306C; font-size:0.9rem; margin-top:-5px; margin-bottom:15px; cursor:pointer; display:none; font-weight: 700;" onclick="copyInsta()">
                 <span id="vInstaText"></span>
             </p>
+
+            <div style="display: flex; gap: 15px; margin-bottom: 20px; justify-content: flex-start;">
+                <a id="btnCall" href="#" style="display:flex; flex-direction:column; align-items:center; gap:6px; text-decoration:none; color:var(--p-blue-dark);">
+                    <div style="width:48px; height:48px; border-radius:50%; background:rgba(162,210,255,0.2); display:flex; align-items:center; justify-content:center; font-size:1.2rem;">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <span style="font-size:0.75rem; font-weight:800;">Call</span>
+                </a>
+                <div onclick="openSmsMenu()" style="display:flex; flex-direction:column; align-items:center; gap:6px; color:var(--p-blue-dark); cursor:pointer;">
+                    <div style="width:48px; height:48px; border-radius:50%; background:rgba(162,210,255,0.2); display:flex; align-items:center; justify-content:center; font-size:1.2rem;">
+                        <i class="fas fa-comment"></i>
+                    </div>
+                    <span style="font-size:0.75rem; font-weight:800;">Text</span>
+                </div>
+                <a id="btnEmail" href="#" style="display:none; flex-direction:column; align-items:center; gap:6px; text-decoration:none; color:var(--text-sub);">
+                    <div style="width:48px; height:48px; border-radius:50%; background:var(--input-bg); display:flex; align-items:center; justify-content:center; font-size:1.2rem; border:1px solid var(--border);">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <span style="font-size:0.75rem; font-weight:800;">Email</span>
+                </a>
+                <a id="btnNav" href="#" target="_blank" style="display:none; flex-direction:column; align-items:center; gap:6px; text-decoration:none; color:var(--p-green-dark);">
+                    <div style="width:48px; height:48px; border-radius:50%; background:rgba(183, 228, 199, 0.2); display:flex; align-items:center; justify-content:center; font-size:1.2rem;">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <span style="font-size:0.75rem; font-weight:800;">Map</span>
+                </a>
+            </div>
+
             <div id="vBadges" style="margin-bottom:15px; display:flex; gap:5px;"></div>
             
             <div id="vIcebreaker" class="icebreaker-box" style="display:none;">
@@ -498,17 +526,6 @@
                 <div id="vDeposit" style="color:var(--p-green); font-weight:800; font-size:1.05rem; display:none;"></div>
             </div>
 
-            <div class="contact-grid">
-                <a id="btnCall" href="#" class="c-btn"><i class="fas fa-phone"></i> Call</a>
-                <div class="c-btn" onclick="openSmsMenu()"><i class="fas fa-comment"></i> Text</div>
-                <a id="btnNav" href="#" target="_blank" class="c-btn" style="grid-column: span 2; display: none; background: #34c759; border-color: #248a3d; color: white;">
-                    <i class="fas fa-map-marker-alt"></i> Get Directions
-                </a>
-            </div>
-            <a id="btnEmail" href="#" class="c-btn" style="width:100%; box-sizing:border-box; margin-bottom:20px; display:none;">
-                <i class="fas fa-envelope"></i> Send Email
-            </a>
-
             <div class="v-grid">
                 <div class="v-box">
                     <span class="v-big" id="vLoyalty"></span>
@@ -529,30 +546,38 @@
                 </div>
             </div>
 
-                       <button id="btnCheckout" class="btn btn-green" onclick="openCheckout()"><i class="fas fa-cash-register"></i> Record Cut / Checkout</button>
+            <button id="btnCheckout" class="btn btn-green" onclick="openCheckout()"><i class="fas fa-cash-register"></i> Record Cut / Checkout</button>
             
             <button id="btnDeposit" class="btn btn-ghost" style="color:var(--p-green); border-color:var(--p-green); margin-top:10px;" onclick="promptDeposit()">
                 <i class="fas fa-hand-holding-usd"></i> Log Deposit / Pre-Pay
             </button>
             
-            <button id="btnAddStrike" class="btn btn-ghost" style="color:var(--status-overdue); border-color:var(--status-overdue); margin-top:10px;" onclick="addStrike()">
-                <i class="fas fa-ban"></i> Record No-Show (Add Strike)
-            </button>
-            <button id="btnRemStrike" class="btn btn-ghost" style="color:var(--text-sub); border-color:var(--border); margin-top:10px; display:none;" onclick="removeStrike()">
-                <i class="fas fa-eraser"></i> Remove Strike
-            </button>
+            <details style="background:var(--bg-card); border: 1px solid rgba(255, 0, 84, 0.3); border-radius: 16px; padding: 15px; margin-top: 15px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(255, 0, 84, 0.05);">
+                <summary style="font-weight: 800; color: var(--status-overdue); font-size:0.95rem; outline: none; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center;">
+                    <span><i class="fas fa-exclamation-triangle" style="margin-right:8px;"></i> Admin & Danger Zone</span>
+                    <i class="fas fa-chevron-down" style="font-size:0.8rem;"></i>
+                </summary>
+                
+                <div style="margin-top: 15px;">
+                    <button id="btnAddStrike" class="btn btn-ghost" style="color:var(--status-overdue); border-color:var(--status-overdue); margin-top:0;" onclick="addStrike()">
+                        <i class="fas fa-ban"></i> Record No-Show (Add Strike)
+                    </button>
+                    <button id="btnRemStrike" class="btn btn-ghost" style="color:var(--text-sub); border-color:var(--border); margin-top:10px; display:none;" onclick="removeStrike()">
+                        <i class="fas fa-eraser"></i> Remove Strike
+                    </button>
 
-            <div style="display:flex; justify-content:space-between; gap:10px; margin-top:10px;">
-                <button id="btnArchive" class="btn btn-ghost" style="flex:1; border:none; color:var(--text-sub); font-size:0.85rem;" onclick="toggleArchive()">
-                    <i class="fas fa-archive"></i> Archive
-                </button>
-                <button id="btnBlacklist" class="btn btn-ghost" style="flex:1; border:none; color:#d32f2f; font-size:0.85rem; font-weight:800;" onclick="toggleBlacklist()">
-                    <i class="fas fa-skull"></i> Blacklist
-                </button>
-            </div>
+                    <div style="display:flex; justify-content:space-between; gap:10px; margin-top:10px;">
+                        <button id="btnArchive" class="btn btn-ghost" style="flex:1; border:none; color:var(--text-sub); font-size:0.85rem; background: var(--input-bg);" onclick="toggleArchive()">
+                            <i class="fas fa-archive"></i> Archive
+                        </button>
+                        <button id="btnBlacklist" class="btn btn-ghost" style="flex:1; border:none; color:#d32f2f; font-size:0.85rem; font-weight:800; background: #ffebee;" onclick="toggleBlacklist()">
+                            <i class="fas fa-skull"></i> Blacklist
+                        </button>
+                    </div>
+                </div>
+            </details>
             
             <div id="vBottomGrid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px;">
-
                 <button class="btn btn-primary" onclick="openSchedule()"><i class="fas fa-calendar"></i> Schedule</button>
                 <button class="btn btn-ghost" onclick="openInsta()" id="btnInsta"><i class="fab fa-instagram"></i> Instagram</button>
             </div>
