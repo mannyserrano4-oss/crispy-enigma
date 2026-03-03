@@ -138,7 +138,10 @@
 
         .metric-pill:first-child::after { background: var(--p-green-dark); }
         .metric-pill:last-child::after { background: var(--p-pink-dark); }
-        .metric-pill:active { transform: scale(0.96); }
+        .metric-pill:active, .btn:active, .fab:active, .client-card:active, .sms-opt:active { 
+            transform: scale(0.96); 
+            transition: transform 0.1s ease; 
+        }
 
         .m-lbl { 
             font-size: 0.65rem; 
@@ -457,7 +460,8 @@
     <div class="footer-bar">
         <div class="search-wrap">
             <i class="fas fa-search search-icon"></i>
-            <input type="text" class="search-input" placeholder="Search..." oninput="handleSearch(this.value)">
+            <input type="text" id="mainSearchInput" class="search-input" placeholder="Search..." oninput="handleSearch(this.value)">
+            <i id="clearSearchIcon" class="fas fa-times" onclick="clearSearch()" style="display:none; position:absolute; right:15px; top:16px; color:var(--text-sub); font-size:1.1rem; cursor:pointer; padding:5px; margin-top:-5px;"></i>
         </div>
         <div class="fab" style="background:var(--p-blue); margin-right:10px;" onclick="openWalkIn()">
             <i class="fas fa-bolt"></i>
@@ -1099,8 +1103,20 @@
         }
 
         function handleSearch(val) {
+            // Show the X if there is text, hide it if empty
+            document.getElementById('clearSearchIcon').style.display = val.length > 0 ? 'block' : 'none';
+            
             // Skips updateMetrics() for lightning speed
             renderList(val);
+        }
+
+        // NEW: Instantly clears the search bar and re-renders
+        function clearSearch() {
+            const input = document.getElementById('mainSearchInput');
+            input.value = '';
+            document.getElementById('clearSearchIcon').style.display = 'none';
+            renderList('');
+            input.focus(); // Keeps the keyboard open so you can quickly type a new name
         }
 
         function updateMetrics() {
@@ -2187,7 +2203,10 @@
             
             // Clear the search bar when switching tabs so the UI isn't confusingly locked
             const searchInput = document.querySelector('.search-input');
-            if(searchInput.value) searchInput.value = '';
+            if(searchInput.value) {
+                searchInput.value = '';
+                document.getElementById('clearSearchIcon').style.display = 'none';
+            }
             
             render(''); 
         }
