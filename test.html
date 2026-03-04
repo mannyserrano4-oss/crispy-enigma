@@ -3239,36 +3239,52 @@
             // Calculate total money about to be pruned
             const totalPrunedMoney = oldHistory.reduce((sum, h) => sum + h.amount, 0);
 
-            if(await customConfirm(`⚠️ STORAGE CLEANUP\n\nYou are about to delete ${oldHistory.length} old receipts from before ${currentYear}.\n\nClient profiles, LTVs, and loyalty will NOT be affected. \n\nProceed to Step 2?`)) {
-                
-                // 1. Force the double backup (JSON + CSV)
-                exportData(); 
-                setTimeout(() => exportHistoryCSV(), 800); // Slight delay so the browser doesn't block the second download
-
-                // 2. The Safety Lock
-                const typed = await customPrompt(`Both backups have been downloaded to your device.\n\nTo permanently delete ${oldHistory.length} old receipts and free up space, type PRUNE below:`, "Type PRUNE here");
-                
-                if (typed !== "PRUNE") {
-                    return alert("Cleanup canceled. Your data was not touched.");
-                }
-
-                // 3. Tally up the old revenue so your Stats page doesn't break
-                if (!settings.archivedRevenue) settings.archivedRevenue = {};
-                
-                oldHistory.forEach(h => {
-                    const year = h.date.split('-')[0];
-                    if (!settings.archivedRevenue[year]) settings.archivedRevenue[year] = 0;
-                    settings.archivedRevenue[year] += h.amount;
-                });
-
-                // 4. Keep ONLY this year's history
-                history = history.filter(h => h.date.startsWith(currentYear));
-                
-                // 5. Save and reload
-                saveAll();
-                alert(`Success! Removed ${oldHistory.length} old receipts and secured $${totalPrunedMoney.toFixed(2)} in your stats archive. Your app is running light and fast.`);
-                render();
+            if(!await customConfirm(`⚠️ STORAGE CLEANUP\n\nYou are about to delete ${oldHistory.length} old receipts from before ${currentYear}.\n\nClient profiles, LTVs, and loyalty will NOT be affected.\n\nReady to begin backup?`)) {
+                return;
             }
+
+            // Step 1: Force User-Initiated JSON Download
+            if(await customConfirm("STEP 1: DOWNLOAD FULL BACKUP\n\nClick 'Yes' to save your .json database file. (Required)")) {
+                exportData(); 
+            } else {
+                return alert("Cleanup canceled. You must download your backup first.");
+            }
+
+            // Short pause so the UI modals don't glitch on top of each other
+            await new Promise(r => setTimeout(r, 400));
+
+            // Step 2: Force User-Initiated CSV Download
+            if(await customConfirm("STEP 2: DOWNLOAD TAX CSV\n\nClick 'Yes' to save your readable .csv receipt history. (Required)")) {
+                exportHistoryCSV();
+            } else {
+                return alert("Cleanup canceled. You must download your CSV first.");
+            }
+
+            await new Promise(r => setTimeout(r, 400));
+
+            // Step 3: The Safety Lock
+            const typed = await customPrompt(`Both backups triggered!\n\nTo permanently delete ${oldHistory.length} old receipts and free up space, type PRUNE below:`, "Type PRUNE here");
+            
+            if (typed !== "PRUNE") {
+                return alert("Cleanup canceled. Your data was not touched.");
+            }
+
+            // 4. Tally up the old revenue so your Stats page doesn't break
+            if (!settings.archivedRevenue) settings.archivedRevenue = {};
+            
+            oldHistory.forEach(h => {
+                const year = h.date.split('-')[0];
+                if (!settings.archivedRevenue[year]) settings.archivedRevenue[year] = 0;
+                settings.archivedRevenue[year] += h.amount;
+            });
+
+            // 5. Keep ONLY this year's history
+            history = history.filter(h => h.date.startsWith(currentYear));
+            
+            // 6. Save and reload
+            saveAll();
+            alert(`Success! Removed ${oldHistory.length} old receipts and secured $${totalPrunedMoney.toFixed(2)} in your stats archive. Your app is running light and fast.`);
+            render();
         }
         // ------------------------------------------
 
