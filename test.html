@@ -2028,11 +2028,14 @@
             openModal('walkInConvertModal');
         }
 
-        function convertWalkIn() {
+        async function convertWalkIn() {
             let rawName = document.getElementById('wcName').value.trim();
             const phone = document.getElementById('wcPhone').value.trim();
             
-            if (!rawName) return alert("Please enter a name to convert.");
+            if (!rawName) {
+                await customConfirm("Please enter a name to convert.");
+                return;
+            }
             
             const cleanName = rawName.replace(/\b\w/g, char => char.toUpperCase());
             const newId = Date.now().toString();
