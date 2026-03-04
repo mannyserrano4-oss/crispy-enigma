@@ -13,8 +13,9 @@
     
     <style>
         /* --- THEME VARIABLES --- */
-        :root {
-            --bg-body: #FFFDF7;
+        :root {
+            --bg-body: #FFFDF7;
+            --bg-header: rgba(255, 253, 247, 0.85);
             --bg-card: #FFFFFF;
             --bg-modal: #FFFFFF;
             --text-main: #4A4A4A;
@@ -42,7 +43,8 @@
         }
 
         body.dark-mode {
-            --bg-body: #1F2026;
+            --bg-body: #1F2026;
+            --bg-header: rgba(31, 32, 38, 0.85);
             --bg-card: #2C2C35;
             --bg-modal: #2C2C35;
             --text-main: #FFFFFF;
@@ -93,10 +95,11 @@
         }
 
         /* --- HEADER --- */
-        .header {
-            position: sticky; top: 0; background: var(--bg-body); z-index: 100;
-            padding-top: env(safe-area-inset-top); border-bottom: 2px solid var(--border);
-        }
+        .header {
+            position: sticky; top: 0; background: var(--bg-header); z-index: 100;
+            padding-top: env(safe-area-inset-top); border-bottom: 2px solid var(--border);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        }
         .top-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; }
         .logo { font-size: 1.5rem; font-weight: 900; letter-spacing: -0.5px; }
         .logo span { font-weight: 300; font-size: 1rem; color: var(--text-sub); }
@@ -648,9 +651,15 @@
             </div>
 
             <label>Tip ($)</label>
-            <input type="number" id="payTip" value="0" onchange="calcTotal()" inputmode="decimal" onfocus="this.select()">
+            <div style="display:flex; gap:8px; margin-bottom:12px;">
+                <button class="btn btn-ghost" style="margin:0; padding:10px; font-size:0.95rem; flex:1; font-weight:800; color:var(--p-green-dark); border-color:var(--p-green-dark);" onclick="document.getElementById('payTip').value=5; calcTotal();">$5</button>
+                <button class="btn btn-ghost" style="margin:0; padding:10px; font-size:0.95rem; flex:1; font-weight:800; color:var(--p-green-dark); border-color:var(--p-green-dark);" onclick="document.getElementById('payTip').value=10; calcTotal();">$10</button>
+                <button class="btn btn-ghost" style="margin:0; padding:10px; font-size:0.95rem; flex:1; font-weight:800; color:var(--p-green-dark); border-color:var(--p-green-dark);" onclick="document.getElementById('payTip').value=15; calcTotal();">$15</button>
+                <button class="btn btn-ghost" style="margin:0; padding:10px; font-size:0.95rem; flex:1; font-weight:800; color:var(--p-green-dark); border-color:var(--p-green-dark);" onclick="document.getElementById('payTip').value=20; calcTotal();">$20</button>
+            </div>
+            <input type="number" id="payTip" value="0" onchange="calcTotal()" inputmode="decimal" onfocus="this.select()">
 
-            <div style="background:var(--input-bg); padding:15px; border-radius:12px; margin:20px 0; text-align:center;">
+            <div style="background:var(--input-bg); padding:15px; border-radius:12px; margin:20px 0; text-align:center;">
                 <span style="color:var(--text-sub); font-size:0.8rem;">TOTAL REVENUE</span><br>
                 <span id="payTotal" style="font-size:2rem; font-weight:800; color:var(--p-green-dark);">$35.00</span>
                 <div id="givebackDisplay" style="color:var(--p-pink-dark); font-size:0.9rem; font-weight:700;">Giveback: $0.00</div>
