@@ -691,7 +691,7 @@
             <input type="text" id="wcName" placeholder="First & Last Name" autocapitalize="words" style="text-transform: capitalize;">
             
             <label>Phone Number</label>
-            <input type="tel" id="wcPhone" placeholder="Mobile Number" style="margin-bottom:10px;">
+            <input type="tel" id="wcPhone" placeholder="Mobile Number" style="margin-bottom:10px;" oninput="applyPhoneMask(event)">
             
             <label style="display:flex; align-items:center; gap:10px; margin-bottom:20px; text-transform:none; color:var(--p-green-dark);">
                 <input type="checkbox" id="wcOffer" style="width:20px; height:20px; margin:0;" checked>
@@ -715,7 +715,7 @@
                     <label style="color:var(--p-blue-dark); font-size:1rem; margin-bottom:10px;">Identity</label>
                     <input type="text" id="eName" placeholder="Full Name" required autocapitalize="words" style="border-color:var(--p-blue); text-transform: capitalize;">
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                        <input type="tel" id="ePhone" placeholder="Phone">
+                        <input type="tel" id="ePhone" placeholder="Phone" oninput="applyPhoneMask(event)">
                         <input type="text" id="eInsta" placeholder="Insta @">
                     </div>
                     <input type="email" id="eEmail" placeholder="Email Address">
@@ -1074,6 +1074,18 @@
         const VIBE_TAGS = ['Mover', 'Sleeper', 'Gamer', 'Sci-fi', 'Fantasy', 'Fitness', 'Traveler', 'Tipper', 'Silent', 'Chill', 'Talkative', 'Sports', 'Family', 'Sensitive skin', 'No politics', 'Picky', 'Movie lover', 'Comedy', 'Foodie', 'Tricky Crown'];
 
         // --- HELPERS ---
+        // --- NEW: PHONE NUMBER INPUT MASK ---
+        function applyPhoneMask(event) {
+            let input = event.target;
+            let x = input.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
+            if (!x[1]) {
+                input.value = '';
+                return;
+            }
+            input.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+        }
+        // ------------------------------------
+
         const getTodayIso = () => {
             const d = new Date();
             return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
