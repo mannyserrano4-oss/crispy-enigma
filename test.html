@@ -15,12 +15,12 @@
     <style>
         /* --- THEME VARIABLES --- */
         :root {
-            --bg-body: #F2F2F7; /* Neutral light gray */
-            --bg-card: #FFFFFF;
-            --bg-modal: #FFFFFF;
-            --text-main: #000000; /* Pure black for maximum readability */
-            --text-sub: #555555; /* Darker subtext */
-            --border: #D1D1D6; /* Visible borders */
+            --bg-body: #000000; /* Original Pitch Black */
+            --bg-card: #1A1A1A; /* Dark Grey Cards */
+            --bg-modal: #1A1A1A;
+            --text-main: #FFFFFF; /* High Contrast White Text */
+            --text-sub: #BBBBBB;
+            --border: #333333;
             
             --p-blue: #A2D2FF;
             --p-blue-dark: #6495ED;
@@ -43,12 +43,12 @@
         }
 
         body.dark-mode {
-            --bg-body: #000000; /* Deep black */
-            --bg-card: #1C1C1E; /* Standard iOS dark card */
-            --bg-modal: #1C1C1E;
-            --text-main: #FFFFFF; /* High contrast white */
-            --text-sub: #EBEBF5; /* Legible off-white subtext */
-            --border: #38383A;
+            --bg-body: #1F2026; /* Deep Charcoal */
+            --bg-card: #2C2C35;
+            --bg-modal: #2C2C35;
+            --text-main: #FFFFFF;
+            --text-sub: #A0A0A5;
+            --border: #3A3A42;
             
             --p-blue: #4D96FF;
             --p-blue-dark: #82C2F2;
@@ -240,12 +240,11 @@
         label { display: block; color: var(--text-sub); font-size: 0.8rem; margin-bottom: 6px; font-weight: 700; text-transform: uppercase;}
         input, select, textarea {
             width: 100%; padding: 14px; border-radius: 12px; border: 2px solid var(--input-border);
-            background-color: var(--input-bg) !important; 
-            color: var(--text-main) !important;
-            font-weight: 600; /* Bolder text for inputs */ 
+            background: #000000 !important; /* Forces black input boxes */
+            color: #FFFFFF !important; /* Forces white text */
+            -webkit-text-fill-color: #FFFFFF; 
             font-size: 1rem; margin-bottom: 15px;
             box-sizing: border-box; transition: border-color 0.2s; appearance: none;
-            -webkit-text-fill-color: var(--text-main); /* Forces iOS to show text color */
         }
                 input:focus { border-color: var(--p-blue-dark); outline: none; background: var(--bg-card); }
 
