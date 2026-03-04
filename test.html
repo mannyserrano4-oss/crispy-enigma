@@ -226,19 +226,25 @@
             background: rgba(0,0,0,0.6); z-index: 500; backdrop-filter: blur(4px); align-items: flex-end;
         }
         .sheet {
-            background: var(--bg-modal); width: 100%; border-radius: 25px 25px 0 0; padding: 25px;
-            padding-bottom: max(env(safe-area-inset-bottom), 35px);
+            background-color: var(--bg-modal) !important; 
+            width: 100%; border-radius: 25px 25px 0 0; padding: 25px;
+            padding-bottom: max(env(safe-area-inset-bottom), 40px);
             box-sizing: border-box; max-height: 90vh; overflow-y: auto;
             animation: slideUp 0.3s cubic-bezier(0.19, 1, 0.22, 1);
             -webkit-overflow-scrolling: touch;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
+            opacity: 1 !important;
         }
         @keyframes slideUp { from {transform: translateY(100%);} to {transform: translateY(0);} }
 
         label { display: block; color: var(--text-sub); font-size: 0.8rem; margin-bottom: 6px; font-weight: 700; text-transform: uppercase;}
         input, select, textarea {
             width: 100%; padding: 14px; border-radius: 12px; border: 2px solid var(--input-border);
-            background: var(--input-bg); color: var(--text-main); font-size: 1rem; margin-bottom: 15px;
+            background-color: var(--input-bg) !important; 
+            color: var(--text-main) !important; 
+            font-size: 1rem; margin-bottom: 15px;
             box-sizing: border-box; transition: border-color 0.2s; appearance: none;
+            -webkit-text-fill-color: var(--text-main); /* Forces iOS to show text color */
         }
                 input:focus { border-color: var(--p-blue-dark); outline: none; background: var(--bg-card); }
 
