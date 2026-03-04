@@ -15,7 +15,6 @@
         /* --- THEME VARIABLES --- */
         :root {
             --bg-body: #FFFDF7;
-            --bg-header: rgba(255, 253, 247, 0.85);
             --bg-card: #FFFFFF;
             --bg-modal: #FFFFFF;
             --text-main: #4A4A4A;
@@ -44,7 +43,6 @@
 
         body.dark-mode {
             --bg-body: #1F2026;
-            --bg-header: rgba(31, 32, 38, 0.85);
             --bg-card: #2C2C35;
             --bg-modal: #2C2C35;
             --text-main: #FFFFFF;
@@ -96,9 +94,8 @@
 
         /* --- HEADER --- */
         .header {
-            position: sticky; top: 0; background: var(--bg-header); z-index: 100;
+            position: sticky; top: 0; background: var(--bg-body); z-index: 100;
             padding-top: env(safe-area-inset-top); border-bottom: 2px solid var(--border);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
         }
         .top-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; }
         .logo { font-size: 1.5rem; font-weight: 900; letter-spacing: -0.5px; }
