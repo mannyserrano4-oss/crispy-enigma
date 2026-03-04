@@ -43,31 +43,36 @@
         }
 
         body.dark-mode {
-            --bg-body: #1F2026; /* Deep Charcoal */
-            --bg-card: #2C2C35;
-            --bg-modal: #2C2C35;
-            --text-main: #FFFFFF;
-            --text-sub: #A0A0A5;
-            --border: #3A3A42;
-            
-            --p-blue: #4D96FF;
-            --p-blue-dark: #82C2F2;
-            --p-green: #06D6A0;
-            --p-green-dark: #06D6A0;
-            --p-pink: #FF758F;
-            --p-pink-dark: #FF4D6D;
-            --p-purple: #9D4EDD;
-            --p-purple-dark: #C77DFF;
-            --p-gold: #FFD700;
-            
-            --status-due: #FF9E00;
-            --status-overdue: #FF0054;
-            --status-good: #06D6A0;
-            
-            --input-bg: #18181B;
-            --input-border: #3F3F46;
-            --shadow: 0 4px 15px rgba(0,0,0,0.4);
-        }
+    --bg-body: #121318;
+    --bg-card: #1C1D23;
+    --bg-modal: #1C1D23;
+
+    --text-main: #F5F5F7;
+    --text-sub: #9A9AA0;
+
+    --border: #2A2B31;
+
+    --input-bg: #16171C;
+    --input-border: #2E2F36;
+
+    --shadow: 0 10px 30px rgba(0,0,0,0.6);
+
+    --p-blue: #3A7BD5;
+    --p-blue-dark: #5DA9FF;
+
+    --p-green: #00C896;
+    --p-green-dark: #00E0A4;
+
+    --p-pink: #FF5C8A;
+    --p-pink-dark: #FF2E63;
+
+    --p-purple: #7C4DFF;
+    --p-purple-dark: #B388FF;
+
+    --status-due: #FF9F1C;
+    --status-overdue: #FF2E63;
+    --status-good: #00E0A4;
+}
 
         /* --- NEW: EXPANDABLE NOTES --- */
         .v-notes-box {
@@ -244,8 +249,7 @@
             color: var(--text-main) !important;
             -webkit-text-fill-color: var(--text-main); /* Standardizes iOS text colors */
             font-size: 1rem; margin-bottom: 15px;
-            box-sizing: border-box; transition: border-color 0.2s; appearance: none;
-            -webkit-text-fill-color: initial; 
+            box-sizing: border-box; transition: border-color 0.2s; appearance: none; 
         }
                 input:focus { border-color: var(--p-blue-dark); outline: none; background: var(--bg-card); }
 
@@ -263,7 +267,7 @@
 
        .btn {
             width: 100%; padding: 18px; border-radius: 16px; border: none; font-size: 1rem; font-weight: 900;
-            color: #000000 !important; /* Bold black text for all buttons */
+            color: var(--text-main);
             text-shadow: none;
        }
         .btn-primary { background: var(--p-blue); color: #000; box-shadow: 0 4px 12px rgba(162, 210, 255, 0.4); }
