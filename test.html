@@ -16,11 +16,11 @@
         /* --- THEME VARIABLES --- */
         :root {
             --bg-body: #F2F2F7; /* Light grey background */
-            --bg-card: #FFFFFF; /* Pure white cards */
+            --bg-card: #FFFFFF; /* White cards */
             --bg-modal: #FFFFFF;
-            --text-main: #000000; /* Bold black text */
+            --text-main: #000000; /* Pure black text */
             --text-sub: #3C3C43; /* Dark grey sub-text */
-            --border: #C6C6C8; /* Visible borders */
+            --border: #D1D1D6; /* Visible borders */
             
             --p-blue: #A2D2FF;
             --p-blue-dark: #6495ED;
@@ -240,8 +240,9 @@
         label { display: block; color: var(--text-sub); font-size: 0.8rem; margin-bottom: 6px; font-weight: 700; text-transform: uppercase;}
         input, select, textarea {
             width: 100%; padding: 14px; border-radius: 12px; border: 2px solid var(--input-border);
-            background-color: var(--input-bg); 
-            color: var(--text-main); 
+            background-color: var(--input-bg) !important; 
+            color: var(--text-main) !important;
+            -webkit-text-fill-color: var(--text-main); /* Standardizes iOS text colors */
             font-size: 1rem; margin-bottom: 15px;
             box-sizing: border-box; transition: border-color 0.2s; appearance: none;
             -webkit-text-fill-color: initial; 
@@ -261,10 +262,10 @@
         }
 
        .btn {
-            width: 100%; padding: 18px; border-radius: 16px; border: none; font-size: 1rem; font-weight: 800;
-            color: #000000; /* Forces black text on colored buttons */
-            cursor: pointer; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 10px;
-        }
+            width: 100%; padding: 18px; border-radius: 16px; border: none; font-size: 1rem; font-weight: 900;
+            color: #000000 !important; /* Bold black text for all buttons */
+            text-shadow: none;
+       }
         .btn-primary { background: var(--p-blue); color: #000; box-shadow: 0 4px 12px rgba(162, 210, 255, 0.4); }
         .btn-green { background: var(--p-green); color: #000; box-shadow: 0 4px 12px rgba(183, 228, 199, 0.4); }
         .btn-red { background: var(--p-pink); color: #000; }
