@@ -1032,6 +1032,9 @@
                     
                     <hr style="border-color:var(--border); margin:20px 0;">
                     
+                    <button class="btn btn-ghost" style="color:var(--status-overdue); border-color:var(--status-overdue); margin-bottom: 20px;" onclick="pruneOldHistory()">
+                        <i class="fas fa-broom"></i> Prune Old History (Free Space)
+                    </button>
                     <button class="btn btn-indigo" style="border: 2px solid var(--p-green-dark); color:var(--p-green-dark);" onclick="exportData()">
                         <i class="fas fa-download"></i> Save Full Backup (.json)
                     </button>
@@ -2234,6 +2237,15 @@
                 }
             });
 
+            // --- NEW: INJECT PRUNED REVENUE ---
+            if (settings.archivedRevenue) {
+                Object.keys(settings.archivedRevenue).forEach(y => {
+                    if(!pastYears[y]) pastYears[y] = 0;
+                    pastYears[y] += settings.archivedRevenue[y];
+                });
+            }
+            // ----------------------------------
+
             const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             const currentMonthIndex = new Date().getMonth();
 
@@ -3200,6 +3212,53 @@
             r.readAsText(input.files[0]);
             input.value = ''; // Resets the file input so it can trigger again
         }
+
+        // --- DATA MANAGEMENT: PRUNE OLD HISTORY ---
+        async function pruneOldHistory() {
+            const currentYear = new Date().getFullYear().toString();
+            
+            // Find all receipts that are NOT from this year
+            const oldHistory = history.filter(h => !h.date.startsWith(currentYear));
+            
+            if (oldHistory.length === 0) {
+                return alert("Your history is already clean! No old transactions to delete.");
+            }
+
+            // Calculate total money about to be pruned
+            const totalPrunedMoney = oldHistory.reduce((sum, h) => sum + h.amount, 0);
+
+            if(await customConfirm(`⚠️ STORAGE CLEANUP\n\nYou are about to delete ${oldHistory.length} old receipts from before ${currentYear}.\n\nClient profiles, LTVs, and loyalty will NOT be affected. \n\nProceed to Step 2?`)) {
+                
+                // 1. Force the double backup (JSON + CSV)
+                exportData(); 
+                setTimeout(() => exportHistoryCSV(), 800); // Slight delay so the browser doesn't block the second download
+
+                // 2. The Safety Lock
+                const typed = await customPrompt(`Both backups have been downloaded to your device.\n\nTo permanently delete ${oldHistory.length} old receipts and free up space, type PRUNE below:`, "Type PRUNE here");
+                
+                if (typed !== "PRUNE") {
+                    return alert("Cleanup canceled. Your data was not touched.");
+                }
+
+                // 3. Tally up the old revenue so your Stats page doesn't break
+                if (!settings.archivedRevenue) settings.archivedRevenue = {};
+                
+                oldHistory.forEach(h => {
+                    const year = h.date.split('-')[0];
+                    if (!settings.archivedRevenue[year]) settings.archivedRevenue[year] = 0;
+                    settings.archivedRevenue[year] += h.amount;
+                });
+
+                // 4. Keep ONLY this year's history
+                history = history.filter(h => h.date.startsWith(currentYear));
+                
+                // 5. Save and reload
+                saveAll();
+                alert(`Success! Removed ${oldHistory.length} old receipts and secured $${totalPrunedMoney.toFixed(2)} in your stats archive. Your app is running light and fast.`);
+                render();
+            }
+        }
+        // ------------------------------------------
 
         // --- SERVICE WORKER REGISTRATION (PWA) ---
         if ('serviceWorker' in navigator) {
