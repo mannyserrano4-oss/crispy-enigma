@@ -15,12 +15,12 @@
     <style>
         /* --- THEME VARIABLES --- */
         :root {
-            --bg-body: #FFFDF7;
+            --bg-body: #F2F2F7; /* Neutral light gray */
             --bg-card: #FFFFFF;
             --bg-modal: #FFFFFF;
-            --text-main: #4A4A4A;
-            --text-sub: #9AA0A6;
-            --border: #F0F0F0;
+            --text-main: #000000; /* Pure black for maximum readability */
+            --text-sub: #555555; /* Darker subtext */
+            --border: #D1D1D6; /* Visible borders */
             
             --p-blue: #A2D2FF;
             --p-blue-dark: #6495ED;
@@ -43,12 +43,12 @@
         }
 
         body.dark-mode {
-            --bg-body: #1F2026;
-            --bg-card: #2C2C35;
-            --bg-modal: #2C2C35;
-            --text-main: #FFFFFF;
-            --text-sub: #A0A0A5;
-            --border: #3A3A42;
+            --bg-body: #000000; /* Deep black */
+            --bg-card: #1C1C1E; /* Standard iOS dark card */
+            --bg-modal: #1C1C1E;
+            --text-main: #FFFFFF; /* High contrast white */
+            --text-sub: #EBEBF5; /* Legible off-white subtext */
+            --border: #38383A;
             
             --p-blue: #4D96FF;
             --p-blue-dark: #82C2F2;
@@ -241,7 +241,8 @@
         input, select, textarea {
             width: 100%; padding: 14px; border-radius: 12px; border: 2px solid var(--input-border);
             background-color: var(--input-bg) !important; 
-            color: var(--text-main) !important; 
+            color: var(--text-main) !important;
+            font-weight: 600; /* Bolder text for inputs */ 
             font-size: 1rem; margin-bottom: 15px;
             box-sizing: border-box; transition: border-color 0.2s; appearance: none;
             -webkit-text-fill-color: var(--text-main); /* Forces iOS to show text color */
@@ -260,9 +261,9 @@
             accent-color: var(--p-green-dark);
         }
 
-        .btn {
-
-            width: 100%; padding: 18px; border-radius: 16px; border: none; font-size: 1rem; font-weight: 700;
+       .btn {
+            width: 100%; padding: 18px; border-radius: 16px; border: none; font-size: 1rem; font-weight: 800;
+            color: #000 !important; /* Forces button text to stay dark/readable */
             cursor: pointer; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 10px;
         }
         .btn-primary { background: var(--p-blue); color: #000; box-shadow: 0 4px 12px rgba(162, 210, 255, 0.4); }
