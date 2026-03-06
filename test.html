@@ -19,32 +19,61 @@
 }
         
         /* --- THEME VARIABLES --- */
-        :root {
-            --bg-body: #FFFDF7;
+        :root {
+            /* Light Mode - High Contrast Fix */
+            --bg-body: #F2F4F7;
             --bg-card: #FFFFFF;
             --bg-modal: #FFFFFF;
-            --text-main: #4A4A4A;
-            --text-sub: #9AA0A6;
-            --border: #F0F0F0;
+            --text-main: #1A1A1B;   /* Much darker for readability */
+            --text-sub: #58595B;    /* Visible grey */
+            --border: #D1D5DB;      /* Darker borders for separation */
             
             --p-blue: #A2D2FF;
-            --p-blue-dark: #6495ED;
+            --p-blue-dark: #007AFF; 
             --p-green: #B7E4C7;
-            --p-green-dark: #52B788;
+            --p-green-dark: #2D6A4F;
             --p-pink: #FFC8DD;
-            --p-pink-dark: #FF8FAB;
+            --p-pink-dark: #A4133C;
             --p-purple: #CDB4DB;
-            --p-purple-dark: #9D4EDD;
+            --p-purple-dark: #5A189A;
             --p-yellow: #FDE2E4;
-            --p-gold: #FFD700;
+            --p-gold: #D4AF37;
             
             --status-due: #FFD6A5;
             --status-overdue: #FFA69E;
             --status-good: #B7E4C7;
             
-            --input-bg: #F7F9FC;
-            --input-border: #DDE2E8;
-            --shadow: 0 4px 15px rgba(200, 200, 200, 0.25);
+            --input-bg: #FFFFFF;
+            --input-border: #BBC0C7;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-mode {
+            /* Dark Mode - Kept Original Colors */
+            --bg-body: #1F2026;
+            --bg-card: #2C2C35;
+            --bg-modal: #2C2C35;
+            --text-main: #FFFFFF;
+            --text-sub: #A0A0A5;
+            --border: #3A3A42;
+            
+            --p-blue: #4D96FF;
+            --p-blue-dark: #82C2F2;
+            --p-green: #06D6A0;
+            --p-green-dark: #06D6A0;
+            --p-pink: #FF758F;
+            --p-pink-dark: #FF4D6D;
+            --p-purple: #9D4EDD;
+            --p-purple-dark: #C77DFF;
+            --p-gold: #FFD700;
+            
+            --status-due: #FF9E00;
+            --status-overdue: #FF0054;
+            --status-good: #06D6A0;
+            
+            --input-bg: #18181B;
+            --input-border: #3F3F46;
+            --shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
 
         body.dark-mode {
