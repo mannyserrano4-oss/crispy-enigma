@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>The Black Book</title>
+    
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    
+    <link rel="stylesheet" href="styles.css">
+    
+</head>
+<body>
+
+    <div id="crashModal">
+        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px;"></i>
+        <h2 style="margin:0;">App Crash Detected</h2>
+        <p style="color:#aaa; font-size:0.9rem;">Something went wrong. Your data is likely still safe.</p>
+        <p id="crashMsg" style="background:#333; padding:10px; border-radius:8px; font-family:monospace; font-size:0.7rem; color:#ff6b6b; word-break: break-all;"></p>
+        <button class="crash-btn" onclick="emergencyCopy()">1. Copy Data</button>
+        <button class="crash-btn" style="background:#444; color:white;" onclick="factoryReset()">2. Factory Reset</button>
+        <button class="crash-btn" style="background:transparent; color:#888; border:1px solid #555;" onclick="location.reload()">3. Reload</button>
+    </div>
+
+    <div class="header">
+        <div class="top-row">
+            <div class="logo">The Black Book <br><span>MAS Barbery</span></div>
+            <div style="display:flex; gap:20px; align-items:center;">
+    <div onclick="openPromo()"><i class="fas fa-bullhorn" style="font-size:1.3rem; color:var(--p-purple-dark); cursor:pointer;"></i></div>
+    <div onclick="openSos()"><i class="fas fa-life-ring" style="font-size:1.3rem; color:var(--status-overdue); cursor:pointer;"></i></div>
+    
+    <div onclick="openMoreMenu()"><i class="fas fa-ellipsis-v" style="font-size:1.3rem; color:var(--text-main); cursor:pointer; padding: 0 5px;"></i></div>
+</div>
+        </div>
+
+        <div class="metrics-scroll">
+            <div class="metric-pill">
+                <span class="m-lbl">Today's Take</span>
+                <span class="m-val today" id="mToday">$0.00</span>
+            </div>
+            <div class="metric-pill">
+                <span class="m-lbl">Total Rev</span>
+                <span class="m-val" id="mRev">$0.00</span>
+            </div>
+            <div class="metric-pill">
+                <span class="m-lbl">Giveback</span>
+                <span class="m-val" id="mGive">$0.00</span>
+            </div>
+            <div class="metric-pill">
+                <span class="m-lbl">Total Clients</span>
+                <span class="m-val" id="mClients">0</span>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" id="tabAll" onclick="setTab('all', this)">All</button>
+            <button class="tab-btn" id="tabDue" onclick="setTab('due', this)">Due</button>
+            <button class="tab-btn" id="tabOverdue" onclick="setTab('overdue', this)">Overdue</button>
+        </div>
+    </div>
+
+    <div id="conciergeBox" style="display:none; margin: 15px 20px 0 20px; background: linear-gradient(135deg, var(--p-blue-dark) 0%, #3a7bd5 100%); border-radius: 16px; padding: 15px; box-shadow: 0 4px 15px rgba(100, 149, 237, 0.4);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <span style="color:#fff; font-weight:800; font-size:1.1rem;"><i class="fas fa-concierge-bell"></i> 48-Hr Quality Check</span>
+        </div>
+        <div id="conciergeList"></div>
+    </div>
+
+    <div id="list" class="client-list"></div>
+
+    <div class="footer-bar">
+        <div class="search-wrap">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="mainSearchInput" class="search-input" placeholder="Search..." oninput="handleSearch(this.value)">
+            <i id="clearSearchIcon" class="fas fa-times" onclick="clearSearch()" style="display:none; position:absolute; right:15px; top:16px; color:var(--text-sub); font-size:1.1rem; cursor:pointer; padding:5px; margin-top:-5px;"></i>
+        </div>
+        <div class="fab" style="background:var(--p-blue); margin-right:10px;" onclick="openWalkIn()">
+            <i class="fas fa-bolt"></i>
+        </div>
+        <div class="fab" onclick="openAddModal()">
+            <i class="fas fa-plus"></i>
+        </div>
+    </div>
+
+    <div id="viewModal" class="overlay">
+        <div class="sheet">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h2 style="margin:0; font-size:1.8rem; text-transform: capitalize;" id="vName">Name</h2>
+                <div style="display:flex; gap:15px; align-items:center;">
+                    <div style="font-weight:700; color:var(--p-blue-dark); cursor:pointer;" onclick="editClient()">EDIT</div>
+                    <i class="fas fa-times" style="font-size:1.6rem; color:var(--text-sub); cursor:pointer; padding-left:5px;" onclick="closeModal('viewModal')"></i>
+                </div>
+            </div>
+            <p id="vSub" style="color:var(--text-sub); margin-top:-10px;">Phone</p>
+            <p id="vInstaDisplay" style="color:#E1306C; font-size:0.9rem; margin-top:-5px; margin-bottom:15px; cursor:pointer; display:none; font-weight: 700;" onclick="copyInsta()">
+                <span id="vInstaText"></span>
+            </p>
+
+            <div style="display: flex; gap: 15px; margin-bottom: 20px; justify-content: flex-start;">
+                <a id="btnCall" href="#" style="display:flex; flex-direction:column; align-items:center; gap:6px; text-decoration:none; color:var(--p-blue-dark);">
+                    <div style="width:48px; height:48px; border-radius:50%; background:rgba(162,210,255,0.2); display:flex; align-items:center; justify-content:center; font-size:1.2rem;">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <span style="font-size:0.75rem; font-weight:800;">Call</span>
+                </a>
+                <div onclick="openSmsMenu()" style="display:flex; flex-direction:column; align-items:center; gap:6px; color:var(--p-blue-dark); cursor:pointer;">
+                    <div style="width:48px; height:48px; border-radius:50%; background:rgba(162,210,255,0.2); display:flex; align-items:center; justify-content:center; font-size:1.2rem;">
+                        <i class="fas fa-comment"></i>
+                    </div>
+                    <span style="font-size:0.75rem; font-weight:800;">Text</span>
+                </div>
+                <a id="btnEmail" href="#" style="display:none; flex-direction:column; align-items:center; gap:6px; text-decoration:none; color:var(--text-sub);">
+                    <div style="width:48px; height:48px; border-radius:50%; background:var(--input-bg); display:flex; align-items:center; justify-content:center; font-size:1.2rem; border:1px solid var(--border);">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <span style="font-size:0.75rem; font-weight:800;">Email</span>
+                </a>
+                <a id="btnNav" href="#" target="_blank" style="display:none; flex-direction:column; align-items:center; gap:6px; text-decoration:none; color:var(--p-green-dark);">
+                    <div style="width:48px; height:48px; border-radius:50%; background:rgba(183, 228, 199, 0.2); display:flex; align-items:center; justify-content:center; font-size:1.2rem;">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <span style="font-size:0.75rem; font-weight:800;">Map</span>
+                </a>
+            </div>
+
+            <div id="vBadges" style="margin-bottom:15px; display:flex; gap:5px;"></div>
+            
+            <div id="vIcebreaker" class="icebreaker-box" style="display:none;">
+                <i class="fas fa-lightbulb"></i> <span id="vIceText"></span>
+            </div>
+
+            <div id="vTags" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:15px;"></div>
+            <div id="vNotesContainer" style="display:none; margin-bottom:15px;">
+                <label style="margin-bottom: 4px;">Permanent Notes</label>
+                <div id="vNotesBox" class="v-notes-box" onclick="this.classList.toggle('expanded')"></div>
+            </div>
+
+            <div class="formula-box" id="vFormula" style="margin-bottom:10px;">"No cut formula saved."</div>
+            
+            <div id="vLastAddons" style="font-size:0.8rem; color:var(--p-blue-dark); font-weight:700; text-align:center; margin-bottom:20px; display:none;"></div>
+            
+            <div id="vLedgerBox" style="display:none; background:var(--input-bg); border:1px solid var(--border); border-radius:12px; padding:15px; margin-bottom:20px; text-align:center;">
+                <div id="vPendingFee" style="color:var(--status-overdue); font-weight:800; font-size:1.05rem; margin-bottom:5px; display:none;"></div>
+                <div id="vDeposit" style="color:var(--p-green); font-weight:800; font-size:1.05rem; display:none;"></div>
+            </div>
+
+            <div class="v-grid">
+                <div class="v-box">
+                    <span class="v-big" id="vLoyalty"></span>
+                    <span style="font-size:0.7rem; text-transform:uppercase;">Loyalty</span>
+                </div>
+                <div class="v-box">
+                    <span class="v-big" style="color:var(--p-green-dark)" id="vCredit">$0.00</span>
+                    <span style="font-size:0.7rem; text-transform:uppercase;">Ref Credit</span>
+                    <div id="vRefCount" style="font-size:0.65rem; color:var(--p-blue-dark); font-weight:800; margin-top:4px; display:none;"></div>
+                </div>
+                <div class="v-box">
+                    <span class="v-big" id="vTotalCuts">0</span>
+                    <span style="font-size:0.7rem; text-transform:uppercase;">Total Cuts</span>
+                </div>
+                <div class="v-box">
+                    <span class="v-big" id="vLTV">$0.00</span>
+                    <span style="font-size:0.7rem; text-transform:uppercase;">LTV</span>
+                </div>
+            </div>
+
+            <button id="btnCheckout" class="btn btn-green" onclick="openCheckout()"><i class="fas fa-cash-register"></i> Record Cut / Checkout</button>
+            
+            <button id="btnDeposit" class="btn btn-ghost" style="color:var(--p-green); border-color:var(--p-green); margin-top:10px;" onclick="promptDeposit()">
+                <i class="fas fa-hand-holding-usd"></i> Log Deposit / Pre-Pay
+            </button>
+            
+            <details style="background:var(--bg-card); border: 1px solid rgba(255, 0, 84, 0.3); border-radius: 16px; padding: 15px; margin-top: 15px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(255, 0, 84, 0.05);">
+                <summary style="font-weight: 800; color: var(--status-overdue); font-size:0.95rem; outline: none; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center;">
+                    <span><i class="fas fa-exclamation-triangle" style="margin-right:8px;"></i> Admin & Danger Zone</span>
+                    <i class="fas fa-chevron-down" style="font-size:0.8rem;"></i>
+                </summary>
+                
+                <div style="margin-top: 15px;">
+                    <button id="btnAddStrike" class="btn btn-ghost" style="color:var(--status-overdue); border-color:var(--status-overdue); margin-top:0;" onclick="addStrike()">
+                        <i class="fas fa-ban"></i> Record No-Show (Add Strike)
+                    </button>
+                    <button id="btnRemStrike" class="btn btn-ghost" style="color:var(--text-sub); border-color:var(--border); margin-top:10px; display:none;" onclick="removeStrike()">
+                        <i class="fas fa-eraser"></i> Remove Strike
+                    </button>
+
+                    <div style="display:flex; justify-content:space-between; gap:10px; margin-top:10px;">
+                        <button id="btnArchive" class="btn btn-ghost" style="flex:1; border:none; color:var(--text-sub); font-size:0.85rem; background: var(--input-bg);" onclick="toggleArchive()">
+                            <i class="fas fa-archive"></i> Archive
+                        </button>
+                        <button id="btnBlacklist" class="btn btn-ghost" style="flex:1; border:none; color:#d32f2f; font-size:0.85rem; font-weight:800; background: #ffebee;" onclick="toggleBlacklist()">
+                            <i class="fas fa-skull"></i> Blacklist
+                        </button>
+                    </div>
+                </div>
+            </details>
+            
+            <div id="vBottomGrid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px;">
+                <button class="btn btn-primary" onclick="openSchedule()"><i class="fas fa-calendar"></i> Schedule</button>
+                <button class="btn btn-ghost" onclick="openInsta()" id="btnInsta"><i class="fab fa-instagram"></i> Instagram</button>
+            </div>
+            
+            <button class="btn btn-ghost" style="margin-top:20px;" onclick="closeModal('viewModal')">Close</button>
+        </div>
+    </div>
+
+    <div id="statsModal" class="overlay">
+        <div class="sheet">
+            <h3>Revenue Stats</h3>
+            <p style="color:var(--text-sub); margin-top:-10px; font-size:0.9rem;">Your yearly performance at a glance.</p>
+            <div id="statsContent"></div>
+            <button class="btn btn-ghost" onclick="closeModal('statsModal'); openModal('settingsModal')"><i class="fas fa-arrow-left"></i> Back to Settings</button>
+        </div>
+    </div>
+
+    <div id="checkoutModal" class="overlay" style="z-index:800;">
+        <div class="sheet">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 style="margin:0;">Checkout</h3>
+                <i class="fas fa-times" style="font-size:1.6rem; color:var(--text-sub); cursor:pointer;" onclick="closeModal('checkoutModal')"></i>
+            </div>
+            
+            <label>Date of Cut</label>
+            <input type="date" id="payDate" style="margin-bottom:15px;">
+
+            <label>Services / Add-Ons</label>
+            <div class="addon-grid" id="checkoutAddons">
+                <div class="addon-pill" onclick="toggleAddon(this, 0)">🧔 Beard</div>
+                <div class="addon-pill" onclick="toggleAddon(this, 0)">🧖‍♂️ Hot Towel</div>
+                <div class="addon-pill" onclick="toggleAddon(this, 0)">✒️ Enhancements</div>
+                <div class="addon-pill" onclick="toggleAddon(this, 0)">✂️ Eyebrows</div>
+                <div class="addon-pill" onclick="toggleAddon(this, 0)">🧴 Wash</div>
+            </div>
+            <p style="font-size:0.7rem; color:var(--text-sub); margin-top:-5px; margin-bottom:15px; font-style:italic;">*Currently tracking for records. Price modifiers set to $0.</p>
+
+            <div id="chkLedgerBox" style="display:none; margin-bottom:15px; background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:12px;">
+                <div id="chkFeeBox" style="display:none; justify-content:space-between; align-items:center; color:var(--status-overdue); font-weight:700; margin-bottom:8px;">
+                    <span id="chkFeeText">⚠️ Fee: $0</span>
+                    <button onclick="waiveFee()" style="background:transparent; border:1px solid var(--status-overdue); color:var(--status-overdue); border-radius:8px; padding:4px 10px; font-size:0.7rem;">Waive</button>
+                </div>
+                <div id="chkDepBox" style="display:none; color:var(--p-green); font-weight:700;">
+                    ✅ Deposit Paid: -$0
+                </div>
+            </div>
+
+            <label>Base Price ($)</label>
+            <input type="number" id="payPrice" onchange="calcTotal()" inputmode="decimal" onfocus="this.select()">
+            
+            <div id="multiCutBox"></div>
+            <button class="btn btn-ghost" style="padding: 10px; margin-top: -5px; margin-bottom: 20px; border: 2px dashed var(--p-blue); color: var(--p-blue-dark);" onclick="addMultiCut()">
+                <i class="fas fa-user-plus"></i> Add Additional Cut
+            </button>
+
+            <label>Discounts</label>
+            <div id="discountList"></div>
+            <div id="customDiscBox" style="display:none;">
+                <label>Custom Discount (%)</label>
+                <input type="number" id="payCustomPct" placeholder="e.g. 50" oninput="calcTotal()" inputmode="decimal" onfocus="this.select()">
+            </div>
+
+            <label>Tip ($)</label>
+            <input type="number" id="payTip" value="0" onchange="calcTotal()" inputmode="decimal" onfocus="this.select()">
+
+            <div style="background:var(--input-bg); padding:15px; border-radius:12px; margin:20px 0; text-align:center;">
+                <span style="color:var(--text-sub); font-size:0.8rem;">TOTAL REVENUE</span><br>
+                <span id="payTotal" style="font-size:2rem; font-weight:800; color:var(--p-green-dark);">$35.00</span>
+                <div id="givebackDisplay" style="color:var(--p-pink-dark); font-size:0.9rem; font-weight:700;">Giveback: $0.00</div>
+            </div>
+
+            <button class="btn btn-green" onclick="finalizeCut()">Confirm & Save</button>
+            
+            <button class="btn btn-ghost" id="btnSmartBook" onclick="smartBook()" style="margin-top:10px; border-color:var(--p-purple-dark); color:var(--p-purple-dark);">
+                <i class="fas fa-calendar-plus"></i> Book Next: <span id="sbDate">...</span>
+            </button>
+
+            <button class="btn btn-red" onclick="closeModal('checkoutModal')">Cancel</button>
+        </div>
+    </div>
+
+    <div id="walkInModal" class="overlay" style="z-index:900;">
+        <div class="sheet">
+            <h3>Quick Walk-In</h3>
+            <p style="color:var(--text-sub); margin-top:-10px; font-size:0.8rem;">Fast revenue entry (No profile needed).</p>
+            
+            <label>Service Price ($)</label>
+            <input type="number" id="wPrice" value="35" inputmode="decimal" onfocus="this.select()">
+
+            <label>Tip ($)</label>
+            <input type="number" id="wTip" value="0" inputmode="decimal" onfocus="this.select()">
+
+            <button class="btn btn-green" onclick="saveWalkIn()">Record Walk-In</button>
+            <button class="btn btn-ghost" onclick="closeModal('walkInModal')">Cancel</button>
+        </div>
+    </div>
+
+    <div id="walkInConvertModal" class="overlay" style="z-index:910;">
+        <div class="sheet">
+            <h3>🚀 Convert to Regular?</h3>
+            <p style="color:var(--text-sub); margin-top:-10px; font-size:0.8rem;">Cash logged! Hand them the phone to save their profile and send a welcome text.</p>
+            
+            <label>Name</label>
+            <input type="text" id="wcName" placeholder="First & Last Name" autocapitalize="words" style="text-transform: capitalize;">
+            
+            <label>Phone Number</label>
+            <input type="tel" id="wcPhone" placeholder="Mobile Number" style="margin-bottom:10px;" oninput="applyPhoneMask(event)">
+            
+            <label style="display:flex; align-items:center; gap:10px; margin-bottom:20px; text-transform:none; color:var(--p-green-dark);">
+                <input type="checkbox" id="wcOffer" style="width:20px; height:20px; margin:0;" checked>
+                <span style="font-size:0.9rem; font-weight:700;">Include $5 Off Welcome Offer</span>
+            </label>
+
+            <button class="btn btn-primary" onclick="convertWalkIn()">Save Client & Send Text</button>
+            <button class="btn btn-ghost" onclick="closeModal('walkInConvertModal')">Skip (Don't Save)</button>
+        </div>
+    </div>
+
+    <div id="editModal" class="overlay">
+        <div class="sheet">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 id="eTitle" style="margin:0;">Client</h3>
+                <i class="fas fa-times" style="font-size:1.6rem; color:var(--text-sub); cursor:pointer;" onclick="cancelEdit()"></i>
+            </div>
+            <form onsubmit="event.preventDefault(); saveClient();">
+                <input type="hidden" id="eId">
+                <div style="border:2px solid var(--p-blue); padding:15px; border-radius:15px; margin-bottom:15px; background:rgba(162,210,255,0.1);">
+                    <label style="color:var(--p-blue-dark); font-size:1rem; margin-bottom:10px;">Identity</label>
+                    <input type="text" id="eName" placeholder="Full Name" required autocapitalize="words" style="border-color:var(--p-blue); text-transform: capitalize;">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                        <input type="tel" id="ePhone" placeholder="Phone" oninput="applyPhoneMask(event)">
+                        <input type="text" id="eInsta" placeholder="Insta @">
+                    </div>
+                    <input type="email" id="eEmail" placeholder="Email Address">
+                    <input type="text" id="eAddr" placeholder="Address">
+                </div>
+
+                <details style="border:2px solid var(--p-green); padding:15px; border-radius:15px; margin-bottom:15px; background:rgba(183,228,199,0.1);">
+                    <summary style="color:var(--p-green-dark); font-weight:800; font-size:1rem; outline:none; cursor:pointer; list-style:none; display:flex; justify-content:space-between; align-items:center;">
+                        <span><i class="fas fa-cut" style="margin-right:8px;"></i> Service Details</span>
+                        <i class="fas fa-chevron-down" style="font-size:0.8rem;"></i>
+                    </summary>
+                    <div style="margin-top:15px;">
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                            <div><label>Price</label><input type="number" id="ePrice" value="35" onfocus="this.select()"></div>
+                            <div><label>Freq (Wks)</label><input type="number" id="eFreq" value="4" onfocus="this.select()"></div>
+                        </div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                            <div><label>First Cut</label><input type="date" id="eFirst"></div>
+                            <div><label>Birthday</label><input type="date" id="eDob"></div>
+                        </div>
+                        <label style="margin-top:10px;">The Formula</label>
+                        <input type="text" id="eFormula" placeholder="e.g. Mid fade, #1.5 into #3">
+                    </div>
+                </details>
+
+                <details style="border:2px solid var(--p-purple); padding:15px; border-radius:15px; margin-bottom:15px; background:rgba(205,180,219,0.1);">
+                    <summary style="color:var(--p-purple); font-weight:800; font-size:1rem; outline:none; cursor:pointer; list-style:none; display:flex; justify-content:space-between; align-items:center;">
+                        <span><i class="fas fa-users" style="margin-right:8px;"></i> Connection & Vibe</span>
+                        <i class="fas fa-chevron-down" style="font-size:0.8rem;"></i>
+                    </summary>
+                    <div style="margin-top:15px;">
+                        <label style="color:var(--p-purple-dark); margin-bottom:5px;">💡 Icebreaker (Ask next time)</label>
+                        <input type="text" id="eIcebreaker" placeholder="e.g. Ask how the Mexico trip was" style="border-color:var(--p-gold); background:#fffde7;">
+                        
+                        <label style="margin-top:10px;">Acquisition Source</label>
+                        <select id="eSource" style="margin-bottom:15px; border-color:var(--p-purple);">
+                            <option value="Unknown">Unknown / Walk-In</option>
+                            <option value="Instagram">Instagram</option>
+                            <option value="Word of Mouth">Word of Mouth / Referral</option>
+                            <option value="Google">Google / Maps</option>
+                            <option value="Other">Other</option>
+                        </select>
+
+                        <label style="display:flex; align-items:center; gap:10px; margin-bottom:15px; color:var(--text-main); text-transform:none;">
+                            <input type="checkbox" id="eComedy" style="width:20px; height:20px; margin:0;">
+                            <span style="font-size:0.85rem; font-weight:700; color:var(--p-purple-dark);">🎭 Add to Comedy Show Invites</span>
+                        </label>
+
+                        <input type="text" id="eRef" placeholder="Referred By..." oninput="searchRef(this.value)" onblur="setTimeout(() => document.getElementById('refResults').style.display='none', 200)">
+                        <div id="refResults" style="background:var(--bg-card); display:none; border:1px solid var(--border); padding:10px;"></div>
+                        
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <label>Permanent Notes</label>
+                            <span onclick="insertDate()" style="font-size:0.7rem; color:var(--p-blue-dark); cursor:pointer; font-weight:bold;">+ Insert Date</span>
+                        </div>
+                        <textarea id="eNotes" rows="3" placeholder="Permanent info (Wife, Job, etc)"></textarea>
+                        
+                        <label style="margin-top:10px;">Vibe Tags</label>
+                        <div class="tag-grid" id="eTags"></div>
+                    </div>
+                </details>
+
+                <details style="border:2px solid #FFD700; padding:15px; border-radius:15px; margin-bottom:15px; background:rgba(255, 215, 0, 0.05);">
+                    <summary style="color:#b8860b; font-weight:800; font-size:1rem; outline:none; cursor:pointer; list-style:none; display:flex; justify-content:space-between; align-items:center;">
+                        <span><i class="fas fa-crown" style="margin-right:8px; filter:none;"></i> Admin: Loyalty & Rewards</span>
+                        <i class="fas fa-chevron-down" style="font-size:0.8rem;"></i>
+                    </summary>
+                    <div style="margin-top:15px;">
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:10px;">
+                            <div>
+                                <label style="font-size:0.7rem;">Banked Free Cuts</label>
+                                <input type="number" id="eBanked" value="0" min="0" inputmode="numeric" pattern="[0-9]*" style="margin-bottom:0;">
+                            </div>
+                            <div>
+                                <label style="font-size:0.7rem;" id="lblLoyaltyEdit">Points (0-4 ✂️)</label>
+                                <input type="number" id="eLoyalty" value="0" min="0" inputmode="numeric" pattern="[0-9]*" style="margin-bottom:0;">
+                            </div>
+                        </div>
+                        <p style="font-size: 0.65rem; color: var(--text-sub); margin: 0; font-style: italic;" id="lblLoyaltyNote">
+                            *Use this to manually fix mistakes. 5 points automatically = 1 Banked Cut.
+                        </p>
+                    </div>
+                </details>
+
+                <button class="btn btn-primary">Save Client</button>
+                <button type="button" class="btn btn-red" onclick="deleteClient()">Delete</button>
+                <button type="button" class="btn btn-ghost" onclick="cancelEdit()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="smsModal" class="overlay" style="z-index: 800;">
+        <div class="sheet">
+            <h3>Send Text</h3>
+            <div class="sms-opt" onclick="sendSms('late')">🏃 Running Late (15m) <i class="fas fa-chevron-right"></i></div>
+            <div class="sms-opt" onclick="sendSms('confirm')">📅 Confirm Appointment <i class="fas fa-chevron-right"></i></div>
+            <div class="sms-opt" onclick="sendSms('longtime')">👋 Long Time No See <i class="fas fa-chevron-right"></i></div>
+            <div class="sms-opt" onclick="sendSms('followup')">✂️ Follow Up <i class="fas fa-chevron-right"></i></div>
+                        <div class="sms-opt" onclick="sendSms('review')">⭐ Request Review <i class="fas fa-chevron-right"></i></div>
+            
+            <div id="btn48hr" class="sms-opt" style="display:none; border-color:var(--p-blue); background:rgba(162,210,255,0.1);" onclick="sendSms('checkin')">💈 48-Hr Satisfaction Check <i class="fas fa-chevron-right"></i></div>
+            
+            <div class="sms-opt" onclick="sendSms('bday')">🎂 Happy Birthday <i class="fas fa-chevron-right"></i></div>
+
+            <div class="sms-opt" onclick="sendSms('noshow')">🚩 Missed Cut (No-Show) <i class="fas fa-chevron-right"></i></div>
+            
+            <div class="sms-opt" onclick="sendSms('loyalty')">🏆 Loyalty Update <i class="fas fa-chevron-right"></i></div>
+            
+            <div class="sms-opt" onclick="sendSms('aftercare')">🧴 Send Aftercare Link <i class="fas fa-chevron-right"></i></div>
+            
+            <div class="sms-opt" onclick="sendSms('custom')">💬 Custom Message <i class="fas fa-chevron-right"></i></div>
+            <button class="btn btn-red" onclick="closeModal('smsModal')">Cancel</button>
+        </div>
+    </div>
+
+    <div id="sosModal" class="overlay" style="z-index: 850;">
+        <div class="sheet">
+            <h3>🚨 Cancellation Radar</h3>
+            <p style="color:var(--text-sub); margin-top:-10px; font-size:0.8rem;">Rapid-fire texts to clients who need a cut right now.</p>
+            
+            <label>The Bait (Edit if needed)</label>
+            <textarea id="sosMsg" rows="3" style="border-color:var(--status-overdue); font-weight:600;">Yo! Just had a last-minute cancellation for today. First person to claim the spot gets $10 off. Let me know! 💈</textarea>
+            
+            <label style="margin-top:10px;">Prime Targets (Due & Overdue)</label>
+                        <div id="sosList" style="max-height: 250px; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 12px; padding: 5px;">
+
+                </div>
+
+            <button class="btn btn-ghost" onclick="closeModal('sosModal')">Cancel</button>
+        </div>
+    </div>
+
+    <div id="promoModal" class="overlay" style="z-index: 850;">
+        <div class="sheet">
+            <h3 style="color:var(--p-purple-dark); margin-bottom: 5px;">📢 Promo Blast</h3>
+            <p style="color:var(--text-sub); margin-top:0; font-size:0.8rem;">Safely text groups without making a group chat.</p>
+            
+            <label>Target Audience</label>
+            <select id="promoTarget" style="margin-bottom:15px;" onchange="buildPromoList()">
+                <option value="all">All Active Clients</option>
+            </select>
+
+            <label>The Message</label>
+            <textarea id="promoMsg" rows="3" style="border-color:var(--p-purple-dark); font-weight:600;">Got a few spots open later this week! Let me know if you need to lock one in. 💈</textarea>
+            
+            <div id="promoList" style="max-height: 250px; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; margin: 15px 0; border: 1px solid var(--border); border-radius: 12px; padding: 5px;">
+            </div>
+
+            <button class="btn btn-ghost" onclick="closeModal('promoModal')">Close</button>
+        </div>
+    </div>
+
+    <div id="briefingModal" class="overlay" style="z-index: 900;">
+        <div class="sheet">
+            <h2 style="margin-top:0; margin-bottom:5px; font-size:1.8rem; display:flex; align-items:center; gap:10px;">
+                <i class="fas fa-coffee" style="color:#8d6e63;"></i> The Morning Brief
+            </h2>
+            <p style="color:var(--text-sub); margin-top:0; font-size:0.9rem; font-weight:600; margin-bottom:20px;" id="briefingDate">...</p>
+            
+            <div id="briefingContent"></div>
+            
+            <button class="btn btn-primary" style="margin-top:10px; background:var(--bg-card); border:2px solid var(--border); color:var(--text-main); box-shadow:none;" onclick="closeModal('briefingModal')">Let's Get to Work</button>
+        </div>
+    </div>
+
+    <div id="moreMenuModal" class="overlay" style="z-index: 850;">
+        <div class="sheet">
+            <h3 style="margin-top: 0; margin-bottom: 20px;">More Actions</h3>
+            
+            <div class="sms-opt" onclick="closeModal('moreMenuModal'); openBriefing()" style="background: linear-gradient(135deg, #fff9c4 0%, #fff176 100%); border: 1px solid var(--p-gold);">
+                <span style="color: #5d4037; font-weight: 800;"><i class="fas fa-coffee" style="width:25px; color: #5d4037;"></i> Daily Briefing</span>
+                <i class="fas fa-chevron-right" style="font-size:0.8rem; color: #5d4037;"></i>
+            </div>
+            
+            <div class="sms-opt" onclick="closeModal('moreMenuModal'); openQrMenu()">
+                <span><i class="fas fa-qrcode" style="width:25px; color:var(--text-sub);"></i> QR Scan Hub</span>
+                <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--text-sub);"></i>
+            </div>
+            
+            <div class="sms-opt" onclick="toggleTheme()" style="justify-content: space-between;">
+                <span><i class="fas fa-moon" style="width:25px; color:var(--text-sub);"></i> Dark Mode</span>
+                <div class="theme-toggle" style="pointer-events: none; margin: 0;"><div class="toggle-dot"></div></div>
+            </div>
+            
+            <div class="sms-opt" onclick="closeModal('moreMenuModal'); openSettings()">
+                <span><i class="fas fa-cog" style="width:25px; color:var(--text-sub);"></i> Settings</span>
+                <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--text-sub);"></i>
+            </div>
+
+            <button class="btn btn-ghost" onclick="closeModal('moreMenuModal')" style="margin-top: 15px;">Close</button>
+        </div>
+    </div>
+    <div id="qrMenuModal" class="overlay" style="z-index: 850;">
+        <div class="sheet">
+            <h3>Client Scan Hub</h3>
+            <p style="color:var(--text-sub); margin-top:-10px; font-size:0.8rem;">Have the client scan your screen.</p>
+            
+            <div class="sms-opt" onclick="showQr('review')">⭐ Leave a Review <i class="fas fa-qrcode"></i></div>
+            <div class="sms-opt" onclick="showQr('card')">📇 Digital Business Card <i class="fas fa-qrcode"></i></div>
+            <div class="sms-opt" onclick="showQr('save')">💾 Save MAS Barbery <i class="fas fa-qrcode"></i></div>
+            <div class="sms-opt" onclick="showQr('book')">📅 Book Next Appointment <i class="fas fa-qrcode"></i></div>
+            
+            <button class="btn btn-red" onclick="closeModal('qrMenuModal')" style="margin-top:10px;">Cancel</button>
+        </div>
+    </div>
+
+    <div id="qrDisplayModal" class="overlay" style="z-index: 900; align-items:center; justify-content:center;">
+        <div class="confirm-box" style="width:90%; max-width:400px; padding:30px 20px;">
+            <h3 id="qrTitle" style="margin-top:0; font-size:1.5rem;">Scan Me</h3>
+            <div style="background:#fff; padding:15px; border-radius:15px; display:inline-block; margin: 15px 0;">
+                <img id="qrImage" src="" alt="QR Code" style="width:200px; height:200px; display:block;">
+            </div>
+            <button class="btn btn-ghost" onclick="backToQrMenu()">Back to Menu</button>
+        </div>
+    </div>
+    
+    <div id="confirmModal" style="display:none; position:fixed; top:calc(env(safe-area-inset-top, 20px) + 15px); left:50%; transform:translateX(-50%); z-index:9999; width:90%; max-width:380px; background:var(--bg-card); padding:20px; border-radius:24px; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:1px solid var(--border); animation: dropDownToast 0.4s cubic-bezier(0.19, 1, 0.22, 1);">
+        <div class="confirm-title" id="cMsg" style="font-size:0.95rem; font-weight:700; margin-bottom:15px; white-space:pre-wrap; line-height:1.4; color:var(--text-main); text-align:center;">Are you sure?</div>
+        <div class="confirm-btns" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:0;">
+            <button class="btn btn-ghost" id="cNo" style="margin:0; padding:12px; border-radius:14px; background:var(--input-bg); border:none; font-size:0.9rem; font-weight:800; color:var(--text-sub);">No</button>
+            <button class="btn btn-primary" id="cYes" style="margin:0; padding:12px; border-radius:14px; font-size:0.9rem; font-weight:800; background:var(--p-blue); color:#000;">Yes</button>
+        </div>
+    </div>
+
+    <div id="promptModal" style="display:none; position:fixed; top:calc(env(safe-area-inset-top, 20px) + 15px); left:50%; transform:translateX(-50%); z-index:9999; width:90%; max-width:380px; background:var(--bg-card); padding:20px; border-radius:24px; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:1px solid var(--border); animation: dropDownToast 0.4s cubic-bezier(0.19, 1, 0.22, 1);">
+        <div class="confirm-title" id="pMsg" style="font-size:0.95rem; font-weight:700; margin-bottom:10px; white-space:pre-wrap; line-height:1.4; color:var(--text-main); text-align:center;">Enter value</div>
+        <input type="text" id="pInput" style="margin-bottom:15px; text-align:center; padding:10px; font-weight:bold; font-size:1.1rem; border-color:var(--p-blue); width:100%; box-sizing:border-box;">
+        <div class="confirm-btns" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:0;">
+            <button class="btn btn-ghost" id="pCancel" style="margin:0; padding:12px; border-radius:14px; background:var(--input-bg); border:none; font-size:0.9rem; font-weight:800; color:var(--text-sub);">Cancel</button>
+            <button class="btn btn-primary" id="pSubmit" style="margin:0; padding:12px; border-radius:14px; font-size:0.9rem; font-weight:800; background:var(--p-blue); color:#000;">Submit</button>
+        </div>
+    </div>
+    
+    <div id="schedModal" class="overlay">
+        <div class="sheet">
+            <h3>Schedule</h3>
+            <label>When?</label>
+            <input type="datetime-local" id="schedDate">
+            <label>Where?</label>
+            <select id="schedLoc" style="margin-bottom:15px;"><option value="shop">My Shop</option><option value="client">Client Home</option></select>
+            
+            <label>Service Type</label>
+            <select id="schedService" style="margin-bottom:20px;">
+                <option value="120">Full Cut & Beard (2 hrs)</option>
+                <option value="90">Standard Cut (1.5 hrs)</option>
+                <option value="60">Express Cut (1 hr)</option>
+                <option value="45">Lineup / Trim (45 mins)</option>
+            </select>
+            <button class="btn btn-primary" onclick="addToCalendar()">Add to Calendar</button>
+            <button class="btn btn-ghost" onclick="closeModal('schedModal')">Cancel</button>
+        </div>
+    </div>
+
+    <div id="historyModal" class="overlay">
+        <div class="sheet">
+            <h3>Transaction History</h3>
+            <div id="historyList" style="margin-bottom:20px;"></div>
+            <button class="btn btn-ghost" onclick="closeModal('historyModal'); openModal('settingsModal')"><i class="fas fa-arrow-left"></i> Back to Settings</button>
+        </div>
+    </div>
+
+        <div id="settingsModal" class="overlay">
+        <div class="sheet">
+            <h2 style="margin-top:0; margin-bottom: 20px; font-size:1.8rem;">⚙️ Settings</h2>
+            
+            <h4 style="margin: 0 0 8px 5px; color:var(--text-sub); text-transform:uppercase; font-size:0.75rem; letter-spacing:1px;">Dashboard & Analytics</h4>
+            <div style="background:var(--input-bg); border: 1px solid var(--border); border-radius: 16px; padding: 15px; margin-bottom: 25px;">
+                <button class="btn btn-green" style="background:var(--p-purple); color:black;" onclick="openStats()"><i class="fas fa-chart-line"></i> View Revenue Stats</button>
+                <button class="btn btn-green" onclick="openHistory()"><i class="fas fa-list"></i> Transaction History</button>
+                <button class="btn btn-ghost" style="margin-bottom:0; border-color:var(--border);" onclick="toggleArchiveMode()"><i class="fas fa-archive"></i> <span id="archiveLabel">View Archived Clients</span></button>
+            </div>
+
+            <details style="background:var(--bg-card); border: 2px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                <summary style="font-weight: 800; color: var(--text-main); font-size:1.1rem; outline: none; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center;">
+                    <span><i class="fas fa-store" style="color:var(--p-blue-dark); margin-right:8px;"></i> Shop Management</span>
+                    <i class="fas fa-chevron-down" style="color:var(--text-sub); font-size:0.9rem;"></i>
+                </summary>
+                
+                <div style="margin-top: 20px;">
+                    <label>📍 Shop Location (For Calendar)</label>
+                    <div style="display:flex; gap:10px; margin-bottom:25px;">
+                        <input type="text" id="setLoc" placeholder="Address" style="margin-bottom:0;">
+                        <button class="btn btn-primary" style="width:auto; margin-bottom:0; padding:0 20px;" onclick="saveSettings()">Save</button>
+                    </div>
+
+                    <label>🏷️ Global Price Update</label>
+                    <input type="number" id="setNewPrice" placeholder="New Base Price (e.g. 40)" style="margin-bottom:10px;" inputmode="decimal">
+                    
+                    <label style="display:flex; align-items:center; gap:10px; margin-bottom:15px; text-transform:none; color:var(--text-main);">
+                        <input type="checkbox" id="setGrandfather" style="width:20px; height:20px; margin:0;" checked>
+                        <span style="font-size:0.85rem; font-weight:700;">Grandfather VIPs ($200+ LTV)</span>
+                    </label>
+                    
+                    <button class="btn btn-primary" style="padding:12px; margin:0;" onclick="massPriceUpdate()">Apply Price Update</button>
+                </div>
+            </details>
+
+            <details style="background:var(--bg-card); border: 2px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                <summary style="font-weight: 800; color: var(--text-main); font-size:1.1rem; outline: none; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center;">
+                    <span><i class="fas fa-database" style="color:var(--p-blue-dark); margin-right:8px;"></i> Data & Backups</span>
+                    <i class="fas fa-chevron-down" style="color:var(--text-sub); font-size:0.9rem;"></i>
+                </summary>
+                
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="exportRobustExcel()">
+                        <i class="fas fa-file-excel"></i> Download Visual Report (.html)
+                    </button>
+                    <button class="btn btn-ghost" onclick="exportHistoryCSV()">
+                        <i class="fas fa-table"></i> Download Transaction CSV (Tax)
+                    </button>
+                    <button class="btn btn-teal" onclick="exportSimpleCSV()">
+                        <i class="fas fa-user-tag"></i> Download Client List CSV
+                    </button>
+                    
+                    <hr style="border-color:var(--border); margin:20px 0;">
+                    
+                    <button class="btn btn-ghost" style="color:var(--status-overdue); border-color:var(--status-overdue); margin-bottom: 20px;" onclick="pruneOldHistory()">
+                        <i class="fas fa-broom"></i> Prune Old History (Free Space)
+                    </button>
+                    <button class="btn btn-indigo" style="border: 2px solid var(--p-green-dark); color:var(--p-green-dark);" onclick="exportData()">
+                        <i class="fas fa-download"></i> Save Full Backup (.json)
+                    </button>
+                    <input type="file" id="restoreFile" hidden onchange="restoreData(this)">
+                    <button class="btn btn-orange" style="margin-bottom:0;" onclick="document.getElementById('restoreFile').click()">
+                        <i class="fas fa-upload"></i> Restore From Backup
+                    </button>
+                </div>
+            </details>
+
+            <button class="btn btn-red" onclick="closeModal('settingsModal')">Close Menu</button>
+        </div>
+    </div>
+    
+    <div id="flashUndoBanner" class="flash-banner">
+        <span>✅ Cut Saved</span>
+        <button onclick="executeFlashUndo()" style="background:var(--p-pink); color:black; border:none; padding:6px 15px; border-radius:20px; font-weight:800; cursor:pointer; font-size:0.8rem;">UNDO</button>
+    </div>
+
+    <script src="script.js"></script>
+    
+</body>
+</html>
