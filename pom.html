@@ -102,8 +102,12 @@
         button.btn-main {
             padding: 10px 25px; border: 2px solid currentColor;
             font-size: 1rem; border-radius: 50px; text-transform: uppercase; font-weight: bold;
+            -webkit-tap-highlight-color: transparent;
         }
-        button.btn-main:hover { background: currentColor; color: var(--glass-bg); }
+        button.btn-main:hover, button.btn-main:active { 
+            background: var(--text-color); 
+            color: var(--bg-color); 
+        }
 
         .modes { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
         .mode-btn { font-size: 0.85rem; padding: 5px 10px; border-radius: 10px; opacity: 0.6; }
@@ -142,44 +146,27 @@
             margin-bottom: 10px; font-size: 0.9rem;
         }
 
-        /* =========================================
-           FOCUS MODE STYLES
-           ========================================= */
-        body.focus-active::before {
-            filter: blur(2px); /* Reduces background blur so you can see it better */
-        }
-        body.focus-active .container {
-            background: transparent;
-            border-color: transparent;
-            box-shadow: none;
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-        }
-        body.focus-active .header,
-        body.focus-active .modes,
-        body.focus-active #start-btn,
-        body.focus-active #reset-btn,
-        body.focus-active .soundboard,
-        body.focus-active #settings-panel {
-            display: none !important;
-        }
-        #focus-btn {
-            display: none; /* Hidden by default */
-            padding: 8px;
-            border: 2px solid currentColor;
-            border-radius: 50%;
-            background: transparent;
-            color: inherit;
-            cursor: pointer;
-            transition: 0.3s;
-            width: 44px; height: 44px;
-            align-items: center; justify-content: center;
-        }
-        #focus-btn svg { width: 22px; height: 22px; fill: currentColor; }
-        #focus-btn:hover { background: currentColor; color: var(--glass-bg); }
-        
-        body.focus-active #focus-btn { display: inline-flex !important; }
-    </style>
+        /* ZEN MODE */
+        .modes, .controls, .soundboard, #settings-panel, #theme-btn, #settings-btn {
+            transition: opacity 0.5s ease;
+        }
+        body.zen-mode .modes, 
+        body.zen-mode .controls, 
+        body.zen-mode .soundboard, 
+        body.zen-mode #settings-panel,
+        body.zen-mode #theme-btn, 
+        body.zen-mode #settings-btn {
+            opacity: 0;
+            pointer-events: none;
+        }
+        body.zen-mode .container {
+            background: transparent;
+            border-color: transparent;
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+    </style>
 </head>
 <body>
 
@@ -187,6 +174,9 @@
     <div class="header">
         <button id="theme-btn" class="theme-toggle" title="Switch Theme">
             <svg viewBox="0 0 24 24"><path d="M17,8C8,10,5.9,16.17,3.82,21.34L5.71,22l1-2.3A4.49,4.49,0,0,0,8,20C19,20,22,3,22,3,21,5,14,5.25,9,6.25S2,11.5,2,13.5a6.22,6.22,0,0,0,1.75,3.75C7,8,17,8,17,8Z"/></svg>
+        </button>
+        <button id="zen-btn" class="theme-toggle" title="Zen Mode">
+            <svg viewBox="0 0 24 24"><path d="M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
         </button>
         <button id="settings-btn" class="settings-toggle" title="Settings">
             <svg viewBox="0 0 24 24"><path d="M12,15.5A3.5,3.5,0,0,1,8.5,12A3.5,3.5,0,0,1,12,8.5A3.5,3.5,0,0,1,15.5,12A3.5,3.5,0,0,1,12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.35 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.35 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.04 4.95,18.95L7.44,17.95C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.95L19.05,18.95C19.27,19.04 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/></svg>
@@ -208,12 +198,9 @@
     </div>
 
     <div class="controls">
-        <button class="btn-main" id="start-btn">Start</button>
-        <button class="btn-main" id="reset-btn">Reset</button>
-        <button id="focus-btn" title="Toggle Focus Mode">
-            <svg viewBox="0 0 24 24"><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/></svg>
-        </button>
-    </div>
+        <button class="btn-main" id="start-btn">Start</button>
+        <button class="btn-main" id="reset-btn">Reset</button>
+    </div>
 
     <div class="soundboard">
         <div class="sound-row">
@@ -324,7 +311,6 @@
     const ambienceBtn = document.getElementById('ambience-btn');
     const ambienceSelect = document.getElementById('ambience-select');
     const themeBtn = document.getElementById('theme-btn');
-    const focusBtn = document.getElementById('focus-btn');
 
     /* =========================================
        3. AUDIO LOGIC
@@ -491,8 +477,7 @@
         releaseWakeLock();
         playSound('alarm');
         clearInterval(timerId); isRunning = false;
-        startBtn.textContent = 'Start'; targetTime = null;
-        focusBtn.style.display = 'none'; document.body.classList.remove('focus-active');
+        startBtn.textContent = 'Start'; targetTime = null;
         localStorage.removeItem('targetTime');
         syncAudio(); 
 
@@ -516,14 +501,12 @@
     function startTimer() {
         if (isRunning) {
             clearInterval(timerId); isRunning = false;
-        startBtn.textContent = 'Start'; targetTime = null;
-        focusBtn.style.display = 'none'; document.body.classList.remove('focus-active');
+            startBtn.textContent = 'Start'; targetTime = null;
             localStorage.removeItem('targetTime');
             releaseWakeLock(); 
             syncAudio();
         } else {
             isRunning = true; startBtn.textContent = 'Pause';
-            focusBtn.style.display = 'inline-flex';
             targetTime = Date.now() + (timeLeft * 1000);
             localStorage.setItem('targetTime', targetTime);
             requestWakeLock(); 
@@ -550,8 +533,7 @@
     function setupTimer(seconds, mode) {
         releaseWakeLock();
         clearInterval(timerId); isRunning = false;
-        isRunning = true; startBtn.textContent = 'Pause';
-            focusBtn.style.display = 'inline-flex';
+        startBtn.textContent = 'Start'; timeLeft = seconds; totalTime = seconds;
         currentMode = mode; targetTime = null;
         localStorage.removeItem('targetTime'); 
         syncAudio(); 
@@ -561,11 +543,6 @@
     // EVENT LISTENERS
     document.getElementById('start-btn').addEventListener('click', () => { playSound('click'); startTimer(); });
     document.getElementById('reset-btn').addEventListener('click', () => { playSound('click'); setupTimer(totalTime, currentMode); });
-
-    focusBtn.addEventListener('click', () => {
-        playSound('click');
-        document.body.classList.toggle('focus-active');
-    });
     
     document.querySelectorAll('.mode-btn[data-time]').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -588,6 +565,12 @@
         playSound('click');
         const panel = document.getElementById('settings-panel');
         panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Zen Mode Toggle
+    document.getElementById('zen-btn').addEventListener('click', () => {
+        playSound('click');
+        document.body.classList.toggle('zen-mode');
     });
 
     // iOS Resume Check
