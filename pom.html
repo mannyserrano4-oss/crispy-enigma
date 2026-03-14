@@ -138,35 +138,47 @@
             border-top: 1px solid rgba(255,255,255,0.3);
         }
         .sound-row {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 10px; font-size: 0.9rem;
-        }
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px; font-size: 0.9rem;
+        }
 
         /* =========================================
-           FOCUS MODE
+           FOCUS MODE STYLES
            ========================================= */
-        .header, .modes, .soundboard, #settings-panel, #start-btn, #reset-btn {
-            transition: opacity 0.5s ease, visibility 0.5s ease;
+        body.focus-active::before {
+            filter: blur(2px); /* Reduces background blur so you can see it better */
         }
-        
-        .container.focus-active .header,
-        .container.focus-active .modes,
-        .container.focus-active .soundboard,
-        .container.focus-active #settings-panel,
-        .container.focus-active #start-btn,
-        .container.focus-active #reset-btn {
-            opacity: 0 !important;
-            visibility: hidden !important; 
-            pointer-events: none !important;
+        body.focus-active .container {
+            background: transparent;
+            border-color: transparent;
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
         }
-        
-        .container.focus-active {
-            background: rgba(0, 0, 0, 0.1) !important; 
-            backdrop-filter: blur(2px) !important; 
-            -webkit-backdrop-filter: blur(2px) !important;
-            border-color: transparent !important;
-            box-shadow: none !important;
+        body.focus-active .header,
+        body.focus-active .modes,
+        body.focus-active #start-btn,
+        body.focus-active #reset-btn,
+        body.focus-active .soundboard,
+        body.focus-active #settings-panel {
+            display: none !important;
         }
+        #focus-btn {
+            display: none; /* Hidden by default */
+            padding: 8px;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+            background: transparent;
+            color: inherit;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 44px; height: 44px;
+            align-items: center; justify-content: center;
+        }
+        #focus-btn svg { width: 22px; height: 22px; fill: currentColor; }
+        #focus-btn:hover { background: currentColor; color: var(--glass-bg); }
+        
+        body.focus-active #focus-btn { display: inline-flex !important; }
     </style>
 </head>
 <body>
@@ -198,7 +210,7 @@
     <div class="controls">
         <button class="btn-main" id="start-btn">Start</button>
         <button class="btn-main" id="reset-btn">Reset</button>
-        <button id="focus-btn" class="settings-toggle" title="Focus Mode" style="display: none;">
+        <button id="focus-btn" title="Toggle Focus Mode">
             <svg viewBox="0 0 24 24"><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/></svg>
         </button>
     </div>
@@ -311,17 +323,11 @@
     const ambiencePlayer = document.getElementById('ambience-player');
     const ambienceBtn = document.getElementById('ambience-btn');
     const ambienceSelect = document.getElementById('ambience-select');
-    const themeBtn = document.getElementById('theme-btn');
+    const themeBtn = document.getElementById('theme-btn');
     const focusBtn = document.getElementById('focus-btn');
-    const mainContainer = document.querySelector('.container');
 
-    focusBtn.addEventListener('click', () => {
-        playSound('click');
-        mainContainer.classList.toggle('focus-active');
-    });
-
-    /* =========================================
-       3. AUDIO LOGIC
+    /* =========================================
+       3. AUDIO LOGIC
        ========================================= */
     function updateMusicSource() {
         const isCyber = html.getAttribute('data-theme') === 'cyber';
@@ -485,7 +491,8 @@
         releaseWakeLock();
         playSound('alarm');
         clearInterval(timerId); isRunning = false;
-        startBtn.textContent = 'Start'; targetTime = null;
+        startBtn.textContent = 'Start'; targetTime = null;
+        focusBtn.style.display = 'none'; document.body.classList.remove('focus-active');
         localStorage.removeItem('targetTime');
         syncAudio(); 
 
@@ -507,21 +514,20 @@
     }
 
     function startTimer() {
-        if (isRunning) {
-            clearInterval(timerId); isRunning = false;
-            startBtn.textContent = 'Start'; targetTime = null;
-            focusBtn.style.display = 'none';
-            mainContainer.classList.remove('focus-active');
-            localStorage.removeItem('targetTime');
-            releaseWakeLock(); 
-            syncAudio();
-        } else {
-            isRunning = true; startBtn.textContent = 'Pause';
-            focusBtn.style.display = 'block';
-            targetTime = Date.now() + (timeLeft * 1000);
-            localStorage.setItem('targetTime', targetTime);
-            requestWakeLock(); 
-            syncAudio();
+        if (isRunning) {
+            clearInterval(timerId); isRunning = false;
+        startBtn.textContent = 'Start'; targetTime = null;
+        focusBtn.style.display = 'none'; document.body.classList.remove('focus-active');
+            localStorage.removeItem('targetTime');
+            releaseWakeLock(); 
+            syncAudio();
+        } else {
+            isRunning = true; startBtn.textContent = 'Pause';
+            focusBtn.style.display = 'inline-flex';
+            targetTime = Date.now() + (timeLeft * 1000);
+            localStorage.setItem('targetTime', targetTime);
+            requestWakeLock(); 
+            syncAudio();
             
             timerId = setInterval(() => {
                 const now = Date.now();
@@ -542,11 +548,10 @@
     }
 
     function setupTimer(seconds, mode) {
-        releaseWakeLock();
-        clearInterval(timerId); isRunning = false;
-        startBtn.textContent = 'Start'; timeLeft = seconds; totalTime = seconds;
-        focusBtn.style.display = 'none';
-        mainContainer.classList.remove('focus-active');
+        releaseWakeLock();
+        clearInterval(timerId); isRunning = false;
+        isRunning = true; startBtn.textContent = 'Pause';
+            focusBtn.style.display = 'inline-flex';
         currentMode = mode; targetTime = null;
         localStorage.removeItem('targetTime'); 
         syncAudio(); 
@@ -554,13 +559,13 @@
     }
 
     // EVENT LISTENERS
-    document.getElementById('focus-btn').addEventListener('click', () => { 
-        playSound('click'); 
-        document.querySelector('.container').classList.toggle('focus-active'); 
-    });
-    
-    document.getElementById('start-btn').addEventListener('click', () => { playSound('click'); startTimer(); });
+    document.getElementById('start-btn').addEventListener('click', () => { playSound('click'); startTimer(); });
     document.getElementById('reset-btn').addEventListener('click', () => { playSound('click'); setupTimer(totalTime, currentMode); });
+
+    focusBtn.addEventListener('click', () => {
+        playSound('click');
+        document.body.classList.toggle('focus-active');
+    });
     
     document.querySelectorAll('.mode-btn[data-time]').forEach(btn => {
         btn.addEventListener('click', () => {
