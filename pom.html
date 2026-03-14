@@ -119,13 +119,14 @@
             border-top: 1px solid currentColor; padding-top: 15px;
             font-size: 0.9rem; text-align: left;
         }
-        .setting-row { margin: 10px 0; display: flex; justify-content: space-between; align-items: center; }
+        .setting-row { margin: 10px 0; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .setting-row label { flex: 1; text-align: left; }
         input[type="number"] {
             width: 60px; padding: 5px; border-radius: 5px; border: 1px solid currentColor;
-            background: rgba(255,255,255,0.2); color: inherit;
+            background: rgba(255,255,255,0.2); color: inherit; flex-shrink: 0; text-align: center;
         }
         input[type="range"] {
-            width: 90px; accent-color: currentColor; background: transparent; cursor: pointer;
+            width: 90px; accent-color: currentColor; background: transparent; cursor: pointer; flex-shrink: 0;
         }
         select {
             padding: 5px; border-radius: 5px; border: 1px solid currentColor;
