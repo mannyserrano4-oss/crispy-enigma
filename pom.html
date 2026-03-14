@@ -72,17 +72,7 @@
         }
         
         .header { display: flex; justify-content: space-between; margin-bottom: 20px; }
-        .button { 
-            cursor: pointer; 
-            border: none; 
-            background: transparent; /* Changed from 'none' to 'transparent' for iOS safety */
-            color: inherit; 
-            font-family: inherit; 
-            transition: 0.2s; 
-            -webkit-tap-highlight-color: transparent; /* This is the ONLY thing needed to fix the ghost box! */
-            appearance: none; 
-            -webkit-appearance: none; /* Stops Apple from injecting its default styles */
-        }
+        button { cursor: pointer; border: none; background: none; color: inherit; font-family: inherit; transition: 0.2s; }
         
         .theme-toggle, .settings-toggle { 
             display: flex; align-items: center; justify-content: center;
@@ -148,10 +138,34 @@
             border-top: 1px solid rgba(255,255,255,0.3);
         }
         .sound-row {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 10px; font-size: 0.9rem;
-        }
-    </style>
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px; font-size: 0.9rem;
+        }
+
+        /* =========================================
+           FOCUS MODE
+           ========================================= */
+        .header, .modes, .soundboard, #settings-panel, .btn-main {
+            transition: opacity 0.5s ease;
+        }
+        
+        .focus-active .header,
+        .focus-active .modes,
+        .focus-active .soundboard,
+        .focus-active #settings-panel,
+        .focus-active .btn-main {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .focus-active.container {
+            background: rgba(0, 0, 0, 0.2) !important; 
+            backdrop-filter: blur(2px) !important; 
+            -webkit-backdrop-filter: blur(2px) !important;
+            border-color: transparent !important;
+            box-shadow: none !important;
+        }
+    </style>
 </head>
 <body>
 
@@ -180,9 +194,12 @@
     </div>
 
     <div class="controls">
-        <button class="btn-main" id="start-btn">Start</button>
-        <button class="btn-main" id="reset-btn">Reset</button>
-    </div>
+        <button class="btn-main" id="start-btn">Start</button>
+        <button class="btn-main" id="reset-btn">Reset</button>
+        <button id="focus-btn" class="settings-toggle" title="Focus Mode" style="display: none;">
+            <svg viewBox="0 0 24 24"><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/></svg>
+        </button>
+    </div>
 
     <div class="soundboard">
         <div class="sound-row">
@@ -208,13 +225,13 @@
             <input type="checkbox" id="auto-break">
         </div>
         <div class="setting-row">
-            <label>Custom Work (min):</label>
-            <input type="number" id="custom-work-input" value="45">
-        </div>
-        <div class="setting-row">
-            <label>Custom Break (min):</label>
-            <input type="number" id="custom-break-input" value="10">
-        </div>
+            <label>Custom Work (min):</label>
+            <input type="number" id="custom-work-input" value="45" inputmode="numeric" pattern="[0-9]*">
+        </div>
+        <div class="setting-row">
+            <label>Custom Break (min):</label>
+            <input type="number" id="custom-break-input" value="10" inputmode="numeric" pattern="[0-9]*">
+        </div>
         <div class="custom-controls">
             <button class="btn-custom" id="start-custom-work">Start Work</button>
             <button class="btn-custom" id="start-custom-break">Start Break</button>
@@ -292,10 +309,17 @@
     const ambiencePlayer = document.getElementById('ambience-player');
     const ambienceBtn = document.getElementById('ambience-btn');
     const ambienceSelect = document.getElementById('ambience-select');
-    const themeBtn = document.getElementById('theme-btn');
+    const themeBtn = document.getElementById('theme-btn');
+    const focusBtn = document.getElementById('focus-btn');
+    const mainContainer = document.querySelector('.container');
 
-    /* =========================================
-       3. AUDIO LOGIC
+    focusBtn.addEventListener('click', () => {
+        playSound('click');
+        mainContainer.classList.toggle('focus-active');
+    });
+
+    /* =========================================
+       3. AUDIO LOGIC
        ========================================= */
     function updateMusicSource() {
         const isCyber = html.getAttribute('data-theme') === 'cyber';
@@ -446,12 +470,11 @@
         }
     }
 
-    function highlightMode(activeBtnId) {
-    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-    if (activeBtnId) {
-        document.getElementById(activeBtnId).classList.add('active');
+    function highlightMode(mode) {
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        if (mode === 'work') document.getElementById('mode-pomodoro').classList.add('active');
+        if (mode === 'break') document.getElementById('mode-short').classList.add('active');
     }
-}
 
     /* =========================================
        5. TIMER LOGIC
@@ -467,10 +490,10 @@
         const autoBreak = document.getElementById('auto-break').checked;
 
         if (currentMode === 'work') {
-            setupTimer(5 * 60, 'break'); highlightMode('mode-short');
+            setupTimer(5 * 60, 'break'); highlightMode('break');
             if(autoBreak) setTimeout(() => startTimer(), 1000);
         } else if (currentMode === 'break') {
-            setupTimer(25 * 60, 'work'); highlightMode('mode-pomodoro');
+            setupTimer(25 * 60, 'work'); highlightMode('work');
         } else if (currentMode === 'custom-work') {
             const breakT = document.getElementById('custom-break-input').value;
             setupTimer(breakT * 60, 'custom-break');
@@ -482,18 +505,21 @@
     }
 
     function startTimer() {
-        if (isRunning) {
-            clearInterval(timerId); isRunning = false;
-            startBtn.textContent = 'Start'; targetTime = null;
-            localStorage.removeItem('targetTime');
-            releaseWakeLock(); 
-            syncAudio();
-        } else {
-            isRunning = true; startBtn.textContent = 'Pause';
-            targetTime = Date.now() + (timeLeft * 1000);
-            localStorage.setItem('targetTime', targetTime);
-            requestWakeLock(); 
-            syncAudio();
+        if (isRunning) {
+            clearInterval(timerId); isRunning = false;
+            startBtn.textContent = 'Start'; targetTime = null;
+            focusBtn.style.display = 'none';
+            mainContainer.classList.remove('focus-active');
+            localStorage.removeItem('targetTime');
+            releaseWakeLock(); 
+            syncAudio();
+        } else {
+            isRunning = true; startBtn.textContent = 'Pause';
+            focusBtn.style.display = 'block';
+            targetTime = Date.now() + (timeLeft * 1000);
+            localStorage.setItem('targetTime', targetTime);
+            requestWakeLock(); 
+            syncAudio();
             
             timerId = setInterval(() => {
                 const now = Date.now();
@@ -514,9 +540,11 @@
     }
 
     function setupTimer(seconds, mode) {
-        releaseWakeLock();
-        clearInterval(timerId); isRunning = false;
-        startBtn.textContent = 'Start'; timeLeft = seconds; totalTime = seconds;
+        releaseWakeLock();
+        clearInterval(timerId); isRunning = false;
+        startBtn.textContent = 'Start'; timeLeft = seconds; totalTime = seconds;
+        focusBtn.style.display = 'none';
+        mainContainer.classList.remove('focus-active');
         currentMode = mode; targetTime = null;
         localStorage.removeItem('targetTime'); 
         syncAudio(); 
@@ -528,12 +556,12 @@
     document.getElementById('reset-btn').addEventListener('click', () => { playSound('click'); setupTimer(totalTime, currentMode); });
     
     document.querySelectorAll('.mode-btn[data-time]').forEach(btn => {
-    btn.addEventListener('click', () => {
-        playSound('click'); 
-        highlightMode(btn.id); // Just pass the ID directly!
-        setupTimer(btn.dataset.time * 60, btn.dataset.mode);
+        btn.addEventListener('click', () => {
+            playSound('click'); highlightMode(btn.dataset.mode === 'work' ? 'work' : 'break');
+            if(btn.id === 'mode-long') { document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
+            setupTimer(btn.dataset.time * 60, btn.dataset.mode);
+        });
     });
-});
     
     document.getElementById('start-custom-work').addEventListener('click', () => {
         playSound('click'); const min = document.getElementById('custom-work-input').value;
