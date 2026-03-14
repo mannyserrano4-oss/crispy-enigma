@@ -120,18 +120,15 @@
             font-size: 0.9rem; text-align: left;
         }
         .setting-row { 
-            margin: 12px 0; 
-            display: grid; 
-            grid-template-columns: 1fr auto; 
+            margin: 15px 0; 
+            display: flex; 
+            justify-content: space-between; 
             align-items: center; 
-            justify-items: end;
-            gap: 15px; 
         }
         .setting-row label { 
-            justify-self: start;
             text-align: left; 
             white-space: nowrap; 
-            margin: 0;
+            margin-right: 15px;
         }
         input[type="number"] {
             width: 60px; padding: 5px; border-radius: 5px; border: 1px solid currentColor;
@@ -139,6 +136,9 @@
         }
         input[type="range"] {
             width: 90px; accent-color: currentColor; background: transparent; cursor: pointer; margin: 0;
+        }
+        input[type="checkbox"] {
+            width: 18px; height: 18px; margin: 0; cursor: pointer;
         }
         select {
             padding: 5px; border-radius: 5px; border: 1px solid currentColor;
