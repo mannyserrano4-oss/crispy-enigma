@@ -84,7 +84,13 @@
         .theme-toggle:hover, .settings-toggle:hover { transform: scale(1.1); opacity: 1; }
         
         /* TIMER VISUALS */
-        .timer-wrapper { position: relative; width: 220px; height: 220px; margin: 0 auto; }
+        .timer-wrapper { 
+            position: relative; width: 220px; height: 220px; margin: 0 auto; 
+            cursor: pointer; transition: transform 0.2s ease; -webkit-tap-highlight-color: transparent;
+        }
+        .timer-wrapper:hover { transform: scale(1.03); }
+        .timer-wrapper:active { transform: scale(0.97); }
+
         svg.timer-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
         circle { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke 1s linear; }
         .track { stroke: rgba(128, 128, 128, 0.3); }
@@ -95,18 +101,7 @@
             transform: translate(-50%, -50%);
             font-size: 3rem; font-weight: bold;
             text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.8);
-        }
-
-        /* BUTTONS */
-        .controls { margin-top: 25px; display: flex; justify-content: center; gap: 15px; }
-        button.btn-main {
-            padding: 10px 25px; border: 2px solid currentColor;
-            font-size: 1rem; border-radius: 50px; text-transform: uppercase; font-weight: bold;
-            -webkit-tap-highlight-color: transparent;
-        }
-        button.btn-main:hover, button.btn-main:active { 
-            background: var(--text-color); 
-            color: var(--bg-color); 
+            pointer-events: none; /* Let clicks pass through to the wrapper */
         }
 
         .modes { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
@@ -189,17 +184,12 @@
         <button class="mode-btn" id="mode-long" data-time="15" data-mode="break">Long Break</button>
     </div>
 
-    <div class="timer-wrapper">
+    <div class="timer-wrapper" id="timer-circle" title="Click to Play/Pause (Double-click to Reset)">
         <svg class="timer-svg">
             <circle class="track" cx="110" cy="110" r="95"></circle>
             <circle class="progress" cx="110" cy="110" r="95"></circle>
         </svg>
         <div class="time-display" id="time-display">25:00</div>
-    </div>
-
-    <div class="controls">
-        <button class="btn-main" id="start-btn">Start</button>
-        <button class="btn-main" id="reset-btn">Reset</button>
     </div>
 
     <div class="soundboard">
@@ -303,7 +293,7 @@
     let ambienceEnabled = false;
 
     const timeDisplay = document.getElementById('time-display');
-    const startBtn = document.getElementById('start-btn');
+    const timerCircle = document.getElementById('timer-circle');
     const html = document.documentElement;
     const bgMusic = document.getElementById('bg-music');
     const musicBtn = document.getElementById('music-btn');
@@ -477,7 +467,7 @@
         releaseWakeLock();
         playSound('alarm');
         clearInterval(timerId); isRunning = false;
-        startBtn.textContent = 'Start'; targetTime = null;
+        targetTime = null;
         localStorage.removeItem('targetTime');
         syncAudio(); 
 
@@ -498,16 +488,16 @@
         }
     }
 
-    function startTimer() {
+    function startTimer(resumeTarget = null) {
         if (isRunning) {
             clearInterval(timerId); isRunning = false;
-            startBtn.textContent = 'Start'; targetTime = null;
+            targetTime = null;
             localStorage.removeItem('targetTime');
             releaseWakeLock(); 
             syncAudio();
         } else {
-            isRunning = true; startBtn.textContent = 'Pause';
-            targetTime = Date.now() + (timeLeft * 1000);
+            isRunning = true; 
+            targetTime = resumeTarget ? resumeTarget : Date.now() + (timeLeft * 1000);
             localStorage.setItem('targetTime', targetTime);
             requestWakeLock(); 
             syncAudio();
@@ -533,7 +523,7 @@
     function setupTimer(seconds, mode) {
         releaseWakeLock();
         clearInterval(timerId); isRunning = false;
-        startBtn.textContent = 'Start'; timeLeft = seconds; totalTime = seconds;
+        timeLeft = seconds; totalTime = seconds;
         currentMode = mode; targetTime = null;
         localStorage.removeItem('targetTime'); 
         syncAudio(); 
@@ -541,8 +531,17 @@
     }
 
     // EVENT LISTENERS
-    document.getElementById('start-btn').addEventListener('click', () => { playSound('click'); startTimer(); });
-    document.getElementById('reset-btn').addEventListener('click', () => { playSound('click'); setupTimer(totalTime, currentMode); });
+    timerCircle.addEventListener('click', () => { 
+        playSound('click'); 
+        startTimer(); 
+    });
+    
+    // Double-click to Reset
+    timerCircle.addEventListener('dblclick', (e) => { 
+        e.preventDefault(); // Prevents accidental zoom on mobile devices
+        playSound('click'); 
+        setupTimer(totalTime, currentMode); 
+    });
     
     document.querySelectorAll('.mode-btn[data-time]').forEach(btn => {
         btn.addEventListener('click', () => {
