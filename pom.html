@@ -146,20 +146,21 @@
            FOCUS MODE
            ========================================= */
         .header, .modes, .soundboard, #settings-panel, .btn-main {
-            transition: opacity 0.5s ease;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
         }
         
-        .focus-active .header,
-        .focus-active .modes,
-        .focus-active .soundboard,
-        .focus-active #settings-panel,
-        .focus-active .btn-main {
-            opacity: 0;
-            pointer-events: none;
+        .container.focus-active .header,
+        .container.focus-active .modes,
+        .container.focus-active .soundboard,
+        .container.focus-active #settings-panel,
+        .container.focus-active .btn-main {
+            opacity: 0 !important;
+            visibility: hidden !important; 
+            pointer-events: none !important;
         }
         
-        .focus-active.container {
-            background: rgba(0, 0, 0, 0.2) !important; 
+        .container.focus-active {
+            background: rgba(0, 0, 0, 0.1) !important; 
             backdrop-filter: blur(2px) !important; 
             -webkit-backdrop-filter: blur(2px) !important;
             border-color: transparent !important;
@@ -552,7 +553,12 @@
     }
 
     // EVENT LISTENERS
-    document.getElementById('start-btn').addEventListener('click', () => { playSound('click'); startTimer(); });
+    document.getElementById('focus-btn').addEventListener('click', () => { 
+        playSound('click'); 
+        document.querySelector('.container').classList.toggle('focus-active'); 
+    });
+    
+    document.getElementById('start-btn').addEventListener('click', () => { playSound('click'); startTimer(); });
     document.getElementById('reset-btn').addEventListener('click', () => { playSound('click'); setupTimer(totalTime, currentMode); });
     
     document.querySelectorAll('.mode-btn[data-time]').forEach(btn => {
