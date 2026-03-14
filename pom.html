@@ -75,20 +75,13 @@
         .button { 
             cursor: pointer; 
             border: none; 
-            background: none; /* Forces no background */
-            outline: none;    /* Kills the permanent gray/blue focus boxes */
+            background: transparent; /* Changed from 'none' to 'transparent' for iOS safety */
             color: inherit; 
             font-family: inherit; 
-            transition: all 0.3s ease; 
-            -webkit-tap-highlight-color: transparent; 
-            -webkit-user-select: none; 
-            user-select: none;
-        }
-        
-        /* This guarantees that clicking the button doesn't force an outline */
-        button:focus {
-            outline: none;
-            background: none;
+            transition: 0.2s; 
+            -webkit-tap-highlight-color: transparent; /* This is the ONLY thing needed to fix the ghost box! */
+            appearance: none; 
+            -webkit-appearance: none; /* Stops Apple from injecting its default styles */
         }
         
         .theme-toggle, .settings-toggle { 
