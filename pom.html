@@ -75,13 +75,20 @@
         .button { 
             cursor: pointer; 
             border: none; 
-            background: none; 
+            background: none; /* Forces no background */
+            outline: none;    /* Kills the permanent gray/blue focus boxes */
             color: inherit; 
             font-family: inherit; 
-            transition: all 0.3s ease; /* Smoothed out from 0.2s */
-            -webkit-tap-highlight-color: transparent; /* Removes the gray tap flash */
-            -webkit-user-select: none; /* Prevents accidental text selection */
+            transition: all 0.3s ease; 
+            -webkit-tap-highlight-color: transparent; 
+            -webkit-user-select: none; 
             user-select: none;
+        }
+        
+        /* This guarantees that clicking the button doesn't force an outline */
+        button:focus {
+            outline: none;
+            background: none;
         }
         
         .theme-toggle, .settings-toggle { 
