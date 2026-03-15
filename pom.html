@@ -460,6 +460,7 @@
     });
 
     ambienceSelect.addEventListener('change', () => {
+        localStorage.setItem('pomoAmbienceTrack', ambienceSelect.value);
         if (ambienceEnabled) {
             if(ambienceSelect.value === 'none') {
                 fadeAudio(ambiencePlayer, 0, 1000); 
@@ -745,12 +746,15 @@
 
     // Auto-update timer if they change the input while stopped
     document.getElementById('custom-work-input').addEventListener('change', (e) => {
+        localStorage.setItem('pomoWorkTime', e.target.value);
         if (!isRunning && currentMode === 'work') setupTimer(Math.max(0.1, e.target.value) * 60, 'work');
     });
     document.getElementById('custom-break-input').addEventListener('change', (e) => {
+        localStorage.setItem('pomoBreakTime', e.target.value);
         if (!isRunning && currentMode === 'break') setupTimer(Math.max(0.1, e.target.value) * 60, 'break');
     });
     document.getElementById('custom-long-input').addEventListener('change', (e) => {
+        localStorage.setItem('pomoLongTime', e.target.value);
         if (!isRunning && currentMode === 'long-break') setupTimer(Math.max(0.1, e.target.value) * 60, 'long-break');
     });
     
@@ -800,9 +804,12 @@
         // Only apply the volume directly if the music is currently active and not paused
         if (musicEnabled && isRunning) bgMusic.volume = e.target.value;
     });
+    musicVol.addEventListener('change', (e) => localStorage.setItem('pomoMusicVol', e.target.value));
+
     ambienceVol.addEventListener('input', (e) => {
         if (ambienceEnabled && isRunning) ambiencePlayer.volume = e.target.value;
     });
+    ambienceVol.addEventListener('change', (e) => localStorage.setItem('pomoAmbienceVol', e.target.value));
     
     // Initialize starting volumes to 0 so they can fade in later
     bgMusic.volume = musicEnabled && isRunning ? musicVol.value : 0;
@@ -857,9 +864,32 @@
             html.setAttribute('data-theme', 'cyber');
             themeBtn.innerHTML = iconRobot;
         }
+        
+        // 1. Load Auto-Break Toggle
         const savedAutoBreak = localStorage.getItem('pomoAutoBreak') === 'true';
         document.getElementById('auto-break').checked = savedAutoBreak;
-        updateVisuals(timeLeft);
+
+        // 2. Load Saved Times
+        if (localStorage.getItem('pomoWorkTime')) document.getElementById('custom-work-input').value = localStorage.getItem('pomoWorkTime');
+        if (localStorage.getItem('pomoBreakTime')) document.getElementById('custom-break-input').value = localStorage.getItem('pomoBreakTime');
+        if (localStorage.getItem('pomoLongTime')) document.getElementById('custom-long-input').value = localStorage.getItem('pomoLongTime');
+
+        // 3. Load Saved Audio Settings
+        if (localStorage.getItem('pomoMusicVol')) musicVol.value = localStorage.getItem('pomoMusicVol');
+        if (localStorage.getItem('pomoAmbienceVol')) ambienceVol.value = localStorage.getItem('pomoAmbienceVol');
+        if (localStorage.getItem('pomoAmbienceTrack')) ambienceSelect.value = localStorage.getItem('pomoAmbienceTrack');
+
+        // 4. Apply loaded volume settings safely
+        bgMusic.volume = musicEnabled && isRunning ? musicVol.value : 0;
+        ambiencePlayer.volume = ambienceEnabled && isRunning ? ambienceVol.value : 0;
+
+        // 5. Ensure timer starts with the saved work time (unless an active iOS timer is running in the background)
+        if (!isRunning && !targetTime) {
+            const startWorkTime = parseFloat(document.getElementById('custom-work-input').value) || 25;
+            setupTimer(Math.max(0.1, startWorkTime) * 60, 'work');
+        } else {
+            updateVisuals(timeLeft);
+        }
     });
     
 </script>
