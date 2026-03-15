@@ -73,14 +73,17 @@
         }
         
        .top-info {
-            display: flex; justify-content: space-between; align-items: center;
+            position: relative;
+            display: flex; justify-content: center; align-items: center;
             margin-bottom: 15px;
             transition: opacity 0.5s ease;
         }
         #greeting-text {
             font-size: 0.9rem; font-weight: bold; opacity: 0.8; letter-spacing: 0.5px;
+            text-align: center;
         }
         #streak-display {
+            position: absolute; right: 0;
             font-size: 0.85rem; font-weight: bold; color: inherit; opacity: 0.9;
         }
         body.zen-mode .top-info { opacity: 0; pointer-events: none; }
