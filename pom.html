@@ -104,9 +104,11 @@
         .timer-wrapper:active { transform: scale(0.97); }
 
         svg.timer-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
-        circle { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke 1s linear; }
+        circle { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke 1s linear, filter 1s linear; }
         .track { stroke: rgba(128, 128, 128, 0.3); }
-        .progress { stroke: var(--text-color); } 
+        .progress { stroke: var(--text-color); filter: drop-shadow(0 0 6px var(--text-color)); } 
+        
+        @keyframes breathe { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         
         .time-display {
             position: absolute; top: 50%; left: 50%;
@@ -556,7 +558,9 @@
             localStorage.removeItem('targetTime');
             releaseWakeLock(); 
             syncAudio();
+            timeDisplay.style.animation = "breathe 2s infinite ease-in-out"; // Start breathing
         } else {
+            timeDisplay.style.animation = "none"; // Stop breathing
             isRunning = true; 
             targetTime = resumeTarget ? resumeTarget : Date.now() + (timeLeft * 1000);
             localStorage.setItem('targetTime', targetTime);
@@ -582,6 +586,7 @@
     }
 
     function setupTimer(seconds, mode) {
+        timeDisplay.style.animation = "none"; // Reset breathing
         clearInterval(titleBlinkId); // Stop bouncing title
         releaseWakeLock();
         clearInterval(timerId); isRunning = false;
@@ -596,6 +601,7 @@
     timerCircle.addEventListener('click', () => { 
         playSound('click'); 
         startTimer(); 
+        document.getElementById('settings-panel').style.display = 'none'; // Auto-close settings
     });
     
     // Double-click to Reset
@@ -604,6 +610,18 @@
         playSound('click'); 
         setupTimer(totalTime, currentMode); 
     });
+
+    // Scroll/Swipe to Quick-Adjust Time
+    timerCircle.addEventListener('wheel', (e) => {
+        e.preventDefault(); // Prevent page scrolling
+        if (isRunning) return; // Don't allow adjustments while running
+        
+        const adjustment = e.deltaY < 0 ? 60 : -60; // Scroll up adds 1 min, down subtracts 1 min
+        if (totalTime + adjustment >= 60) {
+            highlightMode(''); // Clear active mode buttons
+            setupTimer(totalTime + adjustment, 'custom');
+        }
+    }, { passive: false });
     
     document.querySelectorAll('.mode-btn[data-time]').forEach(btn => {
         btn.addEventListener('click', () => {
