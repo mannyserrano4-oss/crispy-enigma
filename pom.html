@@ -611,15 +611,40 @@
         setupTimer(totalTime, currentMode); 
     });
 
-    // Scroll/Swipe to Quick-Adjust Time
+    // Quick-Adjust Time: Mouse Wheel
     timerCircle.addEventListener('wheel', (e) => {
-        e.preventDefault(); // Prevent page scrolling
-        if (isRunning) return; // Don't allow adjustments while running
+        e.preventDefault(); 
+        if (isRunning) return; 
         
-        const adjustment = e.deltaY < 0 ? 60 : -60; // Scroll up adds 1 min, down subtracts 1 min
+        const adjustment = e.deltaY < 0 ? 60 : -60; 
         if (totalTime + adjustment >= 60) {
-            highlightMode(''); // Clear active mode buttons
-            setupTimer(totalTime + adjustment, 'custom');
+            highlightMode(''); 
+            setupTimer(totalTime + adjustment, 'quick-adjust');
+        }
+    }, { passive: false });
+
+    // Quick-Adjust Time: Mobile Touch & Swipe
+    let touchStartY = 0;
+    
+    timerCircle.addEventListener('touchstart', (e) => {
+        if (!isRunning) touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    timerCircle.addEventListener('touchmove', (e) => {
+        if (isRunning) return;
+        e.preventDefault(); // Prevent the whole page from bouncing/scrolling
+        
+        let touchY = e.touches[0].clientY;
+        let diff = touchStartY - touchY;
+        
+        // Adjust the time for every 25 pixels your finger swipes
+        if (Math.abs(diff) > 25) {
+            const adjustment = diff > 0 ? 60 : -60; // Swipe up adds, swipe down subtracts
+            if (totalTime + adjustment >= 60) {
+                highlightMode('');
+                setupTimer(totalTime + adjustment, 'quick-adjust');
+            }
+            touchStartY = touchY; // Reset position so you can keep dragging seamlessly
         }
     }, { passive: false });
     
