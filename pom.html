@@ -327,6 +327,20 @@
         }
     }
 
+    // Re-acquire wake lock if tab becomes visible again while timer is running
+    document.addEventListener('visibilitychange', async () => {
+        if (document.visibilityState === 'visible' && isRunning) {
+            await requestWakeLock();
+        }
+    });
+
+    // Re-acquire wake lock if tab becomes visible again while timer is running
+    document.addEventListener('visibilitychange', async () => {
+        if (document.visibilityState === 'visible' && isRunning) {
+            await requestWakeLock();
+        }
+    });
+
     let musicEnabled = false;
     let ambienceEnabled = false;
 
@@ -600,12 +614,16 @@
     });
     
     document.getElementById('start-custom-work').addEventListener('click', () => {
-        playSound('click'); const min = document.getElementById('custom-work-input').value;
-        document.getElementById('settings-panel').style.display = 'none'; highlightMode(''); setupTimer(min * 60, 'custom-work');
+        playSound('click'); 
+        const min = parseFloat(document.getElementById('custom-work-input').value) || 45;
+        document.getElementById('settings-panel').style.display = 'none'; highlightMode(''); 
+        setupTimer(Math.max(0.1, min) * 60, 'custom-work');
     });
     document.getElementById('start-custom-break').addEventListener('click', () => {
-        playSound('click'); const min = document.getElementById('custom-break-input').value;
-        document.getElementById('settings-panel').style.display = 'none'; highlightMode(''); setupTimer(min * 60, 'custom-break');
+        playSound('click'); 
+        const min = parseFloat(document.getElementById('custom-break-input').value) || 10;
+        document.getElementById('settings-panel').style.display = 'none'; highlightMode(''); 
+        setupTimer(Math.max(0.1, min) * 60, 'custom-break');
     });
     
     document.getElementById('settings-btn').addEventListener('click', () => {
@@ -625,7 +643,11 @@
     if (savedTarget) {
         const now = Date.now();
         if (savedTarget > now) {
-            targetTime = parseInt(savedTarget); timeLeft = Math.ceil((targetTime - now) / 1000); startTimer();
+            targetTime = parseInt(savedTarget); 
+            timeLeft = Math.ceil((targetTime - now) / 1000); 
+            startTimer(targetTime); // Now properly passing the precise target!
+        } else {
+            localStorage.removeItem('targetTime');
         }
     }
     updateVisuals(timeLeft);
