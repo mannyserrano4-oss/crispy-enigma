@@ -84,7 +84,11 @@
         }
         #streak-display {
             position: absolute; right: 0;
+            display: flex; align-items: center; gap: 4px;
             font-size: 0.85rem; font-weight: bold; color: inherit; opacity: 0.9;
+        }
+        .streak-icon {
+            width: 14px; height: 14px; fill: currentColor;
         }
         body.zen-mode .top-info { opacity: 0; pointer-events: none; }
         
@@ -872,7 +876,8 @@
         // Update the screen
         const streakEl = document.getElementById('streak-display');
         if (streakEl) {
-            streakEl.textContent = streak > 0 ? `🔥 ${streak}` : '';
+            const checkIcon = `<svg class="streak-icon" viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg>`;
+            streakEl.innerHTML = streak > 0 ? `${checkIcon} ${streak}` : '';
         }
     }
 
