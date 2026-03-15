@@ -307,6 +307,7 @@
     let currentMode = 'work'; 
     let targetTime = null;
     let wakeLock = null;
+    let titleBlinkId = null;
 
     // Wake Lock Logic for the Shop
     async function requestWakeLock() {
@@ -504,6 +505,13 @@
         releaseWakeLock();
         playSound('alarm');
         clearInterval(timerId); isRunning = false;
+        
+        // Start bouncing tab title
+        let isBlinking = false;
+        titleBlinkId = setInterval(() => {
+            document.title = isBlinking ? "Pomodoro" : "⏰ TIME'S UP!";
+            isBlinking = !isBlinking;
+        }, 500);
         targetTime = null;
         localStorage.removeItem('targetTime');
         syncAudio(); 
@@ -526,6 +534,7 @@
     }
 
     function startTimer(resumeTarget = null) {
+        clearInterval(titleBlinkId); // Stop bouncing title
         if (isRunning) {
             clearInterval(timerId); isRunning = false;
             targetTime = null;
@@ -558,6 +567,7 @@
     }
 
     function setupTimer(seconds, mode) {
+        clearInterval(titleBlinkId); // Stop bouncing title
         releaseWakeLock();
         clearInterval(timerId); isRunning = false;
         timeLeft = seconds; totalTime = seconds;
