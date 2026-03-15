@@ -72,12 +72,18 @@
             transition: color 1s ease, background 0.5s ease, box-shadow 1s ease;
         }
         
-        #greeting-text {
-            font-size: 0.9rem; font-weight: bold; opacity: 0.8;
-            margin-bottom: 15px; letter-spacing: 0.5px;
+       .top-info {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px;
             transition: opacity 0.5s ease;
         }
-        body.zen-mode #greeting-text { opacity: 0; pointer-events: none; }
+        #greeting-text {
+            font-size: 0.9rem; font-weight: bold; opacity: 0.8; letter-spacing: 0.5px;
+        }
+        #streak-display {
+            font-size: 0.85rem; font-weight: bold; color: inherit; opacity: 0.9;
+        }
+        body.zen-mode .top-info { opacity: 0; pointer-events: none; }
         
         .header { display: flex; justify-content: space-between; margin-bottom: 20px; }
         button { 
@@ -221,7 +227,10 @@
 <body>
 
 <div class="container">
-    <div id="greeting-text"></div>
+    <div class="top-info">
+        <div id="greeting-text"></div>
+        <div id="streak-display" title="Sessions completed today"></div>
+    </div>
     <div class="header">
         <button id="theme-btn" class="theme-toggle" title="Switch Theme">
             <svg viewBox="0 0 24 24"><path d="M17,8C8,10,5.9,16.17,3.82,21.34L5.71,22l1-2.3A4.49,4.49,0,0,0,8,20C19,20,22,3,22,3,21,5,14,5.25,9,6.25S2,11.5,2,13.5a6.22,6.22,0,0,0,1.75,3.75C7,8,17,8,17,8Z"/></svg>
@@ -519,7 +528,9 @@
         // Build both Solid Color AND Transparent Glow
         const colorArr = interpolateColorArray(palette.start, palette.end, 1 - percent);
         const currentColor = `rgb(${colorArr[0]}, ${colorArr[1]}, ${colorArr[2]})`;
-        const currentGlow = `rgba(${colorArr[0]}, ${colorArr[1]}, ${colorArr[2]}, 0.25)`;
+        
+        // Only apply the neon glow if we are in the Cyber (Night) theme!
+        const currentGlow = isCyber ? `rgba(${colorArr[0]}, ${colorArr[1]}, ${colorArr[2]}, 0.25)` : 'transparent';
         
         circle.style.stroke = currentColor;
         timeDisplay.style.color = currentColor;
@@ -614,6 +625,7 @@
 
         if (currentMode === 'work') {
             completedSessions++;
+            updateStreakDisplay(true); // +1 to your daily streak!
 
             if (completedSessions % 4 === 0) {
                 // 4th Session complete! Trigger Long Break.
@@ -837,6 +849,30 @@
     bgMusic.volume = musicEnabled && isRunning ? musicVol.value : 0;
     ambiencePlayer.volume = ambienceEnabled && isRunning ? ambienceVol.value : 0;
     
+    function updateStreakDisplay(addSession = false) {
+        const today = new Date().toDateString();
+        let savedDate = localStorage.getItem('pomoDate');
+        let streak = parseInt(localStorage.getItem('pomoStreak')) || 0;
+
+        // If it's a new day, reset the streak to 0
+        if (savedDate !== today) {
+            streak = 0;
+            localStorage.setItem('pomoDate', today);
+        }
+
+        // Add a session if we just finished a Work cycle
+        if (addSession) {
+            streak++;
+            localStorage.setItem('pomoStreak', streak);
+        }
+
+        // Update the screen
+        const streakEl = document.getElementById('streak-display');
+        if (streakEl) {
+            streakEl.textContent = streak > 0 ? `🔥 ${streak}` : '';
+        }
+    }
+
     function setDailyGreeting() {
         const now = new Date();
         const hour = now.getHours();
@@ -881,6 +917,7 @@
     // --- STARTUP LOGIC ---
     window.addEventListener('DOMContentLoaded', () => {
         setDailyGreeting();
+        updateStreakDisplay(); // Check date and load your streak on startup!
         const savedTheme = localStorage.getItem('pomoTheme');
         if (savedTheme === 'cyber') {
             html.setAttribute('data-theme', 'cyber');
