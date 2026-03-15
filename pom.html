@@ -67,8 +67,9 @@
             border-radius: 25px; padding: 30px;
             text-align: center; width: 90%; max-width: 400px;
             color: var(--text-color);
-            box-shadow: 0 8px 32px 0 rgba(0,0,0,0.3);
-            transition: color 1s ease, background 0.5s ease;
+            /* Add a 40px colored glow underneath the standard dark drop shadow! */
+            box-shadow: 0 8px 32px 0 rgba(0,0,0,0.3), 0 0 40px 0 var(--glow-color, transparent);
+            transition: color 1s ease, background 0.5s ease, box-shadow 1s ease;
         }
         
         #greeting-text {
@@ -494,12 +495,12 @@
     /* =========================================
        4. VISUALS & SOUND EFFECTS
        ========================================= */
-    function interpolateColor(color1, color2, factor) {
+    function interpolateColorArray(color1, color2, factor) {
         let result = color1.slice();
         for (let i = 0; i < 3; i++) {
             result[i] = Math.round(result[i] + factor * (color2[i] - color1[i]));
         }
-        return `rgb(${result[0]}, ${result[1]}, ${result[2]})`;
+        return result; // Return raw numbers so we can build transparencies!
     }
 
     function updateVisuals(seconds) {
@@ -514,12 +515,17 @@
 
         const isCyber = html.getAttribute('data-theme') === 'cyber';
         const palette = isCyber ? colorsNight : colorsDay;
-        const currentColor = interpolateColor(palette.start, palette.end, 1 - percent);
+        
+        // Build both Solid Color AND Transparent Glow
+        const colorArr = interpolateColorArray(palette.start, palette.end, 1 - percent);
+        const currentColor = `rgb(${colorArr[0]}, ${colorArr[1]}, ${colorArr[2]})`;
+        const currentGlow = `rgba(${colorArr[0]}, ${colorArr[1]}, ${colorArr[2]}, 0.25)`;
         
         circle.style.stroke = currentColor;
         timeDisplay.style.color = currentColor;
         document.querySelector('.container').style.color = currentColor;
         document.documentElement.style.setProperty('--text-color', currentColor);
+        document.documentElement.style.setProperty('--glow-color', currentGlow);
         
         // Update browser tab title
         document.title = display + " - Pomodoro";
