@@ -383,12 +383,41 @@
         }
     }
 
+    // --- LUXURIOUS AUDIO FADE LOGIC ---
+    function fadeAudio(audio, targetVolume, duration = 1500) {
+        if (audio.fadeInterval) clearInterval(audio.fadeInterval);
+        targetVolume = parseFloat(targetVolume);
+        
+        if (targetVolume > 0 && audio.paused) {
+            audio.volume = 0;
+            audio.play().catch(e=>{});
+        }
+        
+        const startVolume = audio.volume;
+        const volumeChange = targetVolume - startVolume;
+        const steps = 30; 
+        const stepTime = duration / steps;
+        let currentStep = 0;
+        
+        audio.fadeInterval = setInterval(() => {
+            currentStep++;
+            let newVolume = startVolume + (volumeChange * (currentStep / steps));
+            audio.volume = Math.max(0, Math.min(1, newVolume)); // Keep volume in safe range
+            
+            if (currentStep >= steps) {
+                clearInterval(audio.fadeInterval);
+                audio.volume = targetVolume;
+                if (targetVolume === 0) audio.pause();
+            }
+        }, stepTime);
+    }
+
     musicBtn.addEventListener('click', () => {
         playSound('click');
         musicEnabled = !musicEnabled;
         if(!bgMusic.getAttribute('src')) updateMusicSource();
         musicBtn.textContent = musicEnabled ? '⏸' : '▶';
-        if(musicEnabled) { bgMusic.play().catch(e=>{}); } else { bgMusic.pause(); }
+        fadeAudio(bgMusic, musicEnabled ? musicVol.value : 0, 1500);
     });
 
     themeBtn.addEventListener('click', (e) => {
@@ -409,11 +438,11 @@
     // Ambiance Logic
     function syncAudio() {
         if (isRunning) {
-            if (musicEnabled) bgMusic.play().catch(e=>{});
-            if (ambienceEnabled && ambienceSelect.value !== 'none') ambiencePlayer.play().catch(e=>{});
+            fadeAudio(bgMusic, musicEnabled ? musicVol.value : 0, 1500);
+            fadeAudio(ambiencePlayer, (ambienceEnabled && ambienceSelect.value !== 'none') ? ambienceVol.value : 0, 1500);
         } else {
-            bgMusic.pause();
-            ambiencePlayer.pause();
+            fadeAudio(bgMusic, 0, 1000); // Fade out slightly faster when pausing
+            fadeAudio(ambiencePlayer, 0, 1000);
         }
     }
 
@@ -422,21 +451,23 @@
         if (ambienceSelect.value === 'none') return;
         ambienceEnabled = !ambienceEnabled;
         ambienceBtn.textContent = ambienceEnabled ? '⏸' : '▶';
-        if(ambienceEnabled) {
-            ambiencePlayer.src = ambienceSelect.value;
-            ambiencePlayer.play().catch(e=>{});
-        } else {
-            ambiencePlayer.pause();
-        }
+        if (ambienceEnabled) ambiencePlayer.src = ambienceSelect.value;
+        fadeAudio(ambiencePlayer, ambienceEnabled ? ambienceVol.value : 0, 1500);
     });
 
     ambienceSelect.addEventListener('change', () => {
         if (ambienceEnabled) {
-             if(ambienceSelect.value === 'none') {
-                 ambiencePlayer.pause(); ambienceEnabled = false; ambienceBtn.textContent = '▶';
-             } else {
-                 ambiencePlayer.src = ambienceSelect.value; ambiencePlayer.play().catch(e=>{});
-             }
+            if(ambienceSelect.value === 'none') {
+                fadeAudio(ambiencePlayer, 0, 1000); 
+                ambienceEnabled = false; 
+                ambienceBtn.textContent = '▶';
+            } else {
+                fadeAudio(ambiencePlayer, 0, 500); // Quick fade out current track
+                setTimeout(() => {
+                    ambiencePlayer.src = ambienceSelect.value;
+                    fadeAudio(ambiencePlayer, ambienceVol.value, 1500); // Fade in new track
+                }, 500);
+            }
         }
     });
 
@@ -755,11 +786,17 @@
     const musicVol = document.getElementById('music-vol');
     const ambienceVol = document.getElementById('ambience-vol');
     
-    musicVol.addEventListener('input', (e) => bgMusic.volume = e.target.value);
-    ambienceVol.addEventListener('input', (e) => ambiencePlayer.volume = e.target.value);
+    musicVol.addEventListener('input', (e) => {
+        // Only apply the volume directly if the music is currently active and not paused
+        if (musicEnabled && isRunning) bgMusic.volume = e.target.value;
+    });
+    ambienceVol.addEventListener('input', (e) => {
+        if (ambienceEnabled && isRunning) ambiencePlayer.volume = e.target.value;
+    });
     
-    bgMusic.volume = musicVol.value;
-    ambiencePlayer.volume = ambienceVol.value;
+    // Initialize starting volumes to 0 so they can fade in later
+    bgMusic.volume = musicEnabled && isRunning ? musicVol.value : 0;
+    ambiencePlayer.volume = ambienceEnabled && isRunning ? ambienceVol.value : 0;
     
     function setDailyGreeting() {
         const now = new Date();
