@@ -118,6 +118,21 @@
             pointer-events: none; /* Let clicks pass through to the wrapper */
         }
 
+        .session-dots {
+            display: flex; justify-content: center; gap: 12px; margin-top: 15px;
+        }
+        .dot {
+            width: 12px; height: 12px; border-radius: 50%;
+            background-color: var(--text-color); opacity: 0.15; 
+            transition: all 0.5s ease;
+        }
+        .dot.active {
+            opacity: 1;
+            /* Inverts the hue of the current timer color to create a perfect dynamic contrast! */
+            filter: hue-rotate(180deg) brightness(1.2);
+            box-shadow: 0 0 10px currentColor;
+        }
+
         .modes { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
         .mode-btn { font-size: 0.85rem; padding: 5px 10px; border-radius: 10px; opacity: 0.6; }
         .mode-btn.active { opacity: 1; font-weight: bold; background: rgba(128,128,128,0.2); }
@@ -218,6 +233,10 @@
         <div class="time-display" id="time-display">25:00</div>
     </div>
 
+    <div class="session-dots" id="session-dots">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+
     <div class="soundboard">
         <div class="sound-row">
             <select id="ambience-select">
@@ -301,6 +320,7 @@
     let targetTime = null;
     let wakeLock = null;
     let titleBlinkId = null;
+    let completedSessions = 0;
 
     // Wake Lock Logic for the Shop
     async function requestWakeLock() {
@@ -503,6 +523,21 @@
         document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
         if (mode === 'work') document.getElementById('mode-pomodoro').classList.add('active');
         if (mode === 'break') document.getElementById('mode-short').classList.add('active');
+        if (mode === 'long-break') document.getElementById('mode-long').classList.add('active');
+    }
+
+    function updateDots() {
+        const dots = document.querySelectorAll('.dot');
+        // If we just finished the 4th session, keep all 4 dots lit during the Long Break
+        let displayCount = completedSessions % 4;
+        if (completedSessions > 0 && displayCount === 0 && currentMode !== 'work') {
+            displayCount = 4; 
+        }
+        
+        dots.forEach((dot, index) => {
+            if (index < displayCount) dot.classList.add('active');
+            else dot.classList.remove('active');
+        });
     }
 
     /* =========================================
@@ -520,14 +555,26 @@
         const autoBreak = document.getElementById('auto-break').checked;
 
         if (currentMode === 'work') {
-            const breakTime = parseFloat(document.getElementById('custom-break-input').value) || 5;
-            setupTimer(Math.max(0.1, breakTime) * 60, 'break'); 
-            highlightMode('break');
+            completedSessions++;
+
+            if (completedSessions % 4 === 0) {
+                // 4th Session complete! Trigger Long Break.
+                setupTimer(15 * 60, 'long-break'); 
+                highlightMode('long-break');
+            } else {
+                // Normal Short Break
+                const breakTime = parseFloat(document.getElementById('custom-break-input').value) || 5;
+                setupTimer(Math.max(0.1, breakTime) * 60, 'break'); 
+                highlightMode('break');
+            }
+            updateDots();
             if(autoBreak) setTimeout(() => startTimer(), 1000);
+            
         } else if (currentMode === 'break' || currentMode === 'long-break') {
             const workTime = parseFloat(document.getElementById('custom-work-input').value) || 25;
             setupTimer(Math.max(0.1, workTime) * 60, 'work'); 
             highlightMode('work');
+            updateDots(); // Reset dots for the new cycle
             if(autoBreak) setTimeout(() => startTimer(), 1000);
         }
 
