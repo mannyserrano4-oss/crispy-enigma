@@ -506,12 +506,6 @@
         playSound('alarm');
         clearInterval(timerId); isRunning = false;
         
-        // Start bouncing tab title
-        let isBlinking = false;
-        titleBlinkId = setInterval(() => {
-            document.title = isBlinking ? "Pomodoro" : "⏰ TIME'S UP!";
-            isBlinking = !isBlinking;
-        }, 500);
         targetTime = null;
         localStorage.removeItem('targetTime');
         syncAudio(); 
@@ -531,6 +525,13 @@
             const workT = document.getElementById('custom-work-input').value;
             setupTimer(workT * 60, 'custom-work');
         }
+
+        // Start bouncing tab title AFTER setupTimer has prepared the next phase
+        let isBlinking = false;
+        titleBlinkId = setInterval(() => {
+            document.title = isBlinking ? "Pomodoro" : "⏰ TIME'S UP!";
+            isBlinking = !isBlinking;
+        }, 500);
     }
 
     function startTimer(resumeTarget = null) {
