@@ -270,6 +270,10 @@
             <input type="number" id="custom-break-input" value="5" step="0.1" inputmode="decimal">
         </div>
         <div class="setting-row">
+            <label>Long Break (min):</label>
+            <input type="number" id="custom-long-input" value="15" step="0.1" inputmode="decimal">
+        </div>
+        <div class="setting-row">
             <label>Music Volume:</label>
             <input type="range" id="music-vol" min="0" max="1" step="0.05" value="0.5">
         </div>
@@ -591,7 +595,8 @@
 
             if (completedSessions % 4 === 0) {
                 // 4th Session complete! Trigger Long Break.
-                setupTimer(15 * 60, 'long-break'); 
+                const longBreakTime = parseFloat(document.getElementById('custom-long-input').value) || 15;
+                setupTimer(Math.max(0.1, longBreakTime) * 60, 'long-break'); 
                 highlightMode('long-break');
             } else {
                 // Normal Short Break
@@ -725,11 +730,13 @@
             }
             
             let timeToSet = btn.dataset.time;
-            // Override with custom settings if it's the standard Work or Short Break
+            // Override with custom settings if it's a standard mode
             if (btn.id === 'mode-pomodoro') {
                 timeToSet = parseFloat(document.getElementById('custom-work-input').value) || 25;
             } else if (btn.id === 'mode-short') {
                 timeToSet = parseFloat(document.getElementById('custom-break-input').value) || 5;
+            } else if (btn.id === 'mode-long') {
+                timeToSet = parseFloat(document.getElementById('custom-long-input').value) || 15;
             }
             
             setupTimer(Math.max(0.1, timeToSet) * 60, btn.id === 'mode-long' ? 'long-break' : btn.dataset.mode);
@@ -742,6 +749,9 @@
     });
     document.getElementById('custom-break-input').addEventListener('change', (e) => {
         if (!isRunning && currentMode === 'break') setupTimer(Math.max(0.1, e.target.value) * 60, 'break');
+    });
+    document.getElementById('custom-long-input').addEventListener('change', (e) => {
+        if (!isRunning && currentMode === 'long-break') setupTimer(Math.max(0.1, e.target.value) * 60, 'long-break');
     });
     
     document.getElementById('settings-btn').addEventListener('click', () => {
