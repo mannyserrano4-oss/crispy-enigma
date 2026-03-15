@@ -71,6 +71,13 @@
             transition: color 1s ease, background 0.5s ease;
         }
         
+        #greeting-text {
+            font-size: 0.9rem; font-weight: bold; opacity: 0.8;
+            margin-bottom: 15px; letter-spacing: 0.5px;
+            transition: opacity 0.5s ease;
+        }
+        body.zen-mode #greeting-text { opacity: 0; pointer-events: none; }
+        
         .header { display: flex; justify-content: space-between; margin-bottom: 20px; }
         button { 
             cursor: pointer; border: none; background: none; 
@@ -187,6 +194,7 @@
 <body>
 
 <div class="container">
+    <div id="greeting-text"></div>
     <div class="header">
         <button id="theme-btn" class="theme-toggle" title="Switch Theme">
             <svg viewBox="0 0 24 24"><path d="M17,8C8,10,5.9,16.17,3.82,21.34L5.71,22l1-2.3A4.49,4.49,0,0,0,8,20C19,20,22,3,22,3,21,5,14,5.25,9,6.25S2,11.5,2,13.5a6.22,6.22,0,0,0,1.75,3.75C7,8,17,8,17,8Z"/></svg>
@@ -633,8 +641,50 @@
     bgMusic.volume = musicVol.value;
     ambiencePlayer.volume = ambienceVol.value;
     
+    function setDailyGreeting() {
+        const now = new Date();
+        const hour = now.getHours();
+        const day = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+        const month = now.getMonth() + 1; 
+        const date = now.getDate(); 
+
+        let greetings = [];
+
+        // 1. Check for Holidays (Highest Priority)
+        if (month === 1 && date === 1) greetings.push("Happy New Year! Let's crush it. 🎉");
+        else if (month === 2 && date === 14) greetings.push("Happy Valentine's! Love your work. ❤️");
+        else if (month === 10 && date === 31) greetings.push("Happy Halloween! Spooky focus. 🎃");
+        else if (month === 12 && date === 25) greetings.push("Merry Christmas! Gift yourself focus. 🎄");
+        else if (month === 12 && date === 31) greetings.push("New Year's Eve! Finish strong. 🎇");
+        else {
+            // 2. Check Time & Day
+            if (hour >= 5 && hour < 12) {
+                greetings.push("Good morning! Let's get to it.", "Rise and shine!", "Morning coffee & focus.");
+                if (day === 1) greetings.push("Happy Monday! Fresh start.", "Monday morning momentum.");
+                if (day === 5) greetings.push("Happy Friday! Finish strong.");
+            } else if (hour >= 12 && hour < 18) {
+                greetings.push("Good afternoon!", "Keep up the great work.", "Afternoon power hour.");
+                if (day === 3) greetings.push("Happy Hump Day! Halfway there.");
+            } else if (hour >= 18 && hour < 22) {
+                greetings.push("Good evening!", "Winding down but staying focused.", "Evening hustle.");
+            } else {
+                greetings.push("Burning the midnight oil? 🦉", "Late night focus.", "You're a night owl!");
+            }
+
+            // 3. Weekend specific
+            if (day === 0 || day === 6) {
+                greetings.push("Weekend warrior!", "Happy weekend! Remember to rest.");
+            }
+        }
+
+        // Pick a random greeting from our generated list
+        const selectedGreeting = greetings[Math.floor(Math.random() * greetings.length)];
+        document.getElementById('greeting-text').textContent = selectedGreeting;
+    }
+
     // --- STARTUP LOGIC ---
     window.addEventListener('DOMContentLoaded', () => {
+        setDailyGreeting();
         const savedTheme = localStorage.getItem('pomoTheme');
         if (savedTheme === 'cyber') {
             html.setAttribute('data-theme', 'cyber');
