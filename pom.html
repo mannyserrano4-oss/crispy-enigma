@@ -153,11 +153,6 @@
             padding: 5px; border-radius: 5px; border: 1px solid currentColor;
             background: rgba(255,255,255,0.2); color: inherit; width: 140px; cursor: pointer;
         }
-        .custom-controls { display: flex; gap: 10px; margin-top: 10px; }
-        .btn-custom {
-            flex: 1; padding: 8px; background: rgba(128,128,128,0.2);
-            border-radius: 8px; font-weight: bold; font-size: 0.8rem;
-        }
         .btn-icon { font-size: 1.2rem; line-height: 1; }
 
         /* SOUNDBOARD */
@@ -247,12 +242,12 @@
             <input type="checkbox" id="auto-break">
         </div>
         <div class="setting-row">
-            <label>Custom Work (min):</label>
-            <input type="number" id="custom-work-input" value="45" step="0.1" inputmode="decimal">
+            <label>Pomodoro (min):</label>
+            <input type="number" id="custom-work-input" value="25" step="0.1" inputmode="decimal">
         </div>
         <div class="setting-row">
-            <label>Custom Break (min):</label>
-            <input type="number" id="custom-break-input" value="10" step="0.1" inputmode="decimal">
+            <label>Short Break (min):</label>
+            <input type="number" id="custom-break-input" value="5" step="0.1" inputmode="decimal">
         </div>
         <div class="setting-row">
             <label>Music Volume:</label>
@@ -261,10 +256,6 @@
         <div class="setting-row">
             <label>Ambience Volume:</label>
             <input type="range" id="ambience-vol" min="0" max="1" step="0.05" value="0.5">
-        </div>
-        <div class="custom-controls">
-            <button class="btn-custom" id="start-custom-work">Start Work</button>
-            <button class="btn-custom" id="start-custom-break">Start Break</button>
         </div>
     </div>
 
@@ -529,17 +520,15 @@
         const autoBreak = document.getElementById('auto-break').checked;
 
         if (currentMode === 'work') {
-            setupTimer(5 * 60, 'break'); highlightMode('break');
+            const breakTime = parseFloat(document.getElementById('custom-break-input').value) || 5;
+            setupTimer(Math.max(0.1, breakTime) * 60, 'break'); 
+            highlightMode('break');
             if(autoBreak) setTimeout(() => startTimer(), 1000);
-        } else if (currentMode === 'break') {
-            setupTimer(25 * 60, 'work'); highlightMode('work');
-        } else if (currentMode === 'custom-work') {
-            const breakT = document.getElementById('custom-break-input').value;
-            setupTimer(breakT * 60, 'custom-break');
+        } else if (currentMode === 'break' || currentMode === 'long-break') {
+            const workTime = parseFloat(document.getElementById('custom-work-input').value) || 25;
+            setupTimer(Math.max(0.1, workTime) * 60, 'work'); 
+            highlightMode('work');
             if(autoBreak) setTimeout(() => startTimer(), 1000);
-        } else if (currentMode === 'custom-break') {
-            const workT = document.getElementById('custom-work-input').value;
-            setupTimer(workT * 60, 'custom-work');
         }
 
         // Start bouncing tab title AFTER setupTimer has prepared the next phase
@@ -618,8 +607,7 @@
         
         const adjustment = e.deltaY < 0 ? 60 : -60; 
         if (totalTime + adjustment >= 60) {
-            highlightMode(''); 
-            setupTimer(totalTime + adjustment, 'quick-adjust');
+            setupTimer(totalTime + adjustment, currentMode);
         }
     }, { passive: false });
 
@@ -641,32 +629,40 @@
         if (Math.abs(diff) > 25) {
             const adjustment = diff > 0 ? 60 : -60; // Swipe up adds, swipe down subtracts
             if (totalTime + adjustment >= 60) {
-                highlightMode('');
-                setupTimer(totalTime + adjustment, 'quick-adjust');
+                setupTimer(totalTime + adjustment, currentMode);
             }
             touchStartY = touchY; // Reset position so you can keep dragging seamlessly
         }
     }, { passive: false });
     
-    document.querySelectorAll('.mode-btn[data-time]').forEach(btn => {
+    document.querySelectorAll('.mode-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            playSound('click'); highlightMode(btn.dataset.mode === 'work' ? 'work' : 'break');
-            if(btn.id === 'mode-long') { document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
-            setupTimer(btn.dataset.time * 60, btn.dataset.mode);
+            playSound('click'); 
+            highlightMode(btn.dataset.mode === 'work' ? 'work' : 'break');
+            if(btn.id === 'mode-long') { 
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active')); 
+                btn.classList.add('active'); 
+                currentMode = 'long-break';
+            }
+            
+            let timeToSet = btn.dataset.time;
+            // Override with custom settings if it's the standard Work or Short Break
+            if (btn.id === 'mode-pomodoro') {
+                timeToSet = parseFloat(document.getElementById('custom-work-input').value) || 25;
+            } else if (btn.id === 'mode-short') {
+                timeToSet = parseFloat(document.getElementById('custom-break-input').value) || 5;
+            }
+            
+            setupTimer(Math.max(0.1, timeToSet) * 60, btn.id === 'mode-long' ? 'long-break' : btn.dataset.mode);
         });
     });
-    
-    document.getElementById('start-custom-work').addEventListener('click', () => {
-        playSound('click'); 
-        const min = parseFloat(document.getElementById('custom-work-input').value) || 45;
-        document.getElementById('settings-panel').style.display = 'none'; highlightMode(''); 
-        setupTimer(Math.max(0.1, min) * 60, 'custom-work');
+
+    // Auto-update timer if they change the input while stopped
+    document.getElementById('custom-work-input').addEventListener('change', (e) => {
+        if (!isRunning && currentMode === 'work') setupTimer(Math.max(0.1, e.target.value) * 60, 'work');
     });
-    document.getElementById('start-custom-break').addEventListener('click', () => {
-        playSound('click'); 
-        const min = parseFloat(document.getElementById('custom-break-input').value) || 10;
-        document.getElementById('settings-panel').style.display = 'none'; highlightMode(''); 
-        setupTimer(Math.max(0.1, min) * 60, 'custom-break');
+    document.getElementById('custom-break-input').addEventListener('change', (e) => {
+        if (!isRunning && currentMode === 'break') setupTimer(Math.max(0.1, e.target.value) * 60, 'break');
     });
     
     document.getElementById('settings-btn').addEventListener('click', () => {
