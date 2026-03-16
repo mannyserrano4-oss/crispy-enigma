@@ -82,27 +82,30 @@
 
         
        .top-info {
-            display: grid; 
-            grid-template-columns: 1fr auto 1fr; 
+            position: relative;
+            display: flex; 
+            justify-content: center; 
             align-items: center;
             width: 100%;
-            margin-bottom: 15px;
+            min-height: 24px;
+            padding-top: 10px;   /* Pushes text away from the top edge */
+            margin-bottom: 28px; /* Pushes the Zen button further down! */
             transition: opacity 0.5s ease;
         }
 
         #greeting-text {
-            grid-column: 2; /* Keeps the greeting dead center */
             font-size: 0.9rem; font-weight: bold; opacity: 0.8; letter-spacing: 0.5px;
             text-align: center;
-            white-space: nowrap;
+            padding: 0 45px; /* Creates an invisible forcefield so it never touches the streak */
         }
 
         #streak-display {
-            grid-column: 3;
-            justify-self: end; /* Pushes the streak to the absolute far right */
+            position: absolute; 
+            right: 0;
             display: flex; align-items: center; gap: 4px;
             font-size: 0.85rem; font-weight: bold; color: inherit; opacity: 0.9;
             cursor: pointer;
+            padding: 5px;
         }
 
         .streak-icon {
