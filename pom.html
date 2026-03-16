@@ -613,27 +613,33 @@
     }
 
     function playSound(type) {
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const isCyber = html.getAttribute('data-theme') === 'cyber';
-        
-        if (type === 'click') {
-            const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            osc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            osc.type = isCyber ? 'square' : 'triangle';
-            osc.frequency.setValueAtTime(isCyber ? 600 : 300, audioCtx.currentTime);
-            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-            osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.1);
-        } 
-        else if (type === 'alarm') {
-            const sound = isCyber ? alarmFiles.night : alarmFiles.day;
-            sound.currentTime = 0;
-            const playPromise = sound.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(error => { playBeep(isCyber); });
+        try {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const isCyber = html.getAttribute('data-theme') === 'cyber';
+            
+            if (type === 'click') {
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                osc.type = isCyber ? 'square' : 'triangle';
+                osc.frequency.setValueAtTime(isCyber ? 600 : 300, audioCtx.currentTime);
+                gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+                osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.1);
+            } 
+            else if (type === 'alarm') {
+                const sound = isCyber ? alarmFiles.night : alarmFiles.day;
+                // Fix: Only manipulate currentTime if the audio is successfully loaded
+                if (sound.readyState >= 1) sound.currentTime = 0; 
+                
+                const playPromise = sound.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => { playBeep(isCyber); });
+                }
             }
+        } catch (err) {
+            console.error("Audio safely bypassed to prevent crash:", err);
         }
     }
 
@@ -675,15 +681,21 @@
     }
 
     function timerComplete() {
-        commitFocusTime(); // Save the final seconds before hitting 0
-        releaseWakeLock();
-        playSound('alarm');
+        // 1. SAFELY STOP INTERVAL FIRST to prevent infinite crash loops!
         clearInterval(timerId);
         isRunning = false;
-        
         targetTime = null;
         localStorage.removeItem('targetTime');
-        syncAudio(); 
+
+        // 2. Wrap external/audio functions in a try-catch so they can never break the loop
+        try {
+            commitFocusTime(); 
+            releaseWakeLock();
+            playSound('alarm');
+            syncAudio(); 
+        } catch (err) {
+            console.error("Audio/Sync error safely bypassed:", err);
+        } 
 
         const autoLoop = document.getElementById('auto-loop').checked;
 
