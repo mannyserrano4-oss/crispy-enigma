@@ -293,8 +293,8 @@
 
    <div id="settings-panel">
         <div class="setting-row">
-            <label>Auto-start Breaks?</label>
-            <input type="checkbox" id="auto-break">
+            <label>Auto-loop Timer:</label>
+            <input type="checkbox" id="auto-loop">
         </div>
         <div class="setting-row">
             <label>Pomodoro (min):</label>
@@ -385,13 +385,6 @@
             wakeLock = null;
         }
     }
-
-    // Re-acquire wake lock if tab becomes visible again while timer is running
-    document.addEventListener('visibilitychange', async () => {
-        if (document.visibilityState === 'visible' && isRunning) {
-            await requestWakeLock();
-        }
-    });
 
     // Re-acquire wake lock if tab becomes visible again while timer is running
     document.addEventListener('visibilitychange', async () => {
@@ -682,57 +675,63 @@
     }
 
     function timerComplete() {
-        commitFocusTime(); // Save the final seconds before hitting 0
-        releaseWakeLock();
-        playSound('alarm');
-        clearInterval(timerId);
-        isRunning = false;
-        
-        targetTime = null;
-        localStorage.removeItem('targetTime');
-        syncAudio(); 
+        commitFocusTime(); // Save the final seconds before hitting 0
+        releaseWakeLock();
+        playSound('alarm');
+        clearInterval(timerId);
+        isRunning = false;
+        
+        targetTime = null;
+        localStorage.removeItem('targetTime');
+        syncAudio(); 
 
-        const autoBreak = document.getElementById('auto-break').checked;
+        const autoLoop = document.getElementById('auto-loop').checked;
 
-        if (currentMode === 'work') {
-            completedSessions++;
-            localStorage.setItem('pomoSessions', completedSessions); // SAVE DOT PROGRESS
-            updateStreakDisplay(true); // +1 to your daily streak!
+        if (currentMode === 'work') {
+            completedSessions++;
+            localStorage.setItem('pomoSessions', completedSessions); // SAVE DOT PROGRESS
+            updateStreakDisplay(true); // +1 to your daily streak!
 
-            if (completedSessions > 0 && completedSessions % 4 === 0) {
-                // 4th Session complete! Trigger Long Break.
-                const longBreakTime = parseFloat(document.getElementById('custom-long-input').value) || 15;
-                setupTimer(Math.max(0.1, longBreakTime) * 60, 'long-break'); 
-                highlightMode('long-break');
-            } else {
-                // Normal Short Break
-                const breakTime = parseFloat(document.getElementById('custom-break-input').value) || 5;
-                setupTimer(Math.max(0.1, breakTime) * 60, 'break'); 
-                highlightMode('break');
-            }
-        } else if (currentMode === 'break' || currentMode === 'long-break') {
-            const workTime = parseFloat(document.getElementById('custom-work-input').value) || 25;
-            setupTimer(Math.max(0.1, workTime) * 60, 'work'); 
-            highlightMode('work');
-        }
+            if (completedSessions > 0 && completedSessions % 4 === 0) {
+                // 4th Session complete! Trigger Long Break.
+                const longBreakTime = parseFloat(document.getElementById('custom-long-input').value) || 15;
+                setupTimer(Math.max(0.1, longBreakTime) * 60, 'long-break'); 
+                highlightMode('long-break');
+            } else {
+                // Normal Short Break
+                const breakTime = parseFloat(document.getElementById('custom-break-input').value) || 5;
+                setupTimer(Math.max(0.1, breakTime) * 60, 'break'); 
+                highlightMode('break');
+            }
+        } else if (currentMode === 'break' || currentMode === 'long-break') {
+            // Fix: Reset the cycle to 0 if we just finished a Long Break
+            if (currentMode === 'long-break') {
+                completedSessions = 0;
+                localStorage.setItem('pomoSessions', completedSessions);
+            }
+            
+            const workTime = parseFloat(document.getElementById('custom-work-input').value) || 25;
+            setupTimer(Math.max(0.1, workTime) * 60, 'work'); 
+            highlightMode('work');
+        }
 
-        updateDots(); // Ensure dots sync cleanly after any mode change
+        updateDots(); // Ensure dots sync cleanly after any mode change
 
-        // Start bouncing tab title AFTER setupTimer has prepared the next phase
-        let isBlinking = false;
-        titleBlinkId = setInterval(() => {
-            document.title = isBlinking ? "Pomodoro" : "⏰ TIME'S UP!";
-            isBlinking = !isBlinking;
-        }, 500);
+        // Start bouncing tab title AFTER setupTimer has prepared the next phase
+        let isBlinking = false;
+        titleBlinkId = setInterval(() => {
+            document.title = isBlinking ? "Pomodoro" : "⏰ TIME'S UP!";
+            isBlinking = !isBlinking;
+        }, 500);
 
-        // If auto-break is on, wait 1.5 seconds then start the timer automatically
-        if (autoBreak) {
-            if (autoStartTimeout) clearTimeout(autoStartTimeout);
-            autoStartTimeout = setTimeout(() => {
-                if (!isRunning) startTimer();
-            }, 1500);
-        }
-    }
+        // If auto-loop is on, wait 1.5 seconds then start the timer automatically
+        if (autoLoop) {
+            if (autoStartTimeout) clearTimeout(autoStartTimeout);
+            autoStartTimeout = setTimeout(() => {
+                if (!isRunning) startTimer();
+            }, 1500);
+        }
+    }
 
     function setupTimer(seconds, mode) {
         commitFocusTime(); // Save unrecorded time if user manually skips a session
@@ -981,8 +980,8 @@
         });
     }
 
-    document.getElementById('auto-break').addEventListener('change', (e) => {
-        localStorage.setItem('pomoAutoBreak', e.target.checked);
+    document.getElementById('auto-loop').addEventListener('change', (e) => {
+        localStorage.setItem('pomoAutoLoop', e.target.checked);
     });
 
     // Volume Slider Logic
@@ -1081,9 +1080,9 @@
             themeBtn.innerHTML = iconRobot;
         }
         
-        // 1. Load Auto-Break Toggle
-        const savedAutoBreak = localStorage.getItem('pomoAutoBreak') === 'true';
-        document.getElementById('auto-break').checked = savedAutoBreak;
+        // 1. Load Auto-Loop Toggle
+        const savedAutoLoop = localStorage.getItem('pomoAutoLoop') === 'true';
+        document.getElementById('auto-loop').checked = savedAutoLoop;
 
         // 2. Load Saved Times & Task
         if (localStorage.getItem('pomoWorkTime')) document.getElementById('custom-work-input').value = localStorage.getItem('pomoWorkTime');
