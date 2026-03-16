@@ -84,10 +84,12 @@
             text-align: center;
         }
         #streak-display {
-            position: absolute; right: 0;
-            display: flex; align-items: center; gap: 4px;
-            font-size: 0.85rem; font-weight: bold; color: inherit; opacity: 0.9;
-        }
+            position: absolute; right: 0;
+            display: flex; align-items: center; gap: 4px;
+            font-size: 0.85rem; font-weight: bold; color: inherit; opacity: 0.9;
+            cursor: pointer; transition: opacity 0.3s, transform 0.2s;
+        }
+        #streak-display:hover { opacity: 1; transform: scale(1.05); }
         .streak-icon {
             width: 14px; height: 14px; fill: currentColor;
         }
@@ -311,12 +313,18 @@
             <input type="range" id="music-vol" min="0" max="1" step="0.05" value="0.5">
         </div>
         <div class="setting-row">
-            <label>Ambience Volume:</label>
-            <input type="range" id="ambience-vol" min="0" max="1" step="0.05" value="0.5">
-        </div>
-    </div>
+            <label>Ambience Volume:</label>
+            <input type="range" id="ambience-vol" min="0" max="1" step="0.05" value="0.5">
+        </div>
 
-    <audio id="bg-music" loop></audio>
+                <div class="setting-row" style="margin-top: 25px; border-top: 1px dashed rgba(255,255,255,0.3); padding-top: 20px;">
+            <button id="export-btn" style="background: rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 8px; font-size: 0.8rem; border: 1px solid currentColor;">⬇️ Export</button>
+            <label for="import-file" style="background: rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 8px; font-size: 0.8rem; border: 1px solid currentColor; cursor: pointer; text-align: center; margin: 0;">⬆️ Import</label>
+            <input type="file" id="import-file" accept=".json" style="display: none;">
+        </div>
+    </div>
+
+    <audio id="bg-music" loop></audio>
     <audio id="ambience-player" loop></audio>
 </div>
 
@@ -658,10 +666,23 @@
     }
 
     /* =========================================
-       5. TIMER LOGIC
-       ========================================= */
-    function timerComplete() {
-        releaseWakeLock();
+       5. TIMER LOGIC
+       ========================================= */
+    let startingTimeLeft = 0;
+
+    function commitFocusTime() {
+        if (currentMode === 'work' && startingTimeLeft > timeLeft) {
+            const elapsedSeconds = startingTimeLeft - Math.max(0, timeLeft);
+            const elapsedMins = elapsedSeconds / 60;
+            let lifetimeMins = parseFloat(localStorage.getItem('pomoLifetimeMinutes')) || 0;
+            localStorage.setItem('pomoLifetimeMinutes', lifetimeMins + elapsedMins);
+            startingTimeLeft = timeLeft; // Set new checkpoint in case we resume
+        }
+    }
+
+    function timerComplete() {
+        commitFocusTime(); // Save the final seconds before hitting 0
+        releaseWakeLock();
         playSound('alarm');
         clearInterval(timerId); isRunning = false;
         
@@ -705,24 +726,53 @@
         }, 500);
     }
 
-    function startTimer(resumeTarget = null) {
-        clearInterval(titleBlinkId); // Stop bouncing title
-        if (isRunning) {
-            clearInterval(timerId); isRunning = false;
-            targetTime = null;
-            localStorage.removeItem('targetTime');
-            releaseWakeLock(); 
-            syncAudio();
-            timeDisplay.style.animation = "breathe 2s infinite ease-in-out"; // Start breathing
-        } else {
-            timeDisplay.style.animation = "none"; // Stop breathing
-            isRunning = true; 
-            targetTime = resumeTarget ? resumeTarget : Date.now() + (timeLeft * 1000);
-            localStorage.setItem('targetTime', targetTime);
-            requestWakeLock(); 
-            syncAudio();
-            
-            timerId = setInterval(() => {
+    function setupTimer(seconds, mode) {
+        if (typeof commitFocusTime === 'function') commitFocusTime(); // Save unrecorded time if skipping
+        timeDisplay.style.animation = "none"; // Reset breathing
+        clearInterval(titleBlinkId); // Stop bouncing title
+        releaseWakeLock();
+        clearInterval(timerId); isRunning = false;
+        timeLeft = seconds; totalTime = seconds;
+        currentMode = mode; targetTime = null;
+        localStorage.removeItem('targetTime'); 
+        syncAudio(); 
+        updateVisuals(seconds);
+    }
+
+    function setupTimer(seconds, mode) {
+        if (typeof commitFocusTime === 'function') commitFocusTime(); // Save unrecorded time if skipping
+        timeDisplay.style.animation = "none"; // Reset breathing
+        clearInterval(titleBlinkId); // Stop bouncing title
+        releaseWakeLock();
+        clearInterval(timerId); isRunning = false;
+        timeLeft = seconds; totalTime = seconds;
+        currentMode = mode; targetTime = null;
+        localStorage.removeItem('targetTime'); 
+        syncAudio(); 
+        updateVisuals(seconds);
+    }
+
+    function startTimer(resumeTarget = null) {
+        clearInterval(titleBlinkId); // Stop bouncing title
+        if (isRunning) {
+            commitFocusTime(); // Save time spent before pausing
+            clearInterval(timerId); isRunning = false;
+            targetTime = null;
+            localStorage.removeItem('targetTime');
+            releaseWakeLock(); 
+            syncAudio();
+            timeDisplay.style.animation = "breathe 2s infinite ease-in-out"; // Start breathing
+        } else {
+            timeDisplay.style.animation = "none"; // Stop breathing
+            isRunning = true; 
+            if (currentMode === 'work') startingTimeLeft = timeLeft; // Create new checkpoint
+            targetTime = resumeTarget ? resumeTarget : Date.now() + (timeLeft * 1000);
+            targetTime = resumeTarget ? resumeTarget : Date.now() + (timeLeft * 1000);
+            localStorage.setItem('targetTime', targetTime);
+            requestWakeLock(); 
+            syncAudio();
+            
+            timerId = setInterval(() => {
                 const now = Date.now();
                 const distance = targetTime - now;
                 if (distance <= 0) { 
@@ -847,12 +897,77 @@
     });
 
     // Zen Mode Toggle
-    document.getElementById('zen-btn').addEventListener('click', () => {
-        playSound('click');
-        document.body.classList.toggle('zen-mode');
-    });
+    document.getElementById('zen-btn').addEventListener('click', () => {
+        playSound('click');
+        document.body.classList.toggle('zen-mode');
+    });
 
-    // iOS Resume Check
+    // Lifetime Stats Toggle
+    document.getElementById('streak-display').addEventListener('click', (e) => {
+        const el = e.currentTarget;
+        if (el.dataset.showingLifetime === 'true') return;
+        
+        playSound('click');
+        const originalHtml = el.innerHTML;
+        let lifetimeMins = parseFloat(localStorage.getItem('pomoLifetimeMinutes')) || 0;
+        
+        let displayMsg = "";
+        if (lifetimeMins < 60) {
+            displayMsg = `🏆 ${Math.round(lifetimeMins)} Min`;
+        } else {
+            displayMsg = `🏆 ${(lifetimeMins / 60).toFixed(1)} Hrs`;
+        }
+
+        el.dataset.showingLifetime = 'true';
+        el.innerHTML = displayMsg;
+
+        setTimeout(() => {
+            el.innerHTML = originalHtml;
+            el.dataset.showingLifetime = 'false';
+        }, 3000);
+    });
+
+    // DATA EXPORT & IMPORT
+    document.getElementById('export-btn').addEventListener('click', () => {
+        playSound('click');
+        const dataToExport = {};
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('pomo')) {
+                dataToExport[key] = localStorage.getItem(key);
+            }
+        }
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToExport));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "pomodoro_backup.json");
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    });
+
+    document.getElementById('import-file').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            try {
+                const importedData = JSON.parse(event.target.result);
+                for (const key in importedData) {
+                    if (key.startsWith('pomo')) {
+                        localStorage.setItem(key, importedData[key]);
+                    }
+                }
+                alert('Data imported successfully! The timer will now reload.');
+                location.reload();
+            } catch (err) {
+                alert('Error parsing the backup file.');
+            }
+        };
+        reader.readAsText(file);
+    });
+
+    // iOS Resume Check
     const savedTarget = localStorage.getItem('targetTime');
     if (savedTarget) {
         const now = Date.now();
