@@ -333,7 +333,7 @@
         }
 
        /* CUSTOM MODAL */
-        .modal-overlay {
+        #stats-modal.modal-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
@@ -341,14 +341,14 @@
             z-index: 9999;
             opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
         }
-        .modal-overlay.active { 
+        #stats-modal.modal-overlay.active { 
             opacity: 1; pointer-events: all; 
         }
         .modal-content {
-            width: 80%; max-width: 320px;
+            width: 80%; max-width: 320px; margin: 0;
             transform: translateY(20px) scale(0.95); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .modal-overlay.active .modal-content { 
+        #stats-modal.modal-overlay.active .modal-content { 
             transform: translateY(0) scale(1); 
         }
 
@@ -528,13 +528,9 @@
 
 
 
-    <audio id="bg-music" loop></audio>
-
+   <audio id="bg-music" loop></audio>
     <audio id="ambience-player" loop></audio>
-
-</div>
-
-<div id="stats-modal" class="modal-overlay">
+</div> <div id="stats-modal" class="modal-overlay">
     <div class="container modal-content">
         <h3 style="margin-top: 0; border-bottom: 1px dashed currentColor; padding-bottom: 10px;">Total Deep Work</h3>
         <div id="stats-text" style="font-size: 1.5rem; font-weight: bold; margin: 20px 0; letter-spacing: 2px;"></div>
