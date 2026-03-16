@@ -576,11 +576,18 @@
         ctx.fillStyle = color;
         ctx.fill();
 
-        // Push the canvas image to the tab icon
-        const faviconLink = document.getElementById('dynamic-favicon');
-        if (faviconLink) {
-            faviconLink.href = canvas.toDataURL('image/png');
+        // Force the browser to recognize the new favicon by replacing the whole element
+        let oldLink = document.getElementById('dynamic-favicon');
+        if (oldLink) {
+            document.head.removeChild(oldLink);
         }
+
+        let newLink = document.createElement('link');
+        newLink.id = 'dynamic-favicon';
+        newLink.rel = 'icon';
+        newLink.type = 'image/png';
+        newLink.href = canvas.toDataURL('image/png');
+        document.head.appendChild(newLink);
     }
 
     function playBeep(isCyber) {
