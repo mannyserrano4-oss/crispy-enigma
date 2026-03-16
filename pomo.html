@@ -332,25 +332,29 @@
 
         }
 
-       /* CUSTOM MODAL */
-        #stats-modal.modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      /* CUSTOM MODAL */
+        .modal-overlay {
+            position: fixed !important; 
+            top: 0 !important; left: 0 !important; 
+            width: 100vw !important; height: 100vh !important;
             background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 9999;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+            display: none; /* Completely removes it from the side-by-side flex layout! */
+            justify-content: center; align-items: center;
+            z-index: 99999 !important;
         }
-        #stats-modal.modal-overlay.active { 
-            opacity: 1; pointer-events: all; 
+        .modal-overlay.active { 
+            display: flex; 
+            animation: fadeIn 0.3s ease forwards;
         }
-        .modal-content {
-            width: 80%; max-width: 320px; margin: 0;
-            transform: translateY(20px) scale(0.95); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .modal-overlay .modal-content {
+            width: 80% !important; max-width: 320px !important; margin: 0 !important;
         }
-        #stats-modal.modal-overlay.active .modal-content { 
-            transform: translateY(0) scale(1); 
+        .modal-overlay.active .modal-content {
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes popIn { from { transform: translateY(20px) scale(0.95); } to { transform: translateY(0) scale(1); } }
 
     </style>
 
