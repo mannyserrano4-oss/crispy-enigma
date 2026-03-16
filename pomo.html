@@ -95,12 +95,13 @@
             text-align: center;
         }
 
-        #streak-display {
+       #streak-display {
 
-            position: absolute; right: 0;
-            display: flex; align-items: center; gap: 4px;
-            font-size: 0.85rem; font-weight: bold; color: inherit; opacity: 0.9;
-        }
+            position: absolute; right: 0;
+            display: flex; align-items: center; gap: 4px;
+            font-size: 0.85rem; font-weight: bold; color: inherit; opacity: 0.9;
+            cursor: pointer;
+        }
 
         .streak-icon {
 
@@ -493,13 +494,17 @@
 
         <div class="setting-row">
 
-            <label>Ambience Volume:</label>
+            <label>Ambience Volume:</label>
 
-            <input type="range" id="ambience-vol" min="0" max="1" step="0.05" value="0.5">
+            <input type="range" id="ambience-vol" min="0" max="1" step="0.05" value="0.5">
 
+        </div>
+        <div class="setting-row" style="justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 25px;">
+            <button id="export-btn" class="mode-btn active" style="padding: 8px 15px;">Export Backup</button>
+            <button id="import-btn" class="mode-btn active" style="padding: 8px 15px;">Import Backup</button>
+            <input type="file" id="import-file" accept=".json" style="display: none;">
         </div>
-
-    </div>
+    </div>
 
 
 
@@ -1235,35 +1240,32 @@
 
             
 
-            timerId = setInterval(() => {
-
-                const now = Date.now();
-
-                const distance = targetTime - now;
-
-                if (distance <= 0) { 
-
-                    timeLeft = 0; 
-
-                    updateVisuals(0); 
-
-                    timerComplete(); 
-
-                } else { 
-
-                    const newTimeLeft = Math.ceil(distance / 1000);
-
-                    if (newTimeLeft !== timeLeft) {
-
-                        timeLeft = newTimeLeft;
-
-                        updateVisuals(timeLeft);
-
-                    }
-
-                }
-
-            }, 200);
+           timerId = setInterval(() => {
+                const now = Date.now();
+                const distance = targetTime - now;
+                
+                if (distance <= 0) { 
+                    if (currentMode === 'work' && timeLeft > 0) {
+                        let total = parseInt(localStorage.getItem('pomoTotalWorkTime')) || 0;
+                        localStorage.setItem('pomoTotalWorkTime', total + timeLeft);
+                    }
+                    timeLeft = 0; 
+                    updateVisuals(0); 
+                    timerComplete(); 
+                } else { 
+                    const newTimeLeft = Math.ceil(distance / 1000);
+                    if (newTimeLeft !== timeLeft) {
+                        const secondsPassed = timeLeft - newTimeLeft;
+                        if (secondsPassed > 0 && currentMode === 'work') {
+                            let total = parseInt(localStorage.getItem('pomoTotalWorkTime')) || 0;
+                            total += secondsPassed;
+                            localStorage.setItem('pomoTotalWorkTime', total);
+                        }
+                        timeLeft = newTimeLeft;
+                        updateVisuals(timeLeft);
+                    }
+                }
+            }, 200);
 
         }
 
@@ -1717,7 +1719,67 @@
 
 
 
-    // --- STARTUP LOGIC ---
+    /* =========================================
+       6. DATA & TOTAL TIME TRACKING
+       ========================================= */
+
+    // Total Time Tracker Click Event
+    document.getElementById('streak-display').addEventListener('click', () => {
+        let totalSecs = parseInt(localStorage.getItem('pomoTotalWorkTime')) || 0;
+        const h = Math.floor(totalSecs / 3600);
+        const m = Math.floor((totalSecs % 3600) / 60);
+        const s = totalSecs % 60;
+        alert(`Total Deep Work Time: ${h}h ${m}m ${s}s`);
+    });
+
+    // Export Data to JSON
+    document.getElementById('export-btn').addEventListener('click', () => {
+        playSound('click');
+        const data = {};
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith('pomo')) {
+                data[key] = localStorage.getItem(key);
+            }
+        }
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = "pomodoro-backup.json";
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+
+    // Import Data from JSON
+    const importFileInput = document.getElementById('import-file');
+    document.getElementById('import-btn').addEventListener('click', () => {
+        playSound('click');
+        importFileInput.click();
+    });
+
+    importFileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            try {
+                const data = JSON.parse(event.target.result);
+                for (const key in data) {
+                    if (key.startsWith('pomo')) {
+                        localStorage.setItem(key, data[key]);
+                    }
+                }
+                alert("Settings imported successfully! Reloading to apply...");
+                location.reload();
+            } catch (err) {
+                alert("Oops! That doesn't look like a valid backup file.");
+            }
+        };
+        reader.readAsText(file);
+    });
+
+    // --- STARTUP LOGIC ---
 
     window.addEventListener('DOMContentLoaded', () => {
 
