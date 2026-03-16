@@ -523,13 +523,13 @@
 
    <audio id="bg-music" loop></audio>
     <audio id="ambience-player" loop></audio>
-</div> <div id="stats-modal" class="modal-overlay">
-    <div class="container modal-content">
-        <h3 style="margin-top: 0; border-bottom: 1px dashed currentColor; padding-bottom: 10px;">Total Deep Work</h3>
-        <div id="stats-text" style="font-size: 1.5rem; font-weight: bold; margin: 20px 0; letter-spacing: 2px;"></div>
-        <button id="close-modal-btn" class="mode-btn active" style="padding: 10px 20px; font-size: 1rem;">Awesome</button>
-    </div>
-</div>
+</div> 
+
+<dialog id="stats-modal" style="padding: 30px; margin: auto; border: 1px solid rgba(255,255,255,0.2); border-radius: 25px; background: var(--glass-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: var(--text-color); box-shadow: 0 8px 32px 0 rgba(0,0,0,0.3); text-align: center; width: 80%; max-width: 320px; outline: none;">
+    <h3 style="margin-top: 0; border-bottom: 1px dashed currentColor; padding-bottom: 10px;">Total Deep Work</h3>
+    <div id="stats-text" style="font-size: 1.5rem; font-weight: bold; margin: 20px 0; letter-spacing: 2px;"></div>
+    <button id="close-modal-btn" class="mode-btn active" style="padding: 10px 20px; font-size: 1rem;">Awesome</button>
+</dialog>
 
 <script>
 
@@ -1738,7 +1738,9 @@
        6. DATA & TOTAL TIME TRACKING
        ========================================= */
 
-    // Total Time Tracker Click Event (Custom Modal)
+    // Total Time Tracker Click Event (Native Dialog)
+    const statsModal = document.getElementById('stats-modal');
+    
     document.getElementById('streak-display').addEventListener('click', () => {
         playSound('click');
         let totalSecs = parseInt(localStorage.getItem('pomoTotalWorkTime')) || 0;
@@ -1752,19 +1754,25 @@
             `${m}<span style="font-size: 0.8rem; opacity: 0.7;">m</span> ` +
             `${s}<span style="font-size: 0.8rem; opacity: 0.7;">s</span>`;
             
-        document.getElementById('stats-modal').classList.add('active');
+        statsModal.showModal();
     });
 
     // Close the Modal via Button
     document.getElementById('close-modal-btn').addEventListener('click', () => {
         playSound('click');
-        document.getElementById('stats-modal').classList.remove('active');
+        statsModal.close();
     });
 
-    // Close the Modal by clicking the background overlay
-    document.getElementById('stats-modal').addEventListener('click', (e) => {
-        if (e.target.id === 'stats-modal') {
-            document.getElementById('stats-modal').classList.remove('active');
+    // Close the Modal by clicking the backdrop
+    statsModal.addEventListener('click', (e) => {
+        const dialogBounds = statsModal.getBoundingClientRect();
+        if (
+            e.clientX < dialogBounds.left ||
+            e.clientX > dialogBounds.right ||
+            e.clientY < dialogBounds.top ||
+            e.clientY > dialogBounds.bottom
+        ) {
+            statsModal.close();
         }
     });
 
