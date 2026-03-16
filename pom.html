@@ -366,9 +366,9 @@
     let targetTime = null;
     let wakeLock = null;
     let titleBlinkId = null;
-    let completedSessions = 0;
+    let completedSessions = parseInt(localStorage.getItem('pomoSessions')) || 0;
 
-    // Wake Lock Logic for the Shop
+    // Wake Lock Logic for the Shop
     async function requestWakeLock() {
         if ('wakeLock' in navigator) {
             try {
@@ -683,73 +683,48 @@
     function timerComplete() {
         commitFocusTime(); // Save the final seconds before hitting 0
         releaseWakeLock();
-        playSound('alarm');
-        clearInterval(timerId); isRunning = false;
-        
-        targetTime = null;
-        localStorage.removeItem('targetTime');
-        syncAudio(); 
-
-        const autoBreak = document.getElementById('auto-break').checked;
-
-        if (currentMode === 'work') {
-            completedSessions++;
-            updateStreakDisplay(true); // +1 to your daily streak!
-
-            if (completedSessions % 4 === 0) {
-                // 4th Session complete! Trigger Long Break.
-                const longBreakTime = parseFloat(document.getElementById('custom-long-input').value) || 15;
-                setupTimer(Math.max(0.1, longBreakTime) * 60, 'long-break'); 
-                highlightMode('long-break');
-            } else {
-                // Normal Short Break
-                const breakTime = parseFloat(document.getElementById('custom-break-input').value) || 5;
-                setupTimer(Math.max(0.1, breakTime) * 60, 'break'); 
-                highlightMode('break');
-            }
-            updateDots();
-            if(autoBreak) setTimeout(() => startTimer(), 1000);
-            
-        } else if (currentMode === 'break' || currentMode === 'long-break') {
-            const workTime = parseFloat(document.getElementById('custom-work-input').value) || 25;
-            setupTimer(Math.max(0.1, workTime) * 60, 'work'); 
-            highlightMode('work');
-            updateDots(); // Reset dots for the new cycle
-            if(autoBreak) setTimeout(() => startTimer(), 1000);
-        }
-
-        // Start bouncing tab title AFTER setupTimer has prepared the next phase
-        let isBlinking = false;
-        titleBlinkId = setInterval(() => {
-            document.title = isBlinking ? "Pomodoro" : "⏰ TIME'S UP!";
-            isBlinking = !isBlinking;
-        }, 500);
-    }
-
-    function setupTimer(seconds, mode) {
-        if (typeof commitFocusTime === 'function') commitFocusTime(); // Save unrecorded time if skipping
-        timeDisplay.style.animation = "none"; // Reset breathing
-        clearInterval(titleBlinkId); // Stop bouncing title
-        releaseWakeLock();
+        playSound('alarm');
         clearInterval(timerId); isRunning = false;
-        timeLeft = seconds; totalTime = seconds;
-        currentMode = mode; targetTime = null;
-        localStorage.removeItem('targetTime'); 
+        
+        targetTime = null;
+        localStorage.removeItem('targetTime');
         syncAudio(); 
-        updateVisuals(seconds);
-    }
 
-    function setupTimer(seconds, mode) {
-        if (typeof commitFocusTime === 'function') commitFocusTime(); // Save unrecorded time if skipping
-        timeDisplay.style.animation = "none"; // Reset breathing
-        clearInterval(titleBlinkId); // Stop bouncing title
-        releaseWakeLock();
-        clearInterval(timerId); isRunning = false;
-        timeLeft = seconds; totalTime = seconds;
-        currentMode = mode; targetTime = null;
-        localStorage.removeItem('targetTime'); 
-        syncAudio(); 
-        updateVisuals(seconds);
+        const autoBreak = document.getElementById('auto-break').checked;
+
+        if (currentMode === 'work') {
+            completedSessions++;
+            localStorage.setItem('pomoSessions', completedSessions); // SAVE DOT PROGRESS
+            updateStreakDisplay(true); // +1 to your daily streak!
+
+            if (completedSessions % 4 === 0) {
+                // 4th Session complete! Trigger Long Break.
+                const longBreakTime = parseFloat(document.getElementById('custom-long-input').value) || 15;
+                setupTimer(Math.max(0.1, longBreakTime) * 60, 'long-break'); 
+                highlightMode('long-break');
+            } else {
+                // Normal Short Break
+                const breakTime = parseFloat(document.getElementById('custom-break-input').value) || 5;
+                setupTimer(Math.max(0.1, breakTime) * 60, 'break'); 
+                highlightMode('break');
+            }
+            updateDots();
+            if(autoBreak) setTimeout(() => startTimer(), 1000);
+            
+        } else if (currentMode === 'break' || currentMode === 'long-break') {
+            const workTime = parseFloat(document.getElementById('custom-work-input').value) || 25;
+            setupTimer(Math.max(0.1, workTime) * 60, 'work'); 
+            highlightMode('work');
+            updateDots(); // Reset dots for the new cycle
+            if(autoBreak) setTimeout(() => startTimer(), 1000);
+        }
+
+        // Start bouncing tab title AFTER setupTimer has prepared the next phase
+        let isBlinking = false;
+        titleBlinkId = setInterval(() => {
+            document.title = isBlinking ? "Pomodoro" : "⏰ TIME'S UP!";
+            isBlinking = !isBlinking;
+        }, 500);
     }
 
     function startTimer(resumeTarget = null) {
@@ -767,42 +742,43 @@
             isRunning = true; 
             if (currentMode === 'work') startingTimeLeft = timeLeft; // Create new checkpoint
             targetTime = resumeTarget ? resumeTarget : Date.now() + (timeLeft * 1000);
-            targetTime = resumeTarget ? resumeTarget : Date.now() + (timeLeft * 1000);
             localStorage.setItem('targetTime', targetTime);
             requestWakeLock(); 
             syncAudio();
             
             timerId = setInterval(() => {
-                const now = Date.now();
-                const distance = targetTime - now;
-                if (distance <= 0) { 
-                    timeLeft = 0; 
-                    updateVisuals(0); 
-                    timerComplete(); 
-                } else { 
-                    const newTimeLeft = Math.ceil(distance / 1000);
-                    if (newTimeLeft !== timeLeft) {
-                        timeLeft = newTimeLeft;
-                        updateVisuals(timeLeft);
-                    }
-                }
-            }, 200);
-        }
-    }
+                const now = Date.now();
+                const distance = targetTime - now;
+                if (distance <= 0) { 
+                    timeLeft = 0; 
+                    updateVisuals(0); 
+                    timerComplete(); 
+                } else { 
+                    const newTimeLeft = Math.ceil(distance / 1000);
+                    if (newTimeLeft !== timeLeft) {
+                        timeLeft = newTimeLeft;
+                        updateVisuals(timeLeft);
+                    }
+                }
+            }, 200);
+        }
+    }
 
-    function setupTimer(seconds, mode) {
-        timeDisplay.style.animation = "none"; // Reset breathing
-        clearInterval(titleBlinkId); // Stop bouncing title
-        releaseWakeLock();
-        clearInterval(timerId); isRunning = false;
-        timeLeft = seconds; totalTime = seconds;
-        currentMode = mode; targetTime = null;
-        localStorage.removeItem('targetTime'); 
-        syncAudio(); 
-        updateVisuals(seconds);
-    }
+    function setupTimer(seconds, mode) {
+        if (typeof commitFocusTime === 'function') commitFocusTime(); // Save unrecorded time if skipping
+        timeDisplay.style.animation = "none"; // Reset breathing
+        clearInterval(titleBlinkId); // Stop bouncing title
+        releaseWakeLock();
+        clearInterval(timerId); isRunning = false;
+        timeLeft = seconds; totalTime = seconds;
+        currentMode = mode; targetTime = null;
+        localStorage.removeItem('targetTime'); 
+        syncAudio(); 
+        updateVisuals(seconds);
+        updateDots(); // Force dots to sync if you click a mode button manually!
+    }
 
-    // EVENT LISTENERS
+    // EVENT LISTENERS
     timerCircle.addEventListener('click', () => { 
         playSound('click'); 
         startTimer(); 
@@ -1031,13 +1007,13 @@
 
         // Update the screen
         const streakEl = document.getElementById('streak-display');
-        if (streakEl) {
-            const checkIcon = `<svg class="streak-icon" viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg>`;
-            streakEl.innerHTML = streak > 0 ? `${checkIcon} ${streak}` : '';
-        }
-    }
+        if (streakEl) {
+            const checkIcon = `<svg class="streak-icon" viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg>`;
+            streakEl.innerHTML = `${checkIcon} ${streak}`; // Always show the counter!
+        }
+    }
 
-    function setDailyGreeting() {
+    function setDailyGreeting() {
         const now = new Date();
         const hour = now.getHours();
         const day = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
@@ -1079,10 +1055,11 @@
     }
 
     // --- STARTUP LOGIC ---
-    window.addEventListener('DOMContentLoaded', () => {
-        setDailyGreeting();
-        updateStreakDisplay(); // Check date and load your streak on startup!
-        const savedTheme = localStorage.getItem('pomoTheme');
+    window.addEventListener('DOMContentLoaded', () => {
+        setDailyGreeting();
+        updateStreakDisplay(); // Check date and load your streak on startup!
+        updateDots(); // Load your saved dots on startup!
+        const savedTheme = localStorage.getItem('pomoTheme');
         if (savedTheme === 'cyber') {
             html.setAttribute('data-theme', 'cyber');
             themeBtn.innerHTML = iconRobot;
