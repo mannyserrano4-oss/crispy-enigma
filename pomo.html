@@ -328,11 +328,31 @@
 
         body.zen-mode .task-input {
 
-            border-color: transparent; /* Makes the underline vanish in Zen Mode */
+            border-color: transparent; /* Makes the underline vanish in Zen Mode */
 
-        }
+        }
 
-    </style>
+        /* CUSTOM MODAL */
+        .modal-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 100;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active { 
+            opacity: 1; pointer-events: all; 
+        }
+        .modal-content {
+            width: 75%; max-width: 320px;
+            transform: translateY(20px) scale(0.95); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal-overlay.active .modal-content { 
+            transform: translateY(0) scale(1); 
+        }
+
+    </style>
 
 </head>
 
@@ -510,8 +530,16 @@
 
     <audio id="bg-music" loop></audio>
 
-    <audio id="ambience-player" loop></audio>
+    <audio id="ambience-player" loop></audio>
 
+</div>
+
+<div id="stats-modal" class="modal-overlay">
+    <div class="container modal-content">
+        <h3 style="margin-top: 0; border-bottom: 1px dashed currentColor; padding-bottom: 10px;">Total Deep Work</h3>
+        <div id="stats-text" style="font-size: 1.5rem; font-weight: bold; margin: 20px 0; letter-spacing: 2px;"></div>
+        <button id="close-modal-btn" class="mode-btn active" style="padding: 10px 20px; font-size: 1rem;">Awesome</button>
+    </div>
 </div>
 
 
@@ -1723,13 +1751,27 @@
        6. DATA & TOTAL TIME TRACKING
        ========================================= */
 
-    // Total Time Tracker Click Event
+    // Total Time Tracker Click Event (Custom Modal)
     document.getElementById('streak-display').addEventListener('click', () => {
+        playSound('click');
         let totalSecs = parseInt(localStorage.getItem('pomoTotalWorkTime')) || 0;
         const h = Math.floor(totalSecs / 3600);
         const m = Math.floor((totalSecs % 3600) / 60);
         const s = totalSecs % 60;
-        alert(`Total Deep Work Time: ${h}h ${m}m ${s}s`);
+        
+        // Format with nice spacing and smaller unit letters
+        document.getElementById('stats-text').innerHTML = 
+            `${h}<span style="font-size: 0.8rem; opacity: 0.7;">h</span> ` +
+            `${m}<span style="font-size: 0.8rem; opacity: 0.7;">m</span> ` +
+            `${s}<span style="font-size: 0.8rem; opacity: 0.7;">s</span>`;
+            
+        document.getElementById('stats-modal').classList.add('active');
+    });
+
+    // Close the Modal
+    document.getElementById('close-modal-btn').addEventListener('click', () => {
+        playSound('click');
+        document.getElementById('stats-modal').classList.remove('active');
     });
 
     // Export Data to JSON
