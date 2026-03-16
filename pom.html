@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
     <title>Pomodoro</title>
-    <meta name="apple-mobile-web-app-title" content="Pomodoro">
-    
-    <link rel="apple-touch-icon" href="icon.png">
+    <meta name="apple-mobile-web-app-title" content="Pomodoro">
+    
+    <link rel="apple-touch-icon" href="icon.png">
+    <link id="dynamic-favicon" rel="icon" type="image/png" href="icon.png">
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -544,12 +545,45 @@
         document.querySelector('.container').style.color = currentColor;
         document.documentElement.style.setProperty('--text-color', currentColor);
         document.documentElement.style.setProperty('--glow-color', currentGlow);
-        
-        // Update browser tab title
-        document.title = display + " - Pomodoro";
-    }
+        
+        // Update browser tab title
+        document.title = display + " - Pomodoro";
 
-    function playBeep(isCyber) {
+        // Update Live Progress Favicon
+        updateFavicon(percent, currentColor);
+    }
+
+    function updateFavicon(percent, color) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 32;
+        canvas.height = 32;
+        const ctx = canvas.getContext('2d');
+
+        ctx.clearRect(0, 0, 32, 32);
+
+        // Draw a faint background circle (the "track")
+        ctx.beginPath();
+        ctx.arc(16, 16, 15, 0, 2 * Math.PI);
+        ctx.fillStyle = 'rgba(128, 128, 128, 0.3)';
+        ctx.fill();
+
+        // Draw the active progress pie slice
+        ctx.beginPath();
+        ctx.moveTo(16, 16);
+        const startAngle = -Math.PI / 2; // Starts at 12 o'clock
+        const endAngle = startAngle + (percent * 2 * Math.PI);
+        ctx.arc(16, 16, 15, startAngle, endAngle);
+        ctx.fillStyle = color;
+        ctx.fill();
+
+        // Push the canvas image to the tab icon
+        const faviconLink = document.getElementById('dynamic-favicon');
+        if (faviconLink) {
+            faviconLink.href = canvas.toDataURL('image/png');
+        }
+    }
+
+    function playBeep(isCyber) {
         if (audioCtx.state === 'suspended') audioCtx.resume();
         const osc = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
