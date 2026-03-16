@@ -332,20 +332,20 @@
 
         }
 
-        /* CUSTOM MODAL */
+       /* CUSTOM MODAL */
         .modal-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.4);
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
             display: flex; justify-content: center; align-items: center;
-            z-index: 100;
+            z-index: 9999;
             opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
         }
         .modal-overlay.active { 
             opacity: 1; pointer-events: all; 
         }
         .modal-content {
-            width: 75%; max-width: 320px;
+            width: 80%; max-width: 320px;
             transform: translateY(20px) scale(0.95); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .modal-overlay.active .modal-content { 
@@ -541,8 +541,6 @@
         <button id="close-modal-btn" class="mode-btn active" style="padding: 10px 20px; font-size: 1rem;">Awesome</button>
     </div>
 </div>
-
-
 
 <script>
 
@@ -1768,10 +1766,17 @@
         document.getElementById('stats-modal').classList.add('active');
     });
 
-    // Close the Modal
+    // Close the Modal via Button
     document.getElementById('close-modal-btn').addEventListener('click', () => {
         playSound('click');
         document.getElementById('stats-modal').classList.remove('active');
+    });
+
+    // Close the Modal by clicking the background overlay
+    document.getElementById('stats-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'stats-modal') {
+            document.getElementById('stats-modal').classList.remove('active');
+        }
     });
 
     // Export Data to JSON
