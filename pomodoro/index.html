@@ -99,7 +99,7 @@
             padding: 0 45px; /* Creates an invisible forcefield so it never touches the streak */
         }
 
-        #streak-display {
+                #stats-display {
             position: absolute; 
             right: 0;
             top: 50%;
@@ -109,6 +109,7 @@
             cursor: pointer;
             padding: 5px;
         }
+
 
         .streak-icon {
 
@@ -366,7 +367,8 @@
 
         <div id="greeting-text"></div>
 
-        <div id="streak-display" title="Sessions completed today"></div>
+        <div id="stats-display" title="View Total Focus Time">⏱️ Stats</div>
+
 
     </div>
 
@@ -738,61 +740,18 @@
 
 
 
-    // --- LUXURIOUS AUDIO FADE LOGIC ---
-
-    function fadeAudio(audio, targetVolume, duration = 1500) {
-
-        if (audio.fadeInterval) clearInterval(audio.fadeInterval);
-
+        // --- INSTANT AUDIO PLAY/PAUSE LOGIC ---
+    function fadeAudio(audio, targetVolume) {
         targetVolume = parseFloat(targetVolume);
-
+        audio.volume = targetVolume;
         
-
-        if (targetVolume > 0 && audio.paused) {
-
-            audio.volume = 0;
-
+        if (targetVolume > 0) {
             audio.play().catch(e=>{});
-
+        } else {
+            audio.pause();
         }
-
-        
-
-        const startVolume = audio.volume;
-
-        const volumeChange = targetVolume - startVolume;
-
-        const steps = 30; 
-
-        const stepTime = duration / steps;
-
-        let currentStep = 0;
-
-        
-
-        audio.fadeInterval = setInterval(() => {
-
-            currentStep++;
-
-            let newVolume = startVolume + (volumeChange * (currentStep / steps));
-
-            audio.volume = Math.max(0, Math.min(1, newVolume)); // Keep volume in safe range
-
-            
-
-            if (currentStep >= steps) {
-
-                clearInterval(audio.fadeInterval);
-
-                audio.volume = targetVolume;
-
-                if (targetVolume === 0) audio.pause();
-
-            }
-
-        }, stepTime);
-
     }
+
 
 
 
@@ -1164,7 +1123,7 @@
 
             completedSessions++;
 
-            updateStreakDisplay(true); // +1 to your daily streak!
+            
 
 
 
@@ -1609,53 +1568,7 @@
 
     
 
-    function updateStreakDisplay(addSession = false) {
-
-        const today = new Date().toDateString();
-
-        let savedDate = localStorage.getItem('pomoDate');
-
-        let streak = parseInt(localStorage.getItem('pomoStreak')) || 0;
-
-
-
-        // If it's a new day, reset the streak to 0
-
-        if (savedDate !== today) {
-
-            streak = 0;
-
-            localStorage.setItem('pomoDate', today);
-
-        }
-
-
-
-        // Add a session if we just finished a Work cycle
-
-        if (addSession) {
-
-            streak++;
-
-            localStorage.setItem('pomoStreak', streak);
-
-        }
-
-
-
-        // Update the screen
-
-        const streakEl = document.getElementById('streak-display');
-
-        if (streakEl) {
-
-            const checkIcon = `<svg class="streak-icon" viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg>`;
-
-            streakEl.innerHTML = streak > 0 ? `${checkIcon} ${streak}` : '';
-
-        }
-
-    }
+    
 
 
 
@@ -1748,7 +1661,8 @@
     // Total Time Tracker Click Event (Native Dialog)
     const statsModal = document.getElementById('stats-modal');
     
-    document.getElementById('streak-display').addEventListener('click', () => {
+    document.getElementById('stats-display').addEventListener('click', () => {
+
         playSound('click');
         let totalSecs = parseInt(localStorage.getItem('pomoTotalWorkTime')) || 0;
         const h = Math.floor(totalSecs / 3600);
@@ -1836,7 +1750,6 @@
 
         setDailyGreeting();
 
-        updateStreakDisplay(); // Check date and load your streak on startup!
 
         const savedTheme = localStorage.getItem('pomoTheme');
 
