@@ -2481,10 +2481,19 @@
                 inputEl.type = inputMode === "decimal" ? "number" : "text";
                 inputEl.placeholder = placeholder;
                 inputEl.value = '';
-                document.getElementById('promptModal').style.display = 'block';
+                                document.getElementById('promptModal').style.display = 'block';
                 inputEl.focus();
+                
+                // QoL: Let the "Enter/Return" key submit the prompt
+                inputEl.onkeydown = (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault(); 
+                        document.getElementById('pSubmit').click();
+                    }
+                };
 
                 document.getElementById('pSubmit').onclick = () => {
+
                     document.getElementById('promptModal').style.display = 'none';
                     isPromptOpen = false;
                     resolve(inputEl.value);
