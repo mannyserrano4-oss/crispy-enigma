@@ -1029,11 +1029,12 @@
             <h2 style="margin-top:0; margin-bottom: 20px; font-size:1.8rem;">⚙️ Settings</h2>
             
             <h4 style="margin: 0 0 8px 5px; color:var(--text-sub); text-transform:uppercase; font-size:0.75rem; letter-spacing:1px;">Dashboard & Analytics</h4>
-            <div style="background:var(--input-bg); border: 1px solid var(--border); border-radius: 16px; padding: 15px; margin-bottom: 25px;">
-                <button class="btn btn-green" style="background:var(--p-purple); color:black;" onclick="openStats()"><i class="fas fa-chart-line"></i> View Revenue Stats</button>
-                <button class="btn btn-green" onclick="openHistory()"><i class="fas fa-list"></i> Transaction History</button>
-                <button class="btn btn-ghost" style="margin-bottom:0; border-color:var(--border);" onclick="toggleArchiveMode()"><i class="fas fa-archive"></i> <span id="archiveLabel">View Archived Clients</span></button>
+                        <div style="background:var(--input-bg); border: 1px solid var(--border); border-radius: 16px; padding: 15px; margin-bottom: 25px; display: flex; flex-direction: column; gap: 12px;">
+                <button class="btn btn-green" style="background:var(--p-purple); color:black; margin:0;" onclick="openStats()"><i class="fas fa-chart-line"></i> View Revenue Stats</button>
+                <button class="btn btn-green" style="margin:0;" onclick="openHistory()"><i class="fas fa-list"></i> Transaction History</button>
+                <button class="btn btn-ghost" style="margin:0; border-color:var(--border);" onclick="toggleArchiveMode()"><i class="fas fa-archive"></i> <span id="archiveLabel">View Archived Clients</span></button>
             </div>
+
 
             <details style="background:var(--bg-card); border: 2px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
                 <summary style="font-weight: 800; color: var(--text-main); font-size:1.1rem; outline: none; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center;">
@@ -1066,30 +1067,31 @@
                     <i class="fas fa-chevron-down" style="color:var(--text-sub); font-size:0.9rem;"></i>
                 </summary>
                 
-                <div style="margin-top: 20px;">
-                    <button class="btn btn-primary" onclick="exportRobustExcel()">
+                                <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 12px;">
+                    <button class="btn btn-primary" style="margin:0;" onclick="exportRobustExcel()">
                         <i class="fas fa-file-excel"></i> Download Visual Report (.html)
                     </button>
-                    <button class="btn btn-ghost" onclick="exportHistoryCSV()">
+                    <button class="btn btn-ghost" style="margin:0;" onclick="exportHistoryCSV()">
                         <i class="fas fa-table"></i> Download Transaction CSV (Tax)
                     </button>
-                    <button class="btn btn-teal" onclick="exportSimpleCSV()">
+                    <button class="btn btn-teal" style="margin:0;" onclick="exportSimpleCSV()">
                         <i class="fas fa-user-tag"></i> Download Client List CSV
                     </button>
                     
-                    <hr style="border-color:var(--border); margin:20px 0;">
+                    <hr style="border-color:var(--border); margin:10px 0; width:100%;">
                     
-                    <button class="btn btn-ghost" style="color:var(--status-overdue); border-color:var(--status-overdue); margin-bottom: 20px;" onclick="pruneOldHistory()">
+                    <button class="btn btn-ghost" style="color:var(--status-overdue); border-color:var(--status-overdue); margin:0;" onclick="pruneOldHistory()">
                         <i class="fas fa-broom"></i> Prune Old History (Free Space)
                     </button>
-                    <button class="btn btn-indigo" style="border: 2px solid var(--p-green-dark); color:var(--p-green-dark);" onclick="exportData()">
+                    <button class="btn btn-indigo" style="border: 2px solid var(--p-green-dark); color:var(--p-green-dark); margin:0;" onclick="exportData()">
                         <i class="fas fa-download"></i> Save Full Backup (.json)
                     </button>
                     <input type="file" id="restoreFile" hidden onchange="restoreData(this)">
-                    <button class="btn btn-orange" style="margin-bottom:0;" onclick="document.getElementById('restoreFile').click()">
+                    <button class="btn btn-orange" style="margin:0;" onclick="document.getElementById('restoreFile').click()">
                         <i class="fas fa-upload"></i> Restore From Backup
                     </button>
                 </div>
+
             </details>
 
             <button class="btn btn-red" onclick="closeModal('settingsModal')">Close Menu</button>
