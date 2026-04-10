@@ -703,13 +703,16 @@
                 <div id="givebackDisplay" style="color:var(--p-pink-dark); font-size:0.9rem; font-weight:700;">Giveback: $0.00</div>
             </div>
 
-            <button class="btn btn-green" onclick="finalizeCut()">Confirm & Save</button>
-            
-            <button class="btn btn-ghost" id="btnSmartBook" onclick="smartBook()" style="margin-top:10px; border-color:var(--p-purple-dark); color:var(--p-purple-dark);">
-                <i class="fas fa-calendar-plus"></i> Book Next: <span id="sbDate">...</span>
-            </button>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                <button class="btn btn-green" style="margin: 0;" onclick="finalizeCut()">Confirm & Save</button>
+                
+                <button class="btn btn-ghost" id="btnSmartBook" onclick="smartBook()" style="margin: 0; border-color:var(--p-purple-dark); color:var(--p-purple-dark);">
+                    <i class="fas fa-calendar-plus"></i> Book Next: <span id="sbDate">...</span>
+                </button>
 
-            <button class="btn btn-red" onclick="closeModal('checkoutModal')">Cancel</button>
+                <button class="btn btn-red" style="margin: 0;" onclick="closeModal('checkoutModal')">Cancel</button>
+            </div>
+
         </div>
     </div>
 
@@ -2999,12 +3002,13 @@
                     }
                     // -----------------------------------------
 
-                    const div = document.createElement('div');
+                                        const div = document.createElement('div');
                     div.style.display = 'flex';
                     div.style.justifyContent = 'space-between';
                     div.style.alignItems = 'center';
-                    div.style.padding = '10px';
+                    div.style.padding = '16px 10px'; /* Increased padding for breathing room */
                     div.style.borderBottom = '1px solid var(--border)';
+
                     
                     div.innerHTML = `
                         <div>
@@ -3123,13 +3127,14 @@
 
             targets.forEach(c => {
                 const first = c.name.split(' ')[0];
-                const div = document.createElement('div');
+                                const div = document.createElement('div');
                 div.style.display = 'flex';
                 div.style.justifyContent = 'space-between';
                 div.style.alignItems = 'center';
-                div.style.padding = '8px 10px';
+                div.style.padding = '16px 10px'; /* Increased padding for breathing room */
                 div.style.borderBottom = '1px solid var(--border)';
                 div.style.transition = 'opacity 0.3s ease'; // Smooth fade out
+
                 
                 div.innerHTML = `
                     <div style="font-weight:700;">${c.name}</div>
