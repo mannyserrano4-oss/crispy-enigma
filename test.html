@@ -1073,21 +1073,50 @@
                     <i class="fas fa-chevron-down" style="color:var(--text-sub); font-size:0.9rem;"></i>
                 </summary>
                 <div style="margin-top: 20px;">
-                    <p style="font-size:0.8rem; color:var(--text-sub); margin-top:0;">Use <b>[Name]</b> where you want the client's first name to appear.</p>
+                    <p style="font-size:0.8rem; color:var(--text-sub); margin-top:0;">Use <b>[Name]</b> to inject their first name. In Loyalty, use <b>[CutsLeft]</b> to inject the math.</p>
                     
-                    <label>🎂 Birthday</label>
-                    <textarea id="tplBday" rows="2"></textarea>
-                    
-                    <label>👋 Long Time No See</label>
-                    <textarea id="tplLongtime" rows="2"></textarea>
-                    
-                    <label>💈 48-Hr Check-In</label>
-                    <textarea id="tplCheckin" rows="2"></textarea>
-                    
-                    <label>🚩 No-Show</label>
-                    <textarea id="tplNoshow" rows="2"></textarea>
+                    <div style="max-height: 400px; overflow-y: auto; padding-right: 5px; margin-bottom: 15px;">
+                        <label style="color:var(--p-blue-dark);">🏃 Running Late (15m)</label>
+                        <textarea id="tplLate" rows="2"></textarea>
+                        
+                        <label style="color:var(--p-blue-dark);">📅 Confirm Appointment</label>
+                        <textarea id="tplConfirm" rows="2"></textarea>
+                        
+                        <label style="color:var(--p-blue-dark);">👋 Long Time No See</label>
+                        <textarea id="tplLongtime" rows="2"></textarea>
+                        
+                        <label style="color:var(--p-blue-dark);">✂️ Follow Up</label>
+                        <textarea id="tplFollowup" rows="2"></textarea>
+                        
+                        <label style="color:var(--p-blue-dark);">⭐ Request Review</label>
+                        <textarea id="tplReview" rows="3"></textarea>
+                        
+                        <label style="color:var(--p-blue-dark);">💈 48-Hr Satisfaction Check</label>
+                        <textarea id="tplCheckin" rows="2"></textarea>
+                        
+                        <label style="color:var(--p-pink-dark);">🎂 Happy Birthday</label>
+                        <textarea id="tplBday" rows="2"></textarea>
+                        
+                        <label style="color:var(--status-overdue);">🚩 Missed Cut (No-Show)</label>
+                        <textarea id="tplNoshow" rows="2"></textarea>
+                        
+                        <label style="color:var(--p-green-dark);">🧴 Send Aftercare Link</label>
+                        <textarea id="tplAftercare" rows="2"></textarea>
+                        
+                        <hr style="border-color:var(--border); margin: 20px 0;">
+                        <h4 style="margin:0 0 10px 0; color:var(--p-gold);"><i class="fas fa-crown"></i> Loyalty States</h4>
+                        
+                        <label>🏆 Loyalty (Free Cut Banked)</label>
+                        <textarea id="tplLoyaltyBanked" rows="2"></textarea>
+                        
+                        <label>🏆 Loyalty (1 Cut Away)</label>
+                        <textarea id="tplLoyalty1Away" rows="2"></textarea>
+                        
+                        <label>🏆 Loyalty (X Cuts Away)</label>
+                        <textarea id="tplLoyaltyXAway" rows="2"></textarea>
+                    </div>
 
-                    <button class="btn btn-primary" style="padding:12px; margin-top:10px; margin-bottom:0;" onclick="saveSettings()">Save Templates</button>
+                    <button class="btn btn-primary" style="padding:12px; margin:0;" onclick="saveSettings()">Save Templates</button>
                 </div>
             </details>
 
@@ -1144,7 +1173,15 @@
             bday: "Yo [Name], saw it's your birthday month! 🎂 Hit me up to claim that half-off cut.",
             longtime: "Hey [Name], been a while! Time to clean up that cut?",
             checkin: "Yo [Name], just checking in to make sure that cut is still sitting right and styling easy for you.",
-            noshow: "Hey [Name], had you down for a cut today. Let me know if we need to reschedule."
+            noshow: "Hey [Name], had you down for a cut today. Let me know if we need to reschedule.",
+            late: "Hey [Name], running about 15 mins late. So sorry!",
+            confirm: "Yo [Name], just confirming our cut. You still good?",
+            followup: "Appreciate you coming through [Name]! How's the cut treating you?",
+            review: "Yo [Name], appreciate the cut! If you have a sec, rate it here:\n\nhttps://mannyserrano4-oss.github.io/crispy-enigma/reviews",
+            aftercare: "Yo [Name], here is the link to my aftercare guide to keep everything looking fresh until the next cut: https://mannyserrano4-oss.github.io/crispy-enigma/aftercare/",
+            loyaltyBanked: "Yo [Name], you've got a FREE cut banked and ready to use! Let me know when you want to cash it in.",
+            loyalty1Away: "Yo [Name], you are exactly ONE cut away from a freebie! Let's get you in the chair and finish off that punch card.",
+            loyaltyXAway: "Yo [Name], just checking in! You're [CutsLeft] cuts away from earning your free one. Hit me up when you need a fresh fade."
         };
 
         // --- DATA STATE ---
@@ -2573,10 +2610,18 @@
         }
         function openSettings() { 
             const sms = settings.sms || DEFAULT_SMS;
-            document.getElementById('tplBday').value = sms.bday || DEFAULT_SMS.bday;
+            document.getElementById('tplLate').value = sms.late || DEFAULT_SMS.late;
+            document.getElementById('tplConfirm').value = sms.confirm || DEFAULT_SMS.confirm;
             document.getElementById('tplLongtime').value = sms.longtime || DEFAULT_SMS.longtime;
+            document.getElementById('tplFollowup').value = sms.followup || DEFAULT_SMS.followup;
+            document.getElementById('tplReview').value = sms.review || DEFAULT_SMS.review;
             document.getElementById('tplCheckin').value = sms.checkin || DEFAULT_SMS.checkin;
+            document.getElementById('tplBday').value = sms.bday || DEFAULT_SMS.bday;
             document.getElementById('tplNoshow').value = sms.noshow || DEFAULT_SMS.noshow;
+            document.getElementById('tplAftercare').value = sms.aftercare || DEFAULT_SMS.aftercare;
+            document.getElementById('tplLoyaltyBanked').value = sms.loyaltyBanked || DEFAULT_SMS.loyaltyBanked;
+            document.getElementById('tplLoyalty1Away').value = sms.loyalty1Away || DEFAULT_SMS.loyalty1Away;
+            document.getElementById('tplLoyaltyXAway').value = sms.loyaltyXAway || DEFAULT_SMS.loyaltyXAway;
             openModal('settingsModal'); 
         }
         
@@ -2645,10 +2690,18 @@
         function saveSettings() { 
             settings.location = document.getElementById('setLoc').value; 
             settings.sms = {
-                bday: document.getElementById('tplBday').value,
+                late: document.getElementById('tplLate').value,
+                confirm: document.getElementById('tplConfirm').value,
                 longtime: document.getElementById('tplLongtime').value,
+                followup: document.getElementById('tplFollowup').value,
+                review: document.getElementById('tplReview').value,
                 checkin: document.getElementById('tplCheckin').value,
-                noshow: document.getElementById('tplNoshow').value
+                bday: document.getElementById('tplBday').value,
+                noshow: document.getElementById('tplNoshow').value,
+                aftercare: document.getElementById('tplAftercare').value,
+                loyaltyBanked: document.getElementById('tplLoyaltyBanked').value,
+                loyalty1Away: document.getElementById('tplLoyalty1Away').value,
+                loyaltyXAway: document.getElementById('tplLoyaltyXAway').value
             };
             saveAll(); 
             closeModal('settingsModal'); 
@@ -2985,35 +3038,33 @@
             const first = c.name.split(' ')[0]; let msg = ''; 
             const sms = settings.sms || DEFAULT_SMS; // Pull custom templates
 
-            if(type === 'late') msg = `Hey ${first}, running about 15 mins late. So sorry!`; 
-            if(type === 'confirm') msg = `Yo ${first}, just confirming our cut. You still good?`; 
-            if(type === 'followup') msg = `Appreciate you coming through ${first}! How's the cut treating you?`; 
-            if(type === 'review') msg = `Yo ${first}, appreciate the cut! If you have a sec, rate it here:\n\nhttps://mannyserrano4-oss.github.io/crispy-enigma/reviews`;
-            
             // --- EDITABLE TEXT TEMPLATES ---
+            if(type === 'late') msg = (sms.late || DEFAULT_SMS.late).replaceAll('[Name]', first);
+            if(type === 'confirm') msg = (sms.confirm || DEFAULT_SMS.confirm).replaceAll('[Name]', first);
             if(type === 'longtime') msg = (sms.longtime || DEFAULT_SMS.longtime).replaceAll('[Name]', first);
+            if(type === 'followup') msg = (sms.followup || DEFAULT_SMS.followup).replaceAll('[Name]', first);
+            if(type === 'review') msg = (sms.review || DEFAULT_SMS.review).replaceAll('[Name]', first);
             if(type === 'checkin') msg = (sms.checkin || DEFAULT_SMS.checkin).replaceAll('[Name]', first);
             if(type === 'bday') msg = (sms.bday || DEFAULT_SMS.bday).replaceAll('[Name]', first);
             if(type === 'noshow') msg = (sms.noshow || DEFAULT_SMS.noshow).replaceAll('[Name]', first);
+            if(type === 'aftercare') msg = (sms.aftercare || DEFAULT_SMS.aftercare).replaceAll('[Name]', first);
             
-           // --- NEW DYNAMIC LOYALTY TEXT ---
+           // --- SMART LOYALTY TEXT ---
             if(type === 'loyalty') {
                 const banked = c.banked || 0;
                 const points = c.loyalty || 0;
                 const cutsLeft = APP_CONFIG.cutsRequiredForFree - points;
                 
                 if (banked > 0) {
-                    msg = `Yo ${first}, you've got a FREE cut banked and ready to use! Let me know when you want to cash it in.`;
+                    msg = (sms.loyaltyBanked || DEFAULT_SMS.loyaltyBanked).replaceAll('[Name]', first);
                 } else if (cutsLeft === 1) {
-                    msg = `Yo ${first}, you are exactly ONE cut away from a freebie! Let's get you in the chair and finish off that punch card.`;
+                    msg = (sms.loyalty1Away || DEFAULT_SMS.loyalty1Away).replaceAll('[Name]', first);
                 } else {
-                    msg = `Yo ${first}, just checking in! You're ${cutsLeft} cuts away from earning your free one. Hit me up when you need a fresh fade.`;
+                    // Swaps out [Name] and ALSO swaps out [CutsLeft] to inject the math!
+                    msg = (sms.loyaltyXAway || DEFAULT_SMS.loyaltyXAway)
+                        .replaceAll('[Name]', first)
+                        .replaceAll('[CutsLeft]', cutsLeft);
                 }
-            }
-            
-            // --- NEW AFTERCARE TEXT ---
-            if(type === 'aftercare') {
-                msg = `Yo ${first}, here is the link to my aftercare guide to keep everything looking fresh until the next cut: https://mannyserrano4-oss.github.io/crispy-enigma/aftercare/`;
             }
             
             if(type === 'custom') msg = `Hey ${first}, `;
