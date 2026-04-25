@@ -1069,6 +1069,30 @@
 
             <details style="background:var(--bg-card); border: 2px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
                 <summary style="font-weight: 800; color: var(--text-main); font-size:1.1rem; outline: none; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center;">
+                    <span><i class="fas fa-comment-dots" style="color:var(--p-blue-dark); margin-right:8px;"></i> Text Message Templates</span>
+                    <i class="fas fa-chevron-down" style="color:var(--text-sub); font-size:0.9rem;"></i>
+                </summary>
+                <div style="margin-top: 20px;">
+                    <p style="font-size:0.8rem; color:var(--text-sub); margin-top:0;">Use <b>[Name]</b> where you want the client's first name to appear.</p>
+                    
+                    <label>🎂 Birthday</label>
+                    <textarea id="tplBday" rows="2"></textarea>
+                    
+                    <label>👋 Long Time No See</label>
+                    <textarea id="tplLongtime" rows="2"></textarea>
+                    
+                    <label>💈 48-Hr Check-In</label>
+                    <textarea id="tplCheckin" rows="2"></textarea>
+                    
+                    <label>🚩 No-Show</label>
+                    <textarea id="tplNoshow" rows="2"></textarea>
+
+                    <button class="btn btn-primary" style="padding:12px; margin-top:10px; margin-bottom:0;" onclick="saveSettings()">Save Templates</button>
+                </div>
+            </details>
+
+            <details style="background:var(--bg-card); border: 2px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                <summary style="font-weight: 800; color: var(--text-main); font-size:1.1rem; outline: none; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center;">
                     <span><i class="fas fa-database" style="color:var(--p-blue-dark); margin-right:8px;"></i> Data & Backups</span>
                     <i class="fas fa-chevron-down" style="color:var(--text-sub); font-size:0.9rem;"></i>
                 </summary>
@@ -1114,6 +1138,14 @@
         const APP_CONFIG = {
             cutsRequiredForFree: 5 // ⚙️ Change this to 10 for "Every 10th Cut Free"
         };
+
+        // --- DEFAULT SMS TEMPLATES ---
+        const DEFAULT_SMS = {
+            bday: "Yo [Name], saw it's your birthday month! 🎂 Hit me up to claim that half-off cut.",
+            longtime: "Hey [Name], been a while! Time to clean up that cut?",
+            checkin: "Yo [Name], just checking in to make sure that cut is still sitting right and styling easy for you.",
+            noshow: "Hey [Name], had you down for a cut today. Let me know if we need to reschedule."
+        };
 
         // --- DATA STATE ---
         let clients = [];
@@ -1504,7 +1536,8 @@
         }
 
         function fireConcierge(phone, first, btn, clientId) {
-            const msg = `Yo ${first}, just checking in to make sure that cut is still sitting right and styling easy for you.`;
+            const sms = settings.sms || DEFAULT_SMS;
+            const msg = (sms.checkin || DEFAULT_SMS.checkin).replaceAll('[Name]', first);
             
             // --- NEW: Save the check-in stamp to memory ---
             const c = getClient(clientId);
@@ -2538,7 +2571,14 @@
             document.getElementById('schedDate').value = `${y}-${m}-${d}T${h}:${min}`;
             openModal('schedModal'); 
         }
-        function openSettings() { openModal('settingsModal'); }
+        function openSettings() { 
+            const sms = settings.sms || DEFAULT_SMS;
+            document.getElementById('tplBday').value = sms.bday || DEFAULT_SMS.bday;
+            document.getElementById('tplLongtime').value = sms.longtime || DEFAULT_SMS.longtime;
+            document.getElementById('tplCheckin').value = sms.checkin || DEFAULT_SMS.checkin;
+            document.getElementById('tplNoshow').value = sms.noshow || DEFAULT_SMS.noshow;
+            openModal('settingsModal'); 
+        }
         
         function openHistory() { 
             closeModal('settingsModal'); 
@@ -2604,6 +2644,12 @@
         
         function saveSettings() { 
             settings.location = document.getElementById('setLoc').value; 
+            settings.sms = {
+                bday: document.getElementById('tplBday').value,
+                longtime: document.getElementById('tplLongtime').value,
+                checkin: document.getElementById('tplCheckin').value,
+                noshow: document.getElementById('tplNoshow').value
+            };
             saveAll(); 
             closeModal('settingsModal'); 
         }
@@ -2937,16 +2983,18 @@
         function sendSms(type) { 
             const c = getClient(activeId); if(!c || !c.phone) return alert('No phone saved.'); 
             const first = c.name.split(' ')[0]; let msg = ''; 
+            const sms = settings.sms || DEFAULT_SMS; // Pull custom templates
+
             if(type === 'late') msg = `Hey ${first}, running about 15 mins late. So sorry!`; 
             if(type === 'confirm') msg = `Yo ${first}, just confirming our cut. You still good?`; 
-            if(type === 'longtime') msg = `Hey ${first}, been a while! Time to clean up that cut?`; 
             if(type === 'followup') msg = `Appreciate you coming through ${first}! How's the cut treating you?`; 
             if(type === 'review') msg = `Yo ${first}, appreciate the cut! If you have a sec, rate it here:\n\nhttps://mannyserrano4-oss.github.io/crispy-enigma/reviews`;
             
-            // --- NEW TEXT TEMPLATES ---
-            if(type === 'checkin') msg = `Yo ${first}, just checking in to make sure that cut is still sitting right and styling easy for you.`;
-            if(type === 'bday') msg = `Yo ${first}, saw it's your birthday month! 🎂 Hit me up to claim that half-off cut.`;
-            if(type === 'noshow') msg = `Hey ${first}, had you down for a cut today. Let me know if we need to reschedule.`;
+            // --- EDITABLE TEXT TEMPLATES ---
+            if(type === 'longtime') msg = (sms.longtime || DEFAULT_SMS.longtime).replaceAll('[Name]', first);
+            if(type === 'checkin') msg = (sms.checkin || DEFAULT_SMS.checkin).replaceAll('[Name]', first);
+            if(type === 'bday') msg = (sms.bday || DEFAULT_SMS.bday).replaceAll('[Name]', first);
+            if(type === 'noshow') msg = (sms.noshow || DEFAULT_SMS.noshow).replaceAll('[Name]', first);
             
            // --- NEW DYNAMIC LOYALTY TEXT ---
             if(type === 'loyalty') {
