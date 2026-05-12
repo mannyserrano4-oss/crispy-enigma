@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- ========================================== -->
+    <!-- BROWSER TAB TITLE & FAVICON                -->
+    <!-- ========================================== -->
+    <title>Manny Serrano | Stand-Up Comedian</title>
+    <link rel="icon" type="image/png" href="gitpp.png">
+    
+    <!-- ========================================== -->
+    <!-- SEO & LINK PREVIEW META TAGS               -->
+    <!-- ========================================== -->
+    <meta property="og:title" content="Manny Serrano | Stand-Up Comedian">
+    <meta property="og:description" content="Check out my latest stand-up clips, upcoming show dates, and booking info.">
+    <meta property="og:image" content="https://mannyserrano4-oss.github.io/crispy-enigma/gitpp.png">
+    <meta property="og:url" content="https://mannyserrano4-oss.github.io/crispy-enigma/">
+    <meta name="description" content="The official page for Manny Serrano, Stand-Up Comedian. View upcoming shows, past credits, clips, and download the official EPK.">
+    
+    <!-- Tailwind CSS & Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- LINK TO YOUR CSS FILE -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body class="text-gray-800 min-h-screen py-10 px-4 md:px-8">
+
+    <!-- ========================================== -->
+    <!-- MAIN WRAPPER (Controls the layout width)   -->
+    <!-- ========================================== -->
+    <div class="max-w-6xl mx-auto w-full flex flex-col lg:flex-row gap-8">
+
+        <!-- ========================================== -->
+        <!-- LEFT COLUMN: SIDEBAR (Profile & About)     -->
+        <!-- On desktop, this sticks to the screen as   -->
+        <!-- the user scrolls the right column.         -->
+        <!-- ========================================== -->
+        <aside class="lg:w-1/3 lg:sticky lg:top-10 h-max space-y-6">
+            
+            <!-- Profile Card -->
+            <div class="bg-white/30 backdrop-blur-md rounded-3xl p-8 border border-white/40 shadow-lg text-center">
+                <div class="relative inline-block mb-4">
+                    <img src="gitpp.png" alt="Manny Serrano" class="w-40 h-40 rounded-full border-[4px] border-white shadow-xl object-cover">
+                </div>
+                <h1 class="text-3xl font-black text-violet-900 tracking-tight">Manny Serrano</h1>
+                <p class="text-lg text-violet-700 font-medium mb-6">Stand-Up Comedian</p>
+                
+                <p class="text-sm text-gray-800 leading-relaxed font-medium text-left bg-white/40 p-4 rounded-xl shadow-sm border border-white/50">
+                    Tampa-based comedian bringing a unique perspective to the stage. Known for deadpan delivery, sharp crowd work, and observational humor that hits uncomfortably close to home.
+                </p>
+
+                <!-- Social Media Pills -->
+                <div class="flex justify-center gap-3 mt-6">
+                    <a href="https://www.instagram.com/_u/monotonebaritone" target="_blank" class="ios-btn w-12 h-12 flex items-center justify-center rounded-full text-purple-600 text-xl">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    <a href="#" target="_blank" class="ios-btn w-12 h-12 flex items-center justify-center rounded-full text-black text-xl">
+                        <i class="fa-brands fa-tiktok"></i>
+                    </a>
+                    <a href="https://www.facebook.com/share/1ChXo1WokK/?mibextid=wwXIfr" target="_blank" class="ios-btn w-12 h-12 flex items-center justify-center rounded-full text-blue-600 text-xl">
+                        <i class="fa-brands fa-facebook"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Mailing List Card -->
+            <div class="bg-white/30 backdrop-blur-md rounded-3xl p-6 border border-white/40 shadow-lg text-center relative overflow-hidden group">
+                <div class="absolute -left-4 -top-10 bg-violet-400/20 w-32 h-32 rounded-full blur-xl group-hover:bg-violet-400/30 transition-all"></div>
+                <div class="relative z-10">
+                    <h3 class="text-violet-900 font-black text-lg mb-2">
+                        <i class="fa-solid fa-ticket mr-2 text-violet-600"></i>VIP Access
+                    </h3>
+                    <p class="text-sm text-gray-700 mb-4 px-2">Join the list for show announcements and early ticket access.</p>
+                    <a href="https://mannyserrano.substack.com/subscribe" target="_blank" class="ios-btn-primary block w-full py-3 rounded-xl font-bold shadow-md">
+                        Join the List
+                    </a>
+                </div>
+            </div>
+
+            <!-- Booking / EPK Quick Links -->
+            <div class="grid grid-cols-2 gap-3">
+                <a href="#" target="_blank" class="ios-btn flex flex-col items-center justify-center p-4 rounded-2xl shadow-sm">
+                    <i class="fa-solid fa-file-pdf text-2xl mb-1 text-gray-700"></i>
+                    <span class="text-xs font-bold text-gray-800">Download EPK</span>
+                </a>
+                <a href="mailto:mannyserrano4@gmail.com" class="ios-btn flex flex-col items-center justify-center p-4 rounded-2xl shadow-sm">
+                    <i class="fa-solid fa-envelope-open-text text-2xl mb-1 text-violet-600"></i>
+                    <span class="text-xs font-bold text-violet-900">Book Me</span>
+                </a>
+            </div>
+
+        </aside>
+
+
+        <!-- ========================================== -->
+        <!-- RIGHT COLUMN: MAIN CONTENT                 -->
+        <!-- Videos, Tour Dates, and Gallery live here. -->
+        <!-- ========================================== -->
+        <main class="lg:w-2/3 space-y-8">
+
+            <!-- SECTION: LIVE CLIPS -->
+            <section class="bg-white/20 backdrop-blur-md rounded-3xl p-6 md:p-8 border border-white/40 shadow-lg">
+                <div class="flex items-center mb-6">
+                    <i class="fa-solid fa-video text-2xl text-violet-600 mr-3"></i>
+                    <h2 class="text-2xl font-black text-violet-900 tracking-tight">Live Clips</h2>
+                </div>
+                
+                <!-- Videos Grid (Stacks on mobile, side-by-side on desktop) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Video 1 -->
+                    <div class="rounded-2xl overflow-hidden shadow-xl border-[3px] border-white/50 bg-black group relative">
+                        <div class="aspect-video">
+                            <iframe class="w-full h-full" src="https://www.youtube.com/embed/MeMbIu-wulQ" title="Standup Clip 1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                        <div class="p-3 bg-gray-900">
+                            <p class="text-sm text-white font-medium">Live at Side Splitters</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Video 2 -->
+                    <div class="rounded-2xl overflow-hidden shadow-xl border-[3px] border-white/50 bg-black group relative">
+                        <div class="aspect-video">
+                            <!-- Swap this link for your second video -->
+                            <iframe class="w-full h-full" src="https://www.youtube.com/embed/MeMbIu-wulQ" title="Standup Clip 2" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                        <div class="p-3 bg-gray-900">
+                            <p class="text-sm text-white font-medium">Crowd Work at The Dogpound</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: TOUR DATES -->
+            <section class="bg-white/20 backdrop-blur-md rounded-3xl p-6 md:p-8 border border-white/40 shadow-lg">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center">
+                        <i class="fa-solid fa-calendar-days text-2xl text-violet-600 mr-3"></i>
+                        <h2 class="text-2xl font-black text-violet-900 tracking-tight">Upcoming Shows</h2>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <!-- Featured Show (Bigger styling) -->
+                    <a href="#" target="_blank" class="ios-btn flex flex-col md:flex-row md:items-center justify-between w-full p-4 rounded-2xl border-2 border-yellow-400/50 relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-yellow-50/50 -z-10"></div>
+                        <div class="flex items-center mb-2 md:mb-0">
+                            <i class="fa-solid fa-star text-yellow-500 mr-4 text-xl animate-pulse"></i>
+                            <div>
+                                <h4 class="font-black text-violet-900 text-lg">The Dogpound</h4>
+                                <p class="text-sm text-gray-600 font-medium">Tampa, FL • Featured Set</p>
+                            </div>
+                        </div>
+                        <div class="text-left md:text-right">
+                            <p class="font-bold text-violet-800">Nov 22</p>
+                            <span class="inline-block mt-1 bg-violet-600 text-white text-xs font-bold px-3 py-1 rounded-full group-hover:bg-violet-700 transition-colors">Get Tickets</span>
+                        </div>
+                    </a>
+
+                    <!-- Standard Show Date 1 -->
+                    <a href="#" target="_blank" class="ios-btn flex flex-col md:flex-row md:items-center justify-between w-full p-4 rounded-2xl group">
+                        <div class="mb-2 md:mb-0">
+                            <h4 class="font-bold text-violet-900">Java Kava</h4>
+                            <p class="text-sm text-gray-600">Tampa, FL • Open Mic/Showcase</p>
+                        </div>
+                        <div class="text-left md:text-right">
+                            <p class="font-bold text-violet-800">Nov 23</p>
+                            <p class="text-xs text-gray-500 font-medium mt-1 group-hover:text-violet-600 transition-colors">More Info &rarr;</p>
+                        </div>
+                    </a>
+
+                    <!-- Standard Show Date 2 -->
+                    <a href="#" target="_blank" class="ios-btn flex flex-col md:flex-row md:items-center justify-between w-full p-4 rounded-2xl group">
+                        <div class="mb-2 md:mb-0">
+                            <h4 class="font-bold text-violet-900">Side Splitters Comedy Club</h4>
+                            <p class="text-sm text-gray-600">Tampa, FL • Guest Spot</p>
+                        </div>
+                        <div class="text-left md:text-right">
+                            <p class="font-bold text-violet-800">Dec 03</p>
+                            <p class="text-xs text-gray-500 font-medium mt-1 group-hover:text-violet-600 transition-colors">More Info &rarr;</p>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- SECTION: PHOTO GALLERY & CREDITS -->
+            <section class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Past Credits Box -->
+                <div class="bg-white/20 backdrop-blur-md rounded-3xl p-6 border border-white/40 shadow-lg flex flex-col justify-center">
+                    <h3 class="text-sm font-black text-violet-800 uppercase tracking-widest mb-4"><i class="fa-solid fa-masks-theater mr-2"></i>Past Credits</h3>
+                    <ul class="space-y-3 text-sm text-gray-800 font-medium">
+                        <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2"></i> Side Splitters Comedy Club</li>
+                        <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2"></i> Tampa Improv</li>
+                        <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2"></i> The Dogpound</li>
+                        <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2"></i> Java Kava</li>
+                        <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2"></i> Opened for [Insert Name]</li>
+                    </ul>
+                </div>
+
+                <!-- Gallery Grid -->
+                <div class="bg-white/20 backdrop-blur-md rounded-3xl p-6 border border-white/40 shadow-lg">
+                    <h3 class="text-sm font-black text-violet-800 uppercase tracking-widest mb-4"><i class="fa-solid fa-camera mr-2"></i>Stage Shots</h3>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="rounded-xl overflow-hidden h-24 border border-white/50 shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1585699324551-f6c309eedeca?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" alt="Stage Shot 1">
+                        </div>
+                        <div class="rounded-xl overflow-hidden h-24 border border-white/50 shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1527224857830-43a7acc85260?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" alt="Stage Shot 2">
+                        </div>
+                        <div class="rounded-xl overflow-hidden h-24 border border-white/50 shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1516280440502-86ec1df27725?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" alt="Stage Shot 3">
+                        </div>
+                        <div class="rounded-xl overflow-hidden h-24 border border-white/50 shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1514361892635-6b07e31e75f3?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" alt="Stage Shot 4">
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+        </main>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="w-full max-w-6xl mx-auto mt-12 mb-6 flex flex-col md:flex-row justify-between items-center px-4 text-center md:text-left gap-4">
+        <div>
+            <p class="text-xs text-violet-900 font-bold opacity-80 mb-1">
+                &copy; <span id="year">2026</span> Manny Serrano.
+            </p>
+            <p class="text-[10px] text-violet-800 opacity-60 italic">
+                Laughter is the best medicine. (Copays still apply).
+            </p>
+        </div>
+        
+        <!-- Mobile Share Button (Triggers script.js) -->
+        <button onclick="sharePage()" class="ios-btn px-6 py-2 rounded-xl text-sm font-bold text-violet-900 border border-violet-200">
+            <i class="fa-solid fa-share-nodes mr-2"></i> Share Site
+        </button>
+    </div>
+
+    <!-- LINK TO YOUR JAVASCRIPT FILE -->
+    <script src="js/script.js"></script>
+
+</body>
+</html>
