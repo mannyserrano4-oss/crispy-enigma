@@ -79,3 +79,37 @@ input[type="file"] { display: none; }
 
 .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 10px 20px; border-radius: 20px; font-weight: bold; transition: opacity 0.3s; z-index: 1000; }
 .toast.hidden { opacity: 0; pointer-events: none; }
+
+/* Quick Insert Variables UI */
+.var-chips-container {
+  margin-top: -5px;
+  margin-bottom: 5px;
+}
+.var-chips {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto; /* Allows swiping left/right on mobile */
+  gap: 8px;
+  padding: 5px 0;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.var-chips::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+.var-chip {
+  background: var(--bg-color);
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  border-radius: 16px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: bold;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+.var-chip:active {
+  background: var(--primary);
+  color: white;
+}
