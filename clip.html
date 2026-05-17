@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Snippets">
+  <title>Snippet Board</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <header>
+    <h1>My Snippets</h1>
+    <div class="header-controls">
+      <button id="btn-add" class="icon-btn">➕ Add</button>
+      <button id="btn-settings" class="icon-btn">⚙️ Settings</button>
+      <button id="btn-theme" class="icon-btn">🌙</button>
+    </div>
+    <div id="toast" class="toast hidden">Copied to clipboard!</div>
+  </header>
+
+  <!-- Container for categorized snippets -->
+  <main id="snippet-container"></main>
+
+  <!-- Add Snippet Modal -->
+  <div id="modal-add" class="modal hidden">
+    <div class="modal-content">
+      <h2>Add New Snippet</h2>
+      <input type="text" id="input-title" placeholder="Snippet Title (e.g., Intro)">
+      <select id="input-category">
+        <option value="personal">Personal</option>
+        <option value="professional">Professional</option>
+        <option value="barbering">Barbering</option>
+        <option value="comedy">Comedy</option>
+        <option value="proposals">Proposals</option>
+      </select>
+      <p class="hint">Tip: Use brackets like [NAME] or [TIME] to create fillable prompts.</p>
+      <textarea id="input-text" rows="5" placeholder="Your text here..."></textarea>
+      <div class="modal-actions">
+        <button id="btn-save-snippet" class="primary-btn">Save</button>
+        <button class="close-modal secondary-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal for Backup/Restore -->
+  <div id="modal-settings" class="modal hidden">
+    <div class="modal-content">
+      <h2>Settings</h2>
+      <div class="settings-group">
+        <button id="btn-backup" class="primary-btn">⬇️ Backup Snippets (Export)</button>
+      </div>
+      <div class="settings-group">
+        <label for="input-restore" class="file-upload-label">⬆️ Restore Snippets (Import)</label>
+        <input type="file" id="input-restore" accept=".json">
+      </div>
+      <div class="settings-group">
+        <button id="btn-clear-all" class="danger-btn">🗑️ Clear All Data</button>
+      </div>
+      <button class="close-modal secondary-btn">Close</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
