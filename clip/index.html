@@ -21,39 +21,53 @@
     <div id="toast" class="toast hidden">Copied to clipboard!</div>
   </header>
 
-  <!-- Container for categorized snippets -->
   <main id="snippet-container"></main>
 
   <!-- Add Snippet Modal -->
   <div id="modal-add" class="modal hidden">
     <div class="modal-content">
       <h2>Add New Snippet</h2>
-      <input type="text" id="input-title" placeholder="Snippet Title (e.g., Intro)">
-      <select id="input-category">
-        <option value="personal">Personal</option>
-        <option value="professional">Professional</option>
-        <option value="barbering">Barbering</option>
-        <option value="comedy">Comedy</option>
-        <option value="proposals">Proposals</option>
-      </select>
-      <p class="hint">Tip: Use brackets like [NAME] or [TIME] to create fillable prompts.</p>
+      
+      <input type="text" id="input-title" placeholder="Title (e.g., 🏠 Home Address)">
+      
+      <!-- Smart Category Input -->
+      <input type="text" id="input-category" list="category-list" placeholder="Folder (e.g., 💼 Work)">
+      <datalist id="category-list">
+        <!-- JS will populate this with your existing folders -->
+      </datalist>
+
+      <!-- Quick Insert Chips -->
+      <div class="var-chips-container">
+        <span class="hint">Tap to insert at cursor:</span>
+        <div class="var-chips">
+          <button type="button" class="var-chip">[NAME]</button>
+          <button type="button" class="var-chip">[ADDRESS]</button>
+          <button type="button" class="var-chip">[DATE]</button>
+          <button type="button" class="var-chip">[TIME]</button>
+          <button type="button" class="var-chip">[PHONE]</button>
+          <button type="button" class="var-chip">[EMAIL]</button>
+          <button type="button" class="var-chip">[AMOUNT]</button>
+        </div>
+      </div>
+
       <textarea id="input-text" rows="5" placeholder="Your text here..."></textarea>
+      
       <div class="modal-actions">
-        <button id="btn-save-snippet" class="primary-btn">Save</button>
+        <button id="btn-save-snippet" class="primary-btn">Save Snippet</button>
         <button class="close-modal secondary-btn">Cancel</button>
       </div>
     </div>
   </div>
 
-  <!-- Settings Modal for Backup/Restore -->
+  <!-- Settings Modal -->
   <div id="modal-settings" class="modal hidden">
     <div class="modal-content">
       <h2>Settings</h2>
       <div class="settings-group">
-        <button id="btn-backup" class="primary-btn">⬇️ Backup Snippets (Export)</button>
+        <button id="btn-backup" class="primary-btn">⬇️ Backup Snippets</button>
       </div>
       <div class="settings-group">
-        <label for="input-restore" class="file-upload-label">⬆️ Restore Snippets (Import)</label>
+        <label for="input-restore" class="file-upload-label">⬆️ Restore Snippets</label>
         <input type="file" id="input-restore" accept=".json">
       </div>
       <div class="settings-group">
