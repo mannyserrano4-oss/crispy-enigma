@@ -113,3 +113,49 @@ input[type="file"] { display: none; }
   background: var(--primary);
   color: white;
 }
+
+/* Search Bar */
+.search-container { margin-top: 15px; }
+#input-search { width: 100%; padding: 12px; border: 1px solid var(--text-muted); border-radius: 8px; background: var(--card-bg); color: var(--text-color); font-size: 16px; box-sizing: border-box; }
+
+/* Collapsible Folders */
+details.category-section {
+  margin-bottom: 15px;
+  background: var(--card-bg);
+  border-radius: 12px;
+  overflow: hidden;
+}
+summary.category-title {
+  padding: 15px;
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--text-color);
+  cursor: pointer;
+  list-style: none; /* Hide default arrow */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0,0,0,0.02);
+}
+summary.category-title::-webkit-details-marker { display: none; }
+summary.category-title:hover { background: rgba(0,0,0,0.05); }
+
+/* The little arrow that rotates */
+summary.category-title::before {
+  content: '📁';
+  margin-right: 10px;
+}
+details[open] summary.category-title::before {
+  content: '📂';
+}
+
+/* Folder Edit Button */
+.edit-folder-btn {
+  background: none; border: none; font-size: 16px; cursor: pointer; padding: 5px; color: var(--text-muted);
+}
+
+.details-content { padding: 15px; background: var(--bg-color); }
+
+/* New Buttons */
+.success-btn { background: var(--success); color: white; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+.hidden { display: none !important; }
