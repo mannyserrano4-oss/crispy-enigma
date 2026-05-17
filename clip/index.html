@@ -18,23 +18,30 @@
       <button id="btn-settings" class="icon-btn">⚙️ Settings</button>
       <button id="btn-theme" class="icon-btn">🌙</button>
     </div>
+    
+    <!-- New Search Bar -->
+    <div class="search-container">
+      <input type="search" id="input-search" placeholder="🔍 Search snippets...">
+    </div>
+    
     <div id="toast" class="toast hidden">Copied to clipboard!</div>
   </header>
 
   <main id="snippet-container"></main>
 
-  <!-- Add Snippet Modal -->
-  <div id="modal-add" class="modal hidden">
+  <!-- Unified Snippet Modal (Add / Edit / Preview) -->
+  <div id="modal-snippet" class="modal hidden">
     <div class="modal-content">
-      <h2>Add New Snippet</h2>
+      <h2 id="modal-title">Add Snippet</h2>
       
+      <input type="hidden" id="input-id">
       <input type="text" id="input-title" placeholder="Title (e.g., 🏠 Home Address)">
       
-      <!-- Smart Category Input -->
-      <input type="text" id="input-category" list="category-list" placeholder="Folder (e.g., 💼 Work)">
-      <datalist id="category-list">
-        <!-- JS will populate this with your existing folders -->
-      </datalist>
+      <!-- Smart Category Dropdown -->
+      <select id="select-category">
+        <!-- JS populates this -->
+      </select>
+      <input type="text" id="input-new-category" class="hidden" placeholder="Type new folder name...">
 
       <!-- Quick Insert Chips -->
       <div class="var-chips-container">
@@ -52,8 +59,14 @@
 
       <textarea id="input-text" rows="5" placeholder="Your text here..."></textarea>
       
+      <!-- Dynamic Action Buttons -->
+      <div id="action-copy-container" class="modal-actions hidden">
+        <button id="btn-copy-snippet" class="success-btn" style="width: 100%; font-size: 18px; padding: 15px;">📋 COPY TO CLIPBOARD</button>
+      </div>
+
       <div class="modal-actions">
-        <button id="btn-save-snippet" class="primary-btn">Save Snippet</button>
+        <button id="btn-save-snippet" class="primary-btn">Save</button>
+        <button id="btn-delete-snippet" class="danger-btn hidden">Delete</button>
         <button class="close-modal secondary-btn">Cancel</button>
       </div>
     </div>
@@ -63,16 +76,12 @@
   <div id="modal-settings" class="modal hidden">
     <div class="modal-content">
       <h2>Settings</h2>
+      <div class="settings-group"><button id="btn-backup" class="primary-btn">⬇️ Backup (Export)</button></div>
       <div class="settings-group">
-        <button id="btn-backup" class="primary-btn">⬇️ Backup Snippets</button>
-      </div>
-      <div class="settings-group">
-        <label for="input-restore" class="file-upload-label">⬆️ Restore Snippets</label>
+        <label for="input-restore" class="file-upload-label">⬆️ Restore (Import)</label>
         <input type="file" id="input-restore" accept=".json">
       </div>
-      <div class="settings-group">
-        <button id="btn-clear-all" class="danger-btn">🗑️ Clear All Data</button>
-      </div>
+      <div class="settings-group"><button id="btn-clear-all" class="danger-btn">🗑️ Clear All Data</button></div>
       <button class="close-modal secondary-btn">Close</button>
     </div>
   </div>
