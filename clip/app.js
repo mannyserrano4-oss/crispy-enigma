@@ -22,9 +22,61 @@ function loadSnippets() {
 
 function saveSnippets() { localStorage.setItem('mySnippets', JSON.stringify(snippets)); }
 function getActiveSnippets() { return snippets.filter(s => !s.deletedAt); }
-
 function getUniqueCategories() { return [...new Set(getActiveSnippets().map(s => s.category))]; }
 
+// --- CUSTOM MODAL UTILITIES (Replaces Native Popups) ---
+function asyncConfirm(message, confirmBtnText = "Yes, Delete", isDanger = true) {
+  return new Promise(resolve => {
+    document.getElementById('confirm-msg').innerText = message;
+    const btnYes = document.getElementById('btn-confirm-yes');
+    btnYes.innerText = confirmBtnText;
+    btnYes.className = isDanger ? 'danger-btn' : 'primary-btn';
+    document.getElementById('modal-confirm').classList.remove('hidden');
+
+    const cleanup = () => {
+      document.getElementById('modal-confirm').classList.add('hidden');
+      btnYes.removeEventListener('click', handleYes);
+      document.getElementById('btn-confirm-no').removeEventListener('click', handleNo);
+    };
+
+    const handleYes = () => { cleanup(); resolve(true); };
+    const handleNo = () => { cleanup(); resolve(false); };
+
+    btnYes.addEventListener('click', handleYes);
+    document.getElementById('btn-confirm-no').addEventListener('click', handleNo);
+  });
+}
+
+function asyncPrompt(message, defaultVal = "") {
+  return new Promise(resolve => {
+    document.getElementById('prompt-msg').innerText = message;
+    const input = document.getElementById('input-single-prompt');
+    input.value = defaultVal;
+    document.getElementById('modal-single-prompt').classList.remove('hidden');
+    
+    // Slight delay to allow modal to render before focusing
+    setTimeout(() => input.focus(), 100);
+
+    const form = document.getElementById('form-single-prompt');
+    const newForm = form.cloneNode(true);
+    form.replaceWith(newForm);
+
+    document.getElementById('btn-prompt-cancel').addEventListener('click', () => {
+      document.getElementById('modal-single-prompt').classList.add('hidden');
+      resolve(null);
+    }, {once: true});
+
+    newForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const val = newForm.querySelector('input').value;
+      document.getElementById('modal-single-prompt').classList.add('hidden');
+      resolve(val);
+    });
+  });
+}
+
+
+// --- CATEGORY MANAGEMENT ---
 function updateCategoryDropdown() {
   const select = document.getElementById('select-category');
   select.innerHTML = '<option value="">-- Select Folder --</option>';
@@ -44,42 +96,37 @@ document.getElementById('select-category').addEventListener('change', (e) => {
   }
 });
 
-function renameFolder(oldName) {
-  const newName = prompt(`Rename folder "${oldName}" to:`, oldName);
+async function renameFolder(oldName) {
+  const newName = await asyncPrompt(`Rename folder "${oldName}" to:`, oldName);
   if (!newName || newName.trim() === '' || newName === oldName) return;
   snippets.forEach(s => { if (s.category === oldName && !s.deletedAt) s.category = newName.trim(); });
   saveSnippets(); renderSnippets(document.getElementById('input-search').value);
 }
+
 
 // --- SWIPE-TO-REVEAL LOGIC ---
 function createSnippetCard(snippet) {
   const wrapper = document.createElement('div');
   wrapper.className = 'swipe-container';
   
-  // Left Background (Copy) - Now an actual button
   const leftAction = document.createElement('button');
   leftAction.className = 'swipe-actions action-btn left-action';
   leftAction.innerText = '📋 Copy';
   leftAction.addEventListener('click', () => {
-    // Reset card visually before running logic
-    btn.classList.add('snapping');
-    btn.style.transform = `translateX(0px)`;
-    btn.dataset.open = "false";
+    btn.classList.add('snapping'); btn.style.transform = `translateX(0px)`; btn.dataset.open = "false";
     handleDispatch(snippet, 'copy');
   });
   
-  // Right Background (Trash) - Now an actual button
   const rightAction = document.createElement('button');
   rightAction.className = 'swipe-actions action-btn right-action';
   rightAction.innerText = '🗑️ Trash';
-  rightAction.addEventListener('click', () => {
-    if (confirm(`Move "${snippet.title}" to the Trash?`)) {
+  rightAction.addEventListener('click', async () => {
+    const confirmDelete = await asyncConfirm(`Move "${snippet.title}" to the Trash?`);
+    if (confirmDelete) {
       const index = snippets.findIndex(s => s.id === snippet.id);
       if (index > -1) { snippets[index].deletedAt = Date.now(); saveSnippets(); renderSnippets(document.getElementById('input-search').value); }
     } else {
-      btn.classList.add('snapping');
-      btn.style.transform = `translateX(0px)`;
-      btn.dataset.open = "false";
+      btn.classList.add('snapping'); btn.style.transform = `translateX(0px)`; btn.dataset.open = "false";
     }
   });
   
@@ -100,18 +147,12 @@ function createSnippetCard(snippet) {
 
   btn.addEventListener('touchmove', e => {
     if (!isSwiping) return;
-    let diffX = e.touches[0].clientX - startX;
-    let diffY = e.touches[0].clientY - startY;
-
+    let diffX = e.touches[0].clientX - startX; let diffY = e.touches[0].clientY - startY;
     if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 5) {
-      isSwiping = false; 
-      if (btn.dataset.open === "false") btn.style.transform = `translateX(0px)`;
-      return;
+      isSwiping = false; if (btn.dataset.open === "false") btn.style.transform = `translateX(0px)`; return;
     }
-
     if (btn.dataset.open === "false") {
-      if (diffX > 100) diffX = 100;
-      if (diffX < -100) diffX = -100;
+      if (diffX > 100) diffX = 100; if (diffX < -100) diffX = -100;
       btn.style.transform = `translateX(${diffX}px)`;
     }
   }, { passive: true });
@@ -119,30 +160,17 @@ function createSnippetCard(snippet) {
   btn.addEventListener('touchend', e => {
     if (!isSwiping) return;
     let diffX = e.changedTouches[0].clientX - startX;
-    btn.classList.add('snapping');
-    isSwiping = false;
-
-    // Logic to lock open or snap shut
+    btn.classList.add('snapping'); isSwiping = false;
     if (btn.dataset.open === "false") {
-      if (diffX > 50) {
-        btn.style.transform = `translateX(100px)`;
-        btn.dataset.open = "right";
-      } else if (diffX < -50) {
-        btn.style.transform = `translateX(-100px)`;
-        btn.dataset.open = "left";
-      } else {
-        btn.style.transform = `translateX(0px)`;
-      }
+      if (diffX > 50) { btn.style.transform = `translateX(100px)`; btn.dataset.open = "right"; } 
+      else if (diffX < -50) { btn.style.transform = `translateX(-100px)`; btn.dataset.open = "left"; } 
+      else { btn.style.transform = `translateX(0px)`; }
     }
   });
 
-  btn.addEventListener('click', (e) => {
-    // If the card is locked open, tapping it just snaps it shut
+  btn.addEventListener('click', () => {
     if (btn.dataset.open !== "false") {
-      btn.classList.add('snapping');
-      btn.style.transform = `translateX(0px)`;
-      btn.dataset.open = "false";
-      return;
+      btn.classList.add('snapping'); btn.style.transform = `translateX(0px)`; btn.dataset.open = "false"; return;
     }
     openSnippetModal(snippet);
   });
@@ -197,16 +225,14 @@ function renderSnippets(filterText = '') {
     summary.appendChild(titleSpan); summary.appendChild(editFolderBtn); details.appendChild(summary);
 
     const contentDiv = document.createElement('div'); contentDiv.className = 'details-content grid';
-    
-    filteredSnippets.filter(s => s.category === cat).forEach(snippet => {
-      contentDiv.appendChild(createSnippetCard(snippet));
-    });
+    filteredSnippets.filter(s => s.category === cat).forEach(snippet => contentDiv.appendChild(createSnippetCard(snippet)));
     
     details.appendChild(contentDiv); container.appendChild(details);
   });
 }
 
 document.getElementById('input-search').addEventListener('input', (e) => renderSnippets(e.target.value));
+
 
 // --- TRASH UI ---
 function renderTrash() {
@@ -226,8 +252,10 @@ function renderTrash() {
     restoreBtn.addEventListener('click', () => { delete snippet.deletedAt; saveSnippets(); renderSnippets(); renderTrash(); });
 
     const nukeBtn = document.createElement('button'); nukeBtn.className = 'icon-action-btn'; nukeBtn.innerText = '❌';
-    nukeBtn.addEventListener('click', () => {
-      if (confirm(`Permanently delete "${snippet.title}"?`)) { snippets = snippets.filter(s => s.id !== snippet.id); saveSnippets(); renderTrash(); }
+    nukeBtn.addEventListener('click', async () => {
+      if (await asyncConfirm(`Permanently delete "${snippet.title}"?`)) { 
+        snippets = snippets.filter(s => s.id !== snippet.id); saveSnippets(); renderTrash(); 
+      }
     });
 
     actionsDiv.appendChild(restoreBtn); actionsDiv.appendChild(nukeBtn);
@@ -237,7 +265,8 @@ function renderTrash() {
 
 document.getElementById('btn-trash-modal').addEventListener('click', () => { renderTrash(); document.getElementById('modal-trash').classList.remove('hidden'); });
 
-// --- MODALS & SAVING ---
+
+// --- MODALS (ADD/EDIT) ---
 function openSnippetModal(snippet = null) {
   updateCategoryDropdown();
   const modal = document.getElementById('modal-snippet');
@@ -288,87 +317,96 @@ document.getElementById('btn-save-snippet').addEventListener('click', () => {
   saveSnippets(); renderSnippets(document.getElementById('input-search').value); document.getElementById('modal-snippet').classList.add('hidden');
 });
 
-document.getElementById('btn-delete-snippet').addEventListener('click', () => {
-  if (!confirm("Move this snippet to the Trash?")) return;
-  const id = document.getElementById('input-id').value;
-  const index = snippets.findIndex(s => s.id.toString() === id);
-  if (index > -1) { snippets[index].deletedAt = Date.now(); saveSnippets(); renderSnippets(document.getElementById('input-search').value); }
-  document.getElementById('modal-snippet').classList.add('hidden');
+document.getElementById('btn-delete-snippet').addEventListener('click', async () => {
+  if (await asyncConfirm("Move this snippet to the Trash?")) {
+    const id = document.getElementById('input-id').value;
+    const index = snippets.findIndex(s => s.id.toString() === id);
+    if (index > -1) { snippets[index].deletedAt = Date.now(); saveSnippets(); renderSnippets(document.getElementById('input-search').value); }
+    document.getElementById('modal-snippet').classList.add('hidden');
+  }
 });
 
 
-// --- BULLETPROOF iOS COPY FUNCTION WITH SHARE FALLBACK ---
+// --- iOS COPY FALLBACK ---
 async function robustCopy(text) {
-  try {
-    // 1. Try modern clipboard
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch (err) {
-    // 2. Try legacy execCommand
+  try { await navigator.clipboard.writeText(text); return true; } 
+  catch (err) {
     try {
       const textArea = document.createElement("textarea");
-      textArea.value = text;
-      textArea.style.position = "fixed";
-      textArea.style.opacity = "0";
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      const success = document.execCommand('copy');
-      document.body.removeChild(textArea);
-      if (success) return true;
-      throw new Error("execCommand failed");
+      textArea.value = text; textArea.style.position = "fixed"; textArea.style.opacity = "0";
+      document.body.appendChild(textArea); textArea.focus(); textArea.select();
+      const success = document.execCommand('copy'); document.body.removeChild(textArea);
+      if (success) return true; throw new Error("Fallback failed");
     } catch (fallbackErr) {
-      // 3. Ultimate Fallback: The iOS Native Share Sheet
-      // If iOS blocks the clipboard completely, we pop open the share sheet.
-      // You can tap "Copy" directly from the Apple menu!
-      if (navigator.share) {
-        navigator.share({ text: text }).catch(console.error);
-        return false; // Return false so we don't show the generic "Copied!" toast
-      } else {
-        alert("Clipboard blocked by iOS. Try again.");
-        return false;
-      }
+      if (navigator.share) { navigator.share({ text: text }).catch(console.error); return false; } 
+      else { alert("Clipboard blocked. Try again."); return false; }
     }
   }
 }
 
-// --- DISPATCH ACTIONS ---
-async function processVariables(text) {
-  let finalText = text;
-  const matches = finalText.match(/\[([^\]]+)\]/g);
+// --- NEW MULTI-VARIABLE DISPATCH SYSTEM ---
+function handleDispatch(snippet, actionType) {
+  const matches = snippet.text.match(/\[([^\]]+)\]/g);
+
+  // Helper function to actually execute the copy/send
+  const executeFinalAction = async (finalText) => {
+    const index = snippets.findIndex(s => s.id === snippet.id);
+    if (index > -1) { snippets[index].lastUsed = Date.now(); saveSnippets(); renderSnippets(document.getElementById('input-search').value); }
+    document.getElementById('modal-snippet').classList.add('hidden');
+
+    if (actionType === 'copy') {
+      if (await robustCopy(finalText)) {
+        const toast = document.getElementById('toast'); toast.classList.remove('hidden');
+        setTimeout(() => toast.classList.add('hidden'), 2000);
+      }
+    } 
+    else if (actionType === 'sms') { window.location.href = `sms:&body=${encodeURIComponent(finalText)}`; } 
+    else if (actionType === 'email') { window.location.href = `mailto:?body=${encodeURIComponent(finalText)}`; }
+  };
+
+  // If there are variables, construct the multi-input form modal
   if (matches) {
     const uniqueVariables = [...new Set(matches)];
-    for (let variable of uniqueVariables) {
-      let userInput = prompt(`Enter value for ${variable}:`);
-      if (userInput === null) return null; 
-      finalText = finalText.split(variable).join(userInput);
-    }
+    const container = document.getElementById('fill-vars-container');
+    container.innerHTML = ''; // Clear previous fields
+
+    uniqueVariables.forEach((v, index) => {
+      const div = document.createElement('div');
+      div.style.display = 'flex'; div.style.flexDirection = 'column'; div.style.gap = '5px';
+      div.innerHTML = `
+        <label class="var-label">${v}</label>
+        <input type="text" data-var="${v}" required placeholder="Enter ${v}..." id="var-input-${index}">
+      `;
+      container.appendChild(div);
+    });
+
+    document.getElementById('modal-fill-vars').classList.remove('hidden');
+    setTimeout(() => document.getElementById('var-input-0').focus(), 100);
+
+    // Clone form to clear old event listeners
+    const form = document.getElementById('form-fill-vars');
+    const newForm = form.cloneNode(true);
+    form.replaceWith(newForm);
+
+    document.getElementById('btn-fill-cancel').addEventListener('click', () => {
+      document.getElementById('modal-fill-vars').classList.add('hidden');
+    }, {once: true});
+
+    // Submitting the form executes the copy directly (preserving Apple's security rule)
+    newForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      let processedText = snippet.text;
+      const inputs = newForm.querySelectorAll('input');
+      inputs.forEach(input => {
+        processedText = processedText.split(input.getAttribute('data-var')).join(input.value);
+      });
+      document.getElementById('modal-fill-vars').classList.add('hidden');
+      executeFinalAction(processedText); 
+    });
+  } else {
+    // If no variables, execute instantly
+    executeFinalAction(snippet.text);
   }
-  return finalText;
-}
-
-async function handleDispatch(snippet, actionType) {
-  const finalText = await processVariables(snippet.text);
-  if (finalText === null) return; 
-
-  const index = snippets.findIndex(s => s.id === snippet.id);
-  if (index > -1) {
-    snippets[index].lastUsed = Date.now();
-    saveSnippets(); renderSnippets(document.getElementById('input-search').value);
-  }
-  
-  document.getElementById('modal-snippet').classList.add('hidden');
-
-  if (actionType === 'copy') {
-    const success = await robustCopy(finalText);
-    if (success) {
-      const toast = document.getElementById('toast'); 
-      toast.classList.remove('hidden');
-      setTimeout(() => toast.classList.add('hidden'), 2000);
-    }
-  } 
-  else if (actionType === 'sms') { window.location.href = `sms:&body=${encodeURIComponent(finalText)}`; } 
-  else if (actionType === 'email') { window.location.href = `mailto:?body=${encodeURIComponent(finalText)}`; }
 }
 
 // Quick Insert Chips
@@ -407,8 +445,8 @@ document.getElementById('input-restore').addEventListener('change', (event) => {
   reader.readAsText(file);
 });
 
-document.getElementById('btn-clear-all').addEventListener('click', () => {
-  if (confirm("⚠️ Factory Reset? All active and trashed snippets will be destroyed.")) {
+document.getElementById('btn-clear-all').addEventListener('click', async () => {
+  if (await asyncConfirm("⚠️ Factory Reset? All active and trashed snippets will be destroyed.", "Yes, Wipe Data")) {
     snippets = []; saveSnippets(); renderSnippets(); document.getElementById('modal-settings').classList.add('hidden');
   }
 });
