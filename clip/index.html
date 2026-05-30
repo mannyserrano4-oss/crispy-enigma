@@ -59,7 +59,6 @@
       
       <div id="action-copy-container" class="modal-actions hidden">
         <button id="btn-copy-snippet" class="success-btn" style="width: 100%; font-size: 18px; padding: 15px;">📋 COPY</button>
-        
         <div style="display: flex; gap: 10px; margin-top: 10px;">
           <button id="btn-sms-snippet" class="primary-btn" style="background: #10b981; flex: 1; font-size: 16px;">💬 Text</button>
           <button id="btn-email-snippet" class="primary-btn" style="background: #3b82f6; flex: 1; font-size: 16px;">📧 Email</button>
@@ -78,10 +77,7 @@
     <div class="modal-content">
       <h2>Recently Deleted</h2>
       <p class="hint">Items are permanently deleted after 30 days.</p>
-      
-      <div id="trash-container" style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;">
-        </div>
-      
+      <div id="trash-container" style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;"></div>
       <button class="close-modal secondary-btn">Close</button>
     </div>
   </div>
@@ -96,6 +92,44 @@
       </div>
       <div class="settings-group"><button id="btn-clear-all" class="danger-btn">⚠️ Factory Reset Data</button></div>
       <button class="close-modal secondary-btn">Close</button>
+    </div>
+  </div>
+
+  <div id="modal-confirm" class="modal hidden" style="z-index: 200;">
+    <div class="modal-content" style="text-align: center;">
+      <h3 id="confirm-msg" style="margin-top: 0;">Are you sure?</h3>
+      <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button id="btn-confirm-no" class="secondary-btn" style="flex: 1;">Cancel</button>
+        <button id="btn-confirm-yes" class="danger-btn" style="flex: 1;">Yes</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-single-prompt" class="modal hidden" style="z-index: 200;">
+    <div class="modal-content">
+      <h3 id="prompt-msg" style="margin-top: 0;">Enter value</h3>
+      <form id="form-single-prompt" style="display: flex; flex-direction: column; gap: 15px;">
+        <input type="text" id="input-single-prompt" required>
+        <div style="display: flex; gap: 10px;">
+          <button type="button" id="btn-prompt-cancel" class="secondary-btn" style="flex: 1;">Cancel</button>
+          <button type="submit" class="primary-btn" style="flex: 1;">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modal-fill-vars" class="modal hidden" style="z-index: 200;">
+    <div class="modal-content">
+      <h2 style="margin-top: 0; margin-bottom: 5px;">Fill Variables</h2>
+      <p class="hint" style="margin-bottom: 15px;">Use 'Next' on keyboard to jump between fields.</p>
+      <form id="form-fill-vars" style="display: flex; flex-direction: column; gap: 15px;">
+        <div id="fill-vars-container" style="display: flex; flex-direction: column; gap: 12px; max-height: 50vh; overflow-y: auto;">
+          </div>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <button type="button" id="btn-fill-cancel" class="secondary-btn" style="flex: 1;">Cancel</button>
+          <button type="submit" class="success-btn" style="flex: 1;">Generate & Go</button>
+        </div>
+      </form>
     </div>
   </div>
 
