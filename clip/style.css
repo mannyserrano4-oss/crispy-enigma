@@ -159,3 +159,25 @@ details[open] summary.category-title::before {
 /* New Buttons */
 .success-btn { background: var(--success); color: white; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
 .hidden { display: none !important; }
+
+/* --- Recently Used Row --- */
+.recent-section {
+  margin-bottom: 25px;
+}
+.recent-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  padding-bottom: 10px;
+  /* Hide scrollbar for a clean, native look */
+  -ms-overflow-style: none; 
+  scrollbar-width: none; 
+}
+.recent-scroll::-webkit-scrollbar {
+  display: none; 
+}
+.recent-scroll .snippet-card {
+  flex: 0 0 auto; /* Prevents cards from squishing together */
+  width: 140px;   /* Forces a specific width for swipeability */
+  border-left-color: var(--primary) !important; /* Uniform color for recent items */
+}
