@@ -19,7 +19,6 @@
       <button id="btn-theme" class="icon-btn">🌙</button>
     </div>
     
-    <!-- New Search Bar -->
     <div class="search-container">
       <input type="search" id="input-search" placeholder="🔍 Search snippets...">
     </div>
@@ -32,7 +31,6 @@
     <div id="snippet-container"></div>
   </main>
 
-  <!-- Unified Snippet Modal (Add / Edit / Preview) -->
   <div id="modal-snippet" class="modal hidden">
     <div class="modal-content">
       <h2 id="modal-title">Add Snippet</h2>
@@ -40,13 +38,10 @@
       <input type="hidden" id="input-id">
       <input type="text" id="input-title" placeholder="Title (e.g., 🏠 Home Address)">
       
-      <!-- Smart Category Dropdown -->
       <select id="select-category">
-        <!-- JS populates this -->
-      </select>
+        </select>
       <input type="text" id="input-new-category" class="hidden" placeholder="Type new folder name...">
 
-      <!-- Quick Insert Chips -->
       <div class="var-chips-container">
         <span class="hint">Tap to insert at cursor:</span>
         <div class="var-chips">
@@ -62,7 +57,6 @@
 
       <textarea id="input-text" rows="5" placeholder="Your text here..."></textarea>
       
-      <!-- Dynamic Action Buttons -->
       <div id="action-copy-container" class="modal-actions hidden">
         <button id="btn-copy-snippet" class="success-btn" style="width: 100%; font-size: 18px; padding: 15px;">📋 COPY TO CLIPBOARD</button>
       </div>
@@ -75,7 +69,6 @@
     </div>
   </div>
 
-  <!-- Settings Modal -->
   <div id="modal-settings" class="modal hidden">
     <div class="modal-content">
       <h2>Settings</h2>
