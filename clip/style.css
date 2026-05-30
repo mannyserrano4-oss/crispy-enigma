@@ -193,3 +193,43 @@ details[open] summary.category-title::before {
   border-radius: 8px;
   background: transparent;
 }
+
+/* --- Trash Bin UI --- */
+.trash-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: var(--bg-color);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  border: 1px solid var(--text-muted);
+}
+.trash-info {
+  display: flex;
+  flex-direction: column;
+}
+.trash-title {
+  font-weight: bold;
+  font-size: 14px;
+  color: var(--text-color);
+}
+.trash-days {
+  font-size: 11px;
+  color: var(--danger);
+}
+.trash-actions {
+  display: flex;
+  gap: 8px;
+}
+.icon-action-btn {
+  background: var(--card-bg);
+  border: 1px solid var(--text-muted);
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.icon-action-btn:active {
+  transform: scale(0.9);
+}
