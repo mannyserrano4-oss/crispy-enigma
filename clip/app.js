@@ -101,11 +101,10 @@ function createSnippetCard(snippet) {
 
     if (diffX > 70) {
       btn.setAttribute('data-swiped', 'true');
-      // FIX: Fired instantly without a setTimeout to maintain iOS gesture authorization
+      // Execute copy instantly without async delays
       handleDispatch(snippet, 'copy'); 
     } else if (diffX < -70) {
       btn.setAttribute('data-swiped', 'true');
-      // Delaying trash prompt slightly is fine, it doesn't need clipboard access
       setTimeout(() => {
         if (confirm(`Move "${snippet.title}" to the Trash?`)) {
           const index = snippets.findIndex(s => s.id === snippet.id);
@@ -275,67 +274,59 @@ document.getElementById('btn-delete-snippet').addEventListener('click', () => {
 });
 
 
-// --- BULLETPROOF iOS COPY FUNCTION ---
-async function robustCopy(text) {
+// --- BULLETPROOF SYNCHRONOUS iOS COPY FUNCTION ---
+function robustCopy(text) {
+  // We use the legacy execCommand approach entirely to avoid async WebKit blocks
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+  
+  // Keep it off-screen to prevent visual glitches
+  textArea.style.position = "fixed";
+  textArea.style.top = "-9999px";
+  textArea.style.left = "-9999px";
+  
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  
   try {
-    // Attempt modern API first
-    await navigator.clipboard.writeText(text);
+    document.execCommand('copy');
   } catch (err) {
-    // If iOS blocks it, spawn an invisible textarea to force the copy
-    const textArea = document.createElement("textarea");
-    textArea.value = text;
-    
-    // Prevent scrolling or visual glitches
-    textArea.style.position = "fixed";
-    textArea.style.top = "0";
-    textArea.style.left = "0";
-    textArea.style.opacity = "0";
-    
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-    
-    try {
-      document.execCommand('copy');
-    } catch (fallbackErr) {
-      console.error("Fallback failed", fallbackErr);
-      alert("Clipboard access was blocked by your device.");
-    }
-    document.body.removeChild(textArea);
+    console.error("Copy failed", err);
+    alert("Clipboard blocked. Try copying via the preview modal.");
   }
+  
+  document.body.removeChild(textArea);
 }
 
-// --- DISPATCH ACTIONS ---
-async function processVariables(text) {
-  let finalText = text;
+// --- SYNCHRONOUS DISPATCH ACTIONS ---
+// Removed async/await from this entire pipeline
+function handleDispatch(snippet, actionType) {
+  let finalText = snippet.text;
   const matches = finalText.match(/\[([^\]]+)\]/g);
+  
   if (matches) {
     const uniqueVariables = [...new Set(matches)];
     for (let variable of uniqueVariables) {
       let userInput = prompt(`Enter value for ${variable}:`);
-      if (userInput === null) return null; 
+      if (userInput === null) return; // Abort if cancelled
       finalText = finalText.split(variable).join(userInput);
     }
   }
-  return finalText;
-}
-
-async function handleDispatch(snippet, actionType) {
-  const finalText = await processVariables(snippet.text);
-  if (finalText === null) return; 
 
   const index = snippets.findIndex(s => s.id === snippet.id);
   if (index > -1) {
     snippets[index].lastUsed = Date.now();
-    saveSnippets(); renderSnippets(document.getElementById('input-search').value);
+    saveSnippets(); 
+    renderSnippets(document.getElementById('input-search').value);
   }
   
   document.getElementById('modal-snippet').classList.add('hidden');
 
   if (actionType === 'copy') {
-    // Using our new robust copy function
-    await robustCopy(finalText);
-    const toast = document.getElementById('toast'); toast.classList.remove('hidden');
+    robustCopy(finalText);
+    const toast = document.getElementById('toast'); 
+    toast.classList.remove('hidden');
     setTimeout(() => toast.classList.add('hidden'), 2000);
   } 
   else if (actionType === 'sms') { window.location.href = `sms:&body=${encodeURIComponent(finalText)}`; } 
