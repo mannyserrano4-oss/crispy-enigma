@@ -32,6 +32,7 @@
     <div id="snippet-container"></div>
   </main>
 
+  <!-- Unified Snippet Modal (Add / Edit / Preview) -->
   <div id="modal-snippet" class="modal hidden">
     <div class="modal-content">
       <h2 id="modal-title">Add Snippet</h2>
@@ -73,6 +74,7 @@
     </div>
   </div>
 
+  <!-- Trash Modal -->
   <div id="modal-trash" class="modal hidden">
     <div class="modal-content">
       <h2>Recently Deleted</h2>
@@ -82,9 +84,17 @@
     </div>
   </div>
 
+  <!-- Settings Modal -->
   <div id="modal-settings" class="modal hidden">
     <div class="modal-content">
       <h2>Settings</h2>
+      
+      <!-- NEW: Vault Button -->
+      <div class="settings-group">
+        <button id="btn-manage-vault" class="primary-btn" style="background: #8b5cf6;">🗄️ Manage Vault (Smart Variables)</button>
+      </div>
+      <hr style="border: 0; border-top: 1px solid var(--text-muted); width: 100%; opacity: 0.3; margin: 10px 0;">
+      
       <div class="settings-group"><button id="btn-backup" class="primary-btn">⬇️ Backup (Export)</button></div>
       <div class="settings-group">
         <label for="input-restore" class="file-upload-label">⬆️ Restore (Import)</label>
@@ -95,6 +105,26 @@
     </div>
   </div>
 
+  <!-- NEW: Vault Management Modal -->
+  <div id="modal-vault" class="modal hidden" style="z-index: 150;">
+    <div class="modal-content">
+      <h2 style="margin-bottom: 5px;">🗄️ My Vault</h2>
+      <p class="hint" style="margin-bottom: 15px;">Pre-save options for variables like [ADDRESS] or [EMAIL].</p>
+      
+      <!-- List of existing variables and their options -->
+      <div id="vault-container" style="max-height: 40vh; overflow-y: auto; display: flex; flex-direction: column; gap: 15px;"></div>
+      
+      <!-- Add a completely new variable category -->
+      <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--text-muted);">
+        <input type="text" id="input-new-vault-cat" placeholder="New Variable Name (e.g., SERVICE)">
+        <button id="btn-add-vault-cat" class="primary-btn" style="margin-top: 10px;">Add Variable Category</button>
+      </div>
+      
+      <button class="close-modal secondary-btn" style="margin-top: 10px;">Close</button>
+    </div>
+  </div>
+
+  <!-- Custom Confirm Modal -->
   <div id="modal-confirm" class="modal hidden" style="z-index: 200;">
     <div class="modal-content" style="text-align: center;">
       <h3 id="confirm-msg" style="margin-top: 0;">Are you sure?</h3>
@@ -105,6 +135,7 @@
     </div>
   </div>
 
+  <!-- Custom Single Prompt Modal -->
   <div id="modal-single-prompt" class="modal hidden" style="z-index: 200;">
     <div class="modal-content">
       <h3 id="prompt-msg" style="margin-top: 0;">Enter value</h3>
@@ -118,13 +149,15 @@
     </div>
   </div>
 
+  <!-- Custom Multi-Variable Fill Modal -->
   <div id="modal-fill-vars" class="modal hidden" style="z-index: 200;">
     <div class="modal-content">
       <h2 style="margin-top: 0; margin-bottom: 5px;">Fill Variables</h2>
       <p class="hint" style="margin-bottom: 15px;">Use 'Next' on keyboard to jump between fields.</p>
       <form id="form-fill-vars" style="display: flex; flex-direction: column; gap: 15px;">
         <div id="fill-vars-container" style="display: flex; flex-direction: column; gap: 12px; max-height: 50vh; overflow-y: auto;">
-          </div>
+          <!-- JS injects inputs and chips here -->
+        </div>
         <div style="display: flex; gap: 10px; margin-top: 10px;">
           <button type="button" id="btn-fill-cancel" class="secondary-btn" style="flex: 1;">Cancel</button>
           <button type="submit" class="success-btn" style="flex: 1;">Generate & Go</button>
