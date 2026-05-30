@@ -53,7 +53,7 @@ details[open] summary.category-title::before { content: '📂'; }
   position: relative;
   overflow: hidden;
   border-radius: 8px;
-  touch-action: pan-y; /* Allows normal vertical scrolling */
+  touch-action: pan-y; 
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
   background: var(--card-bg);
 }
@@ -62,14 +62,15 @@ details[open] summary.category-title::before { content: '📂'; }
   top: 0; bottom: 0;
   display: flex;
   align-items: center;
-  padding: 0 15px;
-  color: white;
-  font-weight: bold;
   z-index: 0;
-  font-size: 14px;
 }
-.left-action { left: 0; right: 0; background: var(--success); justify-content: flex-start; }
-.right-action { left: 0; right: 0; background: var(--danger); justify-content: flex-end; }
+/* New Button Styles for the background actions */
+.action-btn {
+  border: none; color: white; font-weight: bold; font-size: 15px;
+  cursor: pointer; height: 100%; width: 100px; padding: 0 15px;
+}
+.left-action { left: 0; background: var(--success); text-align: left; }
+.right-action { right: 0; background: var(--danger); text-align: right; }
 
 .snippet-card {
   background-color: var(--card-bg);
@@ -88,7 +89,6 @@ details[open] summary.category-title::before { content: '📂'; }
 }
 .snapping { transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
 
-/* --- Recently Used Row --- */
 .recent-section { margin-bottom: 25px; }
 .recent-scroll { display: flex; overflow-x: auto; gap: 12px; padding-bottom: 10px; -ms-overflow-style: none; scrollbar-width: none; }
 .recent-scroll::-webkit-scrollbar { display: none; }
@@ -110,7 +110,7 @@ details[open] summary.category-title::before { content: '📂'; }
 input[type="file"] { display: none; }
 .hidden { display: none !important; }
 
-/* Quick Insert Variables UI */
+/* Quick Insert */
 .var-chips-container { margin-top: -5px; margin-bottom: 5px; }
 .var-chips { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 8px; padding: 5px 0; -ms-overflow-style: none; scrollbar-width: none; }
 .var-chips::-webkit-scrollbar { display: none; }
