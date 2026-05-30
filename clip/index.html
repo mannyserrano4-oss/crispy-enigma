@@ -16,6 +16,7 @@
     <div class="header-controls">
       <button id="btn-add" class="icon-btn">➕ Add</button>
       <button id="btn-settings" class="icon-btn">⚙️ Settings</button>
+      <button id="btn-trash-modal" class="icon-btn">🗑️ Trash</button>
       <button id="btn-theme" class="icon-btn">🌙</button>
     </div>
     
@@ -38,8 +39,7 @@
       <input type="hidden" id="input-id">
       <input type="text" id="input-title" placeholder="Title (e.g., 🏠 Home Address)">
       
-      <select id="select-category">
-        </select>
+      <select id="select-category"></select>
       <input type="text" id="input-new-category" class="hidden" placeholder="Type new folder name...">
 
       <div class="var-chips-container">
@@ -69,6 +69,18 @@
     </div>
   </div>
 
+  <div id="modal-trash" class="modal hidden">
+    <div class="modal-content">
+      <h2>Recently Deleted</h2>
+      <p class="hint">Items are permanently deleted after 30 days.</p>
+      
+      <div id="trash-container" style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;">
+        </div>
+      
+      <button class="close-modal secondary-btn">Close</button>
+    </div>
+  </div>
+
   <div id="modal-settings" class="modal hidden">
     <div class="modal-content">
       <h2>Settings</h2>
@@ -77,7 +89,7 @@
         <label for="input-restore" class="file-upload-label">⬆️ Restore (Import)</label>
         <input type="file" id="input-restore" accept=".json">
       </div>
-      <div class="settings-group"><button id="btn-clear-all" class="danger-btn">🗑️ Clear All Data</button></div>
+      <div class="settings-group"><button id="btn-clear-all" class="danger-btn">⚠️ Factory Reset Data</button></div>
       <button class="close-modal secondary-btn">Close</button>
     </div>
   </div>
