@@ -1,3 +1,4 @@
+// --- 1. INITIALIZATION & STATE ---
 let snippets = [];
 
 function loadSnippets() {
@@ -82,12 +83,10 @@ function createSnippetCard(snippet) {
     let diffX = e.touches[0].clientX - startX;
     let diffY = e.touches[0].clientY - startY;
 
-    // If moving vertically, cancel the swipe so user can scroll normally
     if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 5) {
       isSwiping = false; btn.style.transform = `translateX(0px)`; return;
     }
 
-    // Cap the visual drag limit
     if (diffX > 100) diffX = 100;
     if (diffX < -100) diffX = -100;
     btn.style.transform = `translateX(${diffX}px)`;
@@ -102,17 +101,18 @@ function createSnippetCard(snippet) {
 
     if (diffX > 70) {
       btn.setAttribute('data-swiped', 'true');
-      setTimeout(() => handleDispatch(snippet, 'copy'), 200);
+      // FIX: Fired instantly without a setTimeout to maintain iOS gesture authorization
+      handleDispatch(snippet, 'copy'); 
     } else if (diffX < -70) {
       btn.setAttribute('data-swiped', 'true');
+      // Delaying trash prompt slightly is fine, it doesn't need clipboard access
       setTimeout(() => {
         if (confirm(`Move "${snippet.title}" to the Trash?`)) {
           const index = snippets.findIndex(s => s.id === snippet.id);
           if (index > -1) { snippets[index].deletedAt = Date.now(); saveSnippets(); renderSnippets(document.getElementById('input-search').value); }
         }
-      }, 200);
+      }, 100);
     } else if (Math.abs(diffX) > 10) {
-      // Prevents accidental clicks when letting go of a short swipe
       btn.setAttribute('data-swiped', 'true');
     }
   });
@@ -275,6 +275,36 @@ document.getElementById('btn-delete-snippet').addEventListener('click', () => {
 });
 
 
+// --- BULLETPROOF iOS COPY FUNCTION ---
+async function robustCopy(text) {
+  try {
+    // Attempt modern API first
+    await navigator.clipboard.writeText(text);
+  } catch (err) {
+    // If iOS blocks it, spawn an invisible textarea to force the copy
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    
+    // Prevent scrolling or visual glitches
+    textArea.style.position = "fixed";
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.opacity = "0";
+    
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+      document.execCommand('copy');
+    } catch (fallbackErr) {
+      console.error("Fallback failed", fallbackErr);
+      alert("Clipboard access was blocked by your device.");
+    }
+    document.body.removeChild(textArea);
+  }
+}
+
 // --- DISPATCH ACTIONS ---
 async function processVariables(text) {
   let finalText = text;
@@ -303,11 +333,10 @@ async function handleDispatch(snippet, actionType) {
   document.getElementById('modal-snippet').classList.add('hidden');
 
   if (actionType === 'copy') {
-    try {
-      await navigator.clipboard.writeText(finalText);
-      const toast = document.getElementById('toast'); toast.classList.remove('hidden');
-      setTimeout(() => toast.classList.add('hidden'), 2000);
-    } catch (err) { alert('Failed to copy.'); }
+    // Using our new robust copy function
+    await robustCopy(finalText);
+    const toast = document.getElementById('toast'); toast.classList.remove('hidden');
+    setTimeout(() => toast.classList.add('hidden'), 2000);
   } 
   else if (actionType === 'sms') { window.location.href = `sms:&body=${encodeURIComponent(finalText)}`; } 
   else if (actionType === 'email') { window.location.href = `mailto:?body=${encodeURIComponent(finalText)}`; }
