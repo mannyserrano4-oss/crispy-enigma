@@ -25,7 +25,7 @@ function getActiveSnippets() { return snippets.filter(s => !s.deletedAt); }
 function getUniqueCategories() { return [...new Set(getActiveSnippets().map(s => s.category))]; }
 
 // --- CUSTOM MODAL UTILITIES (Replaces Native Popups) ---
-function asyncConfirm(message, confirmBtnText = "Yes, Delete", isDanger = true) {
+function asyncConfirm(message, confirmBtnText = "Yes", isDanger = true) {
   return new Promise(resolve => {
     document.getElementById('confirm-msg').innerText = message;
     const btnYes = document.getElementById('btn-confirm-yes');
@@ -54,7 +54,6 @@ function asyncPrompt(message, defaultVal = "") {
     input.value = defaultVal;
     document.getElementById('modal-single-prompt').classList.remove('hidden');
     
-    // Slight delay to allow modal to render before focusing
     setTimeout(() => input.focus(), 100);
 
     const form = document.getElementById('form-single-prompt');
@@ -74,7 +73,6 @@ function asyncPrompt(message, defaultVal = "") {
     });
   });
 }
-
 
 // --- CATEGORY MANAGEMENT ---
 function updateCategoryDropdown() {
@@ -102,7 +100,6 @@ async function renameFolder(oldName) {
   snippets.forEach(s => { if (s.category === oldName && !s.deletedAt) s.category = newName.trim(); });
   saveSnippets(); renderSnippets(document.getElementById('input-search').value);
 }
-
 
 // --- SWIPE-TO-REVEAL LOGIC ---
 function createSnippetCard(snippet) {
@@ -179,7 +176,6 @@ function createSnippetCard(snippet) {
   return wrapper;
 }
 
-
 // --- RENDERING MAIN UI ---
 function renderSnippets(filterText = '') {
   const container = document.getElementById('snippet-container');
@@ -233,7 +229,6 @@ function renderSnippets(filterText = '') {
 
 document.getElementById('input-search').addEventListener('input', (e) => renderSnippets(e.target.value));
 
-
 // --- TRASH UI ---
 function renderTrash() {
   const container = document.getElementById('trash-container'); container.innerHTML = '';
@@ -264,7 +259,6 @@ function renderTrash() {
 }
 
 document.getElementById('btn-trash-modal').addEventListener('click', () => { renderTrash(); document.getElementById('modal-trash').classList.remove('hidden'); });
-
 
 // --- MODALS (ADD/EDIT) ---
 function openSnippetModal(snippet = null) {
@@ -329,8 +323,10 @@ document.getElementById('btn-delete-snippet').addEventListener('click', async ()
 
 // --- iOS COPY FALLBACK ---
 async function robustCopy(text) {
-  try { await navigator.clipboard.writeText(text); return true; } 
-  catch (err) {
+  try { 
+    await navigator.clipboard.writeText(text); 
+    return true; 
+  } catch (err) {
     try {
       const textArea = document.createElement("textarea");
       textArea.value = text; textArea.style.position = "fixed"; textArea.style.opacity = "0";
@@ -344,11 +340,10 @@ async function robustCopy(text) {
   }
 }
 
-// --- NEW MULTI-VARIABLE DISPATCH SYSTEM ---
+// --- NEW MULTI-VARIABLE DISPATCH SYSTEM (NO NATIVE PROMPTS) ---
 function handleDispatch(snippet, actionType) {
   const matches = snippet.text.match(/\[([^\]]+)\]/g);
 
-  // Helper function to actually execute the copy/send
   const executeFinalAction = async (finalText) => {
     const index = snippets.findIndex(s => s.id === snippet.id);
     if (index > -1) { snippets[index].lastUsed = Date.now(); saveSnippets(); renderSnippets(document.getElementById('input-search').value); }
@@ -364,11 +359,10 @@ function handleDispatch(snippet, actionType) {
     else if (actionType === 'email') { window.location.href = `mailto:?body=${encodeURIComponent(finalText)}`; }
   };
 
-  // If there are variables, construct the multi-input form modal
   if (matches) {
     const uniqueVariables = [...new Set(matches)];
     const container = document.getElementById('fill-vars-container');
-    container.innerHTML = ''; // Clear previous fields
+    container.innerHTML = ''; 
 
     uniqueVariables.forEach((v, index) => {
       const div = document.createElement('div');
@@ -381,9 +375,9 @@ function handleDispatch(snippet, actionType) {
     });
 
     document.getElementById('modal-fill-vars').classList.remove('hidden');
+    // Auto-focus the very first input box seamlessly
     setTimeout(() => document.getElementById('var-input-0').focus(), 100);
 
-    // Clone form to clear old event listeners
     const form = document.getElementById('form-fill-vars');
     const newForm = form.cloneNode(true);
     form.replaceWith(newForm);
@@ -392,7 +386,6 @@ function handleDispatch(snippet, actionType) {
       document.getElementById('modal-fill-vars').classList.add('hidden');
     }, {once: true});
 
-    // Submitting the form executes the copy directly (preserving Apple's security rule)
     newForm.addEventListener('submit', (e) => {
       e.preventDefault();
       let processedText = snippet.text;
@@ -404,7 +397,6 @@ function handleDispatch(snippet, actionType) {
       executeFinalAction(processedText); 
     });
   } else {
-    // If no variables, execute instantly
     executeFinalAction(snippet.text);
   }
 }
