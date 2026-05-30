@@ -51,21 +51,41 @@ function renameFolder(oldName) {
   saveSnippets(); renderSnippets(document.getElementById('input-search').value);
 }
 
-// --- SWIPE GESTURE & CARD GENERATION ---
+// --- SWIPE-TO-REVEAL LOGIC ---
 function createSnippetCard(snippet) {
   const wrapper = document.createElement('div');
   wrapper.className = 'swipe-container';
   
-  const leftAction = document.createElement('div');
-  leftAction.className = 'swipe-actions left-action';
+  // Left Background (Copy) - Now an actual button
+  const leftAction = document.createElement('button');
+  leftAction.className = 'swipe-actions action-btn left-action';
   leftAction.innerText = '📋 Copy';
+  leftAction.addEventListener('click', () => {
+    // Reset card visually before running logic
+    btn.classList.add('snapping');
+    btn.style.transform = `translateX(0px)`;
+    btn.dataset.open = "false";
+    handleDispatch(snippet, 'copy');
+  });
   
-  const rightAction = document.createElement('div');
-  rightAction.className = 'swipe-actions right-action';
+  // Right Background (Trash) - Now an actual button
+  const rightAction = document.createElement('button');
+  rightAction.className = 'swipe-actions action-btn right-action';
   rightAction.innerText = '🗑️ Trash';
+  rightAction.addEventListener('click', () => {
+    if (confirm(`Move "${snippet.title}" to the Trash?`)) {
+      const index = snippets.findIndex(s => s.id === snippet.id);
+      if (index > -1) { snippets[index].deletedAt = Date.now(); saveSnippets(); renderSnippets(document.getElementById('input-search').value); }
+    } else {
+      btn.classList.add('snapping');
+      btn.style.transform = `translateX(0px)`;
+      btn.dataset.open = "false";
+    }
+  });
   
   const btn = document.createElement('button');
   btn.className = 'snippet-card snapping';
+  btn.dataset.open = "false"; 
   
   const colors = ['var(--cat-personal)', 'var(--cat-professional)', 'var(--cat-barbering)', 'var(--cat-comedy)', 'var(--cat-proposals)'];
   btn.style.borderLeftColor = colors[snippet.category.length % colors.length];
@@ -84,41 +104,45 @@ function createSnippetCard(snippet) {
     let diffY = e.touches[0].clientY - startY;
 
     if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 5) {
-      isSwiping = false; btn.style.transform = `translateX(0px)`; return;
+      isSwiping = false; 
+      if (btn.dataset.open === "false") btn.style.transform = `translateX(0px)`;
+      return;
     }
 
-    if (diffX > 100) diffX = 100;
-    if (diffX < -100) diffX = -100;
-    btn.style.transform = `translateX(${diffX}px)`;
+    if (btn.dataset.open === "false") {
+      if (diffX > 100) diffX = 100;
+      if (diffX < -100) diffX = -100;
+      btn.style.transform = `translateX(${diffX}px)`;
+    }
   }, { passive: true });
 
   btn.addEventListener('touchend', e => {
     if (!isSwiping) return;
     let diffX = e.changedTouches[0].clientX - startX;
-    
-    btn.classList.add('snapping'); btn.style.transform = `translateX(0px)`;
+    btn.classList.add('snapping');
     isSwiping = false;
 
-    if (diffX > 70) {
-      btn.setAttribute('data-swiped', 'true');
-      // Execute copy instantly without async delays
-      handleDispatch(snippet, 'copy'); 
-    } else if (diffX < -70) {
-      btn.setAttribute('data-swiped', 'true');
-      setTimeout(() => {
-        if (confirm(`Move "${snippet.title}" to the Trash?`)) {
-          const index = snippets.findIndex(s => s.id === snippet.id);
-          if (index > -1) { snippets[index].deletedAt = Date.now(); saveSnippets(); renderSnippets(document.getElementById('input-search').value); }
-        }
-      }, 100);
-    } else if (Math.abs(diffX) > 10) {
-      btn.setAttribute('data-swiped', 'true');
+    // Logic to lock open or snap shut
+    if (btn.dataset.open === "false") {
+      if (diffX > 50) {
+        btn.style.transform = `translateX(100px)`;
+        btn.dataset.open = "right";
+      } else if (diffX < -50) {
+        btn.style.transform = `translateX(-100px)`;
+        btn.dataset.open = "left";
+      } else {
+        btn.style.transform = `translateX(0px)`;
+      }
     }
   });
 
   btn.addEventListener('click', (e) => {
-    if (btn.getAttribute('data-swiped') === 'true') {
-      btn.removeAttribute('data-swiped'); return;
+    // If the card is locked open, tapping it just snaps it shut
+    if (btn.dataset.open !== "false") {
+      btn.classList.add('snapping');
+      btn.style.transform = `translateX(0px)`;
+      btn.dataset.open = "false";
+      return;
     }
     openSnippetModal(snippet);
   });
@@ -213,7 +237,6 @@ function renderTrash() {
 
 document.getElementById('btn-trash-modal').addEventListener('click', () => { renderTrash(); document.getElementById('modal-trash').classList.remove('hidden'); });
 
-
 // --- MODALS & SAVING ---
 function openSnippetModal(snippet = null) {
   updateCategoryDropdown();
@@ -274,65 +297,79 @@ document.getElementById('btn-delete-snippet').addEventListener('click', () => {
 });
 
 
-// --- BULLETPROOF SYNCHRONOUS iOS COPY FUNCTION ---
-function robustCopy(text) {
-  // We use the legacy execCommand approach entirely to avoid async WebKit blocks
-  const textArea = document.createElement("textarea");
-  textArea.value = text;
-  
-  // Keep it off-screen to prevent visual glitches
-  textArea.style.position = "fixed";
-  textArea.style.top = "-9999px";
-  textArea.style.left = "-9999px";
-  
-  document.body.appendChild(textArea);
-  textArea.focus();
-  textArea.select();
-  
+// --- BULLETPROOF iOS COPY FUNCTION WITH SHARE FALLBACK ---
+async function robustCopy(text) {
   try {
-    document.execCommand('copy');
+    // 1. Try modern clipboard
+    await navigator.clipboard.writeText(text);
+    return true;
   } catch (err) {
-    console.error("Copy failed", err);
-    alert("Clipboard blocked. Try copying via the preview modal.");
+    // 2. Try legacy execCommand
+    try {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.opacity = "0";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      const success = document.execCommand('copy');
+      document.body.removeChild(textArea);
+      if (success) return true;
+      throw new Error("execCommand failed");
+    } catch (fallbackErr) {
+      // 3. Ultimate Fallback: The iOS Native Share Sheet
+      // If iOS blocks the clipboard completely, we pop open the share sheet.
+      // You can tap "Copy" directly from the Apple menu!
+      if (navigator.share) {
+        navigator.share({ text: text }).catch(console.error);
+        return false; // Return false so we don't show the generic "Copied!" toast
+      } else {
+        alert("Clipboard blocked by iOS. Try again.");
+        return false;
+      }
+    }
   }
-  
-  document.body.removeChild(textArea);
 }
 
-// --- SYNCHRONOUS DISPATCH ACTIONS ---
-// Removed async/await from this entire pipeline
-function handleDispatch(snippet, actionType) {
-  let finalText = snippet.text;
+// --- DISPATCH ACTIONS ---
+async function processVariables(text) {
+  let finalText = text;
   const matches = finalText.match(/\[([^\]]+)\]/g);
-  
   if (matches) {
     const uniqueVariables = [...new Set(matches)];
     for (let variable of uniqueVariables) {
       let userInput = prompt(`Enter value for ${variable}:`);
-      if (userInput === null) return; // Abort if cancelled
+      if (userInput === null) return null; 
       finalText = finalText.split(variable).join(userInput);
     }
   }
+  return finalText;
+}
+
+async function handleDispatch(snippet, actionType) {
+  const finalText = await processVariables(snippet.text);
+  if (finalText === null) return; 
 
   const index = snippets.findIndex(s => s.id === snippet.id);
   if (index > -1) {
     snippets[index].lastUsed = Date.now();
-    saveSnippets(); 
-    renderSnippets(document.getElementById('input-search').value);
+    saveSnippets(); renderSnippets(document.getElementById('input-search').value);
   }
   
   document.getElementById('modal-snippet').classList.add('hidden');
 
   if (actionType === 'copy') {
-    robustCopy(finalText);
-    const toast = document.getElementById('toast'); 
-    toast.classList.remove('hidden');
-    setTimeout(() => toast.classList.add('hidden'), 2000);
+    const success = await robustCopy(finalText);
+    if (success) {
+      const toast = document.getElementById('toast'); 
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 2000);
+    }
   } 
   else if (actionType === 'sms') { window.location.href = `sms:&body=${encodeURIComponent(finalText)}`; } 
   else if (actionType === 'email') { window.location.href = `mailto:?body=${encodeURIComponent(finalText)}`; }
 }
-
 
 // Quick Insert Chips
 document.querySelectorAll('.var-chip').forEach(chip => {
