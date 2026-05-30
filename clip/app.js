@@ -1,4 +1,3 @@
-// --- 1. INITIALIZATION & STATE ---
 let snippets = [];
 
 function loadSnippets() {
@@ -7,18 +6,13 @@ function loadSnippets() {
     snippets = JSON.parse(saved);
     snippets = snippets.map(s => s.id ? s : { ...s, id: Date.now() + Math.random() });
     
-    // Auto-Purge Trash older than 30 days
     const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
-    const now = Date.now();
-    snippets = snippets.filter(s => !s.deletedAt || (now - s.deletedAt < THIRTY_DAYS_MS));
+    snippets = snippets.filter(s => !s.deletedAt || (Date.now() - s.deletedAt < THIRTY_DAYS_MS));
     saveSnippets();
-    
   } else {
     snippets = [
       { id: 1, title: '✂️ Intro', text: 'MAS Barbery - Mobile Barbering. Contact: Manuel at (555) 555-5555.', category: '💈 Barbering' },
-      { id: 2, title: '💼 Arrival', text: 'Hello [NAME], this is Manuel with Ecolab. I will be arriving at [ADDRESS] on [DATE] around [TIME] for your pest control service.', category: '🏢 Work' },
-      { id: 3, title: '🎤 Open Mic Promo', text: 'I am performing at Comic\'s Night Out at Side Splitters on [DATE]! Come through, show starts at [TIME].', category: '🎭 Comedy' },
-      { id: 4, title: '🏠 My Address', text: 'Town \'n\' Country, Tampa, FL [ZIP CODE]', category: '📌 Personal' }
+      { id: 2, title: '💼 Arrival', text: 'Hello [NAME], this is Manuel with Ecolab. I will be arriving at [ADDRESS] on [DATE].', category: '🏢 Work' }
     ];
     saveSnippets();
   }
@@ -28,7 +22,6 @@ function loadSnippets() {
 function saveSnippets() { localStorage.setItem('mySnippets', JSON.stringify(snippets)); }
 function getActiveSnippets() { return snippets.filter(s => !s.deletedAt); }
 
-// --- 2. CATEGORY MANAGEMENT ---
 function getUniqueCategories() { return [...new Set(getActiveSnippets().map(s => s.category))]; }
 
 function updateCategoryDropdown() {
@@ -57,7 +50,86 @@ function renameFolder(oldName) {
   saveSnippets(); renderSnippets(document.getElementById('input-search').value);
 }
 
-// --- 3. RENDERING MAIN UI ---
+// --- SWIPE GESTURE & CARD GENERATION ---
+function createSnippetCard(snippet) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'swipe-container';
+  
+  const leftAction = document.createElement('div');
+  leftAction.className = 'swipe-actions left-action';
+  leftAction.innerText = '📋 Copy';
+  
+  const rightAction = document.createElement('div');
+  rightAction.className = 'swipe-actions right-action';
+  rightAction.innerText = '🗑️ Trash';
+  
+  const btn = document.createElement('button');
+  btn.className = 'snippet-card snapping';
+  
+  const colors = ['var(--cat-personal)', 'var(--cat-professional)', 'var(--cat-barbering)', 'var(--cat-comedy)', 'var(--cat-proposals)'];
+  btn.style.borderLeftColor = colors[snippet.category.length % colors.length];
+  btn.innerText = snippet.title;
+
+  let startX = 0, startY = 0, isSwiping = false;
+
+  btn.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+    isSwiping = true; btn.classList.remove('snapping');
+  }, { passive: true });
+
+  btn.addEventListener('touchmove', e => {
+    if (!isSwiping) return;
+    let diffX = e.touches[0].clientX - startX;
+    let diffY = e.touches[0].clientY - startY;
+
+    // If moving vertically, cancel the swipe so user can scroll normally
+    if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 5) {
+      isSwiping = false; btn.style.transform = `translateX(0px)`; return;
+    }
+
+    // Cap the visual drag limit
+    if (diffX > 100) diffX = 100;
+    if (diffX < -100) diffX = -100;
+    btn.style.transform = `translateX(${diffX}px)`;
+  }, { passive: true });
+
+  btn.addEventListener('touchend', e => {
+    if (!isSwiping) return;
+    let diffX = e.changedTouches[0].clientX - startX;
+    
+    btn.classList.add('snapping'); btn.style.transform = `translateX(0px)`;
+    isSwiping = false;
+
+    if (diffX > 70) {
+      btn.setAttribute('data-swiped', 'true');
+      setTimeout(() => handleDispatch(snippet, 'copy'), 200);
+    } else if (diffX < -70) {
+      btn.setAttribute('data-swiped', 'true');
+      setTimeout(() => {
+        if (confirm(`Move "${snippet.title}" to the Trash?`)) {
+          const index = snippets.findIndex(s => s.id === snippet.id);
+          if (index > -1) { snippets[index].deletedAt = Date.now(); saveSnippets(); renderSnippets(document.getElementById('input-search').value); }
+        }
+      }, 200);
+    } else if (Math.abs(diffX) > 10) {
+      // Prevents accidental clicks when letting go of a short swipe
+      btn.setAttribute('data-swiped', 'true');
+    }
+  });
+
+  btn.addEventListener('click', (e) => {
+    if (btn.getAttribute('data-swiped') === 'true') {
+      btn.removeAttribute('data-swiped'); return;
+    }
+    openSnippetModal(snippet);
+  });
+
+  wrapper.appendChild(leftAction); wrapper.appendChild(rightAction); wrapper.appendChild(btn);
+  return wrapper;
+}
+
+
+// --- RENDERING MAIN UI ---
 function renderSnippets(filterText = '') {
   const container = document.getElementById('snippet-container');
   const recentContainer = document.getElementById('recent-container');
@@ -76,11 +148,7 @@ function renderSnippets(filterText = '') {
     scrollDiv.className = 'recent-scroll';
     
     if (recentSnippets.length > 0) {
-      recentSnippets.forEach(snippet => {
-        const btn = document.createElement('button'); btn.className = `snippet-card`;
-        btn.innerText = snippet.title; btn.addEventListener('click', () => openSnippetModal(snippet));
-        scrollDiv.appendChild(btn);
-      });
+      recentSnippets.forEach(snippet => scrollDiv.appendChild(createSnippetCard(snippet)));
     } else {
       const placeholder = document.createElement('div'); placeholder.className = 'empty-recent';
       placeholder.innerText = 'Nothing copied yet!'; scrollDiv.appendChild(placeholder);
@@ -106,20 +174,18 @@ function renderSnippets(filterText = '') {
     summary.appendChild(titleSpan); summary.appendChild(editFolderBtn); details.appendChild(summary);
 
     const contentDiv = document.createElement('div'); contentDiv.className = 'details-content grid';
+    
     filteredSnippets.filter(s => s.category === cat).forEach(snippet => {
-      const btn = document.createElement('button'); btn.className = `snippet-card`;
-      const colors = ['var(--cat-personal)', 'var(--cat-professional)', 'var(--cat-barbering)', 'var(--cat-comedy)', 'var(--cat-proposals)'];
-      btn.style.borderLeftColor = colors[cat.length % colors.length];
-      btn.innerText = snippet.title; btn.addEventListener('click', () => openSnippetModal(snippet));
-      contentDiv.appendChild(btn);
+      contentDiv.appendChild(createSnippetCard(snippet));
     });
+    
     details.appendChild(contentDiv); container.appendChild(details);
   });
 }
 
 document.getElementById('input-search').addEventListener('input', (e) => renderSnippets(e.target.value));
 
-// --- 4. TRASH UI ---
+// --- TRASH UI ---
 function renderTrash() {
   const container = document.getElementById('trash-container'); container.innerHTML = '';
   const trashedSnippets = snippets.filter(s => s.deletedAt).sort((a, b) => b.deletedAt - a.deletedAt);
@@ -148,7 +214,8 @@ function renderTrash() {
 
 document.getElementById('btn-trash-modal').addEventListener('click', () => { renderTrash(); document.getElementById('modal-trash').classList.remove('hidden'); });
 
-// --- 5. MODALS & SAVING ---
+
+// --- MODALS & SAVING ---
 function openSnippetModal(snippet = null) {
   updateCategoryDropdown();
   const modal = document.getElementById('modal-snippet');
@@ -167,7 +234,6 @@ function openSnippetModal(snippet = null) {
     idInput.value = snippet.id; titleInput.value = snippet.title; selectCat.value = snippet.category; textInput.value = snippet.text;
     copyBtnContainer.classList.remove('hidden'); deleteBtn.classList.remove('hidden');
     
-    // Wire up the three dispatch buttons
     document.getElementById('btn-copy-snippet').onclick = () => handleDispatch(snippet, 'copy');
     document.getElementById('btn-sms-snippet').onclick = () => handleDispatch(snippet, 'sms');
     document.getElementById('btn-email-snippet').onclick = () => handleDispatch(snippet, 'email');
@@ -208,8 +274,8 @@ document.getElementById('btn-delete-snippet').addEventListener('click', () => {
   document.getElementById('modal-snippet').classList.add('hidden');
 });
 
-// --- 6. CORE ACTION DISPATCH (COPY, SMS, EMAIL) ---
-// Extracts bracket logic into a shared helper function
+
+// --- DISPATCH ACTIONS ---
 async function processVariables(text) {
   let finalText = text;
   const matches = finalText.match(/\[([^\]]+)\]/g);
@@ -217,19 +283,17 @@ async function processVariables(text) {
     const uniqueVariables = [...new Set(matches)];
     for (let variable of uniqueVariables) {
       let userInput = prompt(`Enter value for ${variable}:`);
-      if (userInput === null) return null; // Abort if user hits cancel
+      if (userInput === null) return null; 
       finalText = finalText.split(variable).join(userInput);
     }
   }
   return finalText;
 }
 
-// Handles the final execution based on which button you tapped
 async function handleDispatch(snippet, actionType) {
   const finalText = await processVariables(snippet.text);
-  if (finalText === null) return; // User canceled the prompt
+  if (finalText === null) return; 
 
-  // Log usage for the "Recents" row
   const index = snippets.findIndex(s => s.id === snippet.id);
   if (index > -1) {
     snippets[index].lastUsed = Date.now();
@@ -238,7 +302,6 @@ async function handleDispatch(snippet, actionType) {
   
   document.getElementById('modal-snippet').classList.add('hidden');
 
-  // Execute the specific action
   if (actionType === 'copy') {
     try {
       await navigator.clipboard.writeText(finalText);
@@ -246,14 +309,10 @@ async function handleDispatch(snippet, actionType) {
       setTimeout(() => toast.classList.add('hidden'), 2000);
     } catch (err) { alert('Failed to copy.'); }
   } 
-  else if (actionType === 'sms') {
-    // iOS specific formatting for iMessage/SMS integration
-    window.location.href = `sms:&body=${encodeURIComponent(finalText)}`;
-  } 
-  else if (actionType === 'email') {
-    window.location.href = `mailto:?body=${encodeURIComponent(finalText)}`;
-  }
+  else if (actionType === 'sms') { window.location.href = `sms:&body=${encodeURIComponent(finalText)}`; } 
+  else if (actionType === 'email') { window.location.href = `mailto:?body=${encodeURIComponent(finalText)}`; }
 }
+
 
 // Quick Insert Chips
 document.querySelectorAll('.var-chip').forEach(chip => {
@@ -267,7 +326,7 @@ document.querySelectorAll('.var-chip').forEach(chip => {
   });
 });
 
-// --- 7. SETTINGS & UTILS ---
+// --- SETTINGS & UTILS ---
 document.getElementById('btn-settings').addEventListener('click', () => document.getElementById('modal-settings').classList.remove('hidden'));
 document.querySelectorAll('.close-modal').forEach(btn => { btn.addEventListener('click', (e) => e.target.closest('.modal').classList.add('hidden')); });
 
