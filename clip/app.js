@@ -1,5 +1,6 @@
 // --- 1. INITIALIZATION & STATE ---
 let snippets = [];
+let vault = {}; // The Global Variable Vault
 
 function loadSnippets() {
   const saved = localStorage.getItem('mySnippets');
@@ -17,10 +18,26 @@ function loadSnippets() {
     ];
     saveSnippets();
   }
+  
+  // Load Vault
+  const savedVault = localStorage.getItem('myVault');
+  if (savedVault) {
+    vault = JSON.parse(savedVault);
+  } else {
+    // Seed defaults for you based on your workflow!
+    vault = {
+      "ADDRESS": ["Town 'n' Country, Tampa, FL", "Side Splitters Comedy Club"],
+      "EMAIL": ["manuel.serrano@ecolab.com"],
+      "SERVICE": ["Haircut & Beard Trim", "Pest Control Routine Service"]
+    };
+    saveVault();
+  }
+
   renderSnippets();
 }
 
 function saveSnippets() { localStorage.setItem('mySnippets', JSON.stringify(snippets)); }
+function saveVault() { localStorage.setItem('myVault', JSON.stringify(vault)); }
 function getActiveSnippets() { return snippets.filter(s => !s.deletedAt); }
 function getUniqueCategories() { return [...new Set(getActiveSnippets().map(s => s.category))]; }
 
@@ -53,7 +70,6 @@ function asyncPrompt(message, defaultVal = "") {
     const input = document.getElementById('input-single-prompt');
     input.value = defaultVal;
     document.getElementById('modal-single-prompt').classList.remove('hidden');
-    
     setTimeout(() => input.focus(), 100);
 
     const form = document.getElementById('form-single-prompt');
@@ -73,6 +89,89 @@ function asyncPrompt(message, defaultVal = "") {
     });
   });
 }
+
+// --- VAULT MANAGEMENT ---
+function renderVault() {
+  const container = document.getElementById('vault-container');
+  container.innerHTML = '';
+
+  Object.keys(vault).forEach(category => {
+    const section = document.createElement('div');
+    section.className = 'vault-section';
+    
+    // Header (Title + Delete Category Button)
+    const header = document.createElement('div');
+    header.className = 'vault-section-title';
+    header.innerHTML = `
+      <span>[${category}]</span>
+      <button class="delete-vault-opt" title="Delete entire category">🗑️</button>
+    `;
+    // Delete entire category
+    header.querySelector('button').addEventListener('click', async () => {
+      if (await asyncConfirm(`Delete the variable [${category}] and all its options?`)) {
+        delete vault[category];
+        saveVault(); renderVault();
+      }
+    });
+    section.appendChild(header);
+
+    // List of existing options
+    vault[category].forEach((option, index) => {
+      const optDiv = document.createElement('div');
+      optDiv.className = 'vault-option-item';
+      optDiv.innerHTML = `
+        <span>${option}</span>
+        <button class="delete-vault-opt" title="Remove option">❌</button>
+      `;
+      // Delete single option
+      optDiv.querySelector('button').addEventListener('click', () => {
+        vault[category].splice(index, 1);
+        saveVault(); renderVault();
+      });
+      section.appendChild(optDiv);
+    });
+
+    // Add new option row
+    const addRow = document.createElement('div');
+    addRow.className = 'add-vault-row';
+    addRow.innerHTML = `
+      <input type="text" placeholder="Add option..." id="input-new-opt-${category}">
+      <button class="primary-btn">Add</button>
+    `;
+    addRow.querySelector('button').addEventListener('click', () => {
+      const input = document.getElementById(`input-new-opt-${category}`);
+      const val = input.value.trim();
+      if (val) {
+        vault[category].push(val);
+        saveVault(); renderVault();
+      }
+    });
+    section.appendChild(addRow);
+    container.appendChild(section);
+  });
+}
+
+// Open Vault
+document.getElementById('btn-manage-vault').addEventListener('click', () => {
+  renderVault();
+  document.getElementById('modal-vault').classList.remove('hidden');
+  document.getElementById('modal-settings').classList.add('hidden'); // close settings
+});
+
+// Create new Vault Category
+document.getElementById('btn-add-vault-cat').addEventListener('click', () => {
+  let newCat = document.getElementById('input-new-vault-cat').value.trim().toUpperCase();
+  // Strip brackets if the user typed them accidentally
+  newCat = newCat.replace(/\[|\]/g, ''); 
+  
+  if (!newCat) return;
+  if (vault[newCat]) return alert("Variable already exists!");
+  
+  vault[newCat] = [];
+  saveVault();
+  renderVault();
+  document.getElementById('input-new-vault-cat').value = '';
+});
 
 // --- CATEGORY MANAGEMENT ---
 function updateCategoryDropdown() {
@@ -323,10 +422,8 @@ document.getElementById('btn-delete-snippet').addEventListener('click', async ()
 
 // --- iOS COPY FALLBACK ---
 async function robustCopy(text) {
-  try { 
-    await navigator.clipboard.writeText(text); 
-    return true; 
-  } catch (err) {
+  try { await navigator.clipboard.writeText(text); return true; } 
+  catch (err) {
     try {
       const textArea = document.createElement("textarea");
       textArea.value = text; textArea.style.position = "fixed"; textArea.style.opacity = "0";
@@ -340,7 +437,7 @@ async function robustCopy(text) {
   }
 }
 
-// --- NEW MULTI-VARIABLE DISPATCH SYSTEM (NO NATIVE PROMPTS) ---
+// --- NEW DISPATCH SYSTEM (WITH VAULT SUGGESTIONS) ---
 function handleDispatch(snippet, actionType) {
   const matches = snippet.text.match(/\[([^\]]+)\]/g);
 
@@ -365,17 +462,46 @@ function handleDispatch(snippet, actionType) {
     container.innerHTML = ''; 
 
     uniqueVariables.forEach((v, index) => {
+      // Clean brackets for Vault lookup (e.g., "[ADDRESS]" -> "ADDRESS")
+      const cleanVar = v.replace(/\[|\]/g, ''); 
+      
+      let chipHtml = '';
+      // If we have saved options in the Vault for this variable, build the chips
+      if (vault[cleanVar] && vault[cleanVar].length > 0) {
+        // Build the HTML for the chips
+        const chipButtons = vault[cleanVar].map(opt => {
+          // Escape quotes so it doesn't break HTML attributes
+          const safeOpt = opt.replace(/"/g, '&quot;'); 
+          return `<button type="button" class="var-chip suggestion-chip" data-target="var-input-${index}" data-val="${safeOpt}">${opt}</button>`;
+        }).join('');
+        
+        chipHtml = `
+          <div class="var-chips-container" style="margin-top: 5px; margin-bottom: 0;">
+            <div class="var-chips">${chipButtons}</div>
+          </div>
+        `;
+      }
+
       const div = document.createElement('div');
       div.style.display = 'flex'; div.style.flexDirection = 'column'; div.style.gap = '5px';
       div.innerHTML = `
         <label class="var-label">${v}</label>
         <input type="text" data-var="${v}" required placeholder="Enter ${v}..." id="var-input-${index}">
+        ${chipHtml}
       `;
       container.appendChild(div);
     });
 
+    // Wire up the suggestion chips to populate their specific input box
+    container.querySelectorAll('.suggestion-chip').forEach(chip => {
+      chip.addEventListener('click', (e) => {
+        const targetId = e.target.getAttribute('data-target');
+        const val = e.target.getAttribute('data-val');
+        document.getElementById(targetId).value = val;
+      });
+    });
+
     document.getElementById('modal-fill-vars').classList.remove('hidden');
-    // Auto-focus the very first input box seamlessly
     setTimeout(() => document.getElementById('var-input-0').focus(), 100);
 
     const form = document.getElementById('form-fill-vars');
@@ -402,8 +528,11 @@ function handleDispatch(snippet, actionType) {
 }
 
 // Quick Insert Chips
-document.querySelectorAll('.var-chip').forEach(chip => {
+document.querySelectorAll('.var-chip:not(.suggestion-chip)').forEach(chip => {
   chip.addEventListener('click', (e) => {
+    // Make sure we only target the main Add Snippet text box, not the suggestion chips
+    if(e.target.classList.contains('suggestion-chip')) return; 
+    
     const textarea = document.getElementById('input-text');
     const insertText = e.target.innerText;
     const startPos = textarea.selectionStart; const endPos = textarea.selectionEnd;
