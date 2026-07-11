@@ -45,7 +45,6 @@
 
       <div class="var-chips-container">
         <span class="hint">Tap to insert at cursor:</span>
-        <!-- JS will populate this based on your Vault -->
         <div class="var-chips" id="quick-insert-chips"></div>
       </div>
 
@@ -82,9 +81,22 @@
     <div class="modal-content">
       <h2>Settings</h2>
       
-      <!-- Vault Button -->
+      <!-- NEW: Brand Color Picker -->
       <div class="settings-group">
-        <button id="btn-manage-vault" class="primary-btn" style="background: #8b5cf6;">🗄️ Manage Vault (Smart Variables)</button>
+        <label style="font-size: 14px; font-weight: bold; margin-bottom: 10px; display: block; color: var(--text-color);">Brand Color</label>
+        <div style="display: flex; gap: 15px; margin-bottom: 15px; align-items: center;">
+          <button class="color-swatch" data-color="#3b82f6" style="background: #3b82f6;"></button> <!-- Blue -->
+          <button class="color-swatch" data-color="#10b981" style="background: #10b981;"></button> <!-- Green -->
+          <button class="color-swatch" data-color="#f59e0b" style="background: #f59e0b;"></button> <!-- Gold -->
+          <button class="color-swatch" data-color="#8b5cf6" style="background: #8b5cf6;"></button> <!-- Purple -->
+          <button class="color-swatch" data-color="#1f2937" style="background: #1f2937; border: 1px solid var(--text-muted);"></button> <!-- Dark -->
+          <!-- Custom Color Picker Wheel -->
+          <input type="color" id="custom-color-picker" style="width: 32px; height: 32px; padding: 0; border: none; background: none; cursor: pointer;">
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <button id="btn-manage-vault" class="primary-btn" style="background: var(--primary);">🗄️ Manage Vault</button>
       </div>
       <hr style="border: 0; border-top: 1px solid var(--text-muted); width: 100%; opacity: 0.3; margin: 10px 0;">
       
@@ -103,14 +115,11 @@
     <div class="modal-content">
       <h2 style="margin-bottom: 5px;">🗄️ My Vault</h2>
       <p class="hint" style="margin-bottom: 15px;">Pre-save options for variables like [ADDRESS] or [EMAIL].</p>
-      
       <div id="vault-container" style="max-height: 40vh; overflow-y: auto; display: flex; flex-direction: column; gap: 15px;"></div>
-      
       <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--text-muted);">
         <input type="text" id="input-new-vault-cat" placeholder="New Variable Name (e.g., SERVICE)">
         <button id="btn-add-vault-cat" class="primary-btn" style="margin-top: 10px;">Add Variable Category</button>
       </div>
-      
       <button class="close-modal secondary-btn" style="margin-top: 10px;">Close</button>
     </div>
   </div>
@@ -147,7 +156,6 @@
       <p class="hint" style="margin-bottom: 15px;">Use 'Next' on keyboard to jump between fields.</p>
       <form id="form-fill-vars" style="display: flex; flex-direction: column; gap: 15px;">
         <div id="fill-vars-container" style="display: flex; flex-direction: column; gap: 12px; max-height: 50vh; overflow-y: auto;">
-          <!-- JS injects inputs and chips here -->
         </div>
         <div style="display: flex; gap: 10px; margin-top: 10px;">
           <button type="button" id="btn-fill-cancel" class="secondary-btn" style="flex: 1;">Cancel</button>
