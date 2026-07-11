@@ -21,13 +21,8 @@ body {
   --primary: hsl(var(--primary-h), var(--primary-s), var(--primary-l));
   --primary-soft: hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.15);
   
-  /* The Background: Deepened so the color is actually visible! */
   --bg-color: hsl(var(--primary-h), 45%, 90%);
-  
-  /* The Cards: No longer pure white, but lightly tinted to match the brand */
   --card-bg: hsl(var(--primary-h), 20%, 98%);
-  
-  /* The Text: Subtly tinted instead of stark charcoal */
   --text-color: hsl(var(--primary-h), 30%, 15%);
   --text-muted: hsl(var(--primary-h), 15%, 45%);
 
@@ -63,7 +58,7 @@ details[open] summary.category-title::before { content: '📂'; }
 .details-content { padding: 15px; background: var(--bg-color); transition: background-color 0.3s; }
 .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
 
-/* Swipe Gestures UI */
+/* Swipe Gestures UI (Main List) */
 .swipe-container { position: relative; overflow: hidden; border-radius: 8px; touch-action: pan-y; box-shadow: 0 2px 5px rgba(0,0,0,0.05); background: var(--card-bg); transition: background-color 0.3s; }
 .swipe-actions { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; z-index: 0; }
 .action-btn { border: none; color: white; font-weight: bold; font-size: 15px; cursor: pointer; height: 100%; width: 100px; padding: 0 15px; }
@@ -73,10 +68,11 @@ details[open] summary.category-title::before { content: '📂'; }
 .snippet-card { background-color: var(--card-bg); border: none; border-left: 5px solid var(--primary); border-radius: 8px; padding: 15px 10px; font-size: 15px; font-weight: 600; color: var(--text-color); cursor: pointer; text-align: left; -webkit-appearance: none; position: relative; z-index: 1; width: 100%; height: 100%; box-sizing: border-box; will-change: transform; transition: background-color 0.3s; }
 .snapping { transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
 
+/* Recently Used Row (No Swipe physics) */
 .recent-section { margin-bottom: 25px; }
 .recent-scroll { display: flex; overflow-x: auto; gap: 12px; padding-bottom: 10px; -ms-overflow-style: none; scrollbar-width: none; }
 .recent-scroll::-webkit-scrollbar { display: none; }
-.recent-scroll .swipe-container { flex: 0 0 auto; width: 140px; }
+.recent-card-wrapper { flex: 0 0 auto; width: 140px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); background: var(--card-bg); transition: background-color 0.3s; }
 .empty-recent { color: var(--text-muted); font-style: italic; font-size: 14px; padding: 15px; width: 100%; text-align: center; border: 1px dashed var(--text-muted); border-radius: 8px; background: transparent; }
 
 /* Modals */
