@@ -537,15 +537,20 @@ function handleDispatch(snippet, actionType) {
       container.appendChild(div);
     });
 
-    // RE-WIRED: Find the "nearest" input box regardless of ID
-    container.querySelectorAll('.suggestion-chip').forEach(chip => {
-      chip.addEventListener('click', (e) => {
-        const parentDiv = e.target.closest('div.var-chips-container').parentElement;
-        const inputField = parentDiv.querySelector('.variable-input');
-        const val = e.target.getAttribute('data-val');
-        inputField.value = val;
-      });
-    });
+    // --- FIX: Global listener for variable suggestion chips ---
+document.getElementById('modal-fill-vars').addEventListener('click', (e) => {
+  // Check if the clicked element is one of our chips
+  if (e.target.classList.contains('suggestion-chip')) {
+    // Find the container for this specific variable row
+    const parentDiv = e.target.closest('div.var-chips-container').parentElement;
+    // Find the input within that specific row
+    const inputField = parentDiv.querySelector('.variable-input');
+    
+    if (inputField) {
+      inputField.value = e.target.getAttribute('data-val');
+    }
+  }
+});
 
     document.getElementById('modal-fill-vars').classList.remove('hidden');
     // Auto-focus first input
