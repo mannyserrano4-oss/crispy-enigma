@@ -36,6 +36,13 @@ function loadSnippets() {
     saveVault();
   }
 
+  // Load Saved Brand Color
+  const savedColor = localStorage.getItem('themeColor');
+  if (savedColor) {
+    document.documentElement.style.setProperty('--primary', savedColor);
+    document.getElementById('custom-color-picker').value = savedColor;
+  }
+
   renderSnippets();
   renderQuickInsertChips(); 
 }
@@ -45,13 +52,28 @@ function saveVault() { localStorage.setItem('myVault', JSON.stringify(vault)); }
 function getActiveSnippets() { return snippets.filter(s => !s.deletedAt); }
 function getUniqueCategories() { return [...new Set(getActiveSnippets().map(s => s.category))]; }
 
+// --- THEME & COLOR PICKER ---
+document.querySelectorAll('.color-swatch').forEach(swatch => {
+  swatch.addEventListener('click', (e) => {
+    const color = e.target.getAttribute('data-color');
+    document.documentElement.style.setProperty('--primary', color);
+    localStorage.setItem('themeColor', color);
+    document.getElementById('custom-color-picker').value = color;
+  });
+});
+
+document.getElementById('custom-color-picker').addEventListener('input', (e) => {
+  const color = e.target.value;
+  document.documentElement.style.setProperty('--primary', color);
+  localStorage.setItem('themeColor', color);
+});
+
 // --- DYNAMIC QUICK INSERT CHIPS ---
 function renderQuickInsertChips() {
   const container = document.getElementById('quick-insert-chips');
   if (!container) return;
   container.innerHTML = '';
   
-  // Added the new Smart Tags to the top of the list!
   const smartVars = ['GREETING', 'TODAY', 'NOW'];
   const vaultVars = Object.keys(vault);
   const allVars = [...new Set([...smartVars, ...vaultVars])];
@@ -60,7 +82,6 @@ function renderQuickInsertChips() {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'var-chip';
-    // Style smart tags slightly differently to distinguish them
     if (smartVars.includes(v)) {
       btn.style.backgroundColor = 'var(--primary)';
       btn.style.color = 'white';
@@ -81,7 +102,7 @@ function renderQuickInsertChips() {
   });
 }
 
-// --- NEW: SMART TAG PROCESSOR ---
+// --- SMART TAG PROCESSOR ---
 function processSmartTags(text) {
   const now = new Date();
   const hours = now.getHours();
@@ -94,7 +115,6 @@ function processSmartTags(text) {
   const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   let processed = text;
-  // Globally replace the exact smart tags silently
   processed = processed.replace(/\[GREETING\]/g, greeting);
   processed = processed.replace(/\[TODAY\]/g, dateString);
   processed = processed.replace(/\[NOW\]/g, timeString);
@@ -246,7 +266,7 @@ async function renameFolder(oldName) {
   saveSnippets(); renderSnippets(document.getElementById('input-search').value);
 }
 
-// --- SWIPE-TO-REVEAL LOGIC ---
+// --- SWIPE-TO-REVEAL & DOUBLE-TAP LOGIC ---
 function createSnippetCard(snippet) {
   const wrapper = document.createElement('div');
   wrapper.className = 'swipe-container';
@@ -277,10 +297,12 @@ function createSnippetCard(snippet) {
   btn.dataset.open = "false"; 
   
   const colors = ['var(--cat-personal)', 'var(--cat-professional)', 'var(--cat-barbering)', 'var(--cat-comedy)', 'var(--cat-proposals)'];
+  // If the user picked a brand theme, we still use the rainbow category colors to keep things distinct.
   btn.style.borderLeftColor = colors[snippet.category.length % colors.length];
   btn.innerText = snippet.title;
 
   let startX = 0, startY = 0, isSwiping = false;
+  let clickTimer = null; // Timer to detect double taps
 
   btn.addEventListener('touchstart', e => {
     startX = e.touches[0].clientX; startY = e.touches[0].clientY;
@@ -310,11 +332,24 @@ function createSnippetCard(snippet) {
     }
   });
 
+  // The Magic Double-Tap logic
   btn.addEventListener('click', () => {
     if (btn.dataset.open !== "false") {
       btn.classList.add('snapping'); btn.style.transform = `translateX(0px)`; btn.dataset.open = "false"; return;
     }
-    openSnippetModal(snippet);
+
+    if (clickTimer) {
+      // User tapped twice within 250ms! Double tap activated!
+      clearTimeout(clickTimer);
+      clickTimer = null;
+      handleDispatch(snippet, 'copy');
+    } else {
+      // First tap. Wait to see if they tap again.
+      clickTimer = setTimeout(() => {
+        clickTimer = null;
+        openSnippetModal(snippet); // They didn't tap again, open the normal edit menu.
+      }, 250);
+    }
   });
 
   wrapper.appendChild(leftAction); wrapper.appendChild(rightAction); wrapper.appendChild(btn);
@@ -484,10 +519,7 @@ async function robustCopy(text) {
 
 // --- DISPATCH SYSTEM (WITH VAULT SUGGESTIONS & SMART TAGS) ---
 function handleDispatch(snippet, actionType) {
-  // 1. Process Smart Tags silently FIRST
   let textWithSmartTags = processSmartTags(snippet.text);
-
-  // 2. Find any remaining brackets for the user to fill manually
   const matches = textWithSmartTags.match(/\[([^\]]+)\]/g);
 
   const executeFinalAction = async (finalText) => {
@@ -550,7 +582,7 @@ function handleDispatch(snippet, actionType) {
 
     newForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      let processedText = textWithSmartTags; // Start with the smart-tagged text
+      let processedText = textWithSmartTags; 
       const inputs = newForm.querySelectorAll('input');
       inputs.forEach(input => {
         processedText = processedText.split(input.getAttribute('data-var')).join(input.value);
@@ -559,7 +591,6 @@ function handleDispatch(snippet, actionType) {
       executeFinalAction(processedText); 
     });
   } else {
-    // If no manual variables left, execute instantly
     executeFinalAction(textWithSmartTags);
   }
 }
