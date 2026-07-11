@@ -36,11 +36,15 @@ function loadSnippets() {
     saveVault();
   }
 
-  // Load Saved Brand Color
-  const savedColor = localStorage.getItem('themeColor');
-  if (savedColor) {
-    document.documentElement.style.setProperty('--primary', savedColor);
-    document.getElementById('custom-color-picker').value = savedColor;
+  // Load Saved Brand Theme Engine Settings
+  const savedThemeType = localStorage.getItem('themeType');
+  if (savedThemeType === 'preset') {
+    document.body.setAttribute('data-theme', localStorage.getItem('themeName'));
+  } else if (savedThemeType === 'custom') {
+    document.body.style.setProperty('--primary-h', localStorage.getItem('customH'));
+    document.body.style.setProperty('--primary-s', localStorage.getItem('customS'));
+    document.body.style.setProperty('--primary-l', localStorage.getItem('customL'));
+    document.getElementById('custom-color-picker').value = localStorage.getItem('customHex');
   }
 
   renderSnippets();
@@ -52,21 +56,57 @@ function saveVault() { localStorage.setItem('myVault', JSON.stringify(vault)); }
 function getActiveSnippets() { return snippets.filter(s => !s.deletedAt); }
 function getUniqueCategories() { return [...new Set(getActiveSnippets().map(s => s.category))]; }
 
-// --- THEME & COLOR PICKER ---
+// --- DYNAMIC HSL THEME ENGINE ---
+// Converts standard Hex colors into dynamic HSL formats for the CSS engine
+function hexToHSL(hex) {
+  let r = parseInt(hex.substring(1,3), 16) / 255;
+  let g = parseInt(hex.substring(3,5), 16) / 255;
+  let b = parseInt(hex.substring(5,7), 16) / 255;
+  let max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h, s, l = (max + min) / 2;
+
+  if (max == min) { h = s = 0; } 
+  else {
+    let d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch(max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h /= 6;
+  }
+  return [Math.round(h * 360), Math.round(s * 100) + '%', Math.round(l * 100) + '%'];
+}
+
+// Handle Preset Theme Swatches
 document.querySelectorAll('.color-swatch').forEach(swatch => {
   swatch.addEventListener('click', (e) => {
-    const color = e.target.getAttribute('data-color');
-    document.documentElement.style.setProperty('--primary', color);
-    localStorage.setItem('themeColor', color);
-    document.getElementById('custom-color-picker').value = color;
+    const themeName = e.target.getAttribute('data-theme');
+    document.body.removeAttribute('style'); // Clear custom HSL overrides
+    document.body.setAttribute('data-theme', themeName);
+    localStorage.setItem('themeType', 'preset');
+    localStorage.setItem('themeName', themeName);
   });
 });
 
+// Handle Custom Color Wheel Picker
 document.getElementById('custom-color-picker').addEventListener('input', (e) => {
-  const color = e.target.value;
-  document.documentElement.style.setProperty('--primary', color);
-  localStorage.setItem('themeColor', color);
+  const hex = e.target.value;
+  const [h, s, l] = hexToHSL(hex);
+  
+  document.body.removeAttribute('data-theme'); // Clear presets
+  document.body.style.setProperty('--primary-h', h);
+  document.body.style.setProperty('--primary-s', s);
+  document.body.style.setProperty('--primary-l', l);
+  
+  localStorage.setItem('themeType', 'custom');
+  localStorage.setItem('customH', h);
+  localStorage.setItem('customS', s);
+  localStorage.setItem('customL', l);
+  localStorage.setItem('customHex', hex);
 });
+
 
 // --- DYNAMIC QUICK INSERT CHIPS ---
 function renderQuickInsertChips() {
@@ -82,12 +122,14 @@ function renderQuickInsertChips() {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'var-chip';
+    
+    // Solid fill for smart tags, soft tint for standard vault tags
     if (smartVars.includes(v)) {
       btn.style.backgroundColor = 'var(--primary)';
       btn.style.color = 'white';
     }
-    btn.innerText = `[${v}]`;
     
+    btn.innerText = `[${v}]`;
     btn.addEventListener('click', () => {
       const textarea = document.getElementById('input-text');
       const insertText = btn.innerText;
@@ -97,7 +139,6 @@ function renderQuickInsertChips() {
       textarea.selectionStart = textarea.selectionEnd = startPos + insertText.length;
       textarea.focus();
     });
-    
     container.appendChild(btn);
   });
 }
@@ -297,12 +338,11 @@ function createSnippetCard(snippet) {
   btn.dataset.open = "false"; 
   
   const colors = ['var(--cat-personal)', 'var(--cat-professional)', 'var(--cat-barbering)', 'var(--cat-comedy)', 'var(--cat-proposals)'];
-  // If the user picked a brand theme, we still use the rainbow category colors to keep things distinct.
   btn.style.borderLeftColor = colors[snippet.category.length % colors.length];
   btn.innerText = snippet.title;
 
   let startX = 0, startY = 0, isSwiping = false;
-  let clickTimer = null; // Timer to detect double taps
+  let clickTimer = null; 
 
   btn.addEventListener('touchstart', e => {
     startX = e.touches[0].clientX; startY = e.touches[0].clientY;
@@ -332,22 +372,21 @@ function createSnippetCard(snippet) {
     }
   });
 
-  // The Magic Double-Tap logic
   btn.addEventListener('click', () => {
     if (btn.dataset.open !== "false") {
       btn.classList.add('snapping'); btn.style.transform = `translateX(0px)`; btn.dataset.open = "false"; return;
     }
 
     if (clickTimer) {
-      // User tapped twice within 250ms! Double tap activated!
       clearTimeout(clickTimer);
       clickTimer = null;
+      // HAPTIC FEEDBACK (if supported by device)
+      if (navigator.vibrate) navigator.vibrate(50);
       handleDispatch(snippet, 'copy');
     } else {
-      // First tap. Wait to see if they tap again.
       clickTimer = setTimeout(() => {
         clickTimer = null;
-        openSnippetModal(snippet); // They didn't tap again, open the normal edit menu.
+        openSnippetModal(snippet);
       }, 250);
     }
   });
@@ -517,7 +556,7 @@ async function robustCopy(text) {
   }
 }
 
-// --- DISPATCH SYSTEM (WITH VAULT SUGGESTIONS & SMART TAGS) ---
+// --- DISPATCH SYSTEM ---
 function handleDispatch(snippet, actionType) {
   let textWithSmartTags = processSmartTags(snippet.text);
   const matches = textWithSmartTags.match(/\[([^\]]+)\]/g);
@@ -526,6 +565,9 @@ function handleDispatch(snippet, actionType) {
     const index = snippets.findIndex(s => s.id === snippet.id);
     if (index > -1) { snippets[index].lastUsed = Date.now(); saveSnippets(); renderSnippets(document.getElementById('input-search').value); }
     document.getElementById('modal-snippet').classList.add('hidden');
+
+    // HAPTIC FEEDBACK (if supported by device)
+    if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
 
     if (actionType === 'copy') {
       if (await robustCopy(finalText)) {
