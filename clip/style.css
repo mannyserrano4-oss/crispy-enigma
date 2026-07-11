@@ -94,3 +94,38 @@ details[open] summary.category-title::before { content: '📂'; }
 /* Toast */
 .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 10px 20px; border-radius: 20px; z-index: var(--z-toast); }
 .toast.hidden { display: none; }
+
+/* 1. Hide the browser's ugly native file button */
+#input-restore {
+    display: none;
+}
+
+/* 2. Make your label look like a professional button */
+.file-upload-label {
+    display: block;
+    cursor: pointer;
+    text-align: center;
+    padding: 12px;
+    border: 1px solid var(--text-muted);
+    border-radius: 8px;
+    background: var(--card-bg); /* Matches your card background */
+    color: var(--text-color);
+    font-weight: bold;
+    width: 100%;
+    box-sizing: border-box;
+    transition: background-color 0.2s;
+}
+
+.file-upload-label:active {
+    background: var(--bg-color);
+}
+
+/* Vault specific styling to prevent bloat */
+.vault-section input {
+    padding: 8px !important;
+    font-size: 14px !important;
+    margin-bottom: 5px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
