@@ -301,7 +301,7 @@ async function renameFolder(oldName) {
   saveSnippets(); renderSnippets(document.getElementById('input-search').value);
 }
 
-// --- CARD LOGIC (SINGLE / DOUBLE-TAP ONLY) ---
+// --- CARD LOGIC ---
 function createSnippetCard(snippet) {
   const btn = document.createElement('button');
   btn.className = 'snippet-card';
@@ -490,7 +490,7 @@ async function robustCopy(text) {
   }
 }
 
-// --- DISPATCH SYSTEM (Fixed Input Finding Logic) ---
+// --- DISPATCH SYSTEM (Fixed via Event Delegation) ---
 function handleDispatch(snippet, actionType) {
   let textWithSmartTags = processSmartTags(snippet.text);
   const matches = textWithSmartTags.match(/\[([^\]]+)\]/g);
@@ -532,52 +532,42 @@ function handleDispatch(snippet, actionType) {
 
       const div = document.createElement('div');
       div.style.display = 'flex'; div.style.flexDirection = 'column'; div.style.gap = '5px';
-      // Added a specific class 'variable-input' to find it easily
       div.innerHTML = `<label class="var-label">${v}</label><input type="text" class="variable-input" data-var="${v}" required placeholder="Enter ${v}...">${chipHtml}`;
       container.appendChild(div);
     });
 
-    // --- FIX: Global listener for variable suggestion chips ---
-document.getElementById('modal-fill-vars').addEventListener('click', (e) => {
-  // Check if the clicked element is one of our chips
-  if (e.target.classList.contains('suggestion-chip')) {
-    // Find the container for this specific variable row
-    const parentDiv = e.target.closest('div.var-chips-container').parentElement;
-    // Find the input within that specific row
-    const inputField = parentDiv.querySelector('.variable-input');
-    
-    if (inputField) {
-      inputField.value = e.target.getAttribute('data-val');
-    }
-  }
-});
-
     document.getElementById('modal-fill-vars').classList.remove('hidden');
-    // Auto-focus first input
     setTimeout(() => container.querySelector('input').focus(), 100);
 
     const form = document.getElementById('form-fill-vars');
-    const newForm = form.cloneNode(true);
-    form.replaceWith(newForm);
-
-    document.getElementById('btn-fill-cancel').addEventListener('click', () => {
-      document.getElementById('modal-fill-vars').classList.add('hidden');
-    }, {once: true});
-
-    newForm.addEventListener('submit', (e) => {
+    // REMOVED CLONE LOGIC - Just re-binding the submit
+    form.onsubmit = (e) => {
       e.preventDefault();
       let processedText = textWithSmartTags; 
-      const inputs = newForm.querySelectorAll('.variable-input');
+      const inputs = form.querySelectorAll('.variable-input');
       inputs.forEach(input => {
         processedText = processedText.split(input.getAttribute('data-var')).join(input.value);
       });
       document.getElementById('modal-fill-vars').classList.add('hidden');
       executeFinalAction(processedText); 
-    });
+    };
+
+    document.getElementById('btn-fill-cancel').onclick = () => {
+      document.getElementById('modal-fill-vars').classList.add('hidden');
+    };
   } else {
     executeFinalAction(textWithSmartTags);
   }
 }
+
+// Global Event Delegation for suggestion pills (Handles new elements automatically)
+document.getElementById('modal-fill-vars').addEventListener('click', (e) => {
+  if (e.target.classList.contains('suggestion-chip')) {
+    const parent = e.target.closest('.var-chips-container').parentElement;
+    const input = parent.querySelector('.variable-input');
+    if (input) input.value = e.target.getAttribute('data-val');
+  }
+});
 
 // --- SETTINGS & UTILS ---
 document.getElementById('btn-settings').addEventListener('click', () => document.getElementById('modal-settings').classList.remove('hidden'));
