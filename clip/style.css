@@ -116,3 +116,7 @@ input[type="file"] { display: none; }
 .add-vault-row { display: flex; gap: 8px; margin-top: 8px; }
 .add-vault-row input { padding: 8px; font-size: 14px !important; }
 .add-vault-row button { padding: 8px 12px; font-size: 14px; width: auto; white-space: nowrap; }
+
+/* Brand Theme Selector */
+.color-swatch { width: 32px; height: 32px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; padding: 0; transition: transform 0.1s; }
+.color-swatch:active { transform: scale(0.85); }
