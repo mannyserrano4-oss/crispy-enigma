@@ -53,6 +53,7 @@
       <div id="action-copy-container" class="modal-actions hidden">
         <button id="btn-copy-snippet" class="success-btn" style="width: 100%; font-size: 18px; padding: 15px;">📋 COPY</button>
         <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <!-- Specific utility colors independent of the brand theme -->
           <button id="btn-sms-snippet" class="primary-btn" style="background: #10b981; flex: 1; font-size: 16px;">💬 Text</button>
           <button id="btn-email-snippet" class="primary-btn" style="background: #3b82f6; flex: 1; font-size: 16px;">📧 Email</button>
         </div>
@@ -81,28 +82,29 @@
     <div class="modal-content">
       <h2>Settings</h2>
       
-      <!-- NEW: Brand Color Picker -->
+      <!-- Brand Color Picker -->
       <div class="settings-group">
         <label style="font-size: 14px; font-weight: bold; margin-bottom: 10px; display: block; color: var(--text-color);">Brand Color</label>
         <div style="display: flex; gap: 15px; margin-bottom: 15px; align-items: center;">
-          <button class="color-swatch" data-color="#3b82f6" style="background: #3b82f6;"></button> <!-- Blue -->
-          <button class="color-swatch" data-color="#10b981" style="background: #10b981;"></button> <!-- Green -->
-          <button class="color-swatch" data-color="#f59e0b" style="background: #f59e0b;"></button> <!-- Gold -->
-          <button class="color-swatch" data-color="#8b5cf6" style="background: #8b5cf6;"></button> <!-- Purple -->
-          <button class="color-swatch" data-color="#1f2937" style="background: #1f2937; border: 1px solid var(--text-muted);"></button> <!-- Dark -->
+          <button class="color-swatch" data-theme="blue" style="background: #3b82f6;"></button>
+          <button class="color-swatch" data-theme="green" style="background: #10b981;"></button>
+          <button class="color-swatch" data-theme="gold" style="background: #f59e0b;"></button>
+          <button class="color-swatch" data-theme="purple" style="background: #8b5cf6;"></button>
+          <button class="color-swatch" data-theme="mono" style="background: #1f2937; border: 1px solid var(--text-muted);"></button>
           <!-- Custom Color Picker Wheel -->
           <input type="color" id="custom-color-picker" style="width: 32px; height: 32px; padding: 0; border: none; background: none; cursor: pointer;">
         </div>
       </div>
 
       <div class="settings-group">
-        <button id="btn-manage-vault" class="primary-btn" style="background: var(--primary);">🗄️ Manage Vault</button>
+        <button id="btn-manage-vault" class="primary-btn">🗄️ Manage Vault</button>
       </div>
       <hr style="border: 0; border-top: 1px solid var(--text-muted); width: 100%; opacity: 0.3; margin: 10px 0;">
       
-      <div class="settings-group"><button id="btn-backup" class="primary-btn">⬇️ Backup (Export)</button></div>
+      <!-- Semantic Utility Buttons (No longer branded) -->
+      <div class="settings-group"><button id="btn-backup" class="secondary-btn">⬇️ Backup (Export)</button></div>
       <div class="settings-group">
-        <label for="input-restore" class="file-upload-label">⬆️ Restore (Import)</label>
+        <label for="input-restore" class="secondary-btn file-upload-label">⬆️ Restore (Import)</label>
         <input type="file" id="input-restore" accept=".json">
       </div>
       <div class="settings-group"><button id="btn-clear-all" class="danger-btn">⚠️ Factory Reset Data</button></div>
@@ -155,8 +157,7 @@
       <h2 style="margin-top: 0; margin-bottom: 5px;">Fill Variables</h2>
       <p class="hint" style="margin-bottom: 15px;">Use 'Next' on keyboard to jump between fields.</p>
       <form id="form-fill-vars" style="display: flex; flex-direction: column; gap: 15px;">
-        <div id="fill-vars-container" style="display: flex; flex-direction: column; gap: 12px; max-height: 50vh; overflow-y: auto;">
-        </div>
+        <div id="fill-vars-container" style="display: flex; flex-direction: column; gap: 12px; max-height: 50vh; overflow-y: auto;"></div>
         <div style="display: flex; gap: 10px; margin-top: 10px;">
           <button type="button" id="btn-fill-cancel" class="secondary-btn" style="flex: 1;">Cancel</button>
           <button type="submit" class="success-btn" style="flex: 1;">Generate & Go</button>
