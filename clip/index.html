@@ -45,15 +45,8 @@
 
       <div class="var-chips-container">
         <span class="hint">Tap to insert at cursor:</span>
-        <div class="var-chips">
-          <button type="button" class="var-chip">[NAME]</button>
-          <button type="button" class="var-chip">[ADDRESS]</button>
-          <button type="button" class="var-chip">[DATE]</button>
-          <button type="button" class="var-chip">[TIME]</button>
-          <button type="button" class="var-chip">[PHONE]</button>
-          <button type="button" class="var-chip">[EMAIL]</button>
-          <button type="button" class="var-chip">[AMOUNT]</button>
-        </div>
+        <!-- JS will populate this based on your Vault -->
+        <div class="var-chips" id="quick-insert-chips"></div>
       </div>
 
       <textarea id="input-text" rows="5" placeholder="Your text here..."></textarea>
@@ -89,7 +82,7 @@
     <div class="modal-content">
       <h2>Settings</h2>
       
-      <!-- NEW: Vault Button -->
+      <!-- Vault Button -->
       <div class="settings-group">
         <button id="btn-manage-vault" class="primary-btn" style="background: #8b5cf6;">🗄️ Manage Vault (Smart Variables)</button>
       </div>
@@ -105,16 +98,14 @@
     </div>
   </div>
 
-  <!-- NEW: Vault Management Modal -->
+  <!-- Vault Management Modal -->
   <div id="modal-vault" class="modal hidden" style="z-index: 150;">
     <div class="modal-content">
       <h2 style="margin-bottom: 5px;">🗄️ My Vault</h2>
       <p class="hint" style="margin-bottom: 15px;">Pre-save options for variables like [ADDRESS] or [EMAIL].</p>
       
-      <!-- List of existing variables and their options -->
       <div id="vault-container" style="max-height: 40vh; overflow-y: auto; display: flex; flex-direction: column; gap: 15px;"></div>
       
-      <!-- Add a completely new variable category -->
       <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--text-muted);">
         <input type="text" id="input-new-vault-cat" placeholder="New Variable Name (e.g., SERVICE)">
         <button id="btn-add-vault-cat" class="primary-btn" style="margin-top: 10px;">Add Variable Category</button>
