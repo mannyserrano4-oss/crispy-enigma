@@ -1,6 +1,6 @@
 // --- 1. INITIALIZATION & STATE ---
 let snippets = [];
-let vault = {}; // The Global Variable Vault
+let vault = {}; 
 
 function loadSnippets() {
   const saved = localStorage.getItem('mySnippets');
@@ -24,7 +24,6 @@ function loadSnippets() {
   if (savedVault) {
     vault = JSON.parse(savedVault);
   } else {
-    // Seed defaults for you based on your workflow!
     vault = {
       "ADDRESS": ["Town 'n' Country, Tampa, FL", "Side Splitters Comedy Club"],
       "EMAIL": ["manuel.serrano@ecolab.com"],
@@ -34,6 +33,7 @@ function loadSnippets() {
   }
 
   renderSnippets();
+  renderQuickInsertChips(); // Draw the chips!
 }
 
 function saveSnippets() { localStorage.setItem('mySnippets', JSON.stringify(snippets)); }
@@ -41,7 +41,42 @@ function saveVault() { localStorage.setItem('myVault', JSON.stringify(vault)); }
 function getActiveSnippets() { return snippets.filter(s => !s.deletedAt); }
 function getUniqueCategories() { return [...new Set(getActiveSnippets().map(s => s.category))]; }
 
-// --- CUSTOM MODAL UTILITIES (Replaces Native Popups) ---
+// --- DYNAMIC QUICK INSERT CHIPS ---
+function renderQuickInsertChips() {
+  const container = document.getElementById('quick-insert-chips');
+  if (!container) return;
+  container.innerHTML = '';
+  
+  // Standard variables everyone uses
+  const standardVars = ['NAME', 'DATE', 'TIME', 'AMOUNT', 'PHONE'];
+  // Custom variables from your vault (e.g. WEBSITE)
+  const vaultVars = Object.keys(vault);
+  
+  // Combine them and remove duplicates
+  const allVars = [...new Set([...standardVars, ...vaultVars])];
+  
+  allVars.forEach(v => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'var-chip';
+    btn.innerText = `[${v}]`;
+    
+    // Wire up the insertion logic
+    btn.addEventListener('click', () => {
+      const textarea = document.getElementById('input-text');
+      const insertText = btn.innerText;
+      const startPos = textarea.selectionStart; 
+      const endPos = textarea.selectionEnd;
+      textarea.value = textarea.value.substring(0, startPos) + insertText + textarea.value.substring(endPos);
+      textarea.selectionStart = textarea.selectionEnd = startPos + insertText.length;
+      textarea.focus();
+    });
+    
+    container.appendChild(btn);
+  });
+}
+
+// --- CUSTOM MODAL UTILITIES ---
 function asyncConfirm(message, confirmBtnText = "Yes", isDanger = true) {
   return new Promise(resolve => {
     document.getElementById('confirm-msg').innerText = message;
@@ -99,31 +134,22 @@ function renderVault() {
     const section = document.createElement('div');
     section.className = 'vault-section';
     
-    // Header (Title + Delete Category Button)
     const header = document.createElement('div');
     header.className = 'vault-section-title';
-    header.innerHTML = `
-      <span>[${category}]</span>
-      <button class="delete-vault-opt" title="Delete entire category">🗑️</button>
-    `;
-    // Delete entire category
+    header.innerHTML = `<span>[${category}]</span><button class="delete-vault-opt" title="Delete entire category">🗑️</button>`;
+    
     header.querySelector('button').addEventListener('click', async () => {
       if (await asyncConfirm(`Delete the variable [${category}] and all its options?`)) {
         delete vault[category];
-        saveVault(); renderVault();
+        saveVault(); renderVault(); renderQuickInsertChips();
       }
     });
     section.appendChild(header);
 
-    // List of existing options
     vault[category].forEach((option, index) => {
       const optDiv = document.createElement('div');
       optDiv.className = 'vault-option-item';
-      optDiv.innerHTML = `
-        <span>${option}</span>
-        <button class="delete-vault-opt" title="Remove option">❌</button>
-      `;
-      // Delete single option
+      optDiv.innerHTML = `<span>${option}</span><button class="delete-vault-opt" title="Remove option">❌</button>`;
       optDiv.querySelector('button').addEventListener('click', () => {
         vault[category].splice(index, 1);
         saveVault(); renderVault();
@@ -131,13 +157,9 @@ function renderVault() {
       section.appendChild(optDiv);
     });
 
-    // Add new option row
     const addRow = document.createElement('div');
     addRow.className = 'add-vault-row';
-    addRow.innerHTML = `
-      <input type="text" placeholder="Add option..." id="input-new-opt-${category}">
-      <button class="primary-btn">Add</button>
-    `;
+    addRow.innerHTML = `<input type="text" placeholder="Add option..." id="input-new-opt-${category}"><button class="primary-btn">Add</button>`;
     addRow.querySelector('button').addEventListener('click', () => {
       const input = document.getElementById(`input-new-opt-${category}`);
       const val = input.value.trim();
@@ -151,17 +173,14 @@ function renderVault() {
   });
 }
 
-// Open Vault
 document.getElementById('btn-manage-vault').addEventListener('click', () => {
   renderVault();
   document.getElementById('modal-vault').classList.remove('hidden');
-  document.getElementById('modal-settings').classList.add('hidden'); // close settings
+  document.getElementById('modal-settings').classList.add('hidden'); 
 });
 
-// Create new Vault Category
 document.getElementById('btn-add-vault-cat').addEventListener('click', () => {
   let newCat = document.getElementById('input-new-vault-cat').value.trim().toUpperCase();
-  // Strip brackets if the user typed them accidentally
   newCat = newCat.replace(/\[|\]/g, ''); 
   
   if (!newCat) return;
@@ -170,6 +189,7 @@ document.getElementById('btn-add-vault-cat').addEventListener('click', () => {
   vault[newCat] = [];
   saveVault();
   renderVault();
+  renderQuickInsertChips(); // Update chips instantly!
   document.getElementById('input-new-vault-cat').value = '';
 });
 
@@ -437,7 +457,7 @@ async function robustCopy(text) {
   }
 }
 
-// --- NEW DISPATCH SYSTEM (WITH VAULT SUGGESTIONS) ---
+// --- DISPATCH SYSTEM (WITH VAULT SUGGESTIONS) ---
 function handleDispatch(snippet, actionType) {
   const matches = snippet.text.match(/\[([^\]]+)\]/g);
 
@@ -462,37 +482,24 @@ function handleDispatch(snippet, actionType) {
     container.innerHTML = ''; 
 
     uniqueVariables.forEach((v, index) => {
-      // Clean brackets for Vault lookup (e.g., "[ADDRESS]" -> "ADDRESS")
       const cleanVar = v.replace(/\[|\]/g, ''); 
-      
       let chipHtml = '';
-      // If we have saved options in the Vault for this variable, build the chips
+      
       if (vault[cleanVar] && vault[cleanVar].length > 0) {
-        // Build the HTML for the chips
         const chipButtons = vault[cleanVar].map(opt => {
-          // Escape quotes so it doesn't break HTML attributes
           const safeOpt = opt.replace(/"/g, '&quot;'); 
           return `<button type="button" class="var-chip suggestion-chip" data-target="var-input-${index}" data-val="${safeOpt}">${opt}</button>`;
         }).join('');
         
-        chipHtml = `
-          <div class="var-chips-container" style="margin-top: 5px; margin-bottom: 0;">
-            <div class="var-chips">${chipButtons}</div>
-          </div>
-        `;
+        chipHtml = `<div class="var-chips-container" style="margin-top: 5px; margin-bottom: 0;"><div class="var-chips">${chipButtons}</div></div>`;
       }
 
       const div = document.createElement('div');
       div.style.display = 'flex'; div.style.flexDirection = 'column'; div.style.gap = '5px';
-      div.innerHTML = `
-        <label class="var-label">${v}</label>
-        <input type="text" data-var="${v}" required placeholder="Enter ${v}..." id="var-input-${index}">
-        ${chipHtml}
-      `;
+      div.innerHTML = `<label class="var-label">${v}</label><input type="text" data-var="${v}" required placeholder="Enter ${v}..." id="var-input-${index}">${chipHtml}`;
       container.appendChild(div);
     });
 
-    // Wire up the suggestion chips to populate their specific input box
     container.querySelectorAll('.suggestion-chip').forEach(chip => {
       chip.addEventListener('click', (e) => {
         const targetId = e.target.getAttribute('data-target');
@@ -527,21 +534,6 @@ function handleDispatch(snippet, actionType) {
   }
 }
 
-// Quick Insert Chips
-document.querySelectorAll('.var-chip:not(.suggestion-chip)').forEach(chip => {
-  chip.addEventListener('click', (e) => {
-    // Make sure we only target the main Add Snippet text box, not the suggestion chips
-    if(e.target.classList.contains('suggestion-chip')) return; 
-    
-    const textarea = document.getElementById('input-text');
-    const insertText = e.target.innerText;
-    const startPos = textarea.selectionStart; const endPos = textarea.selectionEnd;
-    textarea.value = textarea.value.substring(0, startPos) + insertText + textarea.value.substring(endPos);
-    textarea.selectionStart = textarea.selectionEnd = startPos + insertText.length;
-    textarea.focus();
-  });
-});
-
 // --- SETTINGS & UTILS ---
 document.getElementById('btn-settings').addEventListener('click', () => document.getElementById('modal-settings').classList.remove('hidden'));
 document.querySelectorAll('.close-modal').forEach(btn => { btn.addEventListener('click', (e) => e.target.closest('.modal').classList.add('hidden')); });
@@ -559,7 +551,7 @@ document.getElementById('input-restore').addEventListener('change', (event) => {
       let imported = JSON.parse(e.target.result);
       if (Array.isArray(imported)) {
         snippets = imported.map(s => s.id ? s : { ...s, id: Date.now() + Math.random() });
-        saveSnippets(); renderSnippets(); alert('Restored!'); document.getElementById('modal-settings').classList.add('hidden');
+        saveSnippets(); renderSnippets(); renderQuickInsertChips(); alert('Restored!'); document.getElementById('modal-settings').classList.add('hidden');
       } else alert('Invalid file.');
     } catch (err) { alert('Error reading file.'); }
   };
