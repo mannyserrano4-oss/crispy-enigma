@@ -14,7 +14,7 @@ function loadSnippets() {
   } else {
     snippets = [
       { id: 1, title: '✂️ Intro', text: 'MAS Barbery - Mobile Barbering. Contact: Manuel at (555) 555-5555.', category: '💈 Barbering' },
-      { id: 2, title: '💼 Arrival', text: 'Hello [NAME], this is Manuel with Ecolab. I will be arriving at [ADDRESS] on [DATE].', category: '🏢 Work' }
+      { id: 2, title: '💼 Arrival', text: 'Hello [NAME], this is Manuel with Ecolab. I will be arriving at [ADDRESS] on [DATE] around [TIME].', category: '🏢 Work' }
     ];
     saveSnippets();
   }
@@ -24,16 +24,22 @@ function loadSnippets() {
   if (savedVault) {
     vault = JSON.parse(savedVault);
   } else {
+    // Seeded with ALL defaults. Some have pre-filled options, some are left blank for manual typing!
     vault = {
+      "NAME": [],
       "ADDRESS": ["Town 'n' Country, Tampa, FL", "Side Splitters Comedy Club"],
+      "DATE": ["Today", "Tomorrow"],
+      "TIME": ["Morning", "Afternoon", "Evening"],
+      "PHONE": ["(555) 555-5555"],
       "EMAIL": ["manuel.serrano@ecolab.com"],
+      "AMOUNT": [],
       "SERVICE": ["Haircut & Beard Trim", "Pest Control Routine Service"]
     };
     saveVault();
   }
 
   renderSnippets();
-  renderQuickInsertChips(); // Draw the chips!
+  renderQuickInsertChips(); 
 }
 
 function saveSnippets() { localStorage.setItem('mySnippets', JSON.stringify(snippets)); }
@@ -41,19 +47,14 @@ function saveVault() { localStorage.setItem('myVault', JSON.stringify(vault)); }
 function getActiveSnippets() { return snippets.filter(s => !s.deletedAt); }
 function getUniqueCategories() { return [...new Set(getActiveSnippets().map(s => s.category))]; }
 
-// --- DYNAMIC QUICK INSERT CHIPS ---
+// --- DYNAMIC QUICK INSERT CHIPS (100% Vault Driven) ---
 function renderQuickInsertChips() {
   const container = document.getElementById('quick-insert-chips');
   if (!container) return;
   container.innerHTML = '';
   
-  // Standard variables everyone uses
-  const standardVars = ['NAME', 'DATE', 'TIME', 'AMOUNT', 'PHONE'];
-  // Custom variables from your vault (e.g. WEBSITE)
-  const vaultVars = Object.keys(vault);
-  
-  // Combine them and remove duplicates
-  const allVars = [...new Set([...standardVars, ...vaultVars])];
+  // Now, ONLY variables that exist in your Vault will become quick-insert chips!
+  const allVars = Object.keys(vault);
   
   allVars.forEach(v => {
     const btn = document.createElement('button');
@@ -189,7 +190,7 @@ document.getElementById('btn-add-vault-cat').addEventListener('click', () => {
   vault[newCat] = [];
   saveVault();
   renderVault();
-  renderQuickInsertChips(); // Update chips instantly!
+  renderQuickInsertChips(); 
   document.getElementById('input-new-vault-cat').value = '';
 });
 
