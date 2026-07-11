@@ -14,17 +14,15 @@ function loadSnippets() {
   } else {
     snippets = [
       { id: 1, title: '✂️ Intro', text: 'MAS Barbery - Mobile Barbering. Contact: Manuel at (555) 555-5555.', category: '💈 Barbering' },
-      { id: 2, title: '💼 Arrival', text: 'Hello [NAME], this is Manuel with Ecolab. I will be arriving at [ADDRESS] on [DATE] around [TIME].', category: '🏢 Work' }
+      { id: 2, title: '💼 Arrival', text: '[GREETING] [NAME], this is Manuel with Ecolab. I will be arriving at [ADDRESS] on [TODAY] around [NOW].', category: '🏢 Work' }
     ];
     saveSnippets();
   }
   
-  // Load Vault
   const savedVault = localStorage.getItem('myVault');
   if (savedVault) {
     vault = JSON.parse(savedVault);
   } else {
-    // Seeded with ALL defaults. Some have pre-filled options, some are left blank for manual typing!
     vault = {
       "NAME": [],
       "ADDRESS": ["Town 'n' Country, Tampa, FL", "Side Splitters Comedy Club"],
@@ -47,22 +45,28 @@ function saveVault() { localStorage.setItem('myVault', JSON.stringify(vault)); }
 function getActiveSnippets() { return snippets.filter(s => !s.deletedAt); }
 function getUniqueCategories() { return [...new Set(getActiveSnippets().map(s => s.category))]; }
 
-// --- DYNAMIC QUICK INSERT CHIPS (100% Vault Driven) ---
+// --- DYNAMIC QUICK INSERT CHIPS ---
 function renderQuickInsertChips() {
   const container = document.getElementById('quick-insert-chips');
   if (!container) return;
   container.innerHTML = '';
   
-  // Now, ONLY variables that exist in your Vault will become quick-insert chips!
-  const allVars = Object.keys(vault);
+  // Added the new Smart Tags to the top of the list!
+  const smartVars = ['GREETING', 'TODAY', 'NOW'];
+  const vaultVars = Object.keys(vault);
+  const allVars = [...new Set([...smartVars, ...vaultVars])];
   
   allVars.forEach(v => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'var-chip';
+    // Style smart tags slightly differently to distinguish them
+    if (smartVars.includes(v)) {
+      btn.style.backgroundColor = 'var(--primary)';
+      btn.style.color = 'white';
+    }
     btn.innerText = `[${v}]`;
     
-    // Wire up the insertion logic
     btn.addEventListener('click', () => {
       const textarea = document.getElementById('input-text');
       const insertText = btn.innerText;
@@ -75,6 +79,27 @@ function renderQuickInsertChips() {
     
     container.appendChild(btn);
   });
+}
+
+// --- NEW: SMART TAG PROCESSOR ---
+function processSmartTags(text) {
+  const now = new Date();
+  const hours = now.getHours();
+  
+  let greeting = "Good evening";
+  if (hours < 12) greeting = "Good morning";
+  else if (hours < 17) greeting = "Good afternoon";
+
+  const dateString = now.toLocaleDateString();
+  const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  let processed = text;
+  // Globally replace the exact smart tags silently
+  processed = processed.replace(/\[GREETING\]/g, greeting);
+  processed = processed.replace(/\[TODAY\]/g, dateString);
+  processed = processed.replace(/\[NOW\]/g, timeString);
+  
+  return processed;
 }
 
 // --- CUSTOM MODAL UTILITIES ---
@@ -440,7 +465,6 @@ document.getElementById('btn-delete-snippet').addEventListener('click', async ()
   }
 });
 
-
 // --- iOS COPY FALLBACK ---
 async function robustCopy(text) {
   try { await navigator.clipboard.writeText(text); return true; } 
@@ -458,9 +482,13 @@ async function robustCopy(text) {
   }
 }
 
-// --- DISPATCH SYSTEM (WITH VAULT SUGGESTIONS) ---
+// --- DISPATCH SYSTEM (WITH VAULT SUGGESTIONS & SMART TAGS) ---
 function handleDispatch(snippet, actionType) {
-  const matches = snippet.text.match(/\[([^\]]+)\]/g);
+  // 1. Process Smart Tags silently FIRST
+  let textWithSmartTags = processSmartTags(snippet.text);
+
+  // 2. Find any remaining brackets for the user to fill manually
+  const matches = textWithSmartTags.match(/\[([^\]]+)\]/g);
 
   const executeFinalAction = async (finalText) => {
     const index = snippets.findIndex(s => s.id === snippet.id);
@@ -522,7 +550,7 @@ function handleDispatch(snippet, actionType) {
 
     newForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      let processedText = snippet.text;
+      let processedText = textWithSmartTags; // Start with the smart-tagged text
       const inputs = newForm.querySelectorAll('input');
       inputs.forEach(input => {
         processedText = processedText.split(input.getAttribute('data-var')).join(input.value);
@@ -531,7 +559,8 @@ function handleDispatch(snippet, actionType) {
       executeFinalAction(processedText); 
     });
   } else {
-    executeFinalAction(snippet.text);
+    // If no manual variables left, execute instantly
+    executeFinalAction(textWithSmartTags);
   }
 }
 
