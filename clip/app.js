@@ -36,7 +36,6 @@ function loadSnippets() {
     saveVault();
   }
 
-  // Load Saved Brand Theme Engine Settings
   const savedThemeType = localStorage.getItem('themeType');
   if (savedThemeType === 'preset') {
     document.body.setAttribute('data-theme', localStorage.getItem('themeName'));
@@ -57,7 +56,6 @@ function getActiveSnippets() { return snippets.filter(s => !s.deletedAt); }
 function getUniqueCategories() { return [...new Set(getActiveSnippets().map(s => s.category))]; }
 
 // --- DYNAMIC HSL THEME ENGINE ---
-// Converts standard Hex colors into dynamic HSL formats for the CSS engine
 function hexToHSL(hex) {
   let r = parseInt(hex.substring(1,3), 16) / 255;
   let g = parseInt(hex.substring(3,5), 16) / 255;
@@ -79,23 +77,21 @@ function hexToHSL(hex) {
   return [Math.round(h * 360), Math.round(s * 100) + '%', Math.round(l * 100) + '%'];
 }
 
-// Handle Preset Theme Swatches
 document.querySelectorAll('.color-swatch').forEach(swatch => {
   swatch.addEventListener('click', (e) => {
     const themeName = e.target.getAttribute('data-theme');
-    document.body.removeAttribute('style'); // Clear custom HSL overrides
+    document.body.removeAttribute('style'); 
     document.body.setAttribute('data-theme', themeName);
     localStorage.setItem('themeType', 'preset');
     localStorage.setItem('themeName', themeName);
   });
 });
 
-// Handle Custom Color Wheel Picker
 document.getElementById('custom-color-picker').addEventListener('input', (e) => {
   const hex = e.target.value;
   const [h, s, l] = hexToHSL(hex);
   
-  document.body.removeAttribute('data-theme'); // Clear presets
+  document.body.removeAttribute('data-theme');
   document.body.style.setProperty('--primary-h', h);
   document.body.style.setProperty('--primary-s', s);
   document.body.style.setProperty('--primary-l', l);
@@ -106,7 +102,6 @@ document.getElementById('custom-color-picker').addEventListener('input', (e) => 
   localStorage.setItem('customL', l);
   localStorage.setItem('customHex', hex);
 });
-
 
 // --- DYNAMIC QUICK INSERT CHIPS ---
 function renderQuickInsertChips() {
@@ -123,7 +118,6 @@ function renderQuickInsertChips() {
     btn.type = 'button';
     btn.className = 'var-chip';
     
-    // Solid fill for smart tags, soft tint for standard vault tags
     if (smartVars.includes(v)) {
       btn.style.backgroundColor = 'var(--primary)';
       btn.style.color = 'white';
@@ -307,80 +301,21 @@ async function renameFolder(oldName) {
   saveSnippets(); renderSnippets(document.getElementById('input-search').value);
 }
 
-// --- SWIPE-TO-REVEAL & DOUBLE-TAP LOGIC ---
+// --- CARD LOGIC (SINGLE / DOUBLE-TAP ONLY) ---
 function createSnippetCard(snippet) {
-  const wrapper = document.createElement('div');
-  wrapper.className = 'swipe-container';
-  
-  const leftAction = document.createElement('button');
-  leftAction.className = 'swipe-actions action-btn left-action';
-  leftAction.innerText = '📋 Copy';
-  leftAction.addEventListener('click', () => {
-    btn.classList.add('snapping'); btn.style.transform = `translateX(0px)`; btn.dataset.open = "false";
-    handleDispatch(snippet, 'copy');
-  });
-  
-  const rightAction = document.createElement('button');
-  rightAction.className = 'swipe-actions action-btn right-action';
-  rightAction.innerText = '🗑️ Trash';
-  rightAction.addEventListener('click', async () => {
-    const confirmDelete = await asyncConfirm(`Move "${snippet.title}" to the Trash?`);
-    if (confirmDelete) {
-      const index = snippets.findIndex(s => s.id === snippet.id);
-      if (index > -1) { snippets[index].deletedAt = Date.now(); saveSnippets(); renderSnippets(document.getElementById('input-search').value); }
-    } else {
-      btn.classList.add('snapping'); btn.style.transform = `translateX(0px)`; btn.dataset.open = "false";
-    }
-  });
-  
   const btn = document.createElement('button');
-  btn.className = 'snippet-card snapping';
-  btn.dataset.open = "false"; 
+  btn.className = 'snippet-card';
   
   const colors = ['var(--cat-personal)', 'var(--cat-professional)', 'var(--cat-barbering)', 'var(--cat-comedy)', 'var(--cat-proposals)'];
   btn.style.borderLeftColor = colors[snippet.category.length % colors.length];
   btn.innerText = snippet.title;
 
-  let startX = 0, startY = 0, isSwiping = false;
   let clickTimer = null; 
 
-  btn.addEventListener('touchstart', e => {
-    startX = e.touches[0].clientX; startY = e.touches[0].clientY;
-    isSwiping = true; btn.classList.remove('snapping');
-  }, { passive: true });
-
-  btn.addEventListener('touchmove', e => {
-    if (!isSwiping) return;
-    let diffX = e.touches[0].clientX - startX; let diffY = e.touches[0].clientY - startY;
-    if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 5) {
-      isSwiping = false; if (btn.dataset.open === "false") btn.style.transform = `translateX(0px)`; return;
-    }
-    if (btn.dataset.open === "false") {
-      if (diffX > 100) diffX = 100; if (diffX < -100) diffX = -100;
-      btn.style.transform = `translateX(${diffX}px)`;
-    }
-  }, { passive: true });
-
-  btn.addEventListener('touchend', e => {
-    if (!isSwiping) return;
-    let diffX = e.changedTouches[0].clientX - startX;
-    btn.classList.add('snapping'); isSwiping = false;
-    if (btn.dataset.open === "false") {
-      if (diffX > 50) { btn.style.transform = `translateX(100px)`; btn.dataset.open = "right"; } 
-      else if (diffX < -50) { btn.style.transform = `translateX(-100px)`; btn.dataset.open = "left"; } 
-      else { btn.style.transform = `translateX(0px)`; }
-    }
-  });
-
   btn.addEventListener('click', () => {
-    if (btn.dataset.open !== "false") {
-      btn.classList.add('snapping'); btn.style.transform = `translateX(0px)`; btn.dataset.open = "false"; return;
-    }
-
     if (clickTimer) {
       clearTimeout(clickTimer);
       clickTimer = null;
-      // HAPTIC FEEDBACK (if supported by device)
       if (navigator.vibrate) navigator.vibrate(50);
       handleDispatch(snippet, 'copy');
     } else {
@@ -391,8 +326,7 @@ function createSnippetCard(snippet) {
     }
   });
 
-  wrapper.appendChild(leftAction); wrapper.appendChild(rightAction); wrapper.appendChild(btn);
-  return wrapper;
+  return btn;
 }
 
 // --- RENDERING MAIN UI ---
@@ -566,7 +500,6 @@ function handleDispatch(snippet, actionType) {
     if (index > -1) { snippets[index].lastUsed = Date.now(); saveSnippets(); renderSnippets(document.getElementById('input-search').value); }
     document.getElementById('modal-snippet').classList.add('hidden');
 
-    // HAPTIC FEEDBACK (if supported by device)
     if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
 
     if (actionType === 'copy') {
