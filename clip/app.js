@@ -490,7 +490,7 @@ async function robustCopy(text) {
   }
 }
 
-// --- DISPATCH SYSTEM ---
+// --- DISPATCH SYSTEM (Fixed Input Finding Logic) ---
 function handleDispatch(snippet, actionType) {
   let textWithSmartTags = processSmartTags(snippet.text);
   const matches = textWithSmartTags.match(/\[([^\]]+)\]/g);
@@ -517,14 +517,14 @@ function handleDispatch(snippet, actionType) {
     const container = document.getElementById('fill-vars-container');
     container.innerHTML = ''; 
 
-    uniqueVariables.forEach((v, index) => {
+    uniqueVariables.forEach((v) => {
       const cleanVar = v.replace(/\[|\]/g, ''); 
       let chipHtml = '';
       
       if (vault[cleanVar] && vault[cleanVar].length > 0) {
         const chipButtons = vault[cleanVar].map(opt => {
           const safeOpt = opt.replace(/"/g, '&quot;'); 
-          return `<button type="button" class="var-chip suggestion-chip" data-target="var-input-${index}" data-val="${safeOpt}">${opt}</button>`;
+          return `<button type="button" class="var-chip suggestion-chip" data-val="${safeOpt}">${opt}</button>`;
         }).join('');
         
         chipHtml = `<div class="var-chips-container" style="margin-top: 5px; margin-bottom: 0;"><div class="var-chips">${chipButtons}</div></div>`;
@@ -532,20 +532,24 @@ function handleDispatch(snippet, actionType) {
 
       const div = document.createElement('div');
       div.style.display = 'flex'; div.style.flexDirection = 'column'; div.style.gap = '5px';
-      div.innerHTML = `<label class="var-label">${v}</label><input type="text" data-var="${v}" required placeholder="Enter ${v}..." id="var-input-${index}">${chipHtml}`;
+      // Added a specific class 'variable-input' to find it easily
+      div.innerHTML = `<label class="var-label">${v}</label><input type="text" class="variable-input" data-var="${v}" required placeholder="Enter ${v}...">${chipHtml}`;
       container.appendChild(div);
     });
 
+    // RE-WIRED: Find the "nearest" input box regardless of ID
     container.querySelectorAll('.suggestion-chip').forEach(chip => {
       chip.addEventListener('click', (e) => {
-        const targetId = e.target.getAttribute('data-target');
+        const parentDiv = e.target.closest('div.var-chips-container').parentElement;
+        const inputField = parentDiv.querySelector('.variable-input');
         const val = e.target.getAttribute('data-val');
-        document.getElementById(targetId).value = val;
+        inputField.value = val;
       });
     });
 
     document.getElementById('modal-fill-vars').classList.remove('hidden');
-    setTimeout(() => document.getElementById('var-input-0').focus(), 100);
+    // Auto-focus first input
+    setTimeout(() => container.querySelector('input').focus(), 100);
 
     const form = document.getElementById('form-fill-vars');
     const newForm = form.cloneNode(true);
@@ -558,7 +562,7 @@ function handleDispatch(snippet, actionType) {
     newForm.addEventListener('submit', (e) => {
       e.preventDefault();
       let processedText = textWithSmartTags; 
-      const inputs = newForm.querySelectorAll('input');
+      const inputs = newForm.querySelectorAll('.variable-input');
       inputs.forEach(input => {
         processedText = processedText.split(input.getAttribute('data-var')).join(input.value);
       });
