@@ -574,8 +574,17 @@ document.getElementById('btn-settings').addEventListener('click', () => document
 document.querySelectorAll('.close-modal').forEach(btn => { btn.addEventListener('click', (e) => e.target.closest('.modal').classList.add('hidden')); });
 
 document.getElementById('btn-backup').addEventListener('click', () => {
-  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(snippets));
-  const a = document.createElement('a'); a.href = dataStr; a.download = "snippets_backup.json"; document.body.appendChild(a); a.click(); a.remove();
+  const data = JSON.stringify(snippets);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = "snippets_backup.json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 });
 
 document.getElementById('input-restore').addEventListener('change', (event) => {
