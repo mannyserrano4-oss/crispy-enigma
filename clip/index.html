@@ -104,9 +104,11 @@
       <!-- Semantic Utility Buttons (No longer branded) -->
       <div class="settings-group"><button id="btn-backup" class="secondary-btn">⬇️ Backup (Export)</button></div>
       <div class="settings-group">
-        <label for="input-restore" class="secondary-btn file-upload-label">⬆️ Restore (Import)</label>
-        <input type="file" id="input-restore" accept=".json">
-      </div>
+  <!-- The 'for' attribute here MUST match the 'id' below -->
+  <label for="input-restore" class="file-upload-label">⬆️ Restore (Import)</label>
+  <input type="file" id="input-restore" accept=".json">
+</div>
+
       <div class="settings-group"><button id="btn-clear-all" class="danger-btn">⚠️ Factory Reset Data</button></div>
       <button class="close-modal secondary-btn">Close</button>
     </div>
