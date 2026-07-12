@@ -147,3 +147,33 @@ details[open] summary.category-title::before { content: '📂'; }
     border: 1px solid var(--text-muted); 
     margin-bottom: 10px;
 }
+
+/* --- ADD THIS TO THE BOTTOM OF YOUR STYLE.CSS --- */
+
+/* 1. Fix: Color Swatches */
+.color-swatch { 
+    width: 36px; height: 36px; border-radius: 50%; 
+    border: 2px solid var(--text-muted); 
+    cursor: pointer; padding: 0; 
+}
+
+#custom-color-picker { 
+    border: 2px solid var(--text-muted); 
+    border-radius: 50%; 
+    overflow: hidden; 
+    width: 36px; height: 36px; 
+    cursor: pointer;
+}
+
+/* 2. Fix: Empty "Recent" state */
+.empty-recent { 
+    color: var(--text-muted); 
+    font-style: italic; 
+    padding: 20px; 
+    width: 100%; 
+    text-align: center; 
+    border: 1px dashed var(--text-muted); 
+    border-radius: 8px; 
+    background: var(--card-bg); 
+    margin-top: 10px;
+}
