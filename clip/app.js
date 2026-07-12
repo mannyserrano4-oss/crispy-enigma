@@ -574,13 +574,15 @@ document.getElementById('btn-settings').addEventListener('click', () => document
 document.querySelectorAll('.close-modal').forEach(btn => { btn.addEventListener('click', (e) => e.target.closest('.modal').classList.add('hidden')); });
 
 document.getElementById('btn-backup').addEventListener('click', () => {
+  const date = new Date();
+  const dateStr = `${date.getMonth() + 1}.${date.getDate()}.${date.getFullYear().toString().slice(-2)}`;
   const data = JSON.stringify(snippets);
   const blob = new Blob([data], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   
   const a = document.createElement('a');
   a.href = url;
-  a.download = "snippets_backup.json";
+  a.download = `snip${dateStr}.json`; // This line now creates the dynamic name
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
