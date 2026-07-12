@@ -187,3 +187,26 @@ details[open] summary.category-title::before { content: '📂'; }
     width: auto !important;
     display: inline-block !important;
 }
+
+/* Fix: Wrap vault items in a pill-shaped container */
+.vault-option-item {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    background: var(--bg-color) !important;
+    padding: 8px 12px !important;
+    border-radius: 8px !important;
+    margin: 5px 0 !important;
+    border: 1px solid var(--text-muted) !important;
+}
+
+/* Fix: Shrink the icons/buttons inside the vault */
+.delete-vault-opt {
+    width: auto !important;
+    padding: 4px 8px !important;
+    font-size: 16px !important;
+    display: inline-block !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: none !important;
+}
