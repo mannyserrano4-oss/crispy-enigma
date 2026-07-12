@@ -101,16 +101,16 @@
       </div>
       <hr style="border: 0; border-top: 1px solid var(--text-muted); width: 100%; opacity: 0.3; margin: 10px 0;">
       
-      <!-- Semantic Utility Buttons (No longer branded) -->
-      <div class="settings-group"><button id="btn-backup" class="secondary-btn">⬇️ Backup (Export)</button></div>
-      <div class="settings-group">
-  <!-- The 'for' attribute here MUST match the 'id' below -->
-  <label for="input-restore" class="secondary-btn file-upload-label">⬆️ Restore (Import)</label>
-  <input type="file" id="input-restore" accept=".json">
-</div>
-
-      <div class="settings-group"><button id="btn-clear-all" class="danger-btn">⚠️ Factory Reset Data</button></div>
-      <button class="close-modal secondary-btn">Close</button>
+      <details style="margin-top: 15px; padding: 10px; border: 1px solid var(--text-muted); border-radius: 8px;">
+  <summary style="cursor:pointer; font-weight:bold; margin-bottom:10px;">📂 Data Management</summary>
+  
+  <div class="settings-group">
+    <button id="btn-backup" class="secondary-btn">⬇️ Backup (Export)</button>
+    <label for="input-restore" id="btn-restore-label" class="file-upload-label">⬆️ Restore (Import)</label>
+    <input type="file" id="input-restore" accept=".json">
+    <button id="btn-clear-all" class="danger-btn">⚠️ Factory Reset Data</button>
+  </div>
+</details>
     </div>
   </div>
 
