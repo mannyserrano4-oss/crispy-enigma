@@ -210,3 +210,20 @@ details[open] summary.category-title::before { content: '📂'; }
     background: transparent !important;
     border: none !important;
 }
+
+/* --- FORCE DISTINCT ACTION COLORS --- */
+
+/* 1. Save button: Always Blue */
+.primary-btn { background: #2563eb !important; color: white !important; }
+
+/* 2. Copy/Text buttons: Always Green */
+.success-btn, #btn-sms-snippet { background: #059669 !important; color: white !important; }
+
+/* 3. Email button: Always Purple/Indigo */
+#btn-email-snippet { background: #6366f1 !important; color: white !important; }
+
+/* 4. Delete button: Always Red */
+.danger-btn { background: #dc2626 !important; color: white !important; }
+
+/* 5. Cancel button: Always Neutral Grey */
+.secondary-btn { background: #6b7280 !important; color: white !important; border: none !important; }
