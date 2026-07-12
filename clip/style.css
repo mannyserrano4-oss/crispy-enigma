@@ -178,3 +178,58 @@ details[open] summary.category-title::before { content: '📂'; }
     background: var(--card-bg); 
     margin-top: 10px;
 }
+
+/* 1. Vault Card Container */
+.vault-section {
+    background: var(--card-bg);
+    border: 1px solid var(--text-muted);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* 2. Variable Title Area */
+.vault-section-title {
+    font-weight: bold;
+    font-size: 16px;
+    color: var(--primary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--text-muted);
+    padding-bottom: 8px;
+}
+
+/* 3. The "Pills" (Options) */
+.vault-option-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-color);
+    padding: 8px 12px;
+    border-radius: 20px; /* Makes them look like pills */
+    margin-bottom: 8px;
+    font-size: 14px;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* 4. Add Option Input Area */
+.add-vault-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.add-vault-row input {
+    margin: 0; /* Removes extra spacing */
+}
+
+.add-vault-row button {
+    margin: 0;
+    padding: 10px;
+    background-color: var(--primary);
+    color: white;
+}
