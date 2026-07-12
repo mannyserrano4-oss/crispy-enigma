@@ -211,19 +211,17 @@ details[open] summary.category-title::before { content: '📂'; }
     border: none !important;
 }
 
-/* --- FORCE DISTINCT ACTION COLORS --- */
+/* --- FIXED ACTION BUTTON COLORS --- */
 
-/* 1. Save button: Always Blue */
-.primary-btn { background: #2563eb !important; color: white !important; }
+/* Copy, Text, Email Buttons */
+#btn-copy-snippet { background: #0891b2 !important; } /* Teal */
+#btn-sms-snippet { background: #059669 !important; }  /* Green */
+#btn-email-snippet { background: #6366f1 !important; } /* Indigo */
 
-/* 2. Copy/Text buttons: Always Green */
-.success-btn, #btn-sms-snippet { background: #059669 !important; color: white !important; }
+/* Data Management Buttons */
+#btn-backup { background: #d97706 !important; color: white !important; border: none !important; } /* Orange */
+#btn-restore-label { background: #0d9488 !important; color: white !important; border: none !important; } /* Teal */
+#btn-clear-all { background: #dc2626 !important; } /* Red */
 
-/* 3. Email button: Always Purple/Indigo */
-#btn-email-snippet { background: #6366f1 !important; color: white !important; }
-
-/* 4. Delete button: Always Red */
-.danger-btn { background: #dc2626 !important; color: white !important; }
-
-/* 5. Cancel button: Always Neutral Grey */
-.secondary-btn { background: #6b7280 !important; color: white !important; border: none !important; }
+/* Save Button */
+#btn-save-snippet { background: #2563eb !important; } /* Blue */
