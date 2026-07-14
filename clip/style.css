@@ -228,5 +228,5 @@ details[open] summary.category-title::before { content: '📂'; }
 
 /* Add space between Recently Used and the Snippets list */
 #recent-container {
-    margin-bottom: 40px !important; /* Adjust this number to make the gap bigger/smaller */
+    margin-bottom: 90px !important; /* Adjust this number to make the gap bigger/smaller */
 }
