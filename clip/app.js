@@ -109,7 +109,7 @@ function renderQuickInsertChips() {
   if (!container) return;
   container.innerHTML = '';
   
-  const smartVars = ['GREETING', 'TODAY', 'NOW'];
+    const smartVars = ['GREETING', 'TODAY', 'TOMORROW', 'NOW'];
   const vaultVars = Object.keys(vault);
   const allVars = [...new Set([...smartVars, ...vaultVars])];
   
@@ -148,14 +148,21 @@ function processSmartTags(text) {
 
   const dateString = now.toLocaleDateString();
   const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  
+  // Calculate tomorrow
+  const tomorrow = new Date(now);
+  tomorrow.setDate(now.getDate() + 1);
+  const tomorrowString = tomorrow.toLocaleDateString();
 
   let processed = text;
   processed = processed.replace(/\[GREETING\]/g, greeting);
   processed = processed.replace(/\[TODAY\]/g, dateString);
+  processed = processed.replace(/\[TOMORROW\]/g, tomorrowString);
   processed = processed.replace(/\[NOW\]/g, timeString);
   
   return processed;
 }
+
 
 // --- CUSTOM MODAL UTILITIES ---
 function asyncConfirm(message, confirmBtnText = "Yes", isDanger = true) {
