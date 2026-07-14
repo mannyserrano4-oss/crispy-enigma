@@ -109,7 +109,10 @@ function renderQuickInsertChips() {
   if (!container) return;
   container.innerHTML = '';
   
-    const smartVars = ['GREETING', 'TODAY', 'TOMORROW', 'NOW'];
+  // Change this line:
+  const smartVars = ['GREETING', 'TODAY', 'TOMORROW', 'DATE:WEDNESDAY']; 
+  // (Adding 'DATE:WEDNESDAY' as a reminder of the syntax)
+
   const vaultVars = Object.keys(vault);
   const allVars = [...new Set([...smartVars, ...vaultVars])];
   
@@ -158,7 +161,9 @@ function processSmartTags(text) {
   processed = processed.replace(/\[GREETING\]/g, greeting);
   processed = processed.replace(/\[TODAY\]/g, dateString);
   processed = processed.replace(/\[TOMORROW\]/g, tomorrowString);
-  processed = processed.replace(/\[NOW\]/g, timeString);
+    // Handle [DATE:...] tags
+  processed = processed.replace(/\[DATE:([^\]]+)\]/g, (match, p1) => getRelativeDate(p1));
+
   
   return processed;
 }
@@ -627,3 +632,28 @@ themeBtn.addEventListener('click', () => {
 
 loadSnippets();
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+
+// Add this to the very bottom of app.js
+function getRelativeDate(input) {
+  const now = new Date();
+  const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  
+  // Handle [DATE:NEXT_WEEK]
+  if (input.includes('NEXT_WEEK')) {
+    const nextWeek = new Date(now);
+    nextWeek.setDate(now.getDate() + 7);
+    return nextWeek.toLocaleDateString();
+  }
+
+  // Handle [DATE:DAYNAME] (e.g., [DATE:WEDNESDAY])
+  const targetDay = days.indexOf(input.toLowerCase());
+  if (targetDay !== -1) {
+    const result = new Date(now);
+    let daysToAdd = targetDay - result.getDay();
+    if (daysToAdd <= 0) daysToAdd += 7;
+    result.setDate(result.getDate() + daysToAdd);
+    return result.toLocaleDateString();
+  }
+  
+  return "Invalid Date";
+}
