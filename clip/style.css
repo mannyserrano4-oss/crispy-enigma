@@ -228,5 +228,10 @@ details[open] summary.category-title::before { content: '📂'; }
 
 /* Add space between Recently Used and the Snippets list */
 #recent-container {
-    margin-bottom: 90px !important; /* Adjust this number to make the gap bigger/smaller */
+    margin-bottom: 40px !important; /* Adjust this number to make the gap bigger/smaller */
+}
+
+/* Add space between "Recently Used" and the dashed box/content below it */
+.recent-section .category-title {
+    margin-bottom: 10px !important;
 }
