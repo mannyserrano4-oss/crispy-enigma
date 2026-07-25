@@ -127,24 +127,26 @@ function renderQuickInsertChips() {
     }
     
     btn.innerText = `[${v}]`;
-    btn.addEventListener('click', async () => {
-      const textarea = document.getElementById('input-text');
-      let insertText = `[${v}]`; // Default behavior
+            btn.addEventListener('click', async () => {
+              const textarea = document.getElementById('input-text');
+              let insertText = `[${v}]`; // Default behavior
 
-      // The Smart Date Logic
-      if (v === 'DATE') {
-        const day = await asyncPrompt("Enter day (e.g., Friday, Next_Week):", "Friday");
-        if (!day) return; // Cancelled
-        insertText = getRelativeDate(day); // Calculate immediately
-      }
+              // The Smart Date Logic
+              if (v === 'DATE') {
+                const day = await asyncPrompt("Enter day (e.g., Friday, Next_Week):", "Friday");
+                if (!day) return; // Cancelled
+                insertText = getRelativeDate(day); // Calculate immediately
+              }
 
-      const startPos = textarea.selectionStart; 
-      const endPos = textarea.selectionEnd;
-      textarea.value = textarea.value.substring(0, startPos) + insertText + textarea.value.substring(endPos);
-      textarea.selectionStart = textarea.selectionEnd = startPos + insertText.length;
-      textarea.focus();
-    });
-}
+              const startPos = textarea.selectionStart; 
+              const endPos = textarea.selectionEnd;
+              textarea.value = textarea.value.substring(0, startPos) + insertText + textarea.value.substring(endPos);
+              textarea.selectionStart = textarea.selectionEnd = startPos + insertText.length;
+              textarea.focus();
+            });
+            container.appendChild(btn); // <-- Added this back!
+          });
+        }
 
 // --- SMART TAG PROCESSOR ---
 function processSmartTags(text) {
@@ -325,7 +327,8 @@ function createSnippetCard(snippet) {
   btn.className = 'snippet-card';
   
   const colors = ['var(--cat-personal)', 'var(--cat-professional)', 'var(--cat-barbering)', 'var(--cat-comedy)', 'var(--cat-proposals)'];
-  btn.style.borderLeftColor = colors[snippet.category.length % colors.length];
+  const catLength = (snippet.category || '').length;
+  btn.style.borderLeftColor = colors[catLength % colors.length];
   btn.innerText = snippet.title;
 
   let clickTimer = null; 
