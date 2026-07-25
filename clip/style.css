@@ -244,7 +244,7 @@ details[open] summary.category-title::before { content: '📂'; }
     display: none !important;
 }
 
-/* Center Recently Used title and row */
+/* 1. Center the "Recently Used" title, but keep its cards left-aligned */
 .recent-section {
     text-align: center;
 }
@@ -252,14 +252,18 @@ details[open] summary.category-title::before { content: '📂'; }
     justify-content: center !important;
 }
 .recent-scroll {
-    justify-content: center !important;
+    justify-content: flex-start !important; /* Keeps recent items starting from the left */
 }
 
-/* Center Folder/Category headers */
+/* 2. Center the Folder/Category headers */
 details.category-section summary.category-title {
-    text-align: center;
+    justify-content: center !important;
 }
 details.category-section summary.category-title span {
-    text-align: center;
-    flex-grow: 0 !important; /* Keeps the text centered nicely next to the edit button */
+    flex-grow: 0 !important; /* Keeps the folder title centered neatly next to the edit button */
+}
+
+/* 3. Keep the snippets inside folders tiled to the left */
+details.category-section .details-content {
+    justify-content: flex-start !important;
 }
