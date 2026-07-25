@@ -243,3 +243,23 @@ details[open] summary.category-title::before { content: '📂'; }
 .category-title::before {
     display: none !important;
 }
+
+/* Center Recently Used title and row */
+.recent-section {
+    text-align: center;
+}
+.recent-section .category-title {
+    justify-content: center !important;
+}
+.recent-scroll {
+    justify-content: center !important;
+}
+
+/* Center Folder/Category headers */
+details.category-section summary.category-title {
+    text-align: center;
+}
+details.category-section summary.category-title span {
+    text-align: center;
+    flex-grow: 0 !important; /* Keeps the text centered nicely next to the edit button */
+}
