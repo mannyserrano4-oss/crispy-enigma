@@ -121,10 +121,9 @@ function renderQuickInsertChips() {
     btn.type = 'button';
     btn.className = 'var-chip';
     
-    if (smartVars.includes(v)) {
-      btn.style.backgroundColor = 'var(--primary)';
-      btn.style.color = 'white';
-    }
+    // Style ALL chips with the theme color
+    btn.style.backgroundColor = 'var(--primary)';
+    btn.style.color = 'white';
     
     btn.innerText = `[${v}]`;
             btn.addEventListener('click', async () => {
