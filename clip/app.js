@@ -379,7 +379,7 @@ function renderSnippets(filterText = '') {
   const filteredSnippets = activeSnippets.filter(s => 
     s.title.toLowerCase().includes(lowerFilter) || s.text.toLowerCase().includes(lowerFilter) || s.category.toLowerCase().includes(lowerFilter)
   );
-  const categories = [...new Set(filteredSnippets.map(s => s.category))];
+  const categories = [...new Set(filteredSnippets.map(s => s.category))].sort();
 
   categories.forEach(cat => {
     const details = document.createElement('details'); details.className = 'category-section';
