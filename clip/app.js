@@ -110,7 +110,7 @@ function renderQuickInsertChips() {
   container.innerHTML = '';
   
   // Change this line:
-  const smartVars = ['GREETING', 'TODAY', 'TOMORROW', 'DATE:WEDNESDAY']; 
+  const smartVars = ['GREETING', 'TODAY', 'TOMORROW', 'DATE']; 
   // (Adding 'DATE:WEDNESDAY' as a reminder of the syntax)
 
   const vaultVars = Object.keys(vault);
@@ -127,17 +127,23 @@ function renderQuickInsertChips() {
     }
     
     btn.innerText = `[${v}]`;
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
       const textarea = document.getElementById('input-text');
-      const insertText = btn.innerText;
+      let insertText = `[${v}]`; // Default behavior
+
+      // The Smart Date Logic
+      if (v === 'DATE') {
+        const day = await asyncPrompt("Enter day (e.g., Friday, Next_Week):", "Friday");
+        if (!day) return; // Cancelled
+        insertText = getRelativeDate(day); // Calculate immediately
+      }
+
       const startPos = textarea.selectionStart; 
       const endPos = textarea.selectionEnd;
       textarea.value = textarea.value.substring(0, startPos) + insertText + textarea.value.substring(endPos);
       textarea.selectionStart = textarea.selectionEnd = startPos + insertText.length;
       textarea.focus();
     });
-    container.appendChild(btn);
-  });
 }
 
 // --- SMART TAG PROCESSOR ---
