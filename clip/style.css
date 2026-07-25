@@ -235,3 +235,6 @@ details[open] summary.category-title::before { content: '📂'; }
 .recent-section .category-title {
     margin-bottom: 10px !important;
 }
+
+/* General hidden class to hide any element */
+.hidden { display: none !important; }
