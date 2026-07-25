@@ -645,17 +645,30 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
 // Add this to the very bottom of app.js
 function getRelativeDate(input) {
   const now = new Date();
-  const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const cleanInput = input.trim().toUpperCase();
+  const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
   
-  // Handle [DATE:NEXT_WEEK]
-  if (input.includes('NEXT_WEEK')) {
+  // Handle [DATE:TOMORROW]
+  if (cleanInput === 'TOMORROW') {
+    const tomorrow = new Date(now);
+    tomorrow.setDate(now.getDate() + 1);
+    return tomorrow.toLocaleDateString();
+  }
+
+  // Handle [DATE:TWO_WEEKS] or [DATE:NEXT_WEEK]
+  if (cleanInput.includes('TWO_WEEKS')) {
+    const twoWeeks = new Date(now);
+    twoWeeks.setDate(now.getDate() + 14);
+    return twoWeeks.toLocaleDateString();
+  }
+  if (cleanInput.includes('NEXT_WEEK')) {
     const nextWeek = new Date(now);
     nextWeek.setDate(now.getDate() + 7);
     return nextWeek.toLocaleDateString();
   }
 
   // Handle [DATE:DAYNAME] (e.g., [DATE:WEDNESDAY])
-  const targetDay = days.indexOf(input.toLowerCase());
+  const targetDay = days.indexOf(cleanInput);
   if (targetDay !== -1) {
     const result = new Date(now);
     let daysToAdd = targetDay - result.getDay();
