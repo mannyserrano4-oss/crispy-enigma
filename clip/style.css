@@ -238,3 +238,8 @@ details[open] summary.category-title::before { content: '📂'; }
 
 /* General hidden class to hide any element */
 .hidden { display: none !important; }
+
+/* Remove the grey folder icon from category headers */
+.category-title::before {
+    display: none !important;
+}
